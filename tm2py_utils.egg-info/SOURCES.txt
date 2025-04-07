@@ -1,0 +1,14 @@
+LICENSE
+README.md
+pyproject.toml
+tm2py_utils/__init__.py
+tm2py_utils.egg-info/PKG-INFO
+tm2py_utils.egg-info/SOURCES.txt
+tm2py_utils.egg-info/dependency_links.txt
+tm2py_utils.egg-info/requires.txt
+tm2py_utils.egg-info/top_level.txt
+tm2py_utils/acceptance/__init__.py
+tm2py_utils/acceptance/acceptance.py
+tm2py_utils/acceptance/canonical.py
+tm2py_utils/acceptance/observed.py
+tm2py_utils/acceptance/simulated.py

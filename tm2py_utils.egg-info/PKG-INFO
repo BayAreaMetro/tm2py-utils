@@ -1,0 +1,13 @@
+Metadata-Version: 2.1
+Name: tm2py-utils
+Version: 0.1.0
+Summary: Your project description
+Author-email: WSP <example@example.com>
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+# tm2py-utils
+Travel Model Two utilities, including post-processing and summarization
+
+See the [Travel Model Two (tm2) repo](https://github.com/BayAreaMetro/tm2py) for model running. 
