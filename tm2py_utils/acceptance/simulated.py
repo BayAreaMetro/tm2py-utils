@@ -447,7 +447,8 @@ class Simulated:
                 .rename(columns={"i_node": "boarding"})
                 .copy()
             )
-            i_df["boarding"] = i_df["boarding"].astype(int)
+            i_df["boarding"] = i_df["boarding"].astype(int, errors="ignore")
+
             i_df = i_df[i_df["boarding"] > 0].copy()
             i_df = i_df.reset_index(drop=True)
 
@@ -457,7 +458,7 @@ class Simulated:
                 .copy()
             )
             j_df = j_df[j_df["boarding"] != "None"].copy()
-            j_df["boarding"] = j_df["boarding"].astype(int)
+            j_df["boarding"] = j_df["boarding"].astype(int, errors="ignore")
             j_df = j_df[j_df["boarding"] > 0].copy()
             j_df = j_df.reset_index(drop=True)
 
