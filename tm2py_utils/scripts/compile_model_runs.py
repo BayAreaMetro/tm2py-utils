@@ -1,3 +1,7 @@
+# Intended for comparing the assigned volumes across model runes
+# the script will wildcard match from the imput directory as follows:
+#  "run_*/Scenario_*/emme_links.shp"
+# and then concatinate the links into a single file for comparisons 
 # %%
 import geopandas as gpd
 import pandas as pd
@@ -9,6 +13,12 @@ from shapely.geometry import LineString
 input_dir = Path(
     r"Z:\MTC\US0024934.9168\Task_3_runtime_improvements\3.1_network_fidelity\run_result"
 )
+
+wide_links_table_output_path = Path(
+        r"Z:\MTC\US0024934.9168\Task_3_runtime_improvements\3.1_network_fidelity\output_summaries\all_links_data"
+    )
+    / "all_data_wide.geojson"
+
 output_dir = input_dir / "consolidated_3"
 
 
@@ -161,10 +171,7 @@ links_wide_table = links_wide_table.drop(columns=ft_cols)
 
 # %%
 links_wide_table.to_file(
-    Path(
-        r"Z:\MTC\US0024934.9168\Task_3_runtime_improvements\3.1_network_fidelity\output_summaries\all_links_data"
-    )
-    / "all_data_wide.geojson"
+    wide_links_table_output_path
 )
 
 
