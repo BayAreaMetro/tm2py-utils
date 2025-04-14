@@ -7,7 +7,14 @@ authors = [
 ]
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = ["geopandas"]
+dependencies = [
+  "geopandas",
+  "toml",          
+  "pydantic<2.0",
+  "requests",
+  "scipy",
+  "openmatrix",
+]
 
 [build-system]
 requires = ["setuptools>=61.0"]
