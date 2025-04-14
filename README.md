@@ -58,7 +58,6 @@ from tm2py_utils.acceptance.simulated import Simulated
 from tm2py_utils.acceptance.acceptance import Acceptance
 
 # Note, these will have to point to the correct files of a successfully run model
-# examples can be found
 scenario_config_file = "scenario_config.toml"
 model_config_file = "model_config.toml"
 canonical_crosswalk_file = "acceptance/canonical_crosswalk.toml"
