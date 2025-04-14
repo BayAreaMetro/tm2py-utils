@@ -15,9 +15,8 @@ input_dir = Path(
 )
 
 wide_links_table_output_path = Path(
-        r"Z:\MTC\US0024934.9168\Task_3_runtime_improvements\3.1_network_fidelity\output_summaries\all_links_data"
-    )
-    / "all_data_wide.geojson"
+    r"Z:\MTC\US0024934.9168\Task_3_runtime_improvements\3.1_network_fidelity\output_summaries\all_links_data"
+) / "all_data_wide.geojson"
 
 output_dir = input_dir / "consolidated_3"
 
