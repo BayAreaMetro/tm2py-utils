@@ -1,0 +1,96 @@
+# config.yaml
+
+constants:
+  ACS_PUMS_5YEAR_LATEST: 2022
+  ACS_PUMS_1YEAR_LATEST: 2023
+  ACS_5YEAR_LATEST: 2022  # Same as ACS_PUMS_5YEAR_LATEST
+  LODES_YEAR_LATEST: 2022
+  EMPRES_LODES_WEIGHT: 0.5
+  DOLLARS_2000_to_202X:
+    "2021": 1.72
+    "2022": 1.81
+    "2023": 1.88  # Estimated based on trend
+  NAICS2_EMPSIX:
+    "NAICS 11": "AGREMPN"
+    "NAICS 21": "AGREMPN"
+    "NAICS 22": "MWTEMPN"
+    "NAICS 23": "OTHEMPN"
+    "NAICS 31-33": "MWTEMPN"
+    "NAICS 42": "MWTEMPN"
+    "NAICS 44-45": "RETEMPN"
+    "NAICS 48-49": "MWTEMPN"
+    "NAICS 51": "OTHEMPN"
+    "NAICS 52": "FPSEMPN"
+    "NAICS 53": "FPSEMPN"
+    "NAICS 54": "FPSEMPN"
+    "NAICS 55": "FPSEMPN"
+    "NAICS 56": "FPSEMPN"
+    "NAICS 61": "HEREMPN"
+    "NAICS 62": "HEREMPN"
+    "NAICS 71": "HEREMPN"
+    "NAICS 72": "HEREMPN"
+    "NAICS 81": "HEREMPN"
+    "NAICS 92": "OTHEMPN"
+  years:
+    - 2023
+
+geo_constants:
+  BAY_AREA_COUNTY_FIPS:
+    "06001": "Alameda"
+    "06013": "Contra Costa"
+    "06041": "Marin"
+    "06055": "Napa"
+    "06075": "San Francisco"
+    "06081": "San Mateo"
+    "06085": "Santa Clara"
+    "06095": "Solano"
+    "06097": "Sonoma"
+
+  BAY_AREA_COUNTIES:
+    - Alameda
+    - Contra Costa
+    - Marin
+    - Napa
+    - San Francisco
+    - San Mateo
+    - Santa Clara
+    - Solano
+    - Sonoma
+
+  BAYCOUNTIES:
+    - "001"
+    - "013"
+    - "041"
+    - "055"
+    - "075"
+    - "081"
+    - "085"
+    - "095"
+    - "097"
+
+  STATE_CODE: "06"
+
+  BA_COUNTY_FIPS_CODES:
+    "001": "06"
+    "013": "06"
+    "041": "06"
+    "055": "06"
+    "075": "06"
+    "081": "06"
+    "085": "06"
+    "095": "06"
+    "097": "06"
+
+paths:
+  userprofile_default: "${USERPROFILE}"
+  box_tm_default: "C:/Box/Modeling and Surveys"
+  box_tm_lzorn_drive_E: "E:/Box/Modeling and Surveys"
+  pba_taz_2015: "${BOX_TM}/Share Data/plan-bay-area-2050/tazdata/PBA50_FinalBlueprintLandUse_TAZdata.xlsx"
+  tm1_root: "."
+  lodes_employment_csv: "${TM1}/${LODES_YEAR}/lodes_wac_employment_${LODES_YEAR}.csv"
+  self_employed_csv: "${TM1}/${YEAR}/taz_self_employed_workers_${YEAR}.csv"
+  lehd_lodes_csv: "M:/Data/Census/LEHD/Origin-Destination Employment Statistics (LODES)/LODES_Bay_Area_county_${LODES_YEAR}.csv"
+  taz_sd_county_csv: "../geographies/taz-superdistrict-county.csv"
+  census_api_key_file: "M:/Data/Census/API/api-key.txt"
+  block2020_to_taz1454_csv: "M:/Data/GIS layers/TM1_taz_census2020/2020block_to_TAZ1454.csv"
+
