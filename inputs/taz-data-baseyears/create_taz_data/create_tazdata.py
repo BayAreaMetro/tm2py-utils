@@ -232,13 +232,25 @@ def main() -> None:
     df_blocks = census_to_df(blocks)
 
         # 2) Fetch ACS5 block-group income buckets for each county
-    # Define income variables (ACS B19001 buckets)
-    income_vars = [f'B19001_{i:03d}' for i in range(2, 18)]
+        # Define fetch variables with ACS estimate suffix (E)
+    fetch_vars = [f'B19001_{i:03d}E' for i in range(2, 18)]
+    # Define income_vars without suffix for downstream processing
+    income_vars = [var[:-1] for var in fetch_vars]
     geo_cfg = _cfg['geo_constants']
     state_code = geo_cfg['STATE_CODE']
     bg_income_records = []
     county_codes = list(geo_cfg['BA_COUNTY_FIPS_CODES'].keys())
     for county_code in county_codes:
+        recs = retrieve_census_variables(
+            c,
+            YEAR,
+            'acs5',
+            fetch_vars,
+            for_geo='block group',
+            state=state_code,
+            county=county_code
+        )
+        bg_income_records.extend(recs)
         recs = retrieve_census_variables(
             c,
             YEAR,
@@ -249,13 +261,9 @@ def main() -> None:
             county=county_code
         )
         bg_income_records.extend(recs)
-    df_bg_inc = census_to_df(bg_income_records)
+        df_bg_inc = census_to_df(bg_income_records)
+
     # Build block-group GEOID
-    
-        + df_bg_inc['county'].str.zfill(3)
-        + df_bg_inc['tract']
-        + df_bg_inc['block group']
-    )
     df_bg_inc['GEOID_BG'] = (
         df_bg_inc['state'].str.zfill(2)
         + df_bg_inc['county'].str.zfill(3)
@@ -263,37 +271,26 @@ def main() -> None:
         + df_bg_inc['block group']
     )
 
-        # 3) Merge block‑group income onto block‑level via crosswalk
-    # Debug: inspect income DataFrame columns
-    logging.info(f"Block‑group income columns: {df_bg_inc.columns.tolist()}")
-
-    # Identify geography columns case‑insensitively
-    cols_lower = {col.lower(): col for col in df_bg_inc.columns}
-    state_col = cols_lower.get('state')
-    county_col = cols_lower.get('county')
-    tract_col = cols_lower.get('tract')
-    bg_col = cols_lower.get('block group')
-    if not (state_col and county_col and tract_col and bg_col):
-        raise KeyError(
-            f"Missing geography columns in block‑group income data: "
-            f"{df_bg_inc.columns.tolist()}"
-        )
-
-    # Build block‑group GEOID
-    df_bg_inc['GEOID_BG'] = (
-        df_bg_inc[state_col].str.zfill(2)
-        + df_bg_inc[county_col].str.zfill(3)
-        + df_bg_inc[tract_col]
-        + df_bg_inc[bg_col]
-    )
-
     # Load block→block group crosswalk
     cw_path = resolve(_cfg['paths']['block_to_blockgroup_csv'])
     cw = pd.read_csv(cw_path)
     # cw must have columns ['BLOCKID', 'GEOID_BG']
 
-    # Merge crosswalk
+    # Merge crosswalk onto blocks
     df_blocks = df_blocks.merge(
+        cw[['BLOCKID', 'GEOID_BG']],
+        left_on='GEOID',
+        right_on='BLOCKID',
+        how='left'
+    )
+
+    # Merge income variables using the computed GEOID_BG
+    df_blocks = df_blocks.merge(
+        df_bg_inc.set_index('GEOID_BG')[income_vars],
+        left_on='GEOID_BG',
+        right_index=True,
+        how='left'
+    )(
         cw[['BLOCKID', 'GEOID_BG']],
         left_on='GEOID',
         right_on='BLOCKID',
@@ -337,7 +334,7 @@ def main() -> None:
         disagg, hhinc_map, 'P1_001N', income_vars
     )
     gq_df = update_gqpop_to_county_totals(
-        county_df, hhinc_map, ACS_PUMS_1YEAR_LATEST
+        county_df, hhinc_map, ACS_PUMS_1YR_LATEST 
     )
 
     # [output routines unchanged]
