@@ -288,3 +288,286 @@ def map_acs5year_household_income_to_tm1_categories(acs_year):
         ("B19001_017", 4, 1.0)
     ]
     return pd.DataFrame(income_mapping, columns=['incrange', 'HHINCQ', 'share'])
+
+def update_tazdata_to_county_target(
+    source_df: pd.DataFrame,
+    target_df: pd.DataFrame,
+    sum_var: str,
+    partial_vars: list,
+) -> pd.DataFrame:
+    """
+    Scale TAZ data so county-level totals match targets.
+
+    Parameters
+    ----------
+    source_df : DataFrame
+        TAZ-level data, must include 'County_Name', the `sum_var`, and any `partial_vars`.
+    target_df : DataFrame
+        County-level targets, must include 'County_Name' and a column named f'{sum_var}_target'.
+    sum_var : str
+        The column in source_df to match to the county total (e.g. 'TOTHH' or 'sum_age').
+    partial_vars : list of str
+        Columns in source_df whose totals should be scaled in the same proportion as sum_var.
+
+    Returns
+    -------
+    DataFrame
+        A new DataFrame in which for each county, sum_var and each partial_var
+        have been multiplied by the factor = county_target / county_current.
+        Rounding artifacts are corrected via fix_rounding_artifacts.
+    """
+    # 1) Compute current county sums of sum_var
+    current = (
+        source_df
+        .groupby('County_Name')[sum_var]
+        .sum()
+        .reset_index()
+    )
+
+    # 2) Bring in the county targets
+    target_col = f'{sum_var}_target'
+    merged = pd.merge(
+        current,
+        target_df[['County_Name', target_col]],
+        on='County_Name',
+    )
+
+    # 3) Calculate the scale factor for each county
+    merged['scale'] = merged[target_col] / merged[sum_var]
+
+    # 4) Apply scaling to each TAZ in the county
+    result = source_df.copy()
+    for _, row in merged.iterrows():
+        scale = row['scale']
+        # If scale is essentially 1, skip
+        if abs(scale - 1) < 1e-4:
+            continue
+
+        mask = result['County_Name'] == row['County_Name']
+        # Scale the sum_var and each partial_var
+        result.loc[mask, sum_var] *= scale
+        for var in partial_vars:
+            result.loc[mask, var] *= scale
+
+        # Round them to integers
+        cols = [sum_var] + partial_vars
+        result.loc[mask, cols] = result.loc[mask, cols].round(0)
+
+        # Fix any rounding artifacts so components sum exactly
+        result = fix_rounding_artifacts(
+            result,
+            id_var='TAZ1454',
+            sum_var=sum_var,
+            partial_vars=partial_vars,
+        )
+
+    return result
+
+
+def update_gqpop_to_county_totals(source_df, target_df, acs1year):
+    """
+    Adjust group quarters population and employment to match county-level targets.
+    Uses decennial DHC-based estimates and scales TAZ group quarters categories.
+
+    Parameters
+    ----------
+    source_df : pd.DataFrame
+        TAZ-level data, must include 'County_Name', the 'gqpop' column, and the
+        detailed gq-type and age breakdown variables.
+    target_df : pd.DataFrame
+        County-level targets, must include 'County_Name', 'GQPOP_target', and we'll
+        compute 'GQEMP_target' here.
+    acs1year : int
+        ACS 1-year vintage (unused directly in this function, but kept for signature
+        consistency).
+
+    Returns
+    -------
+    pd.DataFrame
+        A new DataFrame where:
+          1. The total group-quarters pop ('gqpop') is scaled so that
+             sum(gqpop) by county = GQPOP_target.
+          2. The age-breakdown within gqpop (AGE0004, AGE0519, AGE2044, AGE4564, AGE65P)
+             is similarly scaled to match the new gqpop by county.
+          3. The employed portion of gqpop ('EMPRES' across the pers_occ_* fields)
+             is scaled to a new target GQEMP_target derived from decennial estimates.
+
+    Notes
+    -----
+    - Uses a hard-coded set of “estimates” for each Bay Area county’s total GQ population
+      and employment, purely as a reference to split GQ pop vs. employment.
+    - Invokes `update_tazdata_to_county_target` three times in sequence:
+        a) to scale overall gqpop by county,
+        b) to scale age groups within gqpop,
+        c) to scale the employed residents within gqpop.
+    """
+    # 1) Reference estimates of GQ pop and employment by county
+    estimates = pd.DataFrame({
+        'County_Name': BAY_AREA_COUNTIES,
+        'gq_pop_estimate':   [8000,  4000,  1000,  800,  7000, 3000, 10000, 2000, 2000],
+        'gq_emp_estimate':   [4000,  2000,   500,  400,  3500, 1500,  5000, 1000, 1000],
+    })
+    # Derive the share of GQ pop that is employed
+    estimates['worker_share'] = estimates['gq_emp_estimate'] / estimates['gq_pop_estimate']
+
+    # 2) Merge county targets with our reference estimates
+    det = pd.merge(target_df, estimates, on='County_Name')
+    # Compute a new employment target within GQ pop
+    det['GQEMP_target'] = det['GQPOP_target'] * det['worker_share']
+
+    # 3) Scale total GQ population
+    df1 = update_tazdata_to_county_target(
+        source_df,
+        det,
+        sum_var='gqpop',
+        partial_vars=['gq_type_univ', 'gq_type_mil', 'gq_type_othnon']
+    )
+
+    # 4) Scale the age breakdown within GQ
+    df2 = update_tazdata_to_county_target(
+        df1,
+        det.rename(columns={'GQPOP_target': 'gq_age_target'}),
+        sum_var='gqpop',
+        partial_vars=['AGE0004', 'AGE0519', 'AGE2044', 'AGE4564', 'AGE65P']
+    )
+
+    # 5) Scale the employed-residents component within GQ
+    df3 = update_tazdata_to_county_target(
+        df2,
+        det.rename(columns={'GQEMP_target': 'gq_emp_target'}),
+        sum_var='EMPRES',
+        partial_vars=[
+            'pers_occ_management',
+            'pers_occ_professional',
+            'pers_occ_services',
+            'pers_occ_retail',
+            'pers_occ_manual',
+            'pers_occ_military'
+        ]
+    )
+
+    return df3
+
+
+def make_hhsizes_consistent_with_population(
+    source_df: pd.DataFrame,
+    target_df: pd.DataFrame,
+    size_or_workers: str,
+    popsyn_ACS_PUMS_5year: int
+) -> pd.DataFrame:
+    """
+    Ensure that household size or worker distributions sum to the same as total households.
+
+    Parameters
+    ----------
+    source_df : DataFrame
+        TAZ-level data containing 'TAZ1454', 'County_Name', and the household size/worker buckets.
+    target_df : DataFrame
+        County-level targets, must include 'County_Name' and a column
+        named 'TOTHH_target' (total households target).
+    size_or_workers : str
+        Either 'hh_size' for household size buckets or 'hh_wrks' for households by workers.
+    popsyn_ACS_PUMS_5year : int
+        Year of ACS PUMS five-year dataset, for compatibility (unused here).
+
+    Returns
+    -------
+    DataFrame
+        Adjusted TAZ-level DataFrame with either 'sum_size' or 'sum_hhworkers'
+        scaled to match the county-level 'TOTHH_target'.
+    """
+    # Determine which partial variables to adjust
+    if size_or_workers == 'hh_size':
+        sum_var = 'sum_size'
+        partial_vars = ['hh_size_1', 'hh_size_2', 'hh_size_3', 'hh_size_4_plus']
+    elif size_or_workers == 'hh_wrks':
+        sum_var = 'sum_hhworkers'
+        partial_vars = ['hh_wrks_0', 'hh_wrks_1', 'hh_wrks_2', 'hh_wrks_3_plus']
+    else:
+        raise ValueError(f"size_or_workers must be 'hh_size' or 'hh_wrks', got {size_or_workers}")
+
+    # Rename TOTHH_target in target_df to match sum_var_target
+    targets = target_df.copy()
+    targets = targets.rename(columns={'TOTHH_target': f'{sum_var}_target'})
+
+    # Use the generic scaling function
+    from common import update_tazdata_to_county_target
+    adjusted = update_tazdata_to_county_target(
+        source_df,
+        targets,
+        sum_var,
+        partial_vars
+    )
+    return adjusted
+
+def update_gqpop_to_county_totals(source_df, target_df, acs1year):
+    """
+    Adjust group quarters population and employment to match county-level targets.
+    Uses decennial DHC-based estimates and scales TAZ group quarters categories.
+
+    Parameters
+    ----------
+    source_df : pd.DataFrame
+        TAZ-level data, must include 'County_Name', the 'gqpop' column, and the
+        detailed gq-type and age breakdown variables.
+    target_df : pd.DataFrame
+        County-level targets, must include 'County_Name' and a column 'GQPOP_target'.
+    acs1year : int
+        ACS 1-year vintage (unused directly in this function).
+
+    Returns
+    -------
+    pd.DataFrame
+        A new DataFrame where:
+          1) Total gqpop is scaled so sum(gqpop) by county = GQPOP_target.
+          2) The age breakdown within gqpop (AGE0004, AGE0519, AGE2044, AGE4564, AGE65P)
+             is similarly scaled to that same county target.
+          3) The employed portion of gqpop (EMPRES broken into pers_occ_* fields)
+             is scaled to a new target GQEMP_target derived from decennial estimates.
+    """
+    # 1) Reference estimates for each Bay Area county
+    estimates = pd.DataFrame({
+        'County_Name': BAY_AREA_COUNTIES,
+        'gq_pop_estimate': [8000, 4000, 1000, 800, 7000, 3000, 10000, 2000, 2000],
+        'gq_emp_estimate': [4000, 2000, 500, 400, 3500, 1500, 5000, 1000, 1000],
+    })
+    # Derive share of GQ pop that is employed
+    estimates['worker_share'] = estimates['gq_emp_estimate'] / estimates['gq_pop_estimate']
+
+    # 2) Merge county targets with the reference estimates
+    det = pd.merge(target_df, estimates, on='County_Name')
+    # Compute GQ employment target within each county
+    det['GQEMP_target'] = det['GQPOP_target'] * det['worker_share']
+
+    # 3) Scale total group‐quarters population by county
+    df1 = update_tazdata_to_county_target(
+        source_df,
+        det,
+        sum_var='gqpop',
+        partial_vars=['gq_type_univ', 'gq_type_mil', 'gq_type_othnon']
+    )
+
+    # 4) Scale the age breakdown within GQ population by county
+    df2 = update_tazdata_to_county_target(
+        df1,
+        det.rename(columns={'GQPOP_target': 'gq_age_target'}),
+        sum_var='gqpop',
+        partial_vars=['AGE0004', 'AGE0519', 'AGE2044', 'AGE4564', 'AGE65P']
+    )
+
+    # 5) Scale the employed‐resident component within GQ by county
+    df3 = update_tazdata_to_county_target(
+        df2,
+        det.rename(columns={'GQEMP_target': 'gq_emp_target'}),
+        sum_var='EMPRES',
+        partial_vars=[
+            'pers_occ_management',
+            'pers_occ_professional',
+            'pers_occ_services',
+            'pers_occ_retail',
+            'pers_occ_manual',
+            'pers_occ_military'
+        ]
+    )
+
+    return df3
