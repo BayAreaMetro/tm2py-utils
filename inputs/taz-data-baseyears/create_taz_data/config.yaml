@@ -33,6 +33,7 @@ constants:
     "NAICS 92": "OTHEMPN"
   years:
     - 2023
+  DECENNIAL_YEAR: 2020 
 
 geo_constants:
   BAY_AREA_COUNTY_FIPS:

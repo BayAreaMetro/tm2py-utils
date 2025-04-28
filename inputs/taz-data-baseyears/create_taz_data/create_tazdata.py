@@ -30,6 +30,7 @@ VARIABLES = cfg['variables']
 
 # Default processing year from config
 YEAR = CONSTANTS['years'][0]
+DECENNIAL_YEAR = CONSTANTS['DECENNIAL_YEAR']
 ACS_5YR_LATEST = CONSTANTS['ACS_5YEAR_LATEST']
 
 # ------------------------------
@@ -136,9 +137,83 @@ def step2_fetch_acs_bg(c, year):
     
     return df
 
-def step3_fetch_acs_tract(c, year): raise NotImplementedError
+def step3_fetch_acs_tract(c, year=YEAR):
+    var_map    = VARIABLES.get('ACS_TRACT_VARIABLES', {})
+    if not var_map:
+        raise ValueError("CONFIG ERROR: 'ACS_TRACT_VARIABLES' is empty in config.yaml")
 
-def step4_fetch_dhc_tract(c): raise NotImplementedError
+    fetch_vars = [f"{code}E" for code in var_map.values()]
+    state_code = GEO['STATE_CODE']
+    county_codes = list(GEO['BA_COUNTY_FIPS_CODES'].keys())
+
+    tract_records = []
+    for county in county_codes:
+        recs = retrieve_census_variables(
+            c, year, 'acs5', fetch_vars,
+            for_geo='tract', state=state_code, county=county
+        )
+        tract_records.extend(recs)
+
+    if not tract_records:
+        logging.warning(f"No ACS tract records fetched for year {year}")
+        return pd.DataFrame()
+
+    df = census_to_df(tract_records)
+
+    # --- NEW: ensure every desired column exists as a Series before coercion ---
+    for out_col in var_map:
+        if out_col not in df.columns:
+            # create a Series of zeros matching the DataFrame's index
+            df[out_col] = pd.Series(0, index=df.index)
+
+        # now this is guaranteed to be a Series
+        df[out_col] = (
+            pd.to_numeric(df[out_col], errors='coerce')
+              .fillna(0)
+              .astype(int)
+        )
+
+    return df
+
+def step4_fetch_dhc_tract(c, year=YEAR):
+    dec_year = year if year in (2000, 2010, 2020) else DECENNIAL_YEAR
+
+    var_map      = VARIABLES.get('DHC_TRACT_VARIABLES', {})
+    if not var_map:
+        raise ValueError("CONFIG ERROR: 'DHC_TRACT_VARIABLES' is empty in config.yaml")
+
+    fetch_vars   = list(var_map.values())
+    state_code   = GEO['STATE_CODE']
+    county_codes = list(GEO['BA_COUNTY_FIPS_CODES'].keys())
+
+    dhc_records = []
+    for county in county_codes:
+        recs = retrieve_census_variables(
+            c,
+            dec_year,
+            'dec/sf1',      # ← use this endpoint
+            fetch_vars,
+            for_geo='tract',
+            state=state_code,
+            county=county
+        )
+        dhc_records.extend(recs)
+
+    if not dhc_records:
+        logging.warning(f"No DHC tract records fetched for DHC year {dec_year}")
+        return pd.DataFrame()
+
+    df = census_to_df(dhc_records)
+
+    # rename & coerce
+    df = df.rename(columns={code: name for name, code in var_map.items()})
+    for name in var_map:
+        df[name] = (
+            pd.to_numeric(df.get(name, 0), errors='coerce')
+              .fillna(0)
+              .astype(int)
+        )
+    return df
 
 def step5_compute_block_shares(df_blk, df_bg): raise NotImplementedError
 
