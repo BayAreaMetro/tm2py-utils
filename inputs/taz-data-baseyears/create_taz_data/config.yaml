@@ -1,9 +1,9 @@
 # config.yaml
 
 constants:
-  ACS_PUMS_5YEAR_LATEST: 2022
+  ACS_PUMS_5YEAR_LATEST: 2023
   ACS_PUMS_1YEAR_LATEST: 2023
-  ACS_5YEAR_LATEST: 2022
+  ACS_5YEAR_LATEST: 2023
   LODES_YEAR_LATEST: 2022
   EMPRES_LODES_WEIGHT: 0.5
   DOLLARS_2000_to_202X:
@@ -90,10 +90,7 @@ paths:
   taz_sd_county_csv: "../geographies/taz-superdistrict-county.csv"
   census_api_key_file: "M:/Data/Census/API/api-key.txt"
   block2020_to_taz1454_csv: "M:/Data/GIS layers/TM1_taz_census2020/2020block_to_TAZ1454.csv"
-  block_to_blockgroup_csv: "./inputs/block_to_blockgroup.csv"
-  block_to_tract_csv: "./inputs/block_to_tract.csv"
-  taz_crosswalk: "./inputs/taz_crosswalk.csv"
-  taz_weights: "./inputs/taz_weights.csv"
+  taz_crosswalk: "M:/Data/GIS layers/tm2_tract_to_TAZ1454/TAZ1454_Tract20_crosswalk.csv"
   output_root: "./2023/outputs"
 
 variables:

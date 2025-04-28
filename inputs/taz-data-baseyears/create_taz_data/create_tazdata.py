@@ -14,7 +14,9 @@ from pathlib import Path
 
 import pandas as pd
 import yaml
+import requests
 from census import Census
+
 
 # ------------------------------
 # Load configuration
@@ -28,10 +30,14 @@ GEO       = cfg['geo_constants']
 PATHS     = cfg['paths']
 VARIABLES = cfg['variables']
 
+KEY_FILE = PATHS['census_api_key_file']
+with open(KEY_FILE, 'r') as f:
+    CENSUS_API_KEY = f.read().strip()
+
 # Default processing year from config
 YEAR = CONSTANTS['years'][0]
-DECENNIAL_YEAR = CONSTANTS['DECENNIAL_YEAR']
-ACS_5YR_LATEST = CONSTANTS['ACS_5YEAR_LATEST']
+DECENNIAL_YEAR  = CONSTANTS['DECENNIAL_YEAR']
+ACS_5YR_LATEST  = CONSTANTS['ACS_5YEAR_LATEST']
 
 # ------------------------------
 # Import helper functions from common.py
@@ -49,182 +55,256 @@ from common import (
 )
 
 # ------------------------------
-# STUBS FOR EACH STEP
+# STEP 1: Fetch block-level population (Decennial PL)
 # ------------------------------
 def step1_fetch_block_data(c, year):
-    """1) Fetch block-level population (2020 Decennial PL)"""
     df_raw = download_acs_blocks(c, year, 'dec/pl')
     if df_raw.empty:
         logging.error('No block data retrieved; exiting.')
         sys.exit(1)
     df = census_to_df(df_raw)
+    # rename population field
     if 'P1_001N' in df.columns:
         df = df.rename(columns={'P1_001N': 'pop'})
     else:
-        logging.error('Expected P1_001N field not found in block data')
+        logging.error('Expected P1_001N not found in block data')
         sys.exit(1)
-    result = df[['GEOID', 'pop']].copy()
-    result['pop'] = pd.to_numeric(result['pop'], errors='coerce').fillna(0).astype(int)
-    return result
+    df['pop'] = pd.to_numeric(df['pop'], errors='coerce').fillna(0).astype(int)
+    return df[['GEOID', 'pop']]
 
+# ------------------------------
+# STEP 2: Fetch ACS block-group variables
+# ------------------------------
 def step2_fetch_acs_bg(c, year):
-    """
-    2) Fetch ACS5 block‐group estimates for all variables listed in config.yaml:
-       VARIABLES['ACS_BG_VARIABLES'] maps output_name → ACS code (without the “E”).
-    """
-    var_map     = VARIABLES['ACS_BG_VARIABLES']   # e.g. {'tothh_': 'B19001_001', …}
-    state_code  = GEO['STATE_CODE']
-    counties    = GEO['BA_COUNTY_FIPS_CODES']    # e.g. ['001','013',…]
-    
-    # Turn the var_map into a list of (name, code) pairs
-    items       = list(var_map.items())
-    batch_size  = 45
-    batches     = [items[i:i + batch_size] for i in range(0, len(items), batch_size)]
-    
+    var_map    = VARIABLES['ACS_BG_VARIABLES']
+    state_code = GEO['STATE_CODE']
+    counties   = GEO['BA_COUNTY_FIPS_CODES']
+    # batch into <=45 per request
+    items      = list(var_map.items())
+    batches    = [items[i:i+45] for i in range(0, len(items), 45)]
     df_chunks = []
-    
     for batch in batches:
-        # build your fetch list and rename map for *this* batch
-        fetch_vars   = [f"{code}E" for (_, code) in batch]
-        rename_map   = {f"{code}E": name for (name, code) in batch}
-        
-        # pull each county
+        fetch_vars = [f"{code}E" for (_, code) in batch]
+        rename_map = {f"{code}E": name for (name, code) in batch}
         records = []
         for county in counties:
             try:
                 recs = retrieve_census_variables(
                     c, year, 'acs5', fetch_vars,
-                    for_geo  = 'block group',
-                    state    = state_code,
-                    county   = county
+                    for_geo='block group', state=state_code, county=county
                 )
             except Exception as e:
                 logging.warning(f"County {county} failed: {e}")
                 continue
             records.extend(recs)
-        
         if not records:
-            # nothing came back for this batch
             continue
-        
-        # convert & rename
         df_batch = census_to_df(records).rename(columns=rename_map)
         df_chunks.append(df_batch)
-    
     if not df_chunks:
-        logging.error("No ACS data was fetched for *any* batch.")
+        logging.error('No ACS block-group data fetched.')
         return pd.DataFrame()
-    
-    # merge all the batches back together on the geo columns
-    geo_cols = ['state', 'county', 'tract', 'block group']
+    # merge all batches on geo cols
+    geo_cols = ['state','county','tract','block group']
     df = df_chunks[0]
     for df_next in df_chunks[1:]:
         df = df.merge(df_next, on=geo_cols, how='outer')
-    
-    # now coerce every output_name to int, filling any missing with zero
-    for output_name in var_map.keys():
-        if output_name in df.columns:
-        # existing column: coerce to numeric
-            series = (
-                pd.to_numeric(df[output_name], errors='coerce')
-                .fillna(0)
-                .astype(int)
-         )
+    # coerce each var to int
+    for out in var_map.keys():
+        if out in df.columns:
+            df[out] = pd.to_numeric(df[out], errors='coerce').fillna(0).astype(int)
         else:
-         # missing column: create a zero Series
-            series = pd.Series(0, index=df.index, dtype=int)
-        df[output_name] = series
-    
+            df[out] = 0
     return df
 
+# ------------------------------
+# STEP 3: Fetch ACS tract variables
+# ------------------------------
 def step3_fetch_acs_tract(c, year=YEAR):
-    var_map    = VARIABLES.get('ACS_TRACT_VARIABLES', {})
+    var_map      = VARIABLES.get('ACS_TRACT_VARIABLES', {})
     if not var_map:
-        raise ValueError("CONFIG ERROR: 'ACS_TRACT_VARIABLES' is empty in config.yaml")
-
-    fetch_vars = [f"{code}E" for code in var_map.values()]
-    state_code = GEO['STATE_CODE']
-    county_codes = list(GEO['BA_COUNTY_FIPS_CODES'].keys())
-
-    tract_records = []
-    for county in county_codes:
+        raise ValueError('CONFIG ERROR: ACS_TRACT_VARIABLES empty')
+    fetch_vars   = [f"{code}E" for code in var_map.values()]
+    state_code   = GEO['STATE_CODE']
+    counties     = list(GEO['BA_COUNTY_FIPS_CODES'].keys())
+    records = []
+    for county in counties:
         recs = retrieve_census_variables(
             c, year, 'acs5', fetch_vars,
             for_geo='tract', state=state_code, county=county
         )
-        tract_records.extend(recs)
-
-    if not tract_records:
-        logging.warning(f"No ACS tract records fetched for year {year}")
+        records.extend(recs)
+    if not records:
+        logging.warning(f"No tract ACS for {year}")
         return pd.DataFrame()
-
-    df = census_to_df(tract_records)
-
-    # --- NEW: ensure every desired column exists as a Series before coercion ---
-    for out_col in var_map:
-        if out_col not in df.columns:
-            # create a Series of zeros matching the DataFrame's index
-            df[out_col] = pd.Series(0, index=df.index)
-
-        # now this is guaranteed to be a Series
-        df[out_col] = (
-            pd.to_numeric(df[out_col], errors='coerce')
-              .fillna(0)
-              .astype(int)
-        )
-
+    df = census_to_df(records)
+    # ensure all cols exist and numeric
+    for out in var_map.keys():
+        if out not in df.columns:
+            df[out] = 0
+        df[out] = pd.to_numeric(df[out], errors='coerce').fillna(0).astype(int)
     return df
 
-def step4_fetch_dhc_tract(c, year=YEAR):
-    dec_year = year if year in (2000, 2010, 2020) else DECENNIAL_YEAR
+def step4_fetch_dhc_tract(c, year=DECENNIAL_YEAR):
+    """
+    Fetch full 2020 Demographic & Housing Characteristics (DHC) SF1 tables
+    (the PCT19_* series) at the tract level by calling the /data/{year}/dec/dhc 
+    endpoint directly with requests.
+    """
 
-    var_map      = VARIABLES.get('DHC_TRACT_VARIABLES', {})
+    # 1) Your age/sex group‐quarters mapping
+    var_map = VARIABLES.get('DHC_TRACT_VARIABLES', {})
     if not var_map:
         raise ValueError("CONFIG ERROR: 'DHC_TRACT_VARIABLES' is empty in config.yaml")
+    codes = list(var_map.values())
 
-    fetch_vars   = list(var_map.values())
-    state_code   = GEO['STATE_CODE']
-    county_codes = list(GEO['BA_COUNTY_FIPS_CODES'].keys())
+    state = GEO['STATE_CODE']
+    counties = list(GEO['BA_COUNTY_FIPS_CODES'].keys())
 
-    dhc_records = []
-    for county in county_codes:
-        recs = retrieve_census_variables(
-            c,
-            dec_year,
-            'dec/sf1',      # ← use this endpoint
-            fetch_vars,
-            for_geo='tract',
-            state=state_code,
-            county=county
-        )
-        dhc_records.extend(recs)
+    records = []
+    base_url = f"https://api.census.gov/data/{year}/dec/dhc"
 
-    if not dhc_records:
-        logging.warning(f"No DHC tract records fetched for DHC year {dec_year}")
+    # 2) Loop each county, fetch tract‐level DHC
+    for county in counties:
+        params = {
+            "get":    ",".join(codes),
+            "for":    "tract:*",
+            "in":     f"state:{state}+county:{county}",
+            "key":    CENSUS_API_KEY   # if your c object has the key attribute
+        }
+        resp = requests.get(base_url, params=params)
+        resp.raise_for_status()
+
+        data = resp.json()
+        header, *rows = data
+        for row in rows:
+            rec = dict(zip(header, row))
+            records.append(rec)
+
+    if not records:
+        logging.warning(f"No DHC tract records fetched for year {year}")
         return pd.DataFrame()
 
-    df = census_to_df(dhc_records)
-
-    # rename & coerce
+    # 3) Build DataFrame, rename & coerce
+    df = pd.DataFrame(records)
     df = df.rename(columns={code: name for name, code in var_map.items()})
+
     for name in var_map:
         df[name] = (
-            pd.to_numeric(df.get(name, 0), errors='coerce')
+            pd.to_numeric(df[name], errors="coerce")
               .fillna(0)
               .astype(int)
         )
+
     return df
 
-def step5_compute_block_shares(df_blk, df_bg): raise NotImplementedError
+# ------------------------------
+# STEP 5: Disaggregate ACS BG vars to block level
+# ------------------------------
+def step5_compute_block_shares(df_blk, df_bg):
+    # Ensure block-group GEOID exists in df_bg
+    df_bg = df_bg.copy()
+    if 'GEOID' in df_bg.columns:
+        df_bg = df_bg.rename(columns={'GEOID': 'BG_GEOID'})
+    else:
+        # build BG_GEOID from components
+        df_bg['BG_GEOID'] = (
+            df_bg['state'] + df_bg['county'] +
+            df_bg['tract'] + df_bg['block group']
+        )
+    # Prepare the block-level DataFrame
+    df = df_blk.copy()
+    df['BG_GEOID'] = df['GEOID'].str[:12]
+    # Compute total population per block group
+    bg_pop = df.groupby('BG_GEOID')['pop'].sum().reset_index().rename(columns={'pop': 'bg_pop'})
+    df = df.merge(bg_pop, on='BG_GEOID', how='left')
+    # Compute share and handle zero-pop block groups
+    df['pop_share'] = (df['pop'] / df['bg_pop'].replace({0: 1})).fillna(0)
+    # Merge in block-group ACS estimates
+    df = df.merge(df_bg, on='BG_GEOID', how='left')
+    bg_vars = list(VARIABLES['ACS_BG_VARIABLES'].keys())
+    # Disaggregate each ACS variable
+    for var in bg_vars:
+        df[var] = (df['pop_share'] * df[var].fillna(0)).round().astype(int)
+    return df[['GEOID'] + bg_vars]
+# ------------------------------
+# STEP 6: Build working dataset at block geography
+# ------------------------------
+def step6_build_workingdata(df_shares, df_bg, df_tr, df_dhc):
+    df = df_shares.copy()
+    df['state']       = df['GEOID'].str[:2]
+    df['county']      = df['GEOID'].str[2:5]
+    df['tract']       = df['GEOID'].str[5:11]
+    df['block_group'] = df['GEOID'].str[11:12]
+    df['block']       = df['GEOID'].str[12:]
+    df = df.merge(df_tr, on=['state','county','tract'], how='left')
+    df = df.merge(df_dhc, on=['state','county','tract'], how='left')
+    return df
 
-def step6_build_workingdata(df_comb, df_bg, df_tract, df_dhc): raise NotImplementedError
+# ------------------------------
+# STEP 7: Map ACS income bins to TM1 quartiles
+# ------------------------------
+def step7_process_household_income(working, year=ACS_5YR_LATEST):
+    geoid_col = next((c for c in working.columns if 'geoid' in c.lower()), None)
+    if geoid_col is None:
+        raise KeyError('No GEOID column in working DF')
+    map_df = map_acs5year_household_income_to_tm1_categories(year)
+    code_to_var = {code: name for name, code in VARIABLES['ACS_BG_VARIABLES'].items()}
+    out = pd.DataFrame({'GEOID': working[geoid_col]})
+    for q in sorted(map_df['HHINCQ'].unique()):
+        out[f'hhincq{q}'] = 0
+    for _, row in map_df.iterrows():
+        code, quart, share = row['incrange'], row['HHINCQ'], row['share']
+        col = code_to_var.get(code)
+        if col in working.columns:
+            out[f'hhincq{quart}'] += working[col].fillna(0) * share
+    for col in out.columns:
+        if col.startswith('hhincq'):
+            out[col] = out[col].round().astype(int)
+    return out
 
-def step7_process_household_income(working, year): raise NotImplementedError
+# ------------------------------
+# Step 8: Weighted summarize block-group ACS -> TAZ
+# ------------------------------
+def compute_block_weights(paths):
+    cw_path = Path(__file__).parent / Path(paths['block2020_to_taz1454_csv'])
+    df = pd.read_csv(cw_path, dtype={'blockgroup':str})
+    df['block_POPULATION'] = pd.to_numeric(df['block_POPULATION'],errors='coerce').fillna(0)
+    df['group_pop'] = df.groupby('blockgroup')['block_POPULATION'].transform('sum')
+    df['weight'] = df['block_POPULATION'] / df['group_pop']
+    return df[['GEOID','blockgroup','TAZ1454','weight']]
 
-def step8_summarize_to_taz(working, taz_hhinc): raise NotImplementedError
+def step8_summarize_to_taz(df_bg, df_weights):
+    acs_vars = [c for c in df_bg.columns if c!='blockgroup']
+    df = df_weights.merge(df_bg, left_on='blockgroup', right_on='blockgroup', how='left')
+    for var in acs_vars:
+        df[var] = df[var] * df['weight']
+    return df.groupby('TAZ1454')[acs_vars].sum().reset_index()
 
-def step9_integrate_employment(year): raise NotImplementedError
+# ------------------------------
+# Steps 9a/9b: Tract -> TAZ summarize
+# ------------------------------
+def compute_tract_weights(paths):
+    cw_path = Path(__file__).parent / Path(paths['taz_crosswalk'])
+    df = pd.read_csv(cw_path, dtype={'tract':str})
+    if 'weight' not in df.columns:
+        df['weight'] = 1 / df.groupby('TAZ1454')['tract'].transform('count')
+    return df[['tract','TAZ1454','weight']]
 
+def step9_summarize_tract_to_taz(df_tr, df_wt):
+    df = df_wt.merge(df_tr.rename(columns={'GEOID':'tract'}), on='tract', how='left')
+    vars_tr = [c for c in df_tr.columns if c!='GEOID']
+    for var in vars_tr:
+        df[var] = df[var] * df['weight']
+    return df.groupby('TAZ1454')[vars_tr].sum().reset_index()
+
+def step9_integrate_employment(year):
+    # stub: integrate LODES/self-employed
+    raise NotImplementedError
+
+# ------------------------------
+# Steps 10-13: stubs
+# ------------------------------
 def step10_build_county_targets(taz, emp): raise NotImplementedError
 
 def step11_apply_scaling(taz, targets): raise NotImplementedError
@@ -234,8 +314,9 @@ def step12_join_pba2015(taz): raise NotImplementedError
 def step13_write_outputs(taz, year): raise NotImplementedError
 
 # ------------------------------
-# Logging setup
+# Logging and Census client
 # ------------------------------
+
 def setup_logging(year):
     out_dir = Path(os.path.expandvars(PATHS['output_root']).replace('${YEAR}', str(year)))
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -244,43 +325,43 @@ def setup_logging(year):
                         format='%(asctime)s - %(levelname)s - %(message)s',
                         handlers=handlers)
 
-# ------------------------------
-# Census client
-# ------------------------------
 def setup_census_client():
-    key_file = Path(os.path.expandvars(PATHS['census_api_key_file']))
-    api_key = key_file.read_text().strip()
+    api_key = Path(os.path.expandvars(PATHS['census_api_key_file'])).read_text().strip()
     return Census(api_key)
 
 # ------------------------------
-# Main pipeline execution
+# Main pipeline
 # ------------------------------
 def main():
-    # Use configured YEAR instead of CLI args
     setup_logging(YEAR)
     logging.info(f"Starting TAZ pipeline for YEAR={YEAR}")
-
     c = setup_census_client()
 
     outputs = {}
-    outputs['blocks'] = step1_fetch_block_data(c, YEAR)
-    outputs['acs_bg'] = step2_fetch_acs_bg(c, YEAR)
-    outputs['acs_tr'] = step3_fetch_acs_tract(c, min(YEAR + 2, ACS_5YR_LATEST))
-    outputs['dhc_tr'] = step4_fetch_dhc_tract(c)
-    outputs['shares'] = step5_compute_block_shares(outputs['blocks'], outputs['acs_bg'])
-    outputs['working'] = step6_build_workingdata(
+    outputs['blocks']    = step1_fetch_block_data(c, YEAR)
+    outputs['acs_bg']    = step2_fetch_acs_bg(c, YEAR)
+    outputs['acs_tr']    = step3_fetch_acs_tract(c, min(YEAR+2, ACS_5YR_LATEST))
+    outputs['dhc_tr']    = step4_fetch_dhc_tract(c)
+    outputs['shares']    = step5_compute_block_shares(outputs['blocks'], outputs['acs_bg'])
+    outputs['working']   = step6_build_workingdata(
         outputs['shares'], outputs['acs_bg'], outputs['acs_tr'], outputs['dhc_tr']
     )
-    outputs['hhinc'] = step7_process_household_income(outputs['working'], YEAR)
-    outputs['taz'] = step8_summarize_to_taz(outputs['working'], outputs['hhinc'])
-    outputs['emp'] = step9_integrate_employment(YEAR)
-    outputs['targets'] = step10_build_county_targets(outputs['taz'], outputs['emp'])
-    outputs['scaled'] = step11_apply_scaling(outputs['taz'], outputs['targets'])
-    outputs['final'] = step12_join_pba2015(outputs['scaled'])
+    outputs['hhinc']     = step7_process_household_income(outputs['working'], ACS_5YR_LATEST)
+    outputs['weights']   = compute_block_weights(PATHS)
+    df_bg = outputs['hhinc'].rename(columns={'GEOID':'blockgroup'})
+    outputs['taz']       = step8_summarize_to_taz(df_bg, outputs['weights'])
+    outputs['weights_tract'] = compute_tract_weights(PATHS)
+    outputs['taz_tract']    = step9_summarize_tract_to_taz(
+        outputs['acs_tr'], outputs['weights_tract']
+    )
+    outputs['taz_final']  = outputs['taz'].merge(outputs['taz_tract'], on='TAZ1454', how='left')
+    outputs['emp']       = step9_integrate_employment(YEAR)
+    outputs['targets']   = step10_build_county_targets(outputs['taz'], outputs['emp'])
+    outputs['scaled']    = step11_apply_scaling(outputs['taz'], outputs['targets'])
+    outputs['final']     = step12_join_pba2015(outputs['scaled'])
     step13_write_outputs(outputs['final'], YEAR)
 
     logging.info("TAZ data processing complete.")
 
 if __name__ == '__main__':
     main()
-
