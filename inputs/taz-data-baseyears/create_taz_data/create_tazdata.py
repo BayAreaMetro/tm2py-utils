@@ -7,6 +7,30 @@ End-to-end TAZ data pipeline for Travel Model One and Two.
 Loads all settings (constants, paths, geo, variable mappings) from config.yaml.
 Defines 13 sequential steps, each stubbed out for implementation.
 """
+
+# - Household- and population-based variables are based on the ACS5-year dataset which centers around the
+#   given year, or the latest ACS5-year dataset that is available (see variable, ACS_5year). 
+#   The script fetches this data using tidycensus.
+#
+# - ACS block group variables used in all instances where not suppressed. If suppressed at the block group 
+#   level, tract-level data used instead. Suppressed variables may change if ACS_5year is changed. This 
+#   should be checked, as this change could cause the script not to work.
+#
+# - Group quarter data is not available below state level from ACS, so 2020 Decennial census numbers
+#   are used instead, and then scaled (if applicable)
+#
+# - Wage/Salary Employment data is sourced from LODES for the given year, or the latest LODES dataset that is available.
+#   (See variable, LODES_YEAR)
+# - Self-employed persons are also added from taz_self_employed_workers_[year].csv
+# 
+# - If ACS1-year data is available that is more recent than that used above, these totals are used to scale
+#   the above at a county-level.
+#
+# - Employed Residents, which includes people who live *and* work in the Bay Area are quite different
+#   between ACS and LODES, with ACS regional totals being much higher than LODES regional totals.
+#   This script includes a parameter, EMPRES_LODES_WEIGHT, which can be used to specify a blended target
+#   between the two.
+
 import logging
 import os
 import sys
@@ -145,58 +169,46 @@ def step3_fetch_acs_tract(c, year=YEAR):
         df[out] = pd.to_numeric(df[out], errors='coerce').fillna(0).astype(int)
     return df
 
+# Step 4: Fetch DHC tract variables (Detailed Housing Characteristics)
+# ------------------------------
 def step4_fetch_dhc_tract(c, year=DECENNIAL_YEAR):
     """
-    Fetch full 2020 Demographic & Housing Characteristics (DHC) SF1 tables
-    (the PCT19_* series) at the tract level by calling the /data/{year}/dec/dhc 
-    endpoint directly with requests.
+    Download decennial DHC variables for tracts. Raises if no data.
+    Returns DataFrame with columns ['GEOID', <DHC vars>].
     """
-
-    # 1) Your age/sex group‐quarters mapping
+    # choose valid decennial year
+    dec_year = year if year in (2000, 2010, 2020) else DECENNIAL_YEAR
     var_map = VARIABLES.get('DHC_TRACT_VARIABLES', {})
     if not var_map:
-        raise ValueError("CONFIG ERROR: 'DHC_TRACT_VARIABLES' is empty in config.yaml")
-    codes = list(var_map.values())
-
+        raise ValueError("CONFIG ERROR: DHC_TRACT_VARIABLES is empty in config.yaml")
+    fetch_vars = list(var_map.values())
     state = GEO['STATE_CODE']
     counties = list(GEO['BA_COUNTY_FIPS_CODES'].keys())
 
     records = []
-    base_url = f"https://api.census.gov/data/{year}/dec/dhc"
-
-    # 2) Loop each county, fetch tract‐level DHC
-    for county in counties:
-        params = {
-            "get":    ",".join(codes),
-            "for":    "tract:*",
-            "in":     f"state:{state}+county:{county}",
-            "key":    CENSUS_API_KEY   # if your c object has the key attribute
-        }
-        resp = requests.get(base_url, params=params)
-        resp.raise_for_status()
-
-        data = resp.json()
-        header, *rows = data
-        for row in rows:
-            rec = dict(zip(header, row))
-            records.append(rec)
-
+    for cnt in counties:
+        try:
+            recs = retrieve_census_variables(
+                c, dec_year, 'dec/dhc', fetch_vars,
+                for_geo='tract', state=state, county=cnt
+            )
+            records.extend(recs)
+        except Exception as e:
+            logging.error(f"DHC fetch failed for county {cnt}: {e}")
     if not records:
-        logging.warning(f"No DHC tract records fetched for year {year}")
-        return pd.DataFrame()
+        raise RuntimeError(f"No DHC records fetched for decennial year {dec_year}; aborting.")
 
-    # 3) Build DataFrame, rename & coerce
-    df = pd.DataFrame(records)
+    df = census_to_df(records)
+    # rename according to var_map
     df = df.rename(columns={code: name for name, code in var_map.items()})
-
-    for name in var_map:
-        df[name] = (
-            pd.to_numeric(df[name], errors="coerce")
-              .fillna(0)
-              .astype(int)
-        )
-
+    # ensure GEOID column exists
+    if 'GEOID' not in df.columns:
+        if all(k in df.columns for k in ['state','county','tract']):
+            df['GEOID'] = df['state'] + df['county'] + df['tract']
+        else:
+            raise KeyError("Cannot build GEOID: missing components and no GEOID field in DHC output.")
     return df
+
 
 # ------------------------------
 # STEP 5: Disaggregate ACS BG vars to block level
@@ -231,15 +243,57 @@ def step5_compute_block_shares(df_blk, df_bg):
 # STEP 6: Build working dataset at block geography
 # ------------------------------
 def step6_build_workingdata(df_shares, df_bg, df_tr, df_dhc):
+    """
+    Combine block-level shares with tract and DHC data.
+    Diagnostic prints added to inspect df_dhc structure.
+    """
     df = df_shares.copy()
-    df['state']       = df['GEOID'].str[:2]
-    df['county']      = df['GEOID'].str[2:5]
-    df['tract']       = df['GEOID'].str[5:11]
+    # extract block geographies
+    df['state'] = df['GEOID'].str[:2]
+    df['county'] = df['GEOID'].str[2:5]
+    df['tract'] = df['GEOID'].str[5:11]
     df['block_group'] = df['GEOID'].str[11:12]
-    df['block']       = df['GEOID'].str[12:]
-    df = df.merge(df_tr, on=['state','county','tract'], how='left')
-    df = df.merge(df_dhc, on=['state','county','tract'], how='left')
+    df['block'] = df['GEOID'].str[12:]
+
+    # DEBUG: inspect df_tr and df_dhc columns
+    print("DF_TR columns:", df_tr.columns.tolist())
+    print("DF_DHC columns:", df_dhc.columns.tolist())
+
+    # Ensure tract table has 'GEOID' or state/county/tract
+    df_tr2 = df_tr.copy()
+    if 'GEOID' in df_tr2.columns:
+        df_tr2['state'] = df_tr2['GEOID'].str[:2]
+        df_tr2['county'] = df_tr2['GEOID'].str[2:5]
+        df_tr2['tract'] = df_tr2['GEOID'].str[5:11]
+    # merge tract ACS
+    df = df.merge(df_tr2, on=['state','county','tract'], how='left', suffixes=('','_tr'))
+
+    # Ensure DHC table has 'GEOID' or state/county/tract
+    df_dhc2 = df_dhc.copy()
+    if 'GEOID' in df_dhc2.columns:
+        df_dhc2['state'] = df_dhc2['GEOID'].str[:2]
+        df_dhc2['county'] = df_dhc2['GEOID'].str[2:5]
+        df_dhc2['tract'] = df_dhc2['GEOID'].str[5:11]
+    else:
+        # if no GEOID, assume it already has state/county/tract
+        missing = [c for c in ['state','county','tract'] if c not in df_dhc2.columns]
+        if missing:
+            raise KeyError(f"DHC missing columns: {missing}. Columns present: {df_dhc2.columns.tolist()}")
+    # merge DHC
+    df = df.merge(df_dhc2, on=['state','county','tract'], how='left', suffixes=('','_dhc'))
+
+    # drop any duplicate GEOID columns
+    for col in ['GEOID_tr','GEOID_dhc']:
+        if col in df.columns:
+            df = df.drop(columns=[col])
+
+    # fill numeric NAs
+    num_cols = df.select_dtypes(include='number').columns
+    df[num_cols] = df[num_cols].fillna(0)
+
     return df
+
+
 
 # ------------------------------
 # STEP 7: Map ACS income bins to TM1 quartiles
