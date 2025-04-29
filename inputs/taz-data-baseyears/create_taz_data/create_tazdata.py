@@ -173,9 +173,10 @@ def step3_fetch_acs_tract(c, year=YEAR):
 # ------------------------------
 def step4_fetch_dhc_tract(c, year=DECENNIAL_YEAR):
     """
-    Download decennial DHC variables for tracts. Raises if no data.
+    Download decennial DHC variables for tracts using direct API call. Raises if no data.
     Returns DataFrame with columns ['GEOID', <DHC vars>].
     """
+    import requests
     # choose valid decennial year
     dec_year = year if year in (2000, 2010, 2020) else DECENNIAL_YEAR
     var_map = VARIABLES.get('DHC_TRACT_VARIABLES', {})
@@ -185,28 +186,36 @@ def step4_fetch_dhc_tract(c, year=DECENNIAL_YEAR):
     state = GEO['STATE_CODE']
     counties = list(GEO['BA_COUNTY_FIPS_CODES'].keys())
 
-    records = []
+    all_rows = []
     for cnt in counties:
-        try:
-            recs = retrieve_census_variables(
-                c, dec_year, 'dec/dhc', fetch_vars,
-                for_geo='tract', state=state, county=cnt
-            )
-            records.extend(recs)
-        except Exception as e:
-            logging.error(f"DHC fetch failed for county {cnt}: {e}")
-    if not records:
+        url = f"https://api.census.gov/data/{dec_year}/dec/dhc"
+        params = {
+            'get': ",".join(fetch_vars),
+            'for': 'tract:*',
+            'in': f"state:{state}+county:{cnt}",
+            'key': CENSUS_API_KEY
+        }
+        resp = requests.get(url, params=params)
+        if resp.status_code != 200:
+            logging.error(f"DHC request failed (county {cnt}): {resp.status_code} {resp.text}")
+            continue
+        data = resp.json()
+        # first row is header
+        cols = data[0]
+        for row in data[1:]:
+            all_rows.append(dict(zip(cols, row)))
+    if not all_rows:
         raise RuntimeError(f"No DHC records fetched for decennial year {dec_year}; aborting.")
 
-    df = census_to_df(records)
+    df = pd.DataFrame(all_rows)
     # rename according to var_map
     df = df.rename(columns={code: name for name, code in var_map.items()})
-    # ensure GEOID column exists
+    # build GEOID if not present
     if 'GEOID' not in df.columns:
-        if all(k in df.columns for k in ['state','county','tract']):
-            df['GEOID'] = df['state'] + df['county'] + df['tract']
-        else:
-            raise KeyError("Cannot build GEOID: missing components and no GEOID field in DHC output.")
+        df['GEOID'] = df['state'] + df['county'] + df['tract']
+    # convert numeric columns
+    for name in var_map.keys():
+        df[name] = pd.to_numeric(df[name], errors='coerce').fillna(0).astype(int)
     return df
 
 
@@ -214,31 +223,39 @@ def step4_fetch_dhc_tract(c, year=DECENNIAL_YEAR):
 # STEP 5: Disaggregate ACS BG vars to block level
 # ------------------------------
 def step5_compute_block_shares(df_blk, df_bg):
-    # Ensure block-group GEOID exists in df_bg
-    df_bg = df_bg.copy()
-    if 'GEOID' in df_bg.columns:
-        df_bg = df_bg.rename(columns={'GEOID': 'BG_GEOID'})
+    """
+    Disaggregate ACS block-group estimates to blocks by population share.
+    Adds pop_share and applies to all ACS_BG_VARIABLES.
+    """
+    # Prepare block-group ACS DF
+    df_bg2 = df_bg.copy()
+    if 'GEOID' in df_bg2.columns:
+        df_bg2 = df_bg2.rename(columns={'GEOID':'BG_GEOID'})
     else:
-        # build BG_GEOID from components
-        df_bg['BG_GEOID'] = (
-            df_bg['state'] + df_bg['county'] +
-            df_bg['tract'] + df_bg['block group']
-        )
-    # Prepare the block-level DataFrame
+        df_bg2['BG_GEOID'] = df_bg2['state'] + df_bg2['county'] + df_bg2['tract'] + df_bg2['block_group']
+
+    # Prepare block DF
     df = df_blk.copy()
     df['BG_GEOID'] = df['GEOID'].str[:12]
-    # Compute total population per block group
-    bg_pop = df.groupby('BG_GEOID')['pop'].sum().reset_index().rename(columns={'pop': 'bg_pop'})
+
+    # Compute block-group total pop
+    bg_pop = df.groupby('BG_GEOID')['pop'].sum().reset_index().rename(columns={'pop':'bg_pop'})
     df = df.merge(bg_pop, on='BG_GEOID', how='left')
-    # Compute share and handle zero-pop block groups
-    df['pop_share'] = (df['pop'] / df['bg_pop'].replace({0: 1})).fillna(0)
-    # Merge in block-group ACS estimates
-    df = df.merge(df_bg, on='BG_GEOID', how='left')
+    df['pop_share'] = df['pop'] / df['bg_pop'].replace({0:1})
+
+    # DEBUG: inspect
+    logging.info("Block share sample:\n%s", df[['GEOID','pop','bg_pop','pop_share']].head())
+    df = df.merge(df_bg2, on='BG_GEOID', how='left')
     bg_vars = list(VARIABLES['ACS_BG_VARIABLES'].keys())
-    # Disaggregate each ACS variable
+    logging.info("ACS BG values at first block:\n%s", df[bg_vars].iloc[0])
+
+    # Disaggregate each ACS variable to blocks
     for var in bg_vars:
-        df[var] = (df['pop_share'] * df[var].fillna(0)).round().astype(int)
-    return df[['GEOID'] + bg_vars]
+        df[var] = df['pop_share'] * df[var].fillna(0)
+
+    # return fractional shares (we’ll round later)
+    return df[['GEOID'] + bg_vars + ['pop_share']]
+
 # ------------------------------
 # STEP 6: Build working dataset at block geography
 # ------------------------------
@@ -298,24 +315,41 @@ def step6_build_workingdata(df_shares, df_bg, df_tr, df_dhc):
 # ------------------------------
 # STEP 7: Map ACS income bins to TM1 quartiles
 # ------------------------------
-def step7_process_household_income(working, year=ACS_5YR_LATEST):
-    geoid_col = next((c for c in working.columns if 'geoid' in c.lower()), None)
-    if geoid_col is None:
-        raise KeyError('No GEOID column in working DF')
-    map_df = map_acs5year_household_income_to_tm1_categories(year)
-    code_to_var = {code: name for name, code in VARIABLES['ACS_BG_VARIABLES'].items()}
-    out = pd.DataFrame({'GEOID': working[geoid_col]})
-    for q in sorted(map_df['HHINCQ'].unique()):
-        out[f'hhincq{q}'] = 0
-    for _, row in map_df.iterrows():
-        code, quart, share = row['incrange'], row['HHINCQ'], row['share']
-        col = code_to_var.get(code)
-        if col in working.columns:
-            out[f'hhincq{quart}'] += working[col].fillna(0) * share
-    for col in out.columns:
-        if col.startswith('hhincq'):
-            out[col] = out[col].round().astype(int)
+def step7_process_household_income(df_working, year=ACS_5YR_LATEST):
+    """
+    Allocate ACS block-group income categories into TM1 household income quartiles (HHINCQ1–4).
+    Returns a DataFrame with columns ['GEOID','HHINCQ1','HHINCQ2','HHINCQ3','HHINCQ4'].
+    Includes detailed logging of mapping and available columns.
+    """
+    mapping = map_acs5year_household_income_to_tm1_categories(year)
+    # build code->working-col map for income
+    code_to_col = {code: name for name, code in VARIABLES['ACS_BG_VARIABLES'].items() if name.startswith('hhinc')}
+
+    # DEBUG: show code_to_col keys & df_working cols
+    logging.info(f"code_to_col keys: {list(code_to_col.keys())}")
+    logging.info(f"df_working columns: {df_working.columns.tolist()}")
+
+    out = pd.DataFrame({'GEOID': df_working['GEOID']})
+    for q in [1,2,3,4]:
+        out[f'HHINCQ{q}'] = 0.0
+
+    for _, row in mapping.iterrows():
+        acs_code = row['incrange']
+        q = int(row['HHINCQ'])
+        share = float(row['share'])
+        col = code_to_col.get(acs_code)
+        if col is None:
+            logging.warning(f"No mapping for ACS code {acs_code}")
+            continue
+        if col not in df_working.columns:
+            logging.warning(f"Mapped column {col} not in working DF")
+            continue
+        out[f'HHINCQ{q}'] += df_working[col].fillna(0) * share
+
+    for q in [1,2,3,4]:
+        out[f'HHINCQ{q}'] = out[f'HHINCQ{q}'].round().astype(int)
     return out
+
 
 # ------------------------------
 # Step 8: Weighted summarize block-group ACS -> TAZ
