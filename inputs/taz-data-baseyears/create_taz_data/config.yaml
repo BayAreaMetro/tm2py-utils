@@ -90,7 +90,7 @@ paths:
   taz_sd_county_csv: "../geographies/taz-superdistrict-county.csv"
   census_api_key_file: "M:/Data/Census/API/api-key.txt"
   block2020_to_taz1454_csv: "M:/Data/GIS layers/TM1_taz_census2020/2020block_to_TAZ1454.csv"
-  taz_crosswalk: "M:/Data/GIS layers/TM1_taz_census2020/TAZ1454_tract2020_crosswalk.csv.csv"
+  taz_crosswalk: "M:/Data/GIS layers/TM1_taz_census2020/TAZ1454_tract2020_crosswalk.csv"
   output_root: "./2023/outputs"
 
 variables:
