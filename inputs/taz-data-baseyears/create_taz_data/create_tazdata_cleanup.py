@@ -3,75 +3,22 @@
 """
 create_taz_data.py
 
-End-to-end TAZ data pipeline for Travel Model One and Two.
-Loads all settings (constants, paths, geo, variable mappings) from config.yaml.
-Defines 13 sequential steps, each stubbed out for implementation.
+End-to-end TAZ pipeline for Travel Model One and Two.
+Loads settings from config.yaml and runs through steps 1–13.
 """
-
-# - Household- and population-based variables are based on the ACS5-year dataset which centers around the
-#   given year, or the latest ACS5-year dataset that is available (see variable, ACS_5year). 
-#   The script fetches this data using tidycensus.
-#
-# - ACS block group variables used in all instances where not suppressed. If suppressed at the block group 
-#   level, tract-level data used instead. Suppressed variables may change if ACS_5year is changed. This 
-#   should be checked, as this change could cause the script not to work.
-#
-# - Group quarter data is not available below state level from ACS, so 2020 Decennial census numbers
-#   are used instead, and then scaled (if applicable)
-#
-# - Wage/Salary Employment data is sourced from LODES for the given year, or the latest LODES dataset that is available.
-#   (See variable, LODES_YEAR)
-# - Self-employed persons are also added from taz_self_employed_workers_[year].csv
-# 
-# - If ACS1-year data is available that is more recent than that used above, these totals are used to scale
-#   the above at a county-level.
-#
-# - Employed Residents, which includes people who live *and* work in the Bay Area are quite different
-#   between ACS and LODES, with ACS regional totals being much higher than LODES regional totals.
-#   This script includes a parameter, EMPRES_LODES_WEIGHT, which can be used to specify a blended target
-#   between the two.
 
 import logging
 import os
-import sys
 from pathlib import Path
-
 import pandas as pd
 import yaml
 import requests
 from census import Census
 
-
-# ------------------------------
-# Load configuration
-# ------------------------------
-CONFIG_PATH = Path(__file__).parent / 'config.yaml'
-with CONFIG_PATH.open() as f:
-    cfg = yaml.safe_load(f)
-
-CONSTANTS = cfg['constants']
-GEO       = cfg['geo_constants']
-PATHS     = cfg['paths']
-VARIABLES = cfg['variables']
-
-KEY_FILE = PATHS['census_api_key_file']
-with open(KEY_FILE, 'r') as f:
-    CENSUS_API_KEY = f.read().strip()
-
-# Default processing year from config
-YEAR = CONSTANTS['years'][0]
-DECENNIAL_YEAR  = CONSTANTS['DECENNIAL_YEAR']
-ACS_5YR_LATEST  = CONSTANTS['ACS_5YEAR_LATEST']
-
-# ------------------------------
-# Import helper functions from common.py
-# ------------------------------
-sys.path.insert(0, str(Path(__file__).parent))
+# common helpers
 from common import (
     census_to_df,
-    download_acs_blocks,
     retrieve_census_variables,
-    fix_rounding_artifacts,
     map_acs5year_household_income_to_tm1_categories,
     update_gqpop_to_county_totals,
     update_tazdata_to_county_target,
@@ -79,142 +26,104 @@ from common import (
 )
 
 # ------------------------------
-# STEP 1: Fetch block-level population (Decennial PL)
+# Load configuration
 # ------------------------------
-import logging
-import pandas as pd
+BASE_DIR = Path(__file__).parent
+cfg       = yaml.safe_load((BASE_DIR / 'config.yaml').read_text())
+CONSTANTS = cfg['constants']
+GEO       = cfg['geo_constants']
+PATHS     = cfg['paths']
+VARIABLES = cfg['variables']
+CENSUS_KEY= (BASE_DIR / PATHS['census_api_key_file']).read_text().strip()
 
-def step1_fetch_block_data(c, year):
-    """
-    Fetch 2020 dec/pl block‐level total population (P1_001N),
-    construct the 15‐digit block GEOID from state/county/tract/block,
-    derive blockgroup & tract, and keep state & county.
-    Returns columns:
-      - state        : 2-digit state FIPS
-      - county       : 3-digit county FIPS
-      - block_geoid  : full 15-digit block GEOID
-      - blockgroup   : 12-digit block-group FIPS
-      - tract        : 11-digit tract FIPS
-      - pop          : block population (int)
-    """
-    logger = logging.getLogger(__name__)
+# Processing years
+YEAR       = CONSTANTS['years'][0]
+DEC_YEAR   = CONSTANTS['DECENNIAL_YEAR']
+ACS_LATEST = CONSTANTS['ACS_5YEAR_LATEST']
 
-    # Config
-    dec_year     = CONSTANTS['DECENNIAL_YEAR']              # e.g. 2020
-    state_code   = GEO['STATE_CODE']                        # e.g. "06"
-    county_codes = list(GEO['BA_COUNTY_FIPS_CODES'].keys()) # e.g. ["001","013",…]
-    
-    # 1) Retrieve P1_001N from dec/pl
+# ------------------------------
+# Setup functions
+# ------------------------------
+def setup_logging():
+    out_dir = Path(os.path.expandvars(PATHS['output_root']).replace('${YEAR}', str(YEAR)))
+    out_dir.mkdir(parents=True, exist_ok=True)
+    handlers = [logging.StreamHandler(), logging.FileHandler(out_dir / f'create_tazdata_{YEAR}.log')]
+    logging.basicConfig(level=logging.INFO,
+                        format='%(asctime)s - %(levelname)s - %(message)s',
+                        handlers=handlers)
+
+
+def setup_census():
+    return Census(CENSUS_KEY)
+
+# ------------------------------
+# STEP 1: Fetch block data
+# ------------------------------
+def step1_fetch_block_data(client):
+    """
+    Fetch 2020 dec/pl block population and derive geocodes.
+    Returns DataFrame with state, county, block_geoid, blockgroup, tract, pop.
+    """
     records = []
-    for county in county_codes:
+    for county in GEO['BA_COUNTY_FIPS_CODES']:
         try:
             recs = retrieve_census_variables(
-                c, dec_year, 'dec/pl',
-                ['P1_001N'],      # total population
-                for_geo='block',
-                state=state_code,
-                county=county
+                client, DEC_YEAR, 'dec/pl', ['P1_001N'],
+                for_geo='block', state=GEO['STATE_CODE'], county=county
             )
             records.extend(recs)
         except Exception as e:
-            logger.error(f"Error fetching {dec_year} PL for county {county}: {e}")
+            logging.error(f"DEC PL failed for county {county}: {e}")
     df = pd.DataFrame(records)
-    logger.info(f"step1 fetched columns: {df.columns.tolist()}")
+    logging.info(f"Blocks fetched cols: {df.columns.tolist()}")
 
-    # 2) Pad and keep state & county
-    df['state']  = df['state'].astype(str).str.zfill(2)
-    df['county'] = df['county'].astype(str).str.zfill(3)
-
-    # 3) Pad tract (6) and block (4) then build full block_geoid
-    df['tract'] = df['tract'].astype(str).str.zfill(6)
-    df['block'] = df['block'].astype(str).str.zfill(4)
-    df['block_geoid'] = df['state'] + df['county'] + df['tract'] + df['block']
-
-    # 4) Derive blockgroup & tract keys
+    # Build full block_geoid and derive keys
+    df['state']      = df['state'].astype(str).str.zfill(2)
+    df['county']     = df['county'].astype(str).str.zfill(3)
+    df['tract_raw']  = df['tract'].astype(str).str.zfill(6)
+    df['block_raw']  = df['block'].astype(str).str.zfill(4)
+    df['block_geoid']= df['state'] + df['county'] + df['tract_raw'] + df['block_raw']
     df['blockgroup'] = df['block_geoid'].str[:12]
     df['tract']      = df['block_geoid'].str[:11]
+    df['pop']        = pd.to_numeric(df['P1_001N'], errors='coerce').fillna(0).astype(int)
 
-    # 5) Coerce population
-    df['pop'] = (
-        pd.to_numeric(df.get('P1_001N', 0), errors='coerce')
-          .fillna(0)
-          .astype(int)
-    )
-
-    # 6) Return the columns step5 needs
     return df[['state','county','block_geoid','blockgroup','tract','pop']]
 
-
 # ------------------------------
-# STEP 2: Fetch ACS block-group variables
+# STEP 2: Fetch ACS block-group data
 # ------------------------------
-def step2_fetch_acs_bg(c, year):
+def step2_fetch_acs_bg(client):
     """
-    Fetch ACS 5-year block-group vars and return a DataFrame
-    with:
-      - a 12-char padded 'blockgroup' string (no "1500000US" prefix)
-      - one column per VARIABLES['ACS_BG_VARIABLES'] key
+    Fetch ACS5 5-year block-group variables.
+    Returns DataFrame with 12-digit blockgroup and ACS vars.
     """
-    # 1) FIPS codes from config
-    state_code   = GEO['STATE_CODE']                        # e.g. "06"
-    county_codes = list(GEO['BA_COUNTY_FIPS_CODES'].keys()) # e.g. ["001","013",…]
-    
-    # 2) Build the list of API vars with the "E" suffix
-    fetch_vars = [f"{code}E" for code in VARIABLES['ACS_BG_VARIABLES'].values()]
-
-    # 3) Retrieve records
-    records = []
-    for county in county_codes:
+    codes = [f"{v}E" for v in VARIABLES['ACS_BG_VARIABLES'].values()]
+    recs = []
+    for county in GEO['BA_COUNTY_FIPS_CODES']:
         try:
-            recs = retrieve_census_variables(
-                c, year, 'acs5',
-                fetch_vars,
-                for_geo='block group',
-                state=state_code,
-                county=county
-            )
-            records.extend(recs)
+            recs.extend(retrieve_census_variables(
+                client, YEAR, 'acs5', codes,
+                for_geo='block group', state=GEO['STATE_CODE'], county=county
+            ))
         except Exception as e:
-            logger.error(f"Error retrieving ACS BG for county {county}: {e}")
-            continue
+            logging.error(f"ACS BG failed for county {county}: {e}")
+    df = pd.DataFrame(recs)
+    geo_col = next((c for c in df.columns if 'geoid' in c.lower() or c=='block group'), None)
+    if not geo_col:
+        raise KeyError("ACS BG missing GEOID column")
+    df.rename(columns={geo_col:'blockgroup'}, inplace=True)
+    df['blockgroup']= df['blockgroup'].astype(str).str[-12:].str.zfill(12)
+    df.drop(columns=['state','county','tract','block group'], errors='ignore', inplace=True)
 
-    df = pd.DataFrame(records)
-
-    # 4) Rename the geo-ID field → 'blockgroup'
-    for col in ('GEOID', 'GEO_ID', 'geoid', 'block group'):
-        if col in df.columns:
-            df.rename(columns={col: 'blockgroup'}, inplace=True)
-            break
-    else:
-        raise KeyError("ACS BG fetch: no GEOID or 'block group' column found")
-
-    # 5) Strip any prefix and keep only the last 12 characters
-    df['blockgroup'] = (
-        df['blockgroup']
-          .astype(str)
-          .str[-12:]        # take rightmost 12 characters
-          .str.zfill(12)    # ensure 12 digits
-    )
-
-    # 7) Rename your ACS variables and coerce
-    for new_var, old_code in VARIABLES['ACS_BG_VARIABLES'].items():
-        api_var = f"{old_code}E"
-        if api_var in df.columns:
-            df.rename(columns={api_var: new_var}, inplace=True)
-            df[new_var] = (
-                pd.to_numeric(df[new_var], errors='coerce')
-                  .fillna(0)
-                  .astype(int)
-            )
-        else:
-            logger.warning(f"ACS BG: expected {api_var!r} not in results, filling zeros for {new_var}")
-            df[new_var] = 0
-
+    for name, code in VARIABLES['ACS_BG_VARIABLES'].items():
+        df[name] = pd.to_numeric(df.get(f"{code}E",0), errors='coerce').fillna(0).astype(int)
     return df
+
 # ------------------------------
-# STEP 3: Fetch ACS tract variables
+# STEP 3: Fetch ACS tract data
 # ------------------------------
-def step3_fetch_acs_tract(c, year=YEAR):
+def step3_fetch_acs_tract(c):
+    year=YEAR
     var_map      = VARIABLES.get('ACS_TRACT_VARIABLES', {})
     if not var_map:
         raise ValueError('CONFIG ERROR: ACS_TRACT_VARIABLES empty')
@@ -238,8 +147,38 @@ def step3_fetch_acs_tract(c, year=YEAR):
             df[out] = 0
         df[out] = pd.to_numeric(df[out], errors='coerce').fillna(0).astype(int)
     return df
+# ------------------------------
+# STEP 4: Fetch DHC tract data
+# ------------------------------
+def step4_fetch_dhc_tract(client):
+    """
+    Fetch 2020 dec/dhc tract-level group quarters.
+    Returns DataFrame with GEOID and DHC vars.
+    """
+    codes = list(VARIABLES['DHC_TRACT_VARIABLES'].values())
+    rows = []
+    for county in GEO['BA_COUNTY_FIPS_CODES']:
+        res = requests.get(
+            f"https://api.census.gov/data/{DEC_YEAR}/dec/dhc",
+            params={
+                'get':','.join(codes), 'for':'tract:*',
+                'in':f"state:{GEO['STATE_CODE']}+county:{county}", 'key':CENSUS_KEY
+            }
+        )
+        if res.ok:
+            data = res.json(); cols = data[0]
+            for r in data[1:]: rows.append(dict(zip(cols,r)))
+        else:
+            logging.error(f"DHC failed for county {county}: {res.status_code}")
+    df = pd.DataFrame(rows)
+    if 'GEOID' not in df.columns:
+        df['GEOID'] = df['state']+df['county']+df['tract']
+    for name, code in VARIABLES['DHC_TRACT_VARIABLES'].items():
+        df[name] = pd.to_numeric(df.get(code,0), errors='coerce').fillna(0).astype(int)
+    return df
 
-# Step 4: Fetch DHC tract variables (Detailed Housing Characteristics)
+# ------------------------------
+# STEP 5: Disaggregate BG to blocks
 # ------------------------------
 def step4_fetch_dhc_tract(c, year=DECENNIAL_YEAR):
     """
@@ -528,57 +467,90 @@ def step12_join_pba2015(taz): raise NotImplementedError
 def step13_write_outputs(taz, year): raise NotImplementedError
 
 # ------------------------------
-# Logging and Census client
-# ------------------------------
-
-def setup_logging(year):
-    out_dir = Path(os.path.expandvars(PATHS['output_root']).replace('${YEAR}', str(year)))
-    out_dir.mkdir(parents=True, exist_ok=True)
-    handlers = [logging.StreamHandler(), logging.FileHandler(out_dir / f'create_tazdata_{year}.log')]
-    logging.basicConfig(level=logging.INFO,
-                        format='%(asctime)s - %(levelname)s - %(message)s',
-                        handlers=handlers)
-
-def setup_census_client():
-    api_key = Path(os.path.expandvars(PATHS['census_api_key_file'])).read_text().strip()
-    return Census(api_key)
-
-# ------------------------------
 # Main pipeline
 # ------------------------------
 def main():
-
-    setup_logging(YEAR)
-    
-    logging.info(f"Starting TAZ pipeline for YEAR={YEAR}")
-    
-    c = setup_census_client()
-
-    outputs = {}
-    outputs['blocks']    = step1_fetch_block_data(c, YEAR)
-    outputs['acs_bg']    = step2_fetch_acs_bg(c, YEAR)
-    outputs['acs_tr']    = step3_fetch_acs_tract(c, min(YEAR+2, ACS_5YR_LATEST))
-    outputs['dhc_tr']    = step4_fetch_dhc_tract(c)
-    outputs['shares']    = step5_compute_block_shares(outputs['blocks'], outputs['acs_bg'])
-    outputs['working']   = step6_build_workingdata(
-        outputs['shares'], outputs['acs_bg'], outputs['acs_tr'], outputs['dhc_tr']
+    # —————————————————————————————————————————————————————————————
+    # 0) Setup logging & Census client
+    # —————————————————————————————————————————————————————————————
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(levelname)s %(message)s",
     )
-    outputs['hhinc']     = step7_process_household_income(outputs['working'], ACS_5YR_LATEST)
-    outputs['weights']   = compute_block_weights(PATHS)
-    df_bg = outputs['hhinc'].rename(columns={'GEOID':'blockgroup'})
-    outputs['taz']       = step8_summarize_to_taz(df_bg, outputs['weights'])
-    outputs['weights_tract'] = compute_tract_weights(PATHS)
-    outputs['taz_tract']    = step9_summarize_tract_to_taz(
-        outputs['acs_tr'], outputs['weights_tract']
-    )
-    outputs['taz_final']  = outputs['taz'].merge(outputs['taz_tract'], on='TAZ1454', how='left')
-    outputs['emp']       = step9_integrate_employment(YEAR)
-    outputs['targets']   = step10_build_county_targets(outputs['taz'], outputs['emp'])
-    outputs['scaled']    = step11_apply_scaling(outputs['taz'], outputs['targets'])
-    outputs['final']     = step12_join_pba2015(outputs['scaled'])
-    step13_write_outputs(outputs['final'], YEAR)
+    client = Census(CENSUS_API_KEY)
 
-    logging.info("TAZ data processing complete.")
+    # —————————————————————————————————————————————————————————————
+    # 1) Fetch 2020 block‐level population
+    # —————————————————————————————————————————————————————————————
+    blocks = step1_fetch_block_data(client)
 
-if __name__ == '__main__':
+    # —————————————————————————————————————————————————————————————
+    # 2) Fetch ACS5 block‐group estimates
+    # —————————————————————————————————————————————————————————————
+    acs_bg = step2_fetch_acs_bg(client)
+
+    # —————————————————————————————————————————————————————————————
+    # 3) Fetch ACS5 tract‐level estimates
+    # —————————————————————————————————————————————————————————————
+    acs_tr = step3_fetch_acs_tract(client)
+
+    # —————————————————————————————————————————————————————————————
+    # 4) Fetch decennial DHC for tracts
+    # —————————————————————————————————————————————————————————————
+    dhc_tr = step4_fetch_dhc_tract(client)
+
+    # —————————————————————————————————————————————————————————————
+    # 5) Disaggregate ACS BG → blocks
+    # —————————————————————————————————————————————————————————————
+    shares = step5_compute_block_shares(blocks, acs_bg)
+
+    # —————————————————————————————————————————————————————————————
+    # 6) Build “working” block dataset (merge shares, ACS, DHC)
+    # —————————————————————————————————————————————————————————————
+    working = step6_build_workingdata(shares, acs_bg, acs_tr, dhc_tr)
+
+    # —————————————————————————————————————————————————————————————
+    # 7) Map ACS income buckets → TM1 quartiles
+    # —————————————————————————————————————————————————————————————
+    hhinc = step7_process_household_income(working)
+
+    # —————————————————————————————————————————————————————————————
+    # 8) Summarize block-level ACS BG → TAZ (via block→TAZ weights)
+    # —————————————————————————————————————————————————————————————
+    block_wt = compute_block_weights(PATHS)
+    taz_bg   = step8_summarize_to_taz(shares, block_wt)
+
+    # —————————————————————————————————————————————————————————————
+    # 9a) Summarize tract-level ACS → TAZ (via tract→TAZ weights)
+    # —————————————————————————————————————————————————————————————
+    tract_wt = compute_tract_weights(PATHS)
+    taz_tr   = step9_summarize_tract_to_taz(acs_tr, tract_wt)
+
+    # —————————————————————————————————————————————————————————————
+    # 9b) Integrate employment data (LODES / self-employed) – stub
+    # —————————————————————————————————————————————————————————————
+    emp = step9_integrate_employment(YEAR)
+
+    # —————————————————————————————————————————————————————————————
+    # 10) Build county‐level targets – stub
+    # —————————————————————————————————————————————————————————————
+    targets = step10_build_county_targets(taz_bg, emp)
+
+    # —————————————————————————————————————————————————————————————
+    # 11) Apply scaling factors – stub
+    # —————————————————————————————————————————————————————————————
+    scaled = step11_apply_scaling(taz_bg, targets)
+
+    # —————————————————————————————————————————————————————————————
+    # 12) Join PBA2015 land-use attributes – stub
+    # —————————————————————————————————————————————————————————————
+    enriched = step12_join_pba2015(scaled)
+
+    # —————————————————————————————————————————————————————————————
+    # 13) Write out final TAZ outputs
+    # —————————————————————————————————————————————————————————————
+    step13_write_outputs(enriched, YEAR)
+
+
+if __name__ == "__main__":
     main()
