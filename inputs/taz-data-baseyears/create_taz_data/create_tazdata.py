@@ -215,12 +215,15 @@ def step2_fetch_acs_bg(c, year):
 # STEP 3: Fetch ACS tract variables
 # ------------------------------
 def step3_fetch_acs_tract(c, year=YEAR):
-    var_map      = VARIABLES.get('ACS_TRACT_VARIABLES', {})
+    var_map    = VARIABLES.get('ACS_TRACT_VARIABLES', {})
     if not var_map:
         raise ValueError('CONFIG ERROR: ACS_TRACT_VARIABLES empty')
-    fetch_vars   = [f"{code}E" for code in var_map.values()]
-    state_code   = GEO['STATE_CODE']
-    counties     = list(GEO['BA_COUNTY_FIPS_CODES'].keys())
+
+    # 1) fetch the raw Census vars with E-suffix
+    fetch_vars = [f"{code}E" for code in var_map.values()]
+    state_code = GEO['STATE_CODE']
+    counties   = list(GEO['BA_COUNTY_FIPS_CODES'].keys())
+
     records = []
     for county in counties:
         recs = retrieve_census_variables(
@@ -228,65 +231,105 @@ def step3_fetch_acs_tract(c, year=YEAR):
             for_geo='tract', state=state_code, county=county
         )
         records.extend(recs)
+
     if not records:
         logging.warning(f"No tract ACS for {year}")
         return pd.DataFrame()
+
     df = census_to_df(records)
-    # ensure all cols exist and numeric
-    for out in var_map.keys():
-        if out not in df.columns:
-            df[out] = 0
-        df[out] = pd.to_numeric(df[out], errors='coerce').fillna(0).astype(int)
-    return df
+
+    # 2) build the full 11-digit tract code
+    df['tract'] = (
+        df['state'].astype(str).str.zfill(2)
+      + df['county'].astype(str).str.zfill(3)
+      + df['tract'].astype(str).str.zfill(6)
+    )
+
+    # 3) start your output with tract
+    out = pd.DataFrame({'tract': df['tract']})
+
+    # 4) for each (output_name, census_code), grab the E-column or zeros
+    for output_name, code in var_map.items():
+        colE = f"{code}E"
+        # if missing, produce a zero Series of correct length
+        series = df.get(colE, pd.Series(0, index=df.index))
+        out[output_name] = (
+            pd.to_numeric(series, errors='coerce')
+              .fillna(0)
+              .astype(int)
+        )
+
+    return out
+
 
 # Step 4: Fetch DHC tract variables (Detailed Housing Characteristics)
 # ------------------------------
 def step4_fetch_dhc_tract(c, year=DECENNIAL_YEAR):
     """
-    Download decennial DHC variables for tracts using direct API call. Raises if no data.
-    Returns DataFrame with columns ['GEOID', <DHC vars>].
+    Download decennial DHC variables for tracts using the Census API.
+    Returns a DataFrame with columns:
+      - tract : 11-digit GEOID (state+county+tract)
+      - one column per VARIABLES['DHC_TRACT_VARIABLES'] key
     """
     import requests
-    # choose valid decennial year
-    dec_year = year if year in (2000, 2010, 2020) else DECENNIAL_YEAR
-    var_map = VARIABLES.get('DHC_TRACT_VARIABLES', {})
-    if not var_map:
-        raise ValueError("CONFIG ERROR: DHC_TRACT_VARIABLES is empty in config.yaml")
-    fetch_vars = list(var_map.values())
-    state = GEO['STATE_CODE']
-    counties = list(GEO['BA_COUNTY_FIPS_CODES'].keys())
 
-    all_rows = []
+    # 1) pick a valid decennial year
+    dec_year = year if year in (2000, 2010, 2020) else DECENNIAL_YEAR
+
+    # 2) map and API vars
+    var_map  = VARIABLES.get('DHC_TRACT_VARIABLES', {})
+    if not var_map:
+        raise ValueError("CONFIG ERROR: DHC_TRACT_VARIABLES is empty")
+
+    fetch_vars = list(var_map.values())
+    state      = GEO['STATE_CODE']
+    counties   = list(GEO['BA_COUNTY_FIPS_CODES'].keys())
+
+    # 3) fetch JSON for each county
+    rows = []
     for cnt in counties:
-        url = f"https://api.census.gov/data/{dec_year}/dec/dhc"
-        params = {
-            'get': ",".join(fetch_vars),
-            'for': 'tract:*',
-            'in': f"state:{state}+county:{cnt}",
-            'key': CENSUS_API_KEY
-        }
-        resp = requests.get(url, params=params)
+        resp = requests.get(
+            f"https://api.census.gov/data/{dec_year}/dec/dhc",
+            params={
+                'get': ",".join(fetch_vars),
+                'for': 'tract:*',
+                'in':  f"state:{state}+county:{cnt}",
+                'key': CENSUS_API_KEY
+            }
+        )
         if resp.status_code != 200:
-            logging.error(f"DHC request failed (county {cnt}): {resp.status_code} {resp.text}")
+            logging.error(f"DHC fetch failed ({cnt}): {resp.status_code}")
             continue
         data = resp.json()
-        # first row is header
         cols = data[0]
-        for row in data[1:]:
-            all_rows.append(dict(zip(cols, row)))
-    if not all_rows:
-        raise RuntimeError(f"No DHC records fetched for decennial year {dec_year}; aborting.")
+        for vals in data[1:]:
+            rows.append(dict(zip(cols, vals)))
 
-    df = pd.DataFrame(all_rows)
-    # rename according to var_map
+    if not rows:
+        raise RuntimeError(f"No DHC data for decennial year {dec_year}")
+
+    df = pd.DataFrame(rows)
+
+    # 4) rename raw codes → clean var names
     df = df.rename(columns={code: name for name, code in var_map.items()})
-    # build GEOID if not present
-    if 'GEOID' not in df.columns:
-        df['GEOID'] = df['state'] + df['county'] + df['tract']
-    # convert numeric columns
+
+    # 5) build the full 11-digit tract key
+    df['tract'] = (
+        df['state'].astype(str).str.zfill(2) +
+        df['county'].astype(str).str.zfill(3) +
+        df['tract'].astype(str).str.zfill(6)
+    )
+
+    # 6) pull out just tract + DHC vars, coercing to int
+    out = pd.DataFrame({'tract': df['tract']})
     for name in var_map.keys():
-        df[name] = pd.to_numeric(df[name], errors='coerce').fillna(0).astype(int)
-    return df
+        out[name] = (
+            pd.to_numeric(df[name], errors='coerce')
+              .fillna(0)
+              .astype(int)
+        )
+
+    return out
 
 
 # ------------------------------
@@ -294,187 +337,134 @@ def step4_fetch_dhc_tract(c, year=DECENNIAL_YEAR):
 # ------------------------------
 def step5_compute_block_shares(df_blk, df_bg):
     """
-    Disaggregate ACS block-group variables to blocks using 2020 block population share.
-    Returns a DataFrame with columns ['GEOID'] + ACS_BG_VARIABLES.keys() + ['pop_share'].
+    Disaggregate ACS block-group vars to blocks using block-population share.
+    Expects:
+      - df_blk has 'block_geoid' (15-digit) and 'pop'
+      - df_bg has 'blockgroup' (12-digit) plus ACS_BG_VARIABLES keys
+    Returns:
+      ['block_geoid','blockgroup'] + ACS_BG_VARIABLES keys + ['pop_share']
     """
-    # Prepare ACS block-group DataFrame: ensure BG_GEOID
+    # 1) Copy & promote the BG codes from your ACS table
     df_bg2 = df_bg.copy()
-    if 'GEOID' in df_bg2.columns:
-        df_bg2 = df_bg2.rename(columns={'GEOID':'BG_GEOID'})
-    else:
-        # build BG_GEOID from components
-        df_bg2['BG_GEOID'] = df_bg2['state'] + df_bg2['county'] + df_bg2['tract'] + df_bg2['block group']
+    if 'blockgroup' not in df_bg2.columns:
+        raise KeyError("step5: missing 'blockgroup' in ACS BG data")
+    df_bg2['BG_GEOID'] = df_bg2['blockgroup']
 
-    # Prepare block-level DataFrame
+    # 2) Start from block-level pop
     df = df_blk.copy()
-    df['BG_GEOID'] = df['GEOID'].str.slice(0,12)
+    if 'block_geoid' not in df.columns:
+        raise KeyError("step5: missing 'block_geoid' in block data")
+    # first 12 digits of block_geoid give blockgroup
+    df['BG_GEOID'] = df['block_geoid'].astype(str).str[:12]
 
-    # Compute total pop per block group
-    bg_pop = df.groupby('BG_GEOID')['pop'].sum().reset_index().rename(columns={'pop':'bg_pop'})
+    # 3) Compute blockgroup total pop & shares
+    bg_pop = (
+        df.groupby('BG_GEOID')['pop']
+          .sum()
+          .reset_index()
+          .rename(columns={'pop':'bg_pop'})
+    )
     df = df.merge(bg_pop, on='BG_GEOID', how='left')
     df['pop_share'] = df['pop'] / df['bg_pop'].replace({0:1})
 
-    # DEBUG: log first few shares
-    logging.info("Block share sample:%s", df[['GEOID','pop','bg_pop','pop_share']].head())
+    logging.info(
+        "Block share sample:\n%s",
+        df[['block_geoid','pop','bg_pop','pop_share']].head()
+    )
 
-    # Merge ACS block-group estimates
+    # 4) Merge in ACS block-group variables
     df = df.merge(df_bg2, on='BG_GEOID', how='left')
     bg_vars = list(VARIABLES['ACS_BG_VARIABLES'].keys())
-    logging.info("ACS BG values at first block:%s", df[bg_vars].iloc[0])
+    logging.info(
+        "ACS BG values at first block:\n%s",
+        df[bg_vars].iloc[0]
+    )
 
-    # Disaggregate each ACS variable
+    # 5) Disaggregate each ACS var
     for var in bg_vars:
         df[var] = df['pop_share'] * df[var].fillna(0)
 
-    # Return block-level shares (float); rounding happens later
-    return df[['GEOID'] + bg_vars + ['pop_share']]
+    # 6) Rename BG_GEOID back to blockgroup for step6
+    df['blockgroup'] = df['BG_GEOID']
 
-# ------------------------------
-# STEP 6: Build working dataset at block geography
-# ------------------------------
-def step6_build_workingdata(shares, acs_bg, acs_tr, dhc_tr):
-    # (0) derive blockgroup+tract from the 15-digit GEOID
-    shares['blockgroup'] = (
-        shares['block_geoid'].astype(str).str[-12:].str.zfill(12)
-    )
-    shares['tract'] = shares['blockgroup'].str[:11]
+    return df[['block_geoid','blockgroup'] + bg_vars + ['pop_share']]
+
+def step6_build_workingdata(shares, acs_tr, dhc_tr):
+    """
+    Merge block‐level shares (with ACS‐BG vars) + ACS‐tract + DHC‐tract
+    into a “working” block table. Keeps all original shares columns.
+    """
+    # a) Copy to avoid fragmentation warnings
+    df_work = shares.copy()
+
+    # b) Ensure blockgroup (12d) and tract (11d)
+    df_work['blockgroup'] = df_work['blockgroup'].astype(str).str.zfill(12)
+    df_work['tract']      = df_work['blockgroup'].str[:11]
+
     logger = logging.getLogger(__name__)
-    try:
-        # 1) Log shapes
-        logger.info(f"step6 inputs ▶ shares={shares.shape}, acs_bg={acs_bg.shape}, "
-                    f"acs_tr={acs_tr.shape}, dhc_tr={dhc_tr.shape}")
+    logger.info(f"step6 inputs ▶ shares={df_work.shape}, acs_tr={acs_tr.shape}, dhc_tr={dhc_tr.shape}")
 
-        # 2) Rename/pad/drop as before...
-        key_cfg = {
-            'shares': dict(expected='blockgroup', alts=['GEOID','block_group','bgid'], length=12,
-                           drop_cols=[]),
-            'acs_bg':  dict(expected='blockgroup', alts=['GEOID','GEOID_BG','block group'], length=12,
-                           drop_cols=['state','county','tract']),
-            'acs_tr':  dict(expected='tract',      alts=['GEOID','TRACTCE'],          length=11,
-                           drop_cols=[]),
-            'dhc_tr':  dict(expected='tract',      alts=['GEOID','TRACTCE'],          length=11,
-                           drop_cols=[]),
-        }
-        for df, name in [(shares,'shares'), (acs_bg,'acs_bg'),
-                         (acs_tr,'acs_tr'), (dhc_tr,'dhc_tr')]:
-            cfg = key_cfg[name]
-            exp = cfg['expected']
-            # rename
-            if exp not in df.columns:
-                for alt in cfg['alts']:
-                    if alt in df.columns:
-                        df.rename(columns={alt: exp}, inplace=True)
-                        logger.warning(f"{name}: renamed {alt!r} → {exp!r}")
-                        break
-            if exp not in df.columns:
-                logger.error(f"{name!r} missing key {exp!r}; cols: {df.columns.tolist()}")
-                raise KeyError(f"{name} missing column {exp}")
-            # pad
-            df[exp] = df[exp].astype(str).str.zfill(cfg['length'])
-            logger.debug(f"{name}.{exp} sample: {df[exp].head().tolist()}")
-            # drop configured extras
-            for drop in cfg['drop_cols']:
-                if drop in df.columns:
-                    df.drop(columns=[drop], inplace=True)
-                    logger.warning(f"{name}: dropped column {drop!r}")
-            # drop other geoid‐like collisions
-            to_drop_geo = [c for c in df.columns
-                           if c.lower().startswith('geoid') and c != exp]
-            if to_drop_geo:
-                df.drop(columns=to_drop_geo, inplace=True)
-                logger.warning(f"{name}: dropped extra geo cols {to_drop_geo}")
+    # c) Merge ACS‐tract (11d key)
+    m2 = df_work.merge(acs_tr, on='tract', how='left', indicator='tr_merge')
+    logger.info(f"tr_merge counts → {m2['tr_merge'].value_counts().to_dict()}")
+    df_work = m2.drop(columns=['tr_merge'])
 
-        # ──────────────────────────────────────────────────────────────────────────
-        # 3) **DIAGNOSTIC: key‐matching summary before merge**
-        #
-        s_bg = set(shares['blockgroup'])
-        b_bg = set(acs_bg['blockgroup'])
-        common_bg = s_bg & b_bg
-        logger.info(f"Blockgroup keys ▶ shares unique={len(s_bg)}, acs_bg unique={len(b_bg)}, "
-                    f"intersection={len(common_bg)}")
-        logger.info(f"Sample shares bg (5): {list(s_bg)[:5]}")
-        logger.info(f"Sample acs_bg bg  (5): {list(b_bg)[:5]}")
+    # d) Merge DHC‐tract (11d key)
+    m3 = df_work.merge(dhc_tr, on='tract', how='left', indicator='dhc_merge')
+    logger.info(f"dhc_merge counts → {m3['dhc_merge'].value_counts().to_dict()}")
+    df_final = m3.drop(columns=['dhc_merge'])
 
-        # ──────────────────────────────────────────────────────────────────────────
-        # 4) Merge shares ← acs_bg
-        m1 = shares.merge(acs_bg, on='blockgroup', how='left', indicator='bg_merge')
-        logger.info(f"bg_merge counts → {m1['bg_merge'].value_counts().to_dict()}")
-        df_work = m1.drop(columns=['bg_merge'])
+    logger.info(f"step6 output shape ▶ {df_final.shape}")
+    return df_final
 
-        # ──────────────────────────────────────────────────────────────────────────
-        # 5) **DIAGNOSTIC: tract‐matching summary before second merge**
-        #
-        # shares-derived tract vs. acs_tr
-        s_tr = set(df_work['tract'])
-        t_tr = set(acs_tr['tract'])
-        common_tr = s_tr & t_tr
-        logger.info(f"Tract keys ▶ shares/acs_bg-derived unique={len(s_tr)}, acs_tr unique={len(t_tr)}, "
-                    f"intersection={len(common_tr)}")
-        logger.info(f"Sample shares tract (5): {list(s_tr)[:5]}")
-        logger.info(f"Sample acs_tr tract   (5): {list(t_tr)[:5]}")
 
-        # 6) Merge ← acs_tr
-        m2 = df_work.merge(acs_tr, on='tract', how='left', indicator='tr_merge')
-        logger.info(f"tr_merge counts → {m2['tr_merge'].value_counts().to_dict()}")
-        df_work = m2.drop(columns=['tr_merge'])
-
-        # ──────────────────────────────────────────────────────────────────────────
-        # 7) Merge ← dhc_tr (auto‐retry on collisions)
-        try:
-            m3 = df_work.merge(dhc_tr, on='tract', how='left', indicator='dhc_merge')
-        except MergeError as me:
-            overlap = set(df_work.columns).intersection(dhc_tr.columns) - {'tract'}
-            logger.warning(f"dhc_merge collision: dropping {overlap} & retrying")
-            dhc_clean = dhc_tr.drop(columns=list(overlap))
-            m3 = df_work.merge(dhc_clean, on='tract', how='left', indicator='dhc_merge')
-
-        logger.info(f"dhc_merge counts → {m3['dhc_merge'].value_counts().to_dict()}")
-        result = m3.drop(columns=['dhc_merge'])
-
-        logger.info(f"step6 output shape ▶ {result.shape}")
-        return result
-
-    except Exception:
-        logger.exception("💥 Error in step6_build_workingdata")
-        raise
 
 # ------------------------------
 # STEP 7: Map ACS income bins to TM1 quartiles
 # ------------------------------
 def step7_process_household_income(df_working, year=ACS_5YR_LATEST):
     """
-    Allocate ACS block-group income categories into TM1 household income quartiles (HHINCQ1–4).
-    Returns a DataFrame with columns ['GEOID','HHINCQ1','HHINCQ2','HHINCQ3','HHINCQ4'].
-    Includes detailed logging of mapping and available columns.
+    Allocate ACS block-group income bins into TM1 HHINCQ1–4 by share.
+    Returns a DataFrame with:
+      - blockgroup : 12-digit FIPS
+      - HHINCQ1..HHINCQ4 : int
     """
     mapping = map_acs5year_household_income_to_tm1_categories(year)
-    # build code->working-col map for income
-    code_to_col = {code: name for name, code in VARIABLES['ACS_BG_VARIABLES'].items() if name.startswith('hhinc')}
+    # 1) Build raw‐code → working‐col map, but only keep those actually in df_working
+    code_to_col = {}
+    for new_var, old_code in VARIABLES['ACS_BG_VARIABLES'].items():
+        # only pick the B19001 bins
+        if not old_code.startswith("B19001_"):
+            continue
+        if new_var in df_working.columns:
+            code_to_col[old_code] = new_var
+        else:
+            logging.warning(f"step7: ACS_BG_VARIABLES defines '{new_var}' but working DF lacks that column")
 
-    # DEBUG: show code_to_col keys & df_working cols
-    logging.info(f"code_to_col keys: {list(code_to_col.keys())}")
-    logging.info(f"df_working columns: {df_working.columns.tolist()}")
+    # 2) Kick off output keyed on blockgroup
+    if "blockgroup" not in df_working.columns:
+        raise KeyError("step7: working DF missing 'blockgroup'")
+    out = pd.DataFrame({"blockgroup": df_working["blockgroup"]})
+    for q in (1,2,3,4):
+        out[f"HHINCQ{q}"] = 0.0
 
-    out = pd.DataFrame({'GEOID': df_working['GEOID']})
-    for q in [1,2,3,4]:
-        out[f'HHINCQ{q}'] = 0.0
-
+    # 3) Apply shares
     for _, row in mapping.iterrows():
-        acs_code = row['incrange']
-        q = int(row['HHINCQ'])
-        share = float(row['share'])
-        col = code_to_col.get(acs_code)
+        acs_code = row["incrange"]           # e.g. "B19001_002"
+        q        = int(row["HHINCQ"])
+        share    = float(row["share"])
+        col      = code_to_col.get(acs_code)
         if col is None:
-            logging.warning(f"No mapping for ACS code {acs_code}")
+            logging.warning(f"step7: no working‐column mapped for ACS code {acs_code}")
             continue
-        if col not in df_working.columns:
-            logging.warning(f"Mapped column {col} not in working DF")
-            continue
-        out[f'HHINCQ{q}'] += df_working[col].fillna(0) * share
+        out[f"HHINCQ{q}"] += df_working[col].fillna(0) * share
 
-    for q in [1,2,3,4]:
-        out[f'HHINCQ{q}'] = out[f'HHINCQ{q}'].round().astype(int)
+    # 4) Round and cast
+    for q in (1,2,3,4):
+        out[f"HHINCQ{q}"] = out[f"HHINCQ{q}"].round().astype(int)
     return out
+
+
 
 
 # ------------------------------
