@@ -255,7 +255,7 @@ variables:
     gq_inst_f_1864: PCT19_133N
     gq_noninst_f_1864_univ: PCT19_153N
     gq_noninst_f_1864_mil: PCT19_154N
-    g q_noninst_f_1864_oth: PCT19_157N
+    gq_noninst_f_1864_oth: PCT19_157N
     gq_inst_f_65p: PCT19_165N
     gq_noninst_f_65p_univ: PCT19_185N
     gq_noninst_f_65p_mil: PCT19_186N

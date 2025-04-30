@@ -211,6 +211,7 @@ def step2_fetch_acs_bg(c, year):
             df[new_var] = 0
 
     return df
+
 # ------------------------------
 # STEP 3: Fetch ACS tract variables
 # ------------------------------
@@ -251,7 +252,6 @@ def step3_fetch_acs_tract(c, year=YEAR):
     # 4) for each (output_name, census_code), grab the E-column or zeros
     for output_name, code in var_map.items():
         colE = f"{code}E"
-        # if missing, produce a zero Series of correct length
         series = df.get(colE, pd.Series(0, index=df.index))
         out[output_name] = (
             pd.to_numeric(series, errors='coerce')
@@ -261,8 +261,8 @@ def step3_fetch_acs_tract(c, year=YEAR):
 
     return out
 
-
-# Step 4: Fetch DHC tract variables (Detailed Housing Characteristics)
+# ------------------------------
+# STEP 4: Fetch DHC tract variables (Detailed Housing Characteristics)
 # ------------------------------
 def step4_fetch_dhc_tract(c, year=DECENNIAL_YEAR):
     """
@@ -271,12 +271,6 @@ def step4_fetch_dhc_tract(c, year=DECENNIAL_YEAR):
       - tract : 11-digit GEOID (state+county+tract)
       - one column per VARIABLES['DHC_TRACT_VARIABLES'] key
     """
-    import requests
-
-    # 1) pick a valid decennial year
-    dec_year = year if year in (2000, 2010, 2020) else DECENNIAL_YEAR
-
-    # 2) map and API vars
     var_map  = VARIABLES.get('DHC_TRACT_VARIABLES', {})
     if not var_map:
         raise ValueError("CONFIG ERROR: DHC_TRACT_VARIABLES is empty")
@@ -284,12 +278,10 @@ def step4_fetch_dhc_tract(c, year=DECENNIAL_YEAR):
     fetch_vars = list(var_map.values())
     state      = GEO['STATE_CODE']
     counties   = list(GEO['BA_COUNTY_FIPS_CODES'].keys())
-
-    # 3) fetch JSON for each county
     rows = []
     for cnt in counties:
         resp = requests.get(
-            f"https://api.census.gov/data/{dec_year}/dec/dhc",
+            f"https://api.census.gov/data/{year}/dec/dhc",
             params={
                 'get': ",".join(fetch_vars),
                 'for': 'tract:*',
@@ -297,7 +289,7 @@ def step4_fetch_dhc_tract(c, year=DECENNIAL_YEAR):
                 'key': CENSUS_API_KEY
             }
         )
-        if resp.status_code != 200:
+        if not resp.ok:
             logging.error(f"DHC fetch failed ({cnt}): {resp.status_code}")
             continue
         data = resp.json()
@@ -306,31 +298,19 @@ def step4_fetch_dhc_tract(c, year=DECENNIAL_YEAR):
             rows.append(dict(zip(cols, vals)))
 
     if not rows:
-        raise RuntimeError(f"No DHC data for decennial year {dec_year}")
+        raise RuntimeError(f"No DHC data for decennial year {year}")
 
-    df = pd.DataFrame(rows)
-
-    # 4) rename raw codes → clean var names
-    df = df.rename(columns={code: name for name, code in var_map.items()})
-
-    # 5) build the full 11-digit tract key
+    df = pd.DataFrame(rows).rename(columns={code: name for name, code in var_map.items()})
     df['tract'] = (
-        df['state'].astype(str).str.zfill(2) +
-        df['county'].astype(str).str.zfill(3) +
-        df['tract'].astype(str).str.zfill(6)
+        df['state'].astype(str).str.zfill(2)
+      + df['county'].astype(str).str.zfill(3)
+      + df['tract'].astype(str).str.zfill(6)
     )
 
-    # 6) pull out just tract + DHC vars, coercing to int
     out = pd.DataFrame({'tract': df['tract']})
     for name in var_map.keys():
-        out[name] = (
-            pd.to_numeric(df[name], errors='coerce')
-              .fillna(0)
-              .astype(int)
-        )
-
+        out[name] = pd.to_numeric(df[name], errors='coerce').fillna(0).astype(int)
     return out
-
 
 # ------------------------------
 # STEP 5: Disaggregate ACS BG vars to block level
@@ -342,7 +322,7 @@ def step5_compute_block_shares(df_blk, df_bg):
       - df_blk has 'block_geoid' (15-digit) and 'pop'
       - df_bg has 'blockgroup' (12-digit) plus ACS_BG_VARIABLES keys
     Returns:
-      ['block_geoid','blockgroup'] + ACS_BG_VARIABLES keys + ['pop_share']
+      ['block_geoid','pop','blockgroup'] + ACS_BG_VARIABLES keys + ['pop_share']
     """
     # 1) Copy & promote the BG codes from your ACS table
     df_bg2 = df_bg.copy()
@@ -352,9 +332,8 @@ def step5_compute_block_shares(df_blk, df_bg):
 
     # 2) Start from block-level pop
     df = df_blk.copy()
-    if 'block_geoid' not in df.columns:
-        raise KeyError("step5: missing 'block_geoid' in block data")
-    # first 12 digits of block_geoid give blockgroup
+    if 'block_geoid' not in df.columns or 'pop' not in df.columns:
+        raise KeyError("step5: missing 'block_geoid' or 'pop' in block data")
     df['BG_GEOID'] = df['block_geoid'].astype(str).str[:12]
 
     # 3) Compute blockgroup total pop & shares
@@ -367,49 +346,42 @@ def step5_compute_block_shares(df_blk, df_bg):
     df = df.merge(bg_pop, on='BG_GEOID', how='left')
     df['pop_share'] = df['pop'] / df['bg_pop'].replace({0:1})
 
-    logging.info(
-        "Block share sample:\n%s",
-        df[['block_geoid','pop','bg_pop','pop_share']].head()
-    )
+    logging.info("Block share sample:\n%s", df[['block_geoid','pop','bg_pop','pop_share']].head())
 
     # 4) Merge in ACS block-group variables
     df = df.merge(df_bg2, on='BG_GEOID', how='left')
     bg_vars = list(VARIABLES['ACS_BG_VARIABLES'].keys())
-    logging.info(
-        "ACS BG values at first block:\n%s",
-        df[bg_vars].iloc[0]
-    )
+    logging.info("ACS BG values at first block:\n%s", df[bg_vars].iloc[0])
 
     # 5) Disaggregate each ACS var
     for var in bg_vars:
         df[var] = df['pop_share'] * df[var].fillna(0)
 
-    # 6) Rename BG_GEOID back to blockgroup for step6
+    # 6) Rename for step6
     df['blockgroup'] = df['BG_GEOID']
 
-    return df[['block_geoid','blockgroup'] + bg_vars + ['pop_share']]
+    # **NEW**: carry 'pop' forward so that step6b can compute sharetract
+    return df[['block_geoid','pop','blockgroup'] + bg_vars + ['pop_share']]
 
+# ------------------------------
+# STEP 6: Merge block shares + tract + DHC
+# ------------------------------
 def step6_build_workingdata(shares, acs_tr, dhc_tr):
     """
     Merge block‐level shares (with ACS‐BG vars) + ACS‐tract + DHC‐tract
     into a “working” block table. Keeps all original shares columns.
     """
-    # a) Copy to avoid fragmentation warnings
     df_work = shares.copy()
-
-    # b) Ensure blockgroup (12d) and tract (11d)
     df_work['blockgroup'] = df_work['blockgroup'].astype(str).str.zfill(12)
     df_work['tract']      = df_work['blockgroup'].str[:11]
 
     logger = logging.getLogger(__name__)
     logger.info(f"step6 inputs ▶ shares={df_work.shape}, acs_tr={acs_tr.shape}, dhc_tr={dhc_tr.shape}")
 
-    # c) Merge ACS‐tract (11d key)
     m2 = df_work.merge(acs_tr, on='tract', how='left', indicator='tr_merge')
     logger.info(f"tr_merge counts → {m2['tr_merge'].value_counts().to_dict()}")
     df_work = m2.drop(columns=['tr_merge'])
 
-    # d) Merge DHC‐tract (11d key)
     m3 = df_work.merge(dhc_tr, on='tract', how='left', indicator='dhc_merge')
     logger.info(f"dhc_merge counts → {m3['dhc_merge'].value_counts().to_dict()}")
     df_final = m3.drop(columns=['dhc_merge'])
@@ -417,55 +389,116 @@ def step6_build_workingdata(shares, acs_tr, dhc_tr):
     logger.info(f"step6 output shape ▶ {df_final.shape}")
     return df_final
 
+# ------------------------------
+# STEP 6b: Compute all derived block vars
+# ------------------------------
+def step6b_compute_block_vars(df_work):
+    """
+    Take the block‐level working DF (with pop_share & pop) and compute:
+      - TOTHH, HHPOP, EMPRES
+      - age groups, race, housing, tenure, household size, workers, kids
+      - occupations and group quarters
+    Returns the same DF with all of those new columns appended.
+    """
+    df = df_work.copy()
 
+    if 'sharetract' not in df.columns:
+        df['tract_pop']  = df.groupby('tract')['pop'].transform('sum')
+        df['sharetract'] = df['pop'] / df['tract_pop'].replace({0:1})
+
+    sb = df['pop_share']
+    st = df['sharetract']
+
+    df['TOTHH']   = df['tothh_'] * sb
+    df['HHPOP']   = df['hhpop_'] * sb
+    df['EMPRES']  = (df['employed_'] + df['armedforces_']) * sb
+
+    df['AGE0004'] = (df['male0_4_'] + df['female0_4_']) * sb
+    df['AGE0519'] = df[['male5_9_','male10_14_','male15_17_','male18_19_',
+                       'female5_9_','female10_14_','female15_17_','female18_19_']].sum(axis=1) * sb
+    df['AGE2044'] = df[['male20_','male21_','male22_24_','male25_29_','male30_34_','male35_39_','male40_44_',
+                       'female20_','female21_','female22_24_','female25_29_','female30_34_','female35_39_','female40_44_']].sum(axis=1) * sb
+    df['AGE4564'] = df[['male45_49_','male50_54_','male55_59_','male60_61_','male62_64_',
+                       'female45_49_','female50_54_','female55_59_','female60_61_','female62_64_']].sum(axis=1) * sb
+    df['AGE65P']  = df[['male65_66_','male67_69_','male70_74_','male75_79_','male80_84_','male85p_',
+                       'female65_66_','female67_69_','female70_74_','female75_79_','female80_84_','female85p_']].sum(axis=1) * sb
+    df['AGE62P']  = df[['male62_64_','male65_66_','male67_69_','male70_74_','male75_79_','male80_84_','male85p_',
+                       'female62_64_','female65_66_','female67_69_','female70_74_','female75_79_','female80_84_']].sum(axis=1) * sb
+
+    df['white_nonh'] = df['white_nonh_'] * sb
+    df['black_nonh'] = df['black_nonh_'] * sb
+    df['asian_nonh'] = df['asian_nonh_'] * sb
+    df['other_nonh'] = (df['total_nonh_'] - (df['white_nonh_']+df['black_nonh_']+df['asian_nonh_'])) * sb
+    df['hispanic']   = df['total_hisp_'] * sb
+
+    df['SFDU'] = df[['unit1d_','unit1a_','mobile_','boat_RV_Van_']].sum(axis=1) * sb
+    df['MFDU'] = df[['unit2_','unit3_4_','unit5_9_','unit10_19_','unit20_49_','unit50p_']].sum(axis=1) * sb
+
+    df['hh_own']  = df[['own1_','own2_','own3_','own4_','own5_','own6_','own7p_']].sum(axis=1) * sb
+    df['hh_rent'] = df[['rent1_','rent2_','rent3_','rent4_','rent5_','rent6_','rent7p_']].sum(axis=1) * sb
+
+    df['hh_size_1']      = (df['own1_'] + df['rent1_']) * sb
+    df['hh_size_2']      = (df['own2_'] + df['rent2_']) * sb
+    df['hh_size_3']      = (df['own3_'] + df['rent3_']) * sb
+    df['hh_size_4_plus'] = df[['own4_','own5_','own6_','own7p_','rent4_','rent5_','rent6_','rent7p_']].sum(axis=1) * sb
+
+    df['hh_wrks_0']     = df['hhwrks0_'] * st
+    df['hh_wrks_1']     = df['hhwrks1_'] * st
+    df['hh_wrks_2']     = df['hhwrks2_'] * st
+    df['hh_wrks_3_plus']= df['hhwrks3p_'] * st
+
+    df['hh_kids_yes'] = (df['ownkidsyes_'] + df['rentkidsyes_']) * st
+    df['hh_kids_no']  = (df['ownkidsno_']  + df['rentkidsno_'])  * st
+
+    df['pers_occ_management']   = (df['occ_m_manage_'] + df['occ_f_manage_']) * sb
+    df['pers_occ_professional'] = df[['occ_m_prof_biz_','occ_f_prof_biz_','occ_m_prof_comp_','occ_f_prof_comp_','occ_m_prof_leg_','occ_f_prof_leg_','occ_m_prof_edu_','occ_f_prof_edu_','occ_m_prof_heal_','occ_f_prof_heal_']].sum(axis=1)*sb
+    df['pers_occ_services']     = df[['occ_m_svc_comm_','occ_f_svc_comm_','occ_m_svc_ent_','occ_f_svc_ent_','occ_m_svc_heal_','occ_f_svc_heal_','occ_m_svc_fire_','occ_f_svc_fire_','occ_m_svc_law_','occ_f_svc_law_','occ_m_svc_pers_','occ_f_svc_pers_','occ_m_svc_off_','occ_f_svc_off_']].sum(axis=1)*sb
+    df['pers_occ_retail']       = df[['occ_m_ret_eat_','occ_f_ret_eat_','occ_m_ret_sales_','occ_f_ret_sales_']].sum(axis=1)*sb
+    df['pers_occ_manual']       = df[['occ_m_man_build_','occ_f_man_build_','occ_m_man_nat_','occ_f_man_nat_','occ_m_man_prod_','occ_f_man_prod_']].sum(axis=1)*sb
+    df['pers_occ_military']     = df['armedforces_'] * sb
+
+    df['gq_inst']        = df[['gq_inst_m_0017','gq_inst_m_1864','gq_inst_m_65p','gq_inst_f_0017','gq_inst_f_1864','gq_inst_f_65p']].sum(axis=1)*st
+    df['gq_type_univ']   = df[['gq_noninst_m_0017_univ','gq_noninst_m_1864_univ','gq_noninst_m_65p_univ','gq_noninst_f_0017_univ','gq_noninst_f_1864_univ','gq_noninst_f_65p_univ']].sum(axis=1)*st
+    df['gq_type_mil']    = df[['gq_noninst_m_0017_mil','gq_noninst_m_1864_mil','gq_noninst_m_65p_mil','gq_noninst_f_0017_mil','gq_noninst_f_1864_mil','gq_noninst_f_65p_mil']].sum(axis=1)*st
+    df['gq_type_othnon'] = df[['gq_noninst_m_0017_oth','gq_noninst_m_1864_oth','gq_noninst_m_65p_oth','gq_noninst_f_0017_oth','gq_noninst_f_1864_oth','gq_noninst_f_65p_oth']].sum(axis=1)*st
+
+    return df
 
 # ------------------------------
 # STEP 7: Map ACS income bins to TM1 quartiles
 # ------------------------------
 def step7_process_household_income(df_working, year=ACS_5YR_LATEST):
     """
-    Allocate ACS block-group income bins into TM1 HHINCQ1–4 by share.
-    Returns a DataFrame with:
-      - blockgroup : 12-digit FIPS
-      - HHINCQ1..HHINCQ4 : int
+    Take the block‐level working DF (with hhincXXX_ cols already * sharebg),
+    map each hhinc bin into TM1 quartiles, and append HHINCQ1–HHINCQ4 columns
+    (also at block level).
     """
+    df = df_working.copy()
     mapping = map_acs5year_household_income_to_tm1_categories(year)
-    # 1) Build raw‐code → working‐col map, but only keep those actually in df_working
-    code_to_col = {}
-    for new_var, old_code in VARIABLES['ACS_BG_VARIABLES'].items():
-        # only pick the B19001 bins
-        if not old_code.startswith("B19001_"):
-            continue
-        if new_var in df_working.columns:
-            code_to_col[old_code] = new_var
-        else:
-            logging.warning(f"step7: ACS_BG_VARIABLES defines '{new_var}' but working DF lacks that column")
 
-    # 2) Kick off output keyed on blockgroup
-    if "blockgroup" not in df_working.columns:
-        raise KeyError("step7: working DF missing 'blockgroup'")
-    out = pd.DataFrame({"blockgroup": df_working["blockgroup"]})
+    code_to_col = {
+        old_code: new_var
+        for new_var, old_code in VARIABLES['ACS_BG_VARIABLES'].items()
+        if old_code.startswith('B19001_')
+    }
+
     for q in (1,2,3,4):
-        out[f"HHINCQ{q}"] = 0.0
+        df[f'HHINCQ{q}'] = 0.0
 
-    # 3) Apply shares
     for _, row in mapping.iterrows():
-        acs_code = row["incrange"]           # e.g. "B19001_002"
-        q        = int(row["HHINCQ"])
-        share    = float(row["share"])
+        acs_code = row['incrange']
+        q        = int(row['HHINCQ'])
+        share    = float(row['share'])
         col      = code_to_col.get(acs_code)
-        if col is None:
-            logging.warning(f"step7: no working‐column mapped for ACS code {acs_code}")
+        if col is None or col not in df:
+            logging.warning(f"step7: no working‐column for ACS code {acs_code}")
             continue
-        out[f"HHINCQ{q}"] += df_working[col].fillna(0) * share
+        df[f'HHINCQ{q}'] += df[col] * share
 
-    # 4) Round and cast
     for q in (1,2,3,4):
-        out[f"HHINCQ{q}"] = out[f"HHINCQ{q}"].round().astype(int)
-    return out
+        df[f'HHINCQ{q}'] = df[f'HHINCQ{q}'].round().astype(int)
 
-
-
+    return df
 
 # ------------------------------
 # Step 8: Weighted summarize block-group ACS -> TAZ
@@ -478,83 +511,86 @@ def compute_block_weights(paths):
     df['weight'] = df['block_POPULATION'] / df['group_pop']
     return df[['GEOID','blockgroup','TAZ1454','weight']]
 
-def step8_summarize_to_taz(df_bg, df_weights):
-    acs_vars = [c for c in df_bg.columns if c!='blockgroup']
-    df = df_weights.merge(df_bg, left_on='blockgroup', right_on='blockgroup', how='left')
-    for var in acs_vars:
-        df[var] = df[var] * df['weight']
-    return df.groupby('TAZ1454')[acs_vars].sum().reset_index()
+def step8_summarize_sharebg_to_taz(df_working, paths):
+    """
+    Summarize all block‐level sharebg-derived fields to TAZ.
+    Uses the block→TAZ1454 crosswalk & weight.
+    """
+    wt = compute_block_weights(paths).rename(columns={'GEOID':'block_geoid'})
+    df = wt.merge(df_working, on='block_geoid', how='left')
+
+    sharebg_vars = [
+        'TOTHH','HHPOP','EMPRES',
+        'AGE0004','AGE0519','AGE2044','AGE4564','AGE65P','AGE62P',
+        'white_nonh','black_nonh','asian_nonh','other_nonh','hispanic',
+        'SFDU','MFDU','hh_own','hh_rent',
+        'hh_size_1','hh_size_2','hh_size_3','hh_size_4_plus',
+        'HHINCQ1','HHINCQ2','HHINCQ3','HHINCQ4',
+        'pers_occ_management','pers_occ_professional','pers_occ_services',
+        'pers_occ_retail','pers_occ_manual','pers_occ_military'
+    ]
+
+    for var in sharebg_vars:
+        df[var] = df[var].fillna(0) * df['weight']
+
+    return df.groupby('TAZ1454')[sharebg_vars].sum().reset_index()
 
 # ------------------------------
 # Steps 9a/9b: Tract -> TAZ summarize
 # ------------------------------
 def compute_tract_weights(paths):
     """
-    Load the tract-to-TAZ crosswalk and compute normalized weights for each tract.
-    Expects:
-      paths['taz_crosswalk'] → CSV with at least: tract, TAZ, and a weight/pop_share column.
-    Returns a DataFrame with columns ['tract', 'taz', 'weight'], where weights sum to 1 per tract.
+    Load the tract→TAZ crosswalk and compute equal‐share weights.
+    Detects the tract column by looking for 'tract' in the name.
+    Returns a DataFrame with ['tract','TAZ1454','weight'].
     """
-    # 1) Locate and read the crosswalk CSV
-    cw_path = Path(os.path.expandvars(paths['taz_crosswalk']))
+    cw_path = Path(__file__).parent / Path(paths['taz_crosswalk'])
     df = pd.read_csv(cw_path, dtype=str)
-    
-    # 2) Normalize column names to simplify matching
-    df.columns = df.columns.str.lower().str.replace(' ', '_')
-    
-    # 3) Identify the tract, taz, and weight columns
-    tract_col  = next(col for col in df.columns if 'tract' in col)
-    taz_col    = next(col for col in df.columns if 'taz'   in col)
-    # common weight names: 'weight', 'pop_share', 'share'
-    weight_col = next(col for col in df.columns if any(k in col for k in ('weight','pop_share','share')))
-    
-    # 4) Coerce weight to numeric and normalize so each tract sums to 1
-    df[weight_col] = pd.to_numeric(df[weight_col], errors='coerce').fillna(0)
-    df['weight']  = df.groupby(tract_col)[weight_col].transform(lambda x: x / x.sum())
-    
-    # 5) Return only the three standardized columns
-    return df[[tract_col, taz_col, 'weight']].rename(
-        columns={tract_col: 'tract', taz_col: 'taz'}
-    )
 
-def step9_summarize_tract_to_taz(df_acs_tr, df_weights_tract):
-    # 1) Merge ACS tract data with tract→TAZ weights
-    df = df_weights_tract.merge(df_acs_tr, on='tract', how='left')
+    tract_col = next((c for c in df.columns if 'tract' in c.lower()), None)
+    if tract_col is None:
+        raise KeyError(f"compute_tract_weights: no column containing 'tract' in {cw_path}")
 
-    # 2) Identify which columns to aggregate
-    aggs = [col for col in df.columns if col not in ['tract', 'taz', 'weight']]
+    taz_col = next((c for c in df.columns if 'taz' in c.lower()), None)
+    if taz_col is None:
+        raise KeyError(f"compute_tract_weights: no column containing 'taz' in {cw_path}")
 
-    # 3) Make sure every aggregation column is numeric
-    df[aggs] = df[aggs].apply(pd.to_numeric, errors='coerce').fillna(0)
+    if 'weight' not in df.columns:
+        df['weight'] = 1 / df.groupby(df[taz_col])[tract_col].transform('count')
 
-    # 4) Weight each ACS variable by the tract→TAZ fraction
-    for var in aggs:
-        df[var] = df[var] * df['weight']
+    return df.rename(columns={tract_col:'tract', taz_col:'TAZ1454'})[['tract','TAZ1454','weight']]
 
-    # 5) Group by TAZ and sum up weighted variables
-    df_taz = df.groupby('taz', as_index=False)[aggs].sum()
+def step9_summarize_tract_to_taz(df_tr, df_wt):
+    """
+    Summarize tract‐level variables up to TAZ using tract→TAZ weights.
+    Ensures the output TAZ1454 column is int, so you can merge it directly
+    with the step-8 TAZ table.
+    """
+    wt = df_wt.copy()
+    wt['TAZ1454'] = pd.to_numeric(wt['TAZ1454'], errors='coerce').astype(int)
 
-    return df_taz
+    df = wt.merge(df_tr, on='tract', how='left')
+    numeric_vars = [c for c in df_tr.columns if c != 'tract']
+
+    for var in numeric_vars:
+        df[var] = pd.to_numeric(df[var], errors='coerce').fillna(0) * df['weight']
+
+    return df.groupby('TAZ1454')[numeric_vars].sum().reset_index()
 
 def step9_integrate_employment(year):
-    # stub: integrate LODES/self-employed
     raise NotImplementedError
 
 # ------------------------------
 # Steps 10-13: stubs
 # ------------------------------
 def step10_build_county_targets(taz, emp): raise NotImplementedError
-
 def step11_apply_scaling(taz, targets): raise NotImplementedError
-
 def step12_join_pba2015(taz): raise NotImplementedError
-
 def step13_write_outputs(taz, year): raise NotImplementedError
 
 # ------------------------------
 # Logging and Census client
 # ------------------------------
-
 def setup_logging(year):
     out_dir = Path(os.path.expandvars(PATHS['output_root']).replace('${YEAR}', str(year)))
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -573,37 +609,29 @@ def setup_census_client():
 def main():
 
     setup_logging(YEAR)
-    
     logging.info(f"Starting TAZ pipeline for YEAR={YEAR}")
-    
+
     c = setup_census_client()
 
     outputs = {}
-    outputs['blocks']    = step1_fetch_block_data(c, YEAR)
-    outputs['acs_bg']    = step2_fetch_acs_bg(c, YEAR)
-    outputs['acs_tr']    = step3_fetch_acs_tract(c, min(YEAR+2, ACS_5YR_LATEST))
-    outputs['dhc_tr']    = step4_fetch_dhc_tract(c)
-    outputs['shares']    = step5_compute_block_shares(outputs['blocks'], outputs['acs_bg'])
-    outputs['working']   = step6_build_workingdata(
-        outputs['shares'],  outputs['acs_tr'], outputs['dhc_tr']
-    )
-    outputs['hhinc']     = step7_process_household_income(outputs['working'], ACS_5YR_LATEST)
-    outputs['weights']   = compute_block_weights(PATHS)
+    outputs['blocks']  = step1_fetch_block_data(c, YEAR)
+    outputs['acs_bg']  = step2_fetch_acs_bg(c, YEAR)
+    outputs['acs_tr']  = step3_fetch_acs_tract(c, min(YEAR+2, ACS_5YR_LATEST))
+    outputs['dhc_tr']  = step4_fetch_dhc_tract(c)
+    outputs['shares']  = step5_compute_block_shares(outputs['blocks'], outputs['acs_bg'])
+    outputs['working'] = step6_build_workingdata(outputs['shares'], outputs['acs_tr'], outputs['dhc_tr'])
+    outputs['working'] = step6b_compute_block_vars(outputs['working'])
+    outputs['hhinc']   = step7_process_household_income(outputs['working'], ACS_5YR_LATEST)
+    outputs['weights'] = compute_block_weights(PATHS)
     df_bg = outputs['hhinc'].rename(columns={'GEOID':'blockgroup'})
-    outputs['taz']       = step8_summarize_to_taz(df_bg, outputs['weights'])
+    outputs['taz']         = step8_summarize_sharebg_to_taz(df_bg, PATHS)
     outputs['weights_tract'] = compute_tract_weights(PATHS)
-    outputs['taz_tract']    = step9_summarize_tract_to_taz(
-        outputs['acs_tr'], outputs['weights_tract']
-    )
-    outputs['taz'] = outputs['taz'].rename(columns={'TAZ1454': 'taz'})
-    outputs['taz']['taz']       = outputs['taz']['taz'].astype(str)
-    outputs['taz_tract']['taz'] = outputs['taz_tract']['taz'].astype(str)
-    outputs['taz_final'] = outputs['taz'].merge(outputs['taz_tract'], on ='taz', how='left')
-
-    outputs['emp']       = step9_integrate_employment(YEAR)
-    outputs['targets']   = step10_build_county_targets(outputs['taz'], outputs['emp'])
-    outputs['scaled']    = step11_apply_scaling(outputs['taz'], outputs['targets'])
-    outputs['final']     = step12_join_pba2015(outputs['scaled'])
+    outputs['taz_tract']   = step9_summarize_tract_to_taz(outputs['acs_tr'], outputs['weights_tract'])
+    outputs['taz_final']   = outputs['taz'].merge(outputs['taz_tract'], on='TAZ1454', how='left')
+    outputs['emp']         = step9_integrate_employment(YEAR)
+    outputs['targets']     = step10_build_county_targets(outputs['taz'], outputs['emp'])
+    outputs['scaled']      = step11_apply_scaling(outputs['taz'], outputs['targets'])
+    outputs['final']       = step12_join_pba2015(outputs['scaled'])
     step13_write_outputs(outputs['final'], YEAR)
 
     logging.info("TAZ data processing complete.")
