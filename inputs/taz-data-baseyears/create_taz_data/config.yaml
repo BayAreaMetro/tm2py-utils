@@ -87,7 +87,7 @@ paths:
   lodes_employment_csv: "./2022/lodes_wac_employment_2022.csv"
   self_employed_csv: "./2023/taz_self_employed_workers_2023.csv"
   lehd_lodes_csv: "M:/Data/Census/LEHD/Origin-Destination Employment Statistics (LODES)/LODES_Bay_Area_county_2022.csv"
-  taz_sd_county_csv: "../geographies/taz-superdistrict-county.csv"
+  taz_sd_county_csv: "./geographies/taz-superdistrict-county.csv"
   census_api_key_file: "M:/Data/Census/API/api-key.txt"
   block2020_to_taz1454_csv: "M:/Data/GIS layers/TM1_taz_census2020/2020block_to_TAZ1454.csv"
   taz_crosswalk: "M:/Data/GIS layers/TM1_taz_census2020/TAZ1454_tract2020_crosswalk.csv"

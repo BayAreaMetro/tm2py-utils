@@ -5,32 +5,33 @@ create_taz_data.py
 
 End-to-end TAZ data pipeline for Travel Model One and Two.
 Loads all settings (constants, paths, geo, variable mappings) from config.yaml.
-Defines 13 sequential steps, each stubbed out for implementation.
+Defines 14 sequential steps to create TAZ-level data from Census and LODES data.
+
+
+ - Household- and population-based variables are based on the ACS5-year dataset which centers around the
+   given year, or the latest ACS5-year dataset that is available (see variable, ACS_5year). 
+   The script fetches this data using tidycensus.
+
+ - ACS block group variables used in all instances where not suppressed. If suppressed at the block group 
+   level, tract-level data used instead. Suppressed variables may change if ACS_5year is changed. This 
+   should be checked, as this change could cause the script not to work.
+
+ - Group quarter data is not available below state level from ACS, so 2020 Decennial census numbers
+   are used instead, and then scaled (if applicable)
+
+ - Wage/Salary Employment data is sourced from LODES for the given year, or the latest LODES dataset that is available.
+   (See variable, LODES_YEAR)
+ - Self-employed persons are also added from taz_self_employed_workers_[year].csv
+ 
+ - If ACS1-year data is available that is more recent than that used above, these totals are used to scale
+   the above at a county-level.
+
+ - Employed Residents, which includes people who live *and* work in the Bay Area are quite different
+   between ACS and LODES, with ACS regional totals being much higher than LODES regional totals.
+   This script includes a parameter, EMPRES_LODES_WEIGHT, which can be used to specify a blended target
+   between the two.
+
 """
-
-# - Household- and population-based variables are based on the ACS5-year dataset which centers around the
-#   given year, or the latest ACS5-year dataset that is available (see variable, ACS_5year). 
-#   The script fetches this data using tidycensus.
-#
-# - ACS block group variables used in all instances where not suppressed. If suppressed at the block group 
-#   level, tract-level data used instead. Suppressed variables may change if ACS_5year is changed. This 
-#   should be checked, as this change could cause the script not to work.
-#
-# - Group quarter data is not available below state level from ACS, so 2020 Decennial census numbers
-#   are used instead, and then scaled (if applicable)
-#
-# - Wage/Salary Employment data is sourced from LODES for the given year, or the latest LODES dataset that is available.
-#   (See variable, LODES_YEAR)
-# - Self-employed persons are also added from taz_self_employed_workers_[year].csv
-# 
-# - If ACS1-year data is available that is more recent than that used above, these totals are used to scale
-#   the above at a county-level.
-#
-# - Employed Residents, which includes people who live *and* work in the Bay Area are quite different
-#   between ACS and LODES, with ACS regional totals being much higher than LODES regional totals.
-#   This script includes a parameter, EMPRES_LODES_WEIGHT, which can be used to specify a blended target
-#   between the two.
-
 import logging
 import os
 import sys
@@ -614,122 +615,67 @@ def step10_integrate_employment(year):
 
     return df_emp
 
-
-def step11_build_county_targets(df_taz, paths):
+def step11_compute_scale_factors(taz_df: pd.DataFrame,
+                                 taz_targeted: pd.DataFrame,
+                                 key: str = 'taz',
+                                 target_col: str = 'county_target',
+                                 base_col: str = 'county_base') -> pd.DataFrame:
     """
-    Scale TAZ‐level outputs so they match county‐level control totals.
-
-    Parameters
-    ----------
-    df_taz : pandas.DataFrame
-        Must have a 'taz' column plus all the variables you want to scale.
-    paths : dict
-        Must include:
-          - 'taz_sd_county_csv': path to a CSV mapping each TAZ to its county
-          - 'county_targets_csv': path to a CSV of county‐level control totals,
-            with one row per county and the same variable columns as df_taz
-
-    Returns
-    -------
-    pandas.DataFrame
-        Same as df_taz, but with every variable re‐weighted so that if you do
-        df.groupby('county')[vars].sum(), you get exactly the county_targets.
+    For each TAZ, compute the ratio of targeted county total to
+    the base county total, yielding a scale_factor.
     """
-
-    # 1) load the TAZ→county crosswalk and pick out the two key columns
-    cw = pd.read_csv(os.path.expandvars(paths['taz_sd_county_csv']), dtype=str)
-    # normalize names
-    cw.columns = cw.columns.str.lower().str.replace(' ', '_')
-    taz_col    = next(c for c in cw.columns if 'taz'    in c)
-    county_col = next(c for c in cw.columns if 'county' in c)
-    cw = cw[[taz_col, county_col]].rename(
-        columns={taz_col: 'taz', county_col: 'county'}
-    )
-
-    # 2) attach county onto each TAZ row
-    df = df_taz.merge(cw, on='taz', how='left')
-
-    # 3) read in your county‐level targets
-    df_ct = pd.read_csv(os.path.expandvars(paths['county_targets_csv']), dtype=str)
-    # ensure the county ID column is named 'county' as well
-    if 'county' not in df_ct.columns:
-        ct_id = next(c for c in df_ct.columns if 'county' in c.lower())
-        df_ct = df_ct.rename(columns={ct_id: 'county'})
-    # coerce all the control total columns to numeric
-    vars_to_scale = [c for c in df_ct.columns if c != 'county']
-    df_ct[vars_to_scale] = df_ct[vars_to_scale]\
-        .apply(pd.to_numeric, errors='coerce')\
-        .fillna(0)
-
-    # 4) call the common helper to do the proportional scaling
-    #    (it will group by 'county', compare sums in df vs. df_ct, 
-    #     and multiply each TAZ row by the appropriate factor)
-    df_scaled = update_tazdata_to_county_target(
-        df,          # your merged TAZ+county table
-        df_ct,       # the county‐control‐totals table
-        id_col='taz',
-        county_col='county'
-    )
-
-    return df_scaled
-
-def step12_apply_scaling(taz: pd.DataFrame, targets: pd.DataFrame) -> pd.DataFrame:
-    """
-    Apply county‐level control totals to a TAZ‐level table by computing
-    and applying proportional scaling factors.
-
-    Parameters
-    ----------
-    taz : pandas.DataFrame
-        Must contain:
-          - a 'county' column
-          - one or more numeric variable columns to be scaled.
-    targets : pandas.DataFrame
-        Must contain:
-          - the same 'county' column
-          - one column per variable with the target total for that county.
-
-    Returns
-    -------
-    pandas.DataFrame
-        A copy of `taz` where each variable has been multiplied by a county‐
-        specific factor so that grouping back to county yields exactly the
-        `targets` values.
-    """
-    # 1) Identify variables to scale (everything except 'county')
-    vars_to_scale = [c for c in taz.columns if c != 'county']
-
-    # 2) Compute actual sums by county
-    actual = (
-        taz
-        .groupby('county', as_index=False)[vars_to_scale]
+    # 1) Sum up base values by TAZ
+    base_totals = (
+        taz_df
+        .groupby(key)[base_col]
         .sum()
-        .rename(columns={v: f"{v}_actual" for v in vars_to_scale})
+        .reset_index()
+        .rename(columns={base_col: 'base_total'})
     )
 
-    # 3) Prepare the targets table
-    tgt = targets[['county'] + vars_to_scale]\
-          .rename(columns={v: f"{v}_target" for v in vars_to_scale})
+    # 2) Pull in the targeted totals (already one row per TAZ)
+    targets = taz_targeted[[key, target_col]].rename(columns={target_col: 'target_total'})
 
-    # 4) Merge actuals and targets to get scale factors
-    factors = tgt.merge(actual, on='county')
-    for v in vars_to_scale:
-        # avoid division by zero
-        factors[f"{v}_factor"] = (
-            factors[f"{v}_target"]
-            / factors[f"{v}_actual"].replace({0: np.nan})
-        ).fillna(1)
-    
-    # 5) Attach factors back to each TAZ row
-    factor_cols = ['county'] + [f"{v}_factor" for v in vars_to_scale]
-    df = taz.merge(factors[factor_cols], on='county', how='left')
+    # 3) Merge and compute factor
+    scale_df = (
+        base_totals
+        .merge(targets, on=key, how='left')
+    )
+    scale_df['scale_factor'] = scale_df['target_total'] / scale_df['base_total']
 
-    # 6) Apply scaling
-    for v in vars_to_scale:
-        df[v] = df[v] * df[f"{v}_factor"]
+    return scale_df[[key, 'scale_factor']]
+    return result
 
-    # 7) Drop the factor columns
-    df = df.drop(columns=[f"{v}_factor" for v in vars_to_scale])
+def step12_apply_scaling(taz_df: pd.DataFrame,
+                         taz_targeted: pd.DataFrame,
+                         scale_key: str = 'taz',
+                         vars_to_scale: List[str] = None) -> pd.DataFrame:
+    """
+    Merge in scale_factor and multiply each designated variable by it.
+    """
+    # 1) Compute scale factors
+    scale_df = step11_compute_scale_factors(
+        taz_df,
+        taz_targeted,
+        key=scale_key,
+        target_col='county_target',
+        base_col='county_base'
+    )
+
+    # 2) Merge onto TAZ
+    df = taz_df.merge(scale_df, on=scale_key, how='left')
+
+    # 3) Apply scaling to each variable
+    if vars_to_scale is None:
+        # default to all numeric columns except the key
+        vars_to_scale = [
+            c for c in df.columns
+            if c not in (scale_key, 'scale_factor')
+               and pd.api.types.is_numeric_dtype(df[c])
+        ]
+
+    for col in vars_to_scale:
+        df[col] = df[col] * df['scale_factor']
 
     return df
 
@@ -970,10 +916,14 @@ def main():
 # fill any missing employment with zero
     outputs['taz_final'][['emp_lodes','emp_self']] = (
     outputs['taz_final'][['emp_lodes','emp_self']].fillna(0))
-    outputs['taz_targeted'] = step11_build_county_targets(
-    outputs['taz_final'],  # your TAZ‐level table (with 'taz' column)
-    PATHS)                  # the dict of file paths)
-    outputs['scaled']    = step12_apply_scaling(outputs['taz'], outputs['targets'])
+    outputs['taz_targeted'] = outputs['taz_final'].merge(outputs['emp'],on='taz',how='left'
+)
+    scale_df = step11_compute_scale_factors(outputs['taz'], outputs['taz_targeted'])
+
+# Then apply them (formerly step 11 -> now step 12):
+    outputs['scaled'] = step12_apply_scaling(outputs['taz'], outputs['taz_targeted'],
+    vars_to_scale=[/* list of columns you want scaled */]
+)
     outputs['taz_with_pba2015'] = step13_join_pba2015(outputs['taz_targeted'])
     step14_write_outputs(outputs['taz_with_pba2015'], YEAR)
 
