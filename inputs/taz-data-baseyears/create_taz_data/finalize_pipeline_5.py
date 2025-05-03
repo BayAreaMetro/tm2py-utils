@@ -6,6 +6,7 @@ import pandas as pd
 import yaml
 
 # Load configuration\ nCONFIG_PATH = Path(__file__).parent / 'config.yaml'
+CONFIG_PATH = Path(__file__).parent / 'config.yaml'
 with CONFIG_PATH.open() as f:
     cfg = yaml.safe_load(f)
 PATHS = cfg['paths']

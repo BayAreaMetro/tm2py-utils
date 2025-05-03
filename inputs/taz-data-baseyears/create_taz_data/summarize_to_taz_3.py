@@ -20,6 +20,8 @@ with CONFIG_PATH.open() as f:
     cfg = yaml.safe_load(f)
 PATHS = cfg['paths']
 
+GEO  = cfg['geo_constants']
+
 # ------------------------------
 # STEP 8: Weighted summarize block-group ACS -> TAZ
 # ------------------------------
@@ -36,19 +38,77 @@ def compute_block_weights(paths: dict) -> pd.DataFrame:
     return df[['GEOID','blockgroup','TAZ1454','weight']]
 
 
-def step8_summarize_to_taz(df_bg: pd.DataFrame, df_weights: pd.DataFrame) -> pd.DataFrame:
+def step8_summarize_to_taz(data_df, weights_df):
     """
-    Apply blockgroup weights to block-group ACS data and aggregate to TAZ1454.
-    df_bg: has columns ['blockgroup', ... ACS vars ...]
-    df_weights: output of compute_block_weights
+    Summarize blockgroup-level household income data into TAZ.
 
-    Returns DataFrame with ['TAZ1454', ACS vars...]
+    Expects:
+      - data_df    : DataFrame with columns ['blockgroup', 'HHINCQ1','HHINCQ2','HHINCQ3','HHINCQ4']
+      - weights_df : DataFrame with columns including a blockgroup identifier, a TAZ identifier, and 'weight'
+
+    Returns:
+      - DataFrame with columns ['taz', 'weighted_HHINCQ1', 'weighted_HHINCQ2',
+        'weighted_HHINCQ3', 'weighted_HHINCQ4']
     """
-    acs_vars = [c for c in df_bg.columns if c != 'blockgroup']
-    df = df_weights.merge(df_bg, on='blockgroup', how='left')
-    for var in acs_vars:
-        df[var] = df[var].fillna(0) * df['weight']
-    return df.groupby('TAZ1454', as_index=False)[acs_vars].sum()
+    import pandas as pd
+    import logging
+
+    logger = logging.getLogger(__name__)
+
+    # Debug: show incoming DataFrame schemas
+    logger.info(f"data_df columns: {data_df.columns.tolist()}")
+    logger.info(f"weights_df columns: {weights_df.columns.tolist()}")
+
+    # Identify the blockgroup key in weights_df
+    block_keys = ['blockgroup', 'block', 'GEOID']
+    right_block_key = next((col for col in block_keys if col in weights_df.columns), None)
+    if right_block_key is None:
+        raise KeyError(
+            "weights_df must contain a blockgroup identifier column: one of {}".format(block_keys)
+        )
+
+    # Identify the TAZ key in weights_df
+    taz_keys = ['TAZ1454', 'TAZ', 'taz']
+    right_taz_key = next((col for col in taz_keys if col in weights_df.columns), None)
+    if right_taz_key is None:
+        raise KeyError(
+            "weights_df must contain a TAZ identifier column: one of {}".format(taz_keys)
+        )
+
+    # Ensure weight column exists
+    if 'weight' not in weights_df.columns:
+        raise KeyError("weights_df must contain a 'weight' column")
+
+    logger.info(f"Using blockgroup key: {right_block_key}, TAZ key: {right_taz_key}")
+
+    # 1) Merge data_df with weights_df on blockgroup
+    df = data_df.merge(
+        weights_df[[right_block_key, right_taz_key, 'weight']],
+        left_on='blockgroup', right_on=right_block_key,
+        how='left'
+    )
+    missing_w = df['weight'].isna().sum()
+    if missing_w > 0:
+        logger.warning(f"{missing_w} records missing crosswalk weight")
+
+    # Drop duplicate key column if needed
+    if right_block_key != 'blockgroup':
+        df = df.drop(columns=[right_block_key])
+
+    # Rename TAZ column to 'taz' for consistency
+    if right_taz_key != 'taz':
+        df = df.rename(columns={right_taz_key: 'taz'})
+
+    # 2) Compute weighted values for each household income quartile
+    quartiles = ['HHINCQ1', 'HHINCQ2', 'HHINCQ3', 'HHINCQ4']
+    for q in quartiles:
+        df[f'weighted_{q}'] = df[q] * df['weight']
+
+    # 3) Aggregate to TAZ
+    agg_dict = {f'weighted_{q}': 'sum' for q in quartiles}
+    taz_df = df.groupby('taz', as_index=False).agg(agg_dict)
+
+    return taz_df
 
 # ------------------------------
 # STEP 9: Tract -> TAZ summarize
@@ -69,20 +129,72 @@ def compute_tract_weights(paths: dict) -> pd.DataFrame:
     return df.rename(columns={tract_col: 'tract', taz_col: 'taz'})[['tract','taz','weight']]
 
 
-def step9_summarize_tract_to_taz(df_acs_tr: pd.DataFrame, df_weights_tract: pd.DataFrame) -> pd.DataFrame:
+def step9_summarize_tract_to_taz(acs_df, weights_df):
     """
-    Weight and aggregate tract-level ACS data to TAZ.
-    df_acs_tr: has 'tract' + ACS tract vars
-    df_weights_tract: output of compute_tract_weights
+    Summarize tract-level ACS data into TAZ, writing intermediate CSVs.
 
-    Returns DataFrame with ['taz', ACS vars...]
+    Expects:
+      - acs_df    : DataFrame with columns ['tract', 'hhwrks0_', 'hhwrks1_', 'hhwrks2_', 'hhwrks3p_', 
+                     'ownkidsyes_', 'rentkidsyes_', 'ownkidsno_', 'rentkidsno_']
+      - weights_df: DataFrame with columns ['tract', 'taz', 'weight']
+
+    Returns:
+      - DataFrame with columns ['taz', **'county_fips'**, 'TAZ1454',
+        'weighted_hhwrks0_', …, 'weighted_rentkidsno_']
     """
-    df = df_weights_tract.merge(df_acs_tr, on='tract', how='left')
-    aggs = [col for col in df.columns if col not in ['tract','taz','weight']]
-    df[aggs] = df[aggs].apply(pd.to_numeric, errors='coerce').fillna(0)
-    for var in aggs:
-        df[var] = df[var] * df['weight']
-    return df.groupby('taz', as_index=False)[aggs].sum()
+    import os
+    import pandas as pd
+    import logging
+
+    logger = logging.getLogger(__name__)
+
+    # 1) Log incoming schemas
+    logger.info(f"acs_df columns: {acs_df.columns.tolist()}")
+    logger.info(f"weights_df columns: {weights_df.columns.tolist()}")
+
+    # 1a) Derive county_fips from tract
+    acs_df = acs_df.copy()
+    acs_df['county_fips'] = acs_df['tract'].str[:5]
+
+    # 2) Merge on tract
+    merged = acs_df.merge(
+        weights_df[['tract', 'taz', 'weight']],
+        on='tract',
+        how='left'
+    )
+    missing = merged['weight'].isna().sum()
+    if missing > 0:
+        logger.warning(f"{missing} records missing tract-to-TAZ weight")
+
+    # 3) Write merged for inspection
+    merged_path = os.path.join(os.getcwd(), 'step9_merged.csv')
+    merged.to_csv(merged_path, index=False)
+    logger.info(f"Wrote merged tract-to-TAZ to {merged_path}")
+
+    # 4) Compute weighted ACS variables
+    acs_vars = ['hhwrks0_', 'hhwrks1_', 'hhwrks2_', 'hhwrks3p_',
+                'ownkidsyes_', 'rentkidsyes_', 'ownkidsno_', 'rentkidsno_']
+    for var in acs_vars:
+        merged[f'weighted_{var}'] = merged[var] * merged['weight']
+
+    # 5) Aggregate to TAZ **and preserve county_fips**
+    agg_dict = {f'weighted_{var}': 'sum' for var in acs_vars}
+    # keep one county_fips per TAZ (assumes each TAZ is in a single county)
+    agg_dict.update({
+        'taz': 'first',
+        'county_fips': 'first'      # ← add this line
+    })
+    taz_df = merged.groupby('taz', as_index=False).agg(agg_dict)
+
+    # 6) Preserve original TAZ identifier
+    taz_df['TAZ1454'] = taz_df['taz']
+
+    # 7) Write summary for inspection
+    summary_path = os.path.join(os.getcwd(), 'step9_taz_summary.csv')
+    taz_df.to_csv(summary_path, index=False)
+    logger.info(f"Wrote TAZ ACS summary to {summary_path}")
+
+    return taz_df
 """ 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)

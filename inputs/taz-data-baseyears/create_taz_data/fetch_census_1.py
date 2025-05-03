@@ -267,16 +267,18 @@ def step4_fetch_dhc_tract(c, year=DECENNIAL_YEAR):
     """
     Download decennial DHC variables for tracts using the Census API.
     Returns a DataFrame with columns:
-      - tract : 11-digit GEOID (state+county+tract)
+      - tract       : 11-digit GEOID (state+county+tract)
       - one column per VARIABLES['DHC_TRACT_VARIABLES'] key
+      - county_fips : 3-digit county FIPS (from the raw API response)
+      - County_Name : full county name (matches GEO['BA_COUNTY_FIPS_CODES'])
     """
     import requests
 
     # 1) pick a valid decennial year
     dec_year = year if year in (2000, 2010, 2020) else DECENNIAL_YEAR
 
-    # 2) map and API vars
-    var_map  = VARIABLES.get('DHC_TRACT_VARIABLES', {})
+    # 2) pull your mapping of clean names → API codes
+    var_map = VARIABLES.get('DHC_TRACT_VARIABLES', {})
     if not var_map:
         raise ValueError("CONFIG ERROR: DHC_TRACT_VARIABLES is empty")
 
@@ -309,24 +311,26 @@ def step4_fetch_dhc_tract(c, year=DECENNIAL_YEAR):
 
     df = pd.DataFrame(rows)
 
-    # 4) rename raw codes → clean var names
-    df = df.rename(columns={code: name for name, code in var_map.items()})
-
-    # 5) build the full 11-digit tract key
+    # 4) build the full 11-digit tract GEOID
     df['tract'] = (
-        df['state'].astype(str).str.zfill(2) +
-        df['county'].astype(str).str.zfill(3) +
-        df['tract'].astype(str).str.zfill(6)
+        df['state'].str.zfill(2) +
+        df['county'].str.zfill(3) +
+        df['tract'].str.zfill(6)
     )
 
-    # 6) pull out just tract + DHC vars, coercing to int
+    # 5) pull out each API field into its clean name
     out = pd.DataFrame({'tract': df['tract']})
-    for name in var_map.keys():
-        out[name] = (
-            pd.to_numeric(df[name], errors='coerce')
+    for clean_name, api_code in var_map.items():
+        out[clean_name] = (
+            pd.to_numeric(df[api_code], errors='coerce')
               .fillna(0)
               .astype(int)
         )
+
+    # 6) retain the raw county FIPS from df
+    out['county_fips'] = df['county'].astype(str).str.zfill(3)
+    # 7) map to full county name
+    out['County_Name'] = out['county_fips'].map(GEO['BA_COUNTY_FIPS_CODES'])
 
     return out
 """ 

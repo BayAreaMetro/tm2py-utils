@@ -15,6 +15,7 @@ from pathlib import Path
 import pandas as pd
 import yaml
 from typing import List
+from census import Census
 
 # Load configuration
 CONFIG_PATH = Path(__file__).parent / 'config.yaml'
@@ -22,6 +23,175 @@ with CONFIG_PATH.open() as f:
     cfg = yaml.safe_load(f)
 CONSTANTS = cfg['constants']
 PATHS = cfg['paths']
+
+# ------------------------------
+# LOAD CONFIG
+# ------------------------------
+CONFIG_PATH = Path(__file__).parent / 'config.yaml'
+with CONFIG_PATH.open() as f:
+    cfg = yaml.safe_load(f)
+CONSTANTS = cfg['constants']
+GEO       = cfg.get('geo_constants', {})
+PATHS     = cfg['paths']
+
+STATE_CODE           = GEO.get('STATE_CODE')
+BAY_COUNTIES         = GEO.get('BAY_COUNTIES', [])
+ACS_5YEAR_LATEST     = CONSTANTS.get('ACS_5YEAR_LATEST')
+ACS_PUMS_1YEAR_LATEST= CONSTANTS.get('ACS_PUMS_1YEAR_LATEST')
+EMPRES_LODES_WEIGHT  = CONSTANTS.get('EMPRES_LODES_WEIGHT', 0.0)
+
+def summarize_census_to_taz(working_df, weights_block_df):
+    """
+    Summarize raw block-level working data to TAZ with:
+      - TOTPOP : total population
+      - TOTHH  : total households
+      - HHPOP  : household population
+      - gqpop  : group-quarters population
+
+    Expects:
+      working_df        : DataFrame with 'block_geoid', 'pop', 'hh', 'hhpop', and all 'gq_*' cols
+      weights_block_df  : DataFrame with ['GEOID','TAZ1454','weight']
+
+    Returns:
+      DataFrame with ['taz','TOTPOP','TOTHH','HHPOP','gqpop']
+    """
+    # 1) Normalize the weights table
+    wb = weights_block_df.rename(columns={
+        'GEOID':   'block_geoid',
+        'TAZ1454': 'taz'
+    })
+
+    # 2) Merge block→TAZ weights onto working
+    tmp = working_df.merge(
+        wb[['block_geoid','taz','weight']],
+        on='block_geoid',
+        how='left'
+    )
+    missing = tmp['weight'].isna().sum()
+    if missing > 0:
+        logging.warning(f"{missing} working rows missing a block→TAZ weight")
+
+    # 3) Compute weighted block shares
+    tmp['pop_taz']   = tmp['pop']    * tmp['weight']
+    tmp['hh_taz']    = tmp['hh']     * tmp['weight']
+    tmp['hhpop_taz'] = tmp['hhpop']  * tmp['weight']
+
+    # 4) Collapse all gq_inst / gq_noninst into one gqpop, then weight it
+    gq_cols = [c for c in tmp.columns if c.startswith('gq_inst') or c.startswith('gq_noninst')]
+    tmp['gqpop']     = tmp[gq_cols].sum(axis=1)
+    tmp['gqpop_taz'] = tmp['gqpop'] * tmp['weight']
+
+    # 5) Aggregate to TAZ
+    taz_census = tmp.groupby('taz', as_index=False).agg(
+        TOTPOP = ('pop_taz',   'sum'),
+        TOTHH  = ('hh_taz',    'sum'),
+        HHPOP  = ('hhpop_taz', 'sum'),
+        gqpop  = ('gqpop_taz', 'sum'),
+    )
+
+    return taz_census
+
+
+def build_county_targets(
+    tazdata_census: pd.DataFrame,
+    lehd_lodes: pd.DataFrame,
+    dhc_gqpop: pd.DataFrame,
+    state_code: str,
+    baycounties: List[str],
+    acs_5year: int,
+    acs_pums_1year: int,
+    census_client: Census,
+    empres_lodes_weight: float
+) -> pd.DataFrame:
+    """
+    Build county-level targets for TAZ data based on census and LODES inputs.
+    Returns a DataFrame with current totals, target totals, and diffs.
+    """
+
+    tazdata_census['County_Name'] = tazdata_census['county_fips'] \
+            .map(GEO['BA_COUNTY_FIPS_CODES'])
+    # 1) compute current county totals from TAZ data
+    current = (
+        tazdata_census
+        .groupby('County_Name', as_index=False)
+        .agg(
+            TOTHH=('TOTHH', 'sum'),
+            TOTPOP=('TOTPOP', 'sum'),
+            GQPOP=('gqpop', 'sum'),
+            HHPOP=('HHPOP', 'sum'),
+            EMPRES=('EMPRES', 'sum'),
+            TOTEMP=('TOTEMP', 'sum')
+        )
+    )
+    county_targets = current.copy()
+    # initialize target cols equal to current
+    for col in ['TOTHH','TOTPOP','GQPOP','HHPOP','EMPRES','TOTEMP']:
+        county_targets[f"{col}_target"] = county_targets[col]
+
+    # 2) optionally scale to ACS 1-year if older
+    if acs_5year < acs_pums_1year + 2:
+        acs_vars: Dict[str,str] = {
+            'TOTHH_target':'B19001_001',
+            'TOTPOP_target':'B01001_001',
+            'HHPOP_target':'B28005_001',
+            'employed':'B23025_004',
+            'armedforces':'B23025_006'
+        }
+        records = []
+        for county in baycounties:
+            res = census_client.acs.get(
+                list(acs_vars.values()),
+                geo={'for':'county','in':f'state:{state_code} county:{county}'},
+                year=acs_pums_1year
+            )[0]
+            name = res['NAME'].replace(' County,','')
+            row = {'County_Name':name}
+            # extract ACS values
+            row['TOTHH_target']  = res[f"{acs_vars['TOTHH_target']}E"]
+            row['TOTPOP_target'] = res[f"{acs_vars['TOTPOP_target']}E"]
+            row['HHPOP_target']  = res[f"{acs_vars['HHPOP_target']}E"]
+            empl = res[f"{acs_vars['employed']}E"] + res[f"{acs_vars['armedforces']}E"]
+            row['EMPRES_target'] = empl
+            row['GQPOP_target']  = row['TOTPOP_target'] - row['HHPOP_target']
+            records.append(row)
+        acs_df = pd.DataFrame(records)
+        # subtract institutionalized GQ from DHC
+        acs_df = acs_df.merge(
+            dhc_gqpop[['County_Name','gq_inst']],
+            on='County_Name', how='left'
+        )
+        acs_df['TOTPOP_target'] -= acs_df['gq_inst']
+        acs_df['GQPOP_target']   -= acs_df['gq_inst']
+        # replace targets
+        county_targets = (
+            county_targets.drop(columns=[
+                'TOTHH_target','TOTPOP_target','HHPOP_target','EMPRES_target','GQPOP_target'
+            ])
+            .merge(acs_df, on='County_Name')
+        )
+
+    # 3) blend in LODES employment
+    lodes_sum = (
+        lehd_lodes
+        .query('w_county in @baycounties and h_county in @baycounties')
+        .groupby('h_county', as_index=False)['TOTEMP']
+        .sum()
+        .rename(columns={'h_county':'County_Name','TOTEMP':'EMPRES_LEHD_target'})
+    )
+    county_targets = county_targets.merge(lodes_sum, on='County_Name', how='left')
+    county_targets['EMPRES_target'] = (
+        empres_lodes_weight * county_targets['EMPRES_LEHD_target'] +
+        (1-empres_lodes_weight) * county_targets['EMPRES_target']
+    )
+    county_targets.drop(columns=['EMPRES_LEHD_target'], inplace=True)
+
+    # 4) compute diffs
+    for col in ['TOTHH','TOTPOP','GQPOP','HHPOP','EMPRES','TOTEMP']:
+        county_targets[f"{col}_diff"] = (
+            county_targets[f"{col}_target"] - county_targets[col]
+        )
+    return county_targets
+
 
 # ------------------------------
 # STEP 10: Integrate employment

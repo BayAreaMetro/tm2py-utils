@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python 
 # -*- coding: utf-8 -*-
 """
 run_full_pipeline.py
@@ -7,6 +7,7 @@ Master script to execute the entire TAZ data pipeline in sequence by
 calling each step function directly.
 """
 import os
+import sys
 import logging
 from pathlib import Path
 import yaml
@@ -17,14 +18,13 @@ import pandas as pd
 CONFIG_PATH = Path(__file__).parent / 'config.yaml'
 with CONFIG_PATH.open() as f:
     cfg = yaml.safe_load(f)
-CONSTANTS = cfg['constants']
-PATHS     = cfg['paths']
-ACS_5YR_LATEST = CONSTANTS['ACS_5YEAR_LATEST']
-YEAR           = CONSTANTS['years'][0]
+CONSTANTS       = cfg['constants']
+PATHS           = cfg['paths']
+GEO             = cfg.get('geo_constants', {})
+ACS_5YR_LATEST  = CONSTANTS['ACS_5YEAR_LATEST']
+YEAR            = CONSTANTS['years'][0]
 
-
-# Add project modules to path
-import sys
+# Ensure project modules on path
 sys.path.insert(0, str(Path(__file__).parent))
 
 # Import individual step functions
@@ -45,7 +45,10 @@ from summarize_to_taz_3 import (
     compute_tract_weights,
     step9_summarize_tract_to_taz
 )
+# Integrate & scale functions, including county targets builder
 from integrate_emp_scale_4 import (
+    summarize_census_to_taz,
+    build_county_targets,
     step10_integrate_employment,
     step11_compute_scale_factors,
     step12_apply_scaling
@@ -57,6 +60,7 @@ from finalize_pipeline_5 import (
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
+    # Census client
     c = Census(os.getenv('CENSUS_API_KEY', ''), year=None)
 
     # Steps 1–4: Fetch Census data
@@ -80,39 +84,65 @@ if __name__ == '__main__':
     # Steps 8–9: Summarize to TAZ
     logging.info('Running Step 8: compute block weights and summarize hhinc to TAZ')
     weights_block = compute_block_weights(PATHS)
-    taz_hhinc = step8_summarize_to_taz(hhinc, weights_block)
+    taz_hhinc     = step8_summarize_to_taz(hhinc, weights_block)
+
     logging.info('Running Step 9: compute tract weights and summarize ACS tr to TAZ')
     weights_tract = compute_tract_weights(PATHS)
-    taz_acs = step9_summarize_tract_to_taz(acs_tr, weights_tract)
+    taz_acs       = step9_summarize_tract_to_taz(acs_tr, weights_tract)
 
     # Combine TAZ outputs
     logging.info('Combining TAZ household income and ACS summaries')
-    taz_hhinc['taz'] = taz_hhinc['TAZ1454'].astype(str)
-    taz_acs['taz'] = taz_acs['taz'].astype(str)
-    taz_base = taz_hhinc.merge(taz_acs, on='taz', how='left')
+    taz_hhinc['taz'] = taz_hhinc['taz'].astype(str)
+    taz_acs['taz']   = taz_acs['taz'].astype(str)
+    taz_base         = taz_hhinc.merge(taz_acs, on='taz', how='left')
+
+    # Summarize raw census counts up to TAZ
+    logging.info('Summarizing raw census totals to TAZ for county targets')
+    taz_census = summarize_census_to_taz(working, weights_block)
+    taz_base   = taz_base.merge(taz_census, on='taz', how='left')
+
+    # Build county targets and merge
+    logging.info('Building county targets')
+    county_targets = build_county_targets(
+        tazdata_census      = taz_base,
+        lehd_lodes          = pd.read_csv(os.path.expandvars(PATHS['lehd_lodes_csv']), dtype=str),
+        dhc_gqpop           = dhc_tr,
+        state_code          = GEO['STATE_CODE'],
+        baycounties         = GEO['BAYCOUNTIES'],
+        acs_5year           = ACS_5YR_LATEST,
+        acs_pums_1year      = CONSTANTS['ACS_PUMS_1YEAR_LATEST'],
+        census_client       = c,
+        empres_lodes_weight = CONSTANTS['EMPRES_LODES_WEIGHT']
+    )
+
+    # Extract county_base/target and merge back on County_Name
+    merge_ct = (
+        county_targets[['County_Name','EMPRES','EMPRES_target']]
+        .rename(columns={'EMPRES':'county_base','EMPRES_target':'county_target'})
+    )
+    taz_base = taz_base.merge(merge_ct, on='County_Name', how='left')
 
     # Step 10: Integrate employment
     logging.info('Running Step 10: integrate employment')
     df_emp = step10_integrate_employment(YEAR)
     df_emp['taz'] = df_emp['taz'].astype(str)
-    taz_base['taz'] = taz_base['taz'].astype(str)
-    taz_base = taz_base.merge(df_emp, on='taz', how='left').fillna(0)
+    taz_base      = taz_base.merge(df_emp, on='taz', how='left').fillna(0)
 
     # Step 11: Compute scale factors
     logging.info('Running Step 11: compute scale factors')
     scale_df = step11_compute_scale_factors(
-        taz_df=taz_base,
-        taz_targeted=taz_base,
-        base_col='emp_lodes',
-        target_col='emp_lodes'
+        taz_df       = taz_base,
+        taz_targeted = taz_base,
+        base_col     = 'county_base',
+        target_col   = 'county_target'
     )
 
     # Step 12: Apply scaling
     logging.info('Running Step 12: apply scaling')
     taz_scaled = step12_apply_scaling(
-        taz_base,
-        taz_base,
-        vars_to_scale=['emp_lodes', 'emp_self']
+        taz_df       = taz_base,
+        taz_targeted = taz_base,
+        vars_to_scale= ['emp_lodes', 'emp_self']
     )
 
     # Step 13: Join PBA2015
