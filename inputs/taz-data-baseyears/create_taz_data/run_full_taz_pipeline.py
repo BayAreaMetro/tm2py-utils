@@ -101,6 +101,14 @@ if __name__ == '__main__':
     taz_census = summarize_census_to_taz(working, weights_block)
     taz_base   = taz_base.merge(taz_census, on='taz', how='left')
 
+    
+
+    # Step 10: Integrate employment
+    logging.info('Running Step 10: integrate employment')
+    df_emp = step10_integrate_employment(YEAR)
+    df_emp['taz'] = df_emp['taz'].astype(str)
+    taz_base      = taz_base.merge(df_emp, on='taz', how='left').fillna(0)
+
     # Build county targets and merge
     logging.info('Building county targets')
     county_targets = build_county_targets(
@@ -121,12 +129,6 @@ if __name__ == '__main__':
         .rename(columns={'EMPRES':'county_base','EMPRES_target':'county_target'})
     )
     taz_base = taz_base.merge(merge_ct, on='County_Name', how='left')
-
-    # Step 10: Integrate employment
-    logging.info('Running Step 10: integrate employment')
-    df_emp = step10_integrate_employment(YEAR)
-    df_emp['taz'] = df_emp['taz'].astype(str)
-    taz_base      = taz_base.merge(df_emp, on='taz', how='left').fillna(0)
 
     # Step 11: Compute scale factors
     logging.info('Running Step 11: compute scale factors')

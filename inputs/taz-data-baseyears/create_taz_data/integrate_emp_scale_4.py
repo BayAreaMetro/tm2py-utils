@@ -43,52 +43,52 @@ EMPRES_LODES_WEIGHT  = CONSTANTS.get('EMPRES_LODES_WEIGHT', 0.0)
 def summarize_census_to_taz(working_df, weights_block_df):
     """
     Summarize raw block-level working data to TAZ with:
-      - TOTPOP : total population
-      - TOTHH  : total households
-      - HHPOP  : household population
+      - TOTPOP : total population (hhpop_ + gqpop)
+      - TOTHH  : total households (tothh_)
+      - HHPOP  : household population (hhpop_)
       - gqpop  : group-quarters population
-
+    
     Expects:
-      working_df        : DataFrame with 'block_geoid', 'pop', 'hh', 'hhpop', and all 'gq_*' cols
-      weights_block_df  : DataFrame with ['GEOID','TAZ1454','weight']
-
-    Returns:
-      DataFrame with ['taz','TOTPOP','TOTHH','HHPOP','gqpop']
+      working_df       : DataFrame with 'block_geoid', 'blockgroup', 'tothh_', 'hhpop_', 'gq_*'
+      weights_block_df : DataFrame with ['GEOID','blockgroup','TAZ1454','weight']
     """
-    # 1) Normalize the weights table
-    wb = weights_block_df.rename(columns={
-        'GEOID':   'block_geoid',
-        'TAZ1454': 'taz'
-    })
+    import logging
+    logger = logging.getLogger(__name__)
+    import pandas as pd
 
-    # 2) Merge block→TAZ weights onto working
-    tmp = working_df.merge(
-        wb[['block_geoid','taz','weight']],
-        on='block_geoid',
+    # 1) Rename TAZ and cast blockgroup → str on both
+    wb = weights_block_df.rename(columns={'TAZ1454': 'taz'}).copy()
+    wb['blockgroup'] = wb['blockgroup'].astype(str)
+    wb['taz']        = wb['taz'].astype(str)
+
+    df = working_df.copy()
+    df['blockgroup'] = df['blockgroup'].astype(str)
+
+    # 2) Merge on blockgroup (not block_geoid)
+    tmp = df.merge(
+        wb[['blockgroup','taz','weight']],
+        on='blockgroup',
         how='left'
     )
     missing = tmp['weight'].isna().sum()
     if missing > 0:
-        logging.warning(f"{missing} working rows missing a block→TAZ weight")
+        logger.warning(f"{missing} working rows missing a BG→TAZ weight")
 
-    # 3) Compute weighted block shares
-    tmp['pop_taz']   = tmp['pop']    * tmp['weight']
-    tmp['hh_taz']    = tmp['hh']     * tmp['weight']
-    tmp['hhpop_taz'] = tmp['hhpop']  * tmp['weight']
-
-    # 4) Collapse all gq_inst / gq_noninst into one gqpop, then weight it
+    # 3) Build gqpop, then weight all counts
     gq_cols = [c for c in tmp.columns if c.startswith('gq_inst') or c.startswith('gq_noninst')]
-    tmp['gqpop']     = tmp[gq_cols].sum(axis=1)
-    tmp['gqpop_taz'] = tmp['gqpop'] * tmp['weight']
+    tmp['gqpop']    = tmp[gq_cols].sum(axis=1)
+    tmp['TOTHH_taz']  = tmp['tothh_']  * tmp['weight']
+    tmp['HHPOP_taz']  = tmp['hhpop_']  * tmp['weight']
+    tmp['gqpop_taz']  = tmp['gqpop']   * tmp['weight']
+    tmp['TOTPOP_taz'] = (tmp['hhpop_'] + tmp['gqpop']) * tmp['weight']
 
-    # 5) Aggregate to TAZ
+    # 4) Aggregate to TAZ
     taz_census = tmp.groupby('taz', as_index=False).agg(
-        TOTPOP = ('pop_taz',   'sum'),
-        TOTHH  = ('hh_taz',    'sum'),
-        HHPOP  = ('hhpop_taz', 'sum'),
-        gqpop  = ('gqpop_taz', 'sum'),
+        TOTPOP = ('TOTPOP_taz', 'sum'),
+        TOTHH  = ('TOTHH_taz',  'sum'),
+        HHPOP  = ('HHPOP_taz',  'sum'),
+        gqpop  = ('gqpop_taz',  'sum'),
     )
-
     return taz_census
 
 
