@@ -82,7 +82,7 @@ def main():
     acs_bg = step2_fetch_acs_bg(c, YEAR)
     sanity_check_df(acs_bg, "step2_fetch_acs_bg")
     logging.info('Step 3: fetch ACS tract data')
-    acs_tr = step3_fetch_acs_tract(c, min(YEAR+2, ACS_5YR))
+    acs_tr = step3_fetch_acs_tract(c, ACS_5YR)
     sanity_check_df(acs_tr, "step3_fetch_acs_tract")
     logging.info('Step 4: fetch DHC tract data')
     dhc_tr = step4_fetch_dhc_tract(c)
@@ -97,33 +97,37 @@ def main():
     sanity_check_df(working, "step6_build_workingdata")
     logging.info('Step 7: process household income')
     hhinc = step7_process_household_income(working, ACS_5YR)
+    sanity_check_df(working, "step7_process_household_income")
 
     # Steps 8–9: summarize to TAZ
     logging.info('Step 8: summarize hhinc to TAZ')
     weights_block = compute_block_weights(PATHS)
+    sanity_check_df(weights_block, "compute_block_weights")
     taz_hhinc = step8_summarize_to_taz(hhinc, weights_block)
+    sanity_check_df(taz_hhinc, "taz_hhinc")
     logging.info('Step 9: summarize ACS tract to TAZ')
     weights_tract = compute_tract_weights(PATHS)
+    sanity_check_df(weights_tract, "commute_tract_weights")
     taz_acs = step9_summarize_tract_to_taz(acs_tr, weights_tract)
+    sanity_check_df(taz_acs, "step9_summarize_tract_to_taz")
 
     # Combine TAZ summaries
     logging.info('Combining TAZ summaries')
     taz_hhinc['taz'] = taz_hhinc['taz'].astype(str)
     taz_acs['taz'] = taz_acs['taz'].astype(str)
     taz_base = taz_hhinc.merge(taz_acs, on='taz', how='left')
+    sanity_check_df(taz_base, 'taz_base')
+  
 
     # Raw census counts to TAZ
     logging.info('Summarize raw census to TAZ')
     taz_census = summarize_census_to_taz(working, weights_block)
-    taz_base = taz_base.merge(taz_census, on='taz', how='left')
+    sanity_check_df(taz_census, "summarize_census_to_taz")
 
     # Step 10: integrate employment
     logging.info('Step 10: integrate employment')
-    df_emp = step10_integrate_employment(YEAR)
-    df_emp['taz'] = df_emp['taz'].astype(str)
-    df_emp = df_emp.rename(columns={'emp_lodes': 'EMPRES'})
-    df_emp['TOTEMP'] = df_emp['EMPRES'] + df_emp['emp_self']
-    taz_base = taz_base.merge(df_emp[['taz','EMPRES','TOTEMP']], on='taz', how='left').fillna(0)
+    df_emp = step10_integrate_employment(taz_base, taz_census, YEAR)
+    sanity_check_df(df_emp, "step10_integrate_employment")
 
     # Build and merge county targets
     logging.info('Building county targets')

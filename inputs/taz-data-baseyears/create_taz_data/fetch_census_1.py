@@ -358,18 +358,4 @@ def step4_fetch_dhc_tract(c, year=DECENNIAL_YEAR):
     out['County_Name'] = out['county_fips'].map(GEO['BA_COUNTY_FIPS_CODES'])
 
     return out
-""" 
-if __name__ == '__main__':
-    # Initialize Census client
-    from census import Census
-    c = Census(CENSUS_API_KEY)
-
-    # Fetch Census-based data layers
-    outputs = {}
-    outputs['blocks'] = step1_fetch_block_data(c, YEAR)
-    outputs['acs_bg'] = step2_fetch_acs_bg(c, YEAR)
-    outputs['acs_tr'] = step3_fetch_acs_tract(c, min(YEAR+2, ACS_5YR_LATEST))
-    outputs['dhc_tr'] = step4_fetch_dhc_tract(c)
-
-    # Summary of fetched layers
-    print('Fetched data layers:', list(outputs.keys())) """
+    

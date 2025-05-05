@@ -267,61 +267,105 @@ def build_county_targets(
 # ------------------------------
 # STEP 10: Integrate employment
 # ------------------------------
-def step10_integrate_employment(year):
+def step10_integrate_employment(
+    taz_base: pd.DataFrame,
+    taz_census: pd.DataFrame,
+    year: int
+) -> pd.DataFrame:
     """
-    Integrate LODES wage & salary employment and self-employment into a single TAZ-level DataFrame.
+    Step 10: Merge your census‐derived TAZ summary and employment
+    into the base TAZ DataFrame, avoiding any _x/_y collisions.
 
-    Reads:
-      - PATHS['wage_salary_csv'] : CSV with columns ["COUNTY_NAME", "TAZ1454", "AGREMPN", "FPSEMPN", 
-                                      "HEREMPN", "MWTEMPN", "RETEMPN", "OTHEMPN", "TOTEMP"]
-      - PATHS['self_employment_csv']: CSV with columns ["zone_id", "industry", "value"]
+    Parameters
+    ----------
+    taz_base : pd.DataFrame
+      Output of Step 9 (must include a 'taz' column).
+    taz_census : pd.DataFrame
+      Output of summarize_census_to_taz(...), keyed on 'taz'.
+    year : int
+      Processing year (for naming any output file).
 
-    Returns:
-      - DataFrame with columns:
-          - taz       : TAZ ID (string)
-          - emp_lodes : total wage & salary employment from TOTEMP
-          - emp_self  : sum of self-employment value across industries
+    Returns
+    -------
+    pd.DataFrame
+      A DataFrame with:
+        - all original taz_base columns (plus every census field, merged & coalesced),
+        - EMPRES (wage & salary) and TOTEMP (total) employment columns.
     """
-    import os
-    import pandas as pd
-    import logging
+
 
     logger = logging.getLogger(__name__)
 
-    # 1) Load LODES wage & salary data
+    # --- 1) Merge in all census fields, give them "_cns" suffix to avoid collisions ---
+    merged = taz_base.merge(
+        taz_census,
+        on="taz",
+        how="left",
+        suffixes=("", "_cns")
+    ).fillna(0)
+
+    # --- 2) Auto-coalesce every "_cns" column back into its base name ---
+    cns_cols = [c for c in merged.columns if c.endswith("_cns")]
+    for cns in cns_cols:
+        base = cns[:-4]  # strip off "_cns"
+        # cast to int after filling
+        merged[base] = (
+            merged[base]
+                  .fillna( merged[cns] )
+                  .astype(int)
+        )
+    merged.drop(columns=cns_cols, inplace=True)
+    logger.info("Census fields merged & coalesced")
+
+    # --- 3) Load & prep LODES wage-salary data ---
     path_lodes = os.path.expandvars(PATHS['wage_salary_csv'])
     df_lodes = pd.read_csv(path_lodes, dtype=str)
     logger.info(f"Loaded LODES data from {path_lodes}, columns: {df_lodes.columns.tolist()}")
 
     # Ensure TAZ key
     df_lodes['taz'] = df_lodes['TAZ1454'].astype(str)
-    # Extract total employment
-    df_lodes['emp_lodes'] = pd.to_numeric(df_lodes['TOTEMP'], errors='coerce').fillna(0).astype(int)
-    lodes = df_lodes[['taz', 'emp_lodes']]
+    df_lodes['EMPRES'] = (
+        pd.to_numeric(df_lodes['TOTEMP'], errors='coerce')
+          .fillna(0).astype(int)
+    )
 
-    # 2) Load self-employment data
+    # --- 4) Load & prep self-employment data ---
     path_self = os.path.expandvars(PATHS['self_employment_csv'])
     df_self = pd.read_csv(path_self, dtype=str)
-    logger.info(f"Loaded self-employment data from {path_self}, columns: {df_self.columns.tolist()}")
-
-    # Normalize and aggregate
-    df_self = df_self.rename(columns={'zone_id': 'taz', 'value': 'emp_self'})
-    df_self['emp_self'] = pd.to_numeric(df_self['emp_self'], errors='coerce').fillna(0).astype(int)
+    df_self = df_self.rename(columns={'zone_id':'taz', 'value':'emp_self'})
+    df_self['emp_self'] = (
+        pd.to_numeric(df_self['emp_self'], errors='coerce')
+          .fillna(0).astype(int)
+    )
     self_emp = df_self.groupby('taz', as_index=False)['emp_self'].sum()
 
-    # 3) Merge LODES and self-employment
-    df_emp = lodes.merge(self_emp, on='taz', how='outer').fillna(0)
+    # --- 5) Combine into a single employment table ---
+    df_emp = (
+        df_lodes[['taz','EMPRES']]
+          .merge(self_emp, on='taz', how='outer')
+          .fillna(0)
+    )
+    df_emp['TOTEMP'] = (df_emp['EMPRES'] + df_emp['emp_self']).astype(int)
 
-    # Convert to appropriate dtypes
-    df_emp['emp_lodes'] = df_emp['emp_lodes'].astype(int)
-    df_emp['emp_self']  = df_emp['emp_self'].astype(int)
+    # optional: write for inspection
+    out_emppath = os.path.join(
+        os.getcwd(),
+        f"step10_employment_combined_{year}.csv"
+    )
+    df_emp.to_csv(out_emppath, index=False)
+    logger.info(f"Wrote combined employment data to {out_emppath}")
 
-    # 4) Write intermediate files for inspection
-    merged_path = os.path.join(os.getcwd(), 'step10_employment_combined.csv')
-    df_emp.to_csv(merged_path, index=False)
-    logger.info(f"Wrote combined employment data to {merged_path}")
+    # --- 6) Merge EMPRES & TOTEMP into the now census-enhanced TAZ base ---
+    final = merged.merge(
+        df_emp[['taz','EMPRES','TOTEMP']],
+        on='taz',
+        how='left'
+    ).fillna(0)
+    final['EMPRES'] = final['EMPRES'].astype(int)
+    final['TOTEMP'] = final['TOTEMP'].astype(int)
 
-    return df_emp
+    logger.info("Employment integrated into TAZ base")
+    return final
 
 def step11_compute_scale_factors(taz_df: pd.DataFrame,
                                  taz_targeted: pd.DataFrame,
@@ -493,32 +537,3 @@ def step12_apply_scaling(taz_df: pd.DataFrame,
         df[col] = df[col] * df['scale_factor']
 
     return df
-
-# ------------------------------
-# MAIN: integrate employment and apply scaling
-# ------------------------------
-if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
-    # STEP 10: Integrate employment data
-    # Combine household income and ACS summaries into unified TAZ DataFrame
-    taz_hh = taz_hhinc.rename(columns={'TAZ1454':'taz'})
-    taz_hh['taz'] = taz_hh['taz'].astype(str)
-    taz_acs['taz'] = taz_acs['taz'].astype(str)
-    taz = taz_hh.merge(taz_acs, on='taz', how='left')
-
-    # Step 10: integrate employment
-    df_emp = step10_integrate_employment(YEAR)
-    taz = taz.merge(df_emp, on='taz', how='left')
-
-    # Step 11: compute scale factors
-    # taz_targeted: DataFrame with county_target and county_base for each TAZ
-    # For now, copy taz to serve as both base and target
-    taz_targeted = taz.copy()
-    scale_df = step11_compute_scale_factors(taz, taz_targeted)
-    print('Scale factors computed: rows=', scale_df.shape[0])
-
-    # Step 12: apply scaling
-    taz_scaled = step12_apply_scaling(taz, taz_targeted,
-                                      vars_to_scale=['emp_lodes','emp_self'])
-
-
