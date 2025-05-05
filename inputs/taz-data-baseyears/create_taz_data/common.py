@@ -571,3 +571,116 @@ def update_gqpop_to_county_totals(source_df, target_df, acs1year):
     )
 
     return df3
+
+def apply_county_targets_to_taz(
+    taz_df: pd.DataFrame,
+    county_targets: pd.DataFrame,
+    sum_var: str,
+    partial_vars: List[str]
+) -> pd.DataFrame:
+    """
+    Scale TAZ‐level variables to match county‐level control totals.
+
+    Args:
+        taz_df: DataFrame with one row per TAZ. Must include:
+            - 'taz' (or already a 'county_fips' column)
+            - sum_var (e.g. 'EMPRES')
+            - all names in partial_vars
+        county_targets: DataFrame with county rows. Must include:
+            - 'county_fips' (string of length 5)
+            - sum_var column (the target total for each county)
+        sum_var: name of the aggregate variable (in both taz_df and county_targets)
+        partial_vars: list of disaggregate column names in taz_df to scale similarly
+
+    Returns:
+        A copy of taz_df with sum_var and each partial_var multiplied by the county scale factor.
+
+    Raises:
+        KeyError: if any required columns are missing.
+    """
+    df = taz_df.copy()
+
+    # 1) Ensure we have a 'county_fips' column
+    if 'county_fips' not in df.columns:
+        # assume TAZ codes are strings where first 5 chars = county FIPS
+        df['county_fips'] = df['taz'].astype(str).str[:5]
+
+    # 2) Validate input columns
+    needed = {sum_var, *partial_vars, 'county_fips'}
+    missing = needed - set(df.columns)
+    if missing:
+        raise KeyError(f"apply_county_targets: missing in taz_df → {missing}")
+
+    tgt_needed = {'county_fips', sum_var}
+    missing_tgt = tgt_needed - set(county_targets.columns)
+    if missing_tgt:
+        raise KeyError(f"apply_county_targets: missing in county_targets → {missing_tgt}")
+
+    # 3) Compute actual county totals
+    actual = (
+        df
+        .groupby('county_fips')[sum_var]
+        .sum()
+        .reset_index()
+        .rename(columns={sum_var: f"{sum_var}_actual"})
+    )
+
+    # 4) Merge targets + actuals, compute scale factor
+    merged = (
+        county_targets[['county_fips', sum_var]]
+        .merge(actual, on='county_fips', how='left')
+    )
+    merged['scale_factor'] = merged[sum_var] / merged[f"{sum_var}_actual"]
+
+    # 5) Bring scale factor back to TAZ rows
+    df = df.merge(
+        merged[['county_fips', 'scale_factor']],
+        on='county_fips',
+        how='left'
+    )
+
+    # 6) Apply scaling
+    df[sum_var] = df[sum_var] * df['scale_factor']
+    for var in partial_vars:
+        df[var] = df[var] * df['scale_factor']
+
+    # 7) Clean up
+    df.drop(columns=['scale_factor'], inplace=True)
+
+    return df
+
+
+def sanity_check_df(df: pd.DataFrame, step_name: str) -> pd.DataFrame:
+    # 1) Empty?
+    if df.empty:
+        raise RuntimeError(f"[SANITY] {step_name} returned an empty DataFrame")
+
+    # 2) Numeric columns
+    num = df.select_dtypes(include=[np.number])
+    if num.shape[1] == 0:
+        raise RuntimeError(f"[SANITY] {step_name} has no numeric columns")
+
+    # 3) Column sums & overall sum
+    col_sums = num.sum()
+    total    = col_sums.sum()
+
+    # Convert to full strings
+    sums_str = col_sums.to_string()
+    logging.info(f"[SANITY] {step_name} column sums:\n{sums_str}")
+    logging.info(f"[SANITY] {step_name} overall numeric sum: {total}")
+
+    if total == 0:
+        raise RuntimeError(f"[SANITY] {step_name} numeric sum is zero — aborting")
+
+    # 4) Descriptive stats
+    desc = num.describe().T
+    desc_str = desc.to_string()  
+    logging.info(f"[SANITY] {step_name} descriptive stats:\n{desc_str}")
+
+    return df
+
+    def with_sanity(step_fn):
+        def wrapper(*args, **kwargs):
+            df = step_fn(*args, **kwargs)
+            return sanity_check_df(df, step_fn.__name__)
+        return wrapper

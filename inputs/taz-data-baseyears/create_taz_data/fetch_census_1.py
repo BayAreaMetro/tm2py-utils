@@ -41,6 +41,8 @@ import pandas as pd
 import yaml
 import requests
 from census import Census
+import time
+from common import retrieve_census_variables, census_to_df
 
 
 
@@ -213,50 +215,73 @@ def step2_fetch_acs_bg(c, year):
 # ------------------------------
 # STEP 3: Fetch ACS tract variables
 # ------------------------------
-def step3_fetch_acs_tract(c, year=YEAR):
-    var_map    = VARIABLES.get('ACS_TRACT_VARIABLES', {})
+def step3_fetch_acs_tract(c, year=YEAR, max_retries=3, backoff=5):
+    var_map  = VARIABLES.get('ACS_TRACT_VARIABLES', {})
     if not var_map:
         raise ValueError('CONFIG ERROR: ACS_TRACT_VARIABLES empty')
 
-    # 1) fetch the raw Census vars with E-suffix
+    # 1) Build the list of E-suffixed codes to fetch
     fetch_vars = [f"{code}E" for code in var_map.values()]
     state_code = GEO['STATE_CODE']
     counties   = list(GEO['BA_COUNTY_FIPS_CODES'].keys())
 
+    # 2) Fetch with retries
     records = []
     for county in counties:
-        recs = retrieve_census_variables(
-            c, year, 'acs5', fetch_vars,
-            for_geo='tract', state=state_code, county=county
-        )
-        records.extend(recs)
+        for attempt in range(1, max_retries+1):
+            try:
+                logging.info(f"[STEP3] attempt {attempt} → fetching {fetch_vars} for tract in {state_code}/{county}")
+                recs = retrieve_census_variables(
+                    c, year, 'acs5', fetch_vars,
+                    for_geo='tract', state=state_code, county=county
+                )
+                if not recs:
+                    raise RuntimeError("empty response")
+                records.extend(recs)
+                break
+            except Exception as e:
+                logging.warning(f"[STEP3] county {county}, attempt {attempt} failed: {e}")
+                if attempt == max_retries:
+                    raise RuntimeError(f"Failed after {max_retries} tries for {state_code}/{county}")
+                time.sleep(backoff)
 
-    if not records:
-        logging.warning(f"No tract ACS for {year}")
-        return pd.DataFrame()
-
+    # 3) Assemble DataFrame
     df = census_to_df(records)
+    logging.info(f"[STEP3] raw df columns: {df.columns.tolist()}")
 
-    # 2) build the full 11-digit tract code
+    # 4) Build the 11-digit tract code
     df['tract'] = (
         df['state'].astype(str).str.zfill(2)
       + df['county'].astype(str).str.zfill(3)
       + df['tract'].astype(str).str.zfill(6)
     )
 
-    # 3) start your output with tract
+    # 5) Pivot into your clean output
     out = pd.DataFrame({'tract': df['tract']})
-
-    # 4) for each (output_name, census_code), grab the E-column or zeros
-    for output_name, code in var_map.items():
+    for out_name, code in var_map.items():
         colE = f"{code}E"
-        # if missing, produce a zero Series of correct length
-        series = df.get(colE, pd.Series(0, index=df.index))
-        out[output_name] = (
+        if colE in df.columns:
+            series = df[colE]
+        elif code in df.columns:
+            series = df[code]
+        else:
+            series = pd.Series(0, index=df.index)
+
+        out[out_name] = (
             pd.to_numeric(series, errors='coerce')
               .fillna(0)
               .astype(int)
         )
+
+    # DEBUG
+    logging.info(f"[STEP3 DEBUG] var_map: {var_map}")
+    logging.info(f"[STEP3 DEBUG] out columns: {out.columns.tolist()}")
+    logging.info(f"[STEP3 DEBUG] out sample:\n{out.head(5)}")
+
+    # 6) Crash if everything is zero
+    if out.drop(columns='tract').values.sum() == 0:
+        logging.error(f"[STEP3] ALL-ZEROS for year={year}, vars={list(var_map.keys())}")
+        raise RuntimeError(f"ACS tract fetch for {year} returned all zeros — aborting")
 
     return out
 
