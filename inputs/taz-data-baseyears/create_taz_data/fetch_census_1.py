@@ -16,6 +16,7 @@ from common import (
     update_tazdata_to_county_target,
     make_hhsizes_consistent_with_population,
 )
+import time
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -172,23 +173,37 @@ def step2b_compute_bg_vars(df: pd.DataFrame) -> pd.DataFrame:
       'svc_ent','prof_heal','svc_heal','svc_fire','svc_law','ret_eat',
       'man_build','svc_pers','ret_sales','svc_off','man_nat','man_prod'
     ]
-    
-    # 2) Employment / occupation summaries
     for cat in cats:
         df[f'occ_{cat}'] = df[f'occ_m_{cat}'] + df[f'occ_f_{cat}']
     
-    # 2) Now your combined bins exactly as in R:
-    # total across all occupations:
+    # 2) Total employment (sum of all occ_* cols)
     occ_cols = [f'occ_{cat}' for cat in cats]
     df['emp_occ_total'] = df[occ_cols].sum(axis=1)
-    # service + retail
-    df['emp_service_retail'] = df['occ_svc_comm'] + df['occ_svc_ent'] \
-                             + df['occ_svc_heal'] + df['occ_svc_fire'] \
-                             + df['occ_svc_law']  + df['occ_svc_pers'] \
-                             + df['occ_svc_off']  + df['occ_ret_sell']  # adjust if needed
-    # manual + military = natural resources + production/moving
-    df['emp_manual_military'] = df['occ_man_nat'] + df['occ_man_build'] \
-                              + df['occ_man_prod']
+    
+    # 3) Service + retail
+    service_cats = ['svc_comm','svc_ent','svc_heal','svc_fire','svc_law','svc_pers','svc_off']
+    df['emp_service_retail'] = df[[f'occ_{c}' for c in service_cats] + ['occ_ret_sales']].sum(axis=1)
+    
+    # 4) Manual + production (natural resources + building + production)
+    df['emp_manual_military'] = (
+        df['occ_man_nat'] +
+        df['occ_man_build'] +
+        df['occ_man_prod']
+    )
+
+    df['sfdu'] = df['unit1d'] + df['unit1a'] + df['mobile'] + df['boat_RV_Van']
+    df['mfdu'] = (
+        df['unit2'] + df['unit3_4'] + df['unit5_9']
+    + df['unit10_19'] + df['unit20_49'] + df['unit50p']
+    )
+    # Tenure
+    df['hh_own']  = df[['own1','own2','own3','own4','own5','own6','own7p']].sum(axis=1)
+    df['hh_rent'] = df[['rent1','rent2','rent3','rent4','rent5','rent6','rent7p']].sum(axis=1)
+    # Household sizes
+    df['hh_size_1']      = df['own1']  + df['rent1']
+    df['hh_size_2']      = df['own2']  + df['rent2']
+    df['hh_size_3']      = df['own3']  + df['rent3']
+    df['hh_size_4_plus'] = df[['own4','own5','own6','own7p','rent4','rent5','rent6','rent7p']].sum(axis=1)
     return df
 # ------------------------------
 # STEP 3: Fetch ACS tract variables

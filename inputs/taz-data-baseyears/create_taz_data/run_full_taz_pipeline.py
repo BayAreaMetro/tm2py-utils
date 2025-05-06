@@ -96,7 +96,7 @@ def main():
     shares = step5_compute_block_shares(blocks, acs_bg)
     sanity_check_df(shares, "step5_compute_block_shares")
     logging.info('Step 6: build working data')
-    working = step6_build_workingdata(shares, acs_bg, acs_tr, dhc_tr)
+    working = step6_build_workingdata(shares, acs_tr, dhc_tr)
     sanity_check_df(working, "step6_build_workingdata")
     
     logging.info('Step 7: process household income')
@@ -109,11 +109,11 @@ def main():
     sanity_check_df(weights_block, "compute_block_weights")
     taz_hhinc = step8_summarize_to_taz(hhinc, weights_block)
     sanity_check_df(taz_hhinc, "taz_hhinc")
-    logging.info('Step 9: summarize ACS tract to TAZ')
-    weights_tract = compute_tract_weights(PATHS)
-    sanity_check_df(weights_tract, "compute_tract_weights")
-    taz_acs = step9_summarize_tract_to_taz(acs_tr, weights_tract)
-    sanity_check_df(taz_acs, "step9_summarize_tract_to_taz")
+    #logging.info('Step 9: summarize ACS tract to TAZ')
+    #weights_tract = compute_tract_weights(PATHS)
+    #sanity_check_df(weights_tract, "compute_tract_weights")
+    #taz_acs = step9_summarize_tract_to_taz(acs_tr, weights_tract)
+    #sanity_check_df(taz_acs, "step9_summarize_tract_to_taz")
 
     # Combine TAZ summaries
     logging.info('Combining TAZ summaries')
