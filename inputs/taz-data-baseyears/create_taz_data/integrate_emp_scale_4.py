@@ -20,6 +20,7 @@ import logging
 import time
 from common import update_tazdata_to_county_target
 from common import make_hhsizes_consistent_with_population
+import numpy as np
 
 
 # Load configuration
@@ -38,55 +39,44 @@ ACS_PUMS_1YEAR_LATEST= CONSTANTS.get('ACS_PUMS_1YEAR_LATEST')
 EMPRES_LODES_WEIGHT  = CONSTANTS.get('EMPRES_LODES_WEIGHT', 0.0)
 
 def summarize_census_to_taz(working_df, weights_block_df):
-    """
-    Summarize raw block-level working data to TAZ with:
-      - TOTPOP : total population (hhpop_ + gqpop)
-      - TOTHH  : total households (tothh_)
-      - HHPOP  : household population (hhpop_)
-      - gqpop  : group-quarters population
-    
-    Expects:
-      working_df       : DataFrame with 'block_geoid', 'blockgroup', 'tothh_', 'hhpop_', 'gq_*'
-      weights_block_df : DataFrame with ['GEOID','blockgroup','TAZ1454','weight']
-    """
-    import logging
-    logger = logging.getLogger(__name__)
     import pandas as pd
+    working_df['block_geoid'] = working_df['block_geoid'].astype(str).str.zfill(15)
+    weights_block_df['GEOID'] = weights_block_df['GEOID'].astype(str).str.zfill(15)
 
-    # 1) Rename TAZ and cast blockgroup → str on both
-    wb = weights_block_df.rename(columns={'TAZ1454': 'taz'}).copy()
-    wb['blockgroup'] = wb['blockgroup'].astype(str)
-    wb['taz']        = wb['taz'].astype(str)
+    # Merge working data with weights on block-group/block-geoid
+    merged = working_df.merge(weights_block_df, left_on='block_geoid', right_on='GEOID', how='left')
 
-    df = working_df.copy()
-    df['blockgroup'] = df['blockgroup'].astype(str)
+    # Variables you need to sum
+    sum_vars = [
+    'tothh', 'hhpop', 'age0004', 'age0519', 'age2044',
+    'age4564', 'age65p', 'sfdu', 'mfdu', 'hh_own', 'hh_rent',
+    'hh_size_1', 'hh_size_2', 'hh_size_3', 'hh_size_4_plus',
+    'hh_wrks_0', 'hh_wrks_1', 'hh_wrks_2', 'hh_wrks_3_plus',
+    'hh_kids_yes', 'hh_kids_no', 'age62p', 'gq_inst',
+    'gq_type_univ', 'gq_type_mil', 'gq_type_othnon',
+    'pers_occ_management', 'pers_occ_professional', 'pers_occ_services',
+    'pers_occ_retail', 'pers_occ_manual', 'pers_occ_military',
+    'white_nonh', 'black_nonh', 'asian_nonh', 'other_nonh', 'hispanic'
+    ]
 
-    # 2) Merge on blockgroup (not block_geoid)
-    tmp = df.merge(
-        wb[['blockgroup','taz','weight']],
-        on='blockgroup',
-        how='left'
+    # Multiply all variables by the weight
+    for var in sum_vars:
+        merged[var] = merged[var] * merged['weight']
+
+    # Perform the grouping and sum
+    tazdata_census = merged.groupby('TAZ1454', as_index=False)[sum_vars].sum()
+
+    # Compute the derived variables
+    tazdata_census['sum_age'] = (
+        tazdata_census[['AGE0004', 'AGE0519', 'AGE2044', 'AGE4564', 'AGE65P']].sum(axis=1)
     )
-    missing = tmp['weight'].isna().sum()
-    if missing > 0:
-        logger.warning(f"{missing} working rows missing a BG→TAZ weight")
-
-    # 3) Build gqpop, then weight all counts
-    gq_cols = [c for c in tmp.columns if c.startswith('gq_inst') or c.startswith('gq_noninst')]
-    tmp['gqpop']    = tmp[gq_cols].sum(axis=1)
-    tmp['TOTHH_taz']  = tmp['tothh_']  * tmp['weight']
-    tmp['HHPOP_taz']  = tmp['hhpop_']  * tmp['weight']
-    tmp['gqpop_taz']  = tmp['gqpop']   * tmp['weight']
-    tmp['TOTPOP_taz'] = (tmp['hhpop_'] + tmp['gqpop']) * tmp['weight']
-
-    # 4) Aggregate to TAZ
-    taz_census = tmp.groupby('taz', as_index=False).agg(
-        TOTPOP = ('TOTPOP_taz', 'sum'),
-        TOTHH  = ('TOTHH_taz',  'sum'),
-        HHPOP  = ('HHPOP_taz',  'sum'),
-        gqpop  = ('gqpop_taz',  'sum'),
+    tazdata_census['gqpop'] = (
+        tazdata_census['gq_type_univ'] + 
+        tazdata_census['gq_type_mil'] + 
+        tazdata_census['gq_type_othnon']
     )
-    return taz_census
+
+    return tazdata_census
 
 
 def _compute_current_totals(df):
@@ -352,7 +342,7 @@ def step10_integrate_employment(
         os.getcwd(),
         f"step10_employment_combined_{year}.csv"
     )
-    df_emp.to_csv(out_emppath, index=False)
+    #df_emp.to_csv(out_emppath, index=False)
     logger.info(f"Wrote combined employment data to {out_emppath}")
 
     # --- 6) Merge EMPRES & TOTEMP into the now census-enhanced TAZ base ---
@@ -367,142 +357,189 @@ def step10_integrate_employment(
     logger.info("Employment integrated into TAZ base")
     return final
 
-def step11_compute_scale_factors(taz_df: pd.DataFrame,
-                                 taz_targeted: pd.DataFrame,
-                                 key: str = 'taz',
-                                 target_col: str = 'county_target',
-                                 base_col: str = 'county_base') -> pd.DataFrame:
+def step11_compute_scale_factors(
+    taz_df: pd.DataFrame,
+    taz_targeted: pd.DataFrame,
+    base_col: str,
+    target_col: str
+) -> pd.DataFrame:
     """
-    For each TAZ, compute the ratio of targeted county total to
-    the base county total, yielding a scale_factor.
+    For each county, compute a scale factor = (sum target_col) / (sum base_col),
+    then assign that factor to every TAZ in the county.
+
+    Returns a DataFrame with columns ['taz','scale_factor'].
     """
-    # 1) Sum up base values by TAZ
-    base_totals = (
+    logger = logging.getLogger(__name__)
+
+    # 1) Sum up the base & target by county
+    current = (
         taz_df
-        .groupby(key)[base_col]
-        .sum()
-        .reset_index()
-        .rename(columns={base_col: 'base_total'})
+          .groupby('county_fips', as_index=False)[base_col]
+          .sum()
+          .rename(columns={base_col: 'current_total'})
+    )
+    target = (
+        taz_targeted
+          .groupby('county_fips', as_index=False)[target_col]
+          .sum()
+          .rename(columns={target_col: 'target_total'})
     )
 
-    # 2) Pull in the targeted totals (already one row per TAZ)
-    targets = taz_targeted[[key, target_col]].rename(columns={target_col: 'target_total'})
+    df_cnty = current.merge(target, on='county_fips', how='left').fillna(0)
 
-    # 3) Merge and compute factor
+    # 2) Compute ratio, guarding against zero division
+    df_cnty['scale_factor'] = np.where(
+        df_cnty['current_total'] > 0,
+        df_cnty['target_total'] / df_cnty['current_total'],
+        1.0
+    )
+
+    # Log a quick sanity check
+    total_sf = df_cnty['scale_factor'].sum()
+    logger.info(
+        "[SANITY] step11_compute_scale_factors: "
+        "sum of scale_factors = %.3f", total_sf
+    )
+
+    # 3) Map the county-level factor back to each TAZ
     scale_df = (
-        base_totals
-        .merge(targets, on=key, how='left')
+        taz_df[['taz','county_fips']]
+          .merge(
+              df_cnty[['county_fips','scale_factor']],
+              on='county_fips',
+              how='left'
+          )
     )
-    scale_df['scale_factor'] = scale_df['target_total'] / scale_df['base_total']
 
-    return scale_df[[key, 'scale_factor']]
+    # Final sanity check: no nulls, all positive
+    if scale_df['scale_factor'].isnull().any():
+        raise RuntimeError("[SANITY] Missing scale_factor for some TAZs")
+    if (scale_df['scale_factor'] <= 0).any():
+        raise RuntimeError("[SANITY] Non-positive scale_factor found")
+
+    return scale_df
 
 def apply_county_targets_to_taz(
     taz_df: pd.DataFrame,
     county_targets: pd.DataFrame,
-    popsyn_ACS_PUMS_5YEAR: int
+    popsyn_acs_pums_5year: int
 ) -> pd.DataFrame:
     """
-    Push county-level target totals back down to each TAZ across multiple metrics.
+    Push county-level target totals back down to each TAZ across multiple metrics,
+    mirroring the R update_tazdata_to_county_target calls in sequence,
+    and use the ACS PUMS 5-year vintage for household-size consistency.
 
     Args:
-        taz_df: DataFrame of TAZ-level data.
-        county_targets: DataFrame with county_fips and *_target columns.
-        popsyn_ACS_PUMS_5YEAR: ACS PUMS 1-year vintage for size/work consistency.
+        taz_df: DataFrame of TAZ-level data, must include 'county_fips' and all source columns.
+        county_targets: DataFrame with 'county_fips' and *_target columns for each metric.
+        popsyn_acs_pums_5year: ACS PUMS 5-year vintage used for household-size and worker-consistency.
 
     Returns:
         DataFrame: Updated TAZ-level DataFrame with county targets applied.
     """
+    import logging
+    from common import update_tazdata_to_county_target, make_hhsizes_consistent_with_population
+
     logger = logging.getLogger(__name__)
     df = taz_df.copy()
 
+    # 1) Scale employment
     logger.info("Applying county EMPRES targets to TAZ")
     df = update_tazdata_to_county_target(
-        source_df=df,
-        target_df=county_targets,
-        sum_var='EMPRES',
-        partial_vars=[
+        source_df    = df,
+        target_df    = county_targets,
+        sum_var      = 'EMPRES',
+        partial_vars = [
             'pers_occ_management', 'pers_occ_professional',
-            'pers_occ_services', 'pers_occ_retail',
-            'pers_occ_manual', 'pers_occ_military'
+            'pers_occ_services',   'pers_occ_retail',
+            'pers_occ_manual',     'pers_occ_military'
         ]
     )
 
+    # 2) Scale total population & households
     logger.info("Applying county household and population targets to TAZ")
-    # Total households & population by age
     df = update_tazdata_to_county_target(
-        source_df=df,
-        target_df=county_targets.rename(columns={'TOTPOP_target':'sum_age_target'}),
-        sum_var='sum_age',
-        partial_vars=['AGE0004','AGE0519','AGE2044','AGE4564','AGE65P']
+        source_df    = df,
+        target_df    = county_targets.rename(columns={'TOTPOP_target':'sum_age_target'}),
+        sum_var      = 'sum_age',
+        partial_vars = ['AGE0004','AGE0519','AGE2044','AGE4564','AGE65P']
     )
-    # Population by ethnicity
     df = update_tazdata_to_county_target(
-        source_df=df,
-        target_df=county_targets.rename(columns={'TOTPOP_target':'sum_ethnicity_target'}),
-        sum_var='sum_ethnicity',
-        partial_vars=['white_nonh','black_nonh','asian_nonh','other_nonh','hispanic']
-    )
-    # Housing units
-    df = update_tazdata_to_county_target(
-        source_df=df,
-        target_df=county_targets.rename(columns={'TOTHH_target':'sum_DU_target'}),
-        sum_var='sum_DU',
-        partial_vars=['SFDU','MFDU']
-    )
-    # Tenure
-    df = update_tazdata_to_county_target(
-        source_df=df,
-        target_df=county_targets.rename(columns={'TOTHH_target':'sum_tenure_target'}),
-        sum_var='sum_tenure',
-        partial_vars=['hh_own','hh_rent']
-    )
-    # Households with kids
-    df = update_tazdata_to_county_target(
-        source_df=df,
-        target_df=county_targets.rename(columns={'TOTHH_target':'sum_kids_target'}),
-        sum_var='sum_kids',
-        partial_vars=['hh_kids_yes','hh_kids_no']
-    )
-    # Income quartiles
-    df = update_tazdata_to_county_target(
-        source_df=df,
-        target_df=county_targets.rename(columns={'TOTHH_target':'sum_income_target'}),
-        sum_var='sum_income',
-        partial_vars=['HHINCQ1','HHINCQ2','HHINCQ3','HHINCQ4']
-    )
-    # Household size
-    df = update_tazdata_to_county_target(
-        source_df=df,
-        target_df=county_targets.rename(columns={'TOTHH_target':'sum_size_target'}),
-        sum_var='sum_size',
-        partial_vars=['hh_size_1','hh_size_2','hh_size_3','hh_size_4_plus']
-    )
-    df = make_hhsizes_consistent_with_population(
-        source_df=df,
-        target_df=county_targets,
-        size_or_workers='hh_size',
-        popsyn_ACS_PUMS_5YEAR=popsyn_ACS_PUMS_5YEAR
-    )
-    # Household workers
-    df = update_tazdata_to_county_target(
-        source_df=df,
-        target_df=county_targets.rename(columns={'TOTHH_target':'sum_hhworkers_target'}),
-        sum_var='sum_hhworkers',
-        partial_vars=['hh_wrks_0','hh_wrks_1','hh_wrks_2','hh_wrks_3_plus']
-    )
-    df = make_hhsizes_consistent_with_population(
-        source_df=df,
-        target_df=county_targets,
-        size_or_workers='hh_wrks',
-        popsyn_ACS_PUMS_5YEAR=popsyn_ACS_PUMS_5YEAR
+        source_df    = df,
+        target_df    = county_targets.rename(columns={'TOTPOP_target':'sum_ethnicity_target'}),
+        sum_var      = 'sum_ethnicity',
+        partial_vars = ['white_nonh','black_nonh','asian_nonh','other_nonh','hispanic']
     )
 
-    # Final household and total population
-    df['TOTHH'] = df['sum_size']
+    # 3) Scale housing units & tenure
+    logger.info("Applying county housing-unit and tenure targets to TAZ")
+    df = update_tazdata_to_county_target(
+        source_df    = df,
+        target_df    = county_targets.rename(columns={'TOTHH_target':'sum_DU_target'}),
+        sum_var      = 'sum_DU',
+        partial_vars = ['SFDU','MFDU']
+    )
+    df = update_tazdata_to_county_target(
+        source_df    = df,
+        target_df    = county_targets.rename(columns={'TOTHH_target':'sum_tenure_target'}),
+        sum_var      = 'sum_tenure',
+        partial_vars = ['hh_own','hh_rent']
+    )
+
+    # 4) Scale households with kids
+    logger.info("Applying county household-with-kids targets to TAZ")
+    df = update_tazdata_to_county_target(
+        source_df    = df,
+        target_df    = county_targets.rename(columns={'TOTHH_target':'sum_kids_target'}),
+        sum_var      = 'sum_kids',
+        partial_vars = ['hh_kids_yes','hh_kids_no']
+    )
+
+    # 5) Scale income quartiles
+    logger.info("Applying county income-quartile targets to TAZ")
+    df = update_tazdata_to_county_target(
+        source_df    = df,
+        target_df    = county_targets.rename(columns={'TOTHH_target':'sum_income_target'}),
+        sum_var      = 'sum_income',
+        partial_vars = ['HHINCQ1','HHINCQ2','HHINCQ3','HHINCQ4']
+    )
+
+    # 6) Scale household size & enforce PUMS distribution
+    logger.info("Applying county household-size targets to TAZ")
+    df = update_tazdata_to_county_target(
+        source_df    = df,
+        target_df    = county_targets.rename(columns={'TOTHH_target':'sum_size_target'}),
+        sum_var      = 'sum_size',
+        partial_vars = ['hh_size_1','hh_size_2','hh_size_3','hh_size_4_plus']
+    )
+    df = make_hhsizes_consistent_with_population(
+        source_df             = df,
+        target_df             = county_targets,
+        size_or_workers       = 'hh_size',
+        popsyn_acs_pums_5year = popsyn_acs_pums_5year
+    )
+
+    # 7) Scale household workers & enforce PUMS distribution
+    logger.info("Applying county household-worker targets to TAZ")
+    df = update_tazdata_to_county_target(
+        source_df    = df,
+        target_df    = county_targets.rename(columns={'TOTHH_target':'sum_hhworkers_target'}),
+        sum_var      = 'sum_hhworkers',
+        partial_vars = ['hh_wrks_0','hh_wrks_1','hh_wrks_2','hh_wrks_3_plus']
+    )
+    df = make_hhsizes_consistent_with_population(
+        source_df             = df,
+        target_df             = county_targets,
+        size_or_workers       = 'hh_wrks',
+        popsyn_acs_pums_5year = popsyn_acs_pums_5year
+    )
+
+    # 8) Final adjustments: overwrite TOTHH and TOTPOP
+    df['TOTHH']  = df['sum_size']
     df['TOTPOP'] = df['HHPOP'] + df['gqpop']
 
     return df
+
     return result
 
 def step12_apply_scaling(taz_df: pd.DataFrame,

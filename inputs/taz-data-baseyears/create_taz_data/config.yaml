@@ -48,15 +48,15 @@ geo_constants:
     - "097"
   STATE_CODE: "06"
   BA_COUNTY_FIPS_CODES:
-    "001": "06"
-    "013": "06"
-    "041": "06"
-    "055": "06"
-    "075": "06"
-    "081": "06"
-    "085": "06"
-    "095": "06"
-    "097": "06"
+    "001": "Alameda"
+    "013": "Contra Costa"
+    "041": "Marin"
+    "055": "Napa"
+    "075": "San Francisco"
+    "081": "San Mateo"
+    "085": "Santa Clara"
+    "095": "Solano"
+    "097": "Sonoma"
 
 paths:
   tm1_root: "."
@@ -75,146 +75,148 @@ paths:
 
 variables:
   ACS_BG_VARIABLES:
-    tothh_: B19001_001
-    hhpop_: B28005_001
-    male0_4_: B01001_003
-    male5_9_: B01001_004
-    male10_14_: B01001_005
-    male15_17_: B01001_006
-    male18_19_: B01001_007
-    male20_: B01001_008
-    male21_: B01001_009
-    male22_24_: B01001_010
-    male25_29_: B01001_011
-    male30_34_: B01001_012
-    male35_39_: B01001_013
-    male40_44_: B01001_014
-    male45_49_: B01001_015
-    male50_54_: B01001_016
-    male55_59_: B01001_017
-    male60_61_: B01001_018
-    male62_64_: B01001_019
-    male65_66_: B01001_020
-    male67_69_: B01001_021
-    male70_74_: B01001_022
-    male75_79_: B01001_023
-    male80_84_: B01001_024
-    male85p_: B01001_025
-    female0_4_: B01001_027
-    female5_9_: B01001_028
-    female10_14_: B01001_029
-    female15_17_: B01001_030
-    female18_19_: B01001_031
-    female20_: B01001_032
-    female21_: B01001_033
-    female22_24_: B01001_034
-    female25_29_: B01001_035
-    female30_34_: B01001_036
-    female35_39_: B01001_037
-    female40_44_: B01001_038
-    female45_49_: B01001_039
-    female50_54_: B01001_040
-    female55_59_: B01001_041
-    female60_61_: B01001_042
-    female62_64_: B01001_043
-    female65_66_: B01001_044
-    female67_69_: B01001_045
-    female70_74_: B01001_046
-    female75_79_: B01001_047
-    female80_84_: B01001_048
-    female85p_: B01001_049
-    own1_: B25009_003
-    own2_: B25009_004
-    own3_: B25009_005
-    own4_: B25009_006
-    own5_: B25009_007
-    own6_: B25009_008
-    own7p_: B25009_009
-    rent1_: B25009_011
-    rent2_: B25009_012
-    rent3_: B25009_013
-    rent4_: B25009_014
-    rent5_: B25009_015
-    rent6_: B25009_016
-    rent7p_: B25009_017
-    white_nonh_: B03002_003
-    black_nonh_: B03002_004
-    asian_nonh_: B03002_006
-    total_nonh_: B03002_002
-    total_hisp_: B03002_012
-    unit1d_: B25024_002
-    unit1a_: B25024_003
-    unit2_: B25024_004
-    unit3_4_: B25024_005
-    unit5_9_: B25024_006
-    unit10_19_: B25024_007
-    unit20_49_: B25024_008
-    unit50p_: B25024_009
-    mobile_: B25024_010
-    boat_RV_Van_: B25024_011
-    employed_: B23025_004
-    armedforces_: B23025_006
-    hhinc000_010_: B19001_002
-    hhinc010_015_: B19001_003
-    hhinc015_020_: B19001_004
-    hhinc020_025_: B19001_005
-    hhinc025_030_: B19001_006
-    hhinc030_035_: B19001_007
-    hhinc035_040_: B19001_008
-    hhinc040_045_: B19001_009
-    hhinc045_050_: B19001_010
-    hhinc050_060_: B19001_011
-    hhinc060_075_: B19001_012
-    hhinc075_100_: B19001_013
-    hhinc100_125_: B19001_014
-    hhinc125_150_: B19001_015
-    hhinc150_200_: B19001_016
-    hhinc200p_: B19001_017
-    occ_m_manage_: C24010_005
-    occ_m_prof_biz_: C24010_006
-    occ_m_prof_comp_: C24010_007
-    occ_m_svc_comm_: C24010_012
-    occ_m_prof_leg_: C24010_013
-    occ_m_prof_edu_: C24010_014
-    occ_m_svc_ent_: C24010_015
-    occ_m_prof_heal_: C24010_016
-    occ_m_svc_heal_: C24010_020
-    occ_m_svc_fire_: C24010_022
-    occ_m_svc_law_: C24010_023
-    occ_m_ret_eat_: C24010_024
-    occ_m_man_build_: C24010_025
-    occ_m_svc_pers_: C24010_026
-    occ_m_ret_sales_: C24010_028
-    occ_m_svc_off_: C24010_029
-    occ_m_man_nat_: C24010_030
-    occ_m_man_prod_: C24010_034
-    occ_f_manage_: C24010_041
-    occ_f_prof_biz_: C24010_042
-    occ_f_prof_comp_: C24010_043
-    occ_f_svc_comm_: C24010_048
-    occ_f_prof_leg_: C24010_049
-    occ_f_prof_edu_: C24010_050
-    occ_f_svc_ent_: C24010_051
-    occ_f_prof_heal_: C24010_052
-    occ_f_svc_heal_: C24010_056
-    occ_f_svc_fire_: C24010_058
-    occ_f_svc_law_: C24010_059
-    occ_f_ret_eat_: C24010_060
-    occ_f_man_build_: C24010_061
-    occ_f_svc_pers_: C24010_062
-    occ_f_ret_sales_: C24010_064
-    occ_f_svc_off_: C24010_065
-    occ_f_man_nat_: C24010_066
-    occ_f_man_prod_: C24010_070
+    tothh: B19001_001
+    hhpop: B28005_001
+    employed: B23025_004
+    armedforces: B23025_006
+    male0_4: B01001_003
+    male5_9: B01001_004
+    male10_14: B01001_005
+    male15_17: B01001_006
+    male18_19: B01001_007
+    male20: B01001_008
+    male21: B01001_009
+    male22_24: B01001_010
+    male25_29: B01001_011
+    male30_34: B01001_012
+    male35_39: B01001_013
+    male40_44: B01001_014
+    male45_49: B01001_015
+    male50_54: B01001_016
+    male55_59: B01001_017
+    male60_61: B01001_018
+    male62_64: B01001_019
+    male65_66: B01001_020
+    male67_69: B01001_021
+    male70_74: B01001_022
+    male75_79: B01001_023
+    male80_84: B01001_024
+    male85p: B01001_025
+    female0_4: B01001_027
+    female5_9: B01001_028
+    female10_14: B01001_029
+    female15_17: B01001_030
+    female18_19: B01001_031
+    female20: B01001_032
+    female21: B01001_033
+    female22_24: B01001_034
+    female25_29: B01001_035
+    female30_34: B01001_036
+    female35_39: B01001_037
+    female40_44: B01001_038
+    female45_49: B01001_039
+    female50_54: B01001_040
+    female55_59: B01001_041
+    female60_61: B01001_042
+    female62_64: B01001_043
+    female65_66: B01001_044
+    female67_69: B01001_045
+    female70_74: B01001_046
+    female75_79: B01001_047
+    female80_84: B01001_048
+    female85p: B01001_049
+    own1: B25009_003
+    own2: B25009_004
+    own3: B25009_005
+    own4: B25009_006
+    own5: B25009_007
+    own6: B25009_008
+    own7p: B25009_009
+    rent1: B25009_011
+    rent2: B25009_012
+    rent3: B25009_013
+    rent4: B25009_014
+    rent5: B25009_015
+    rent6: B25009_016
+    rent7p: B25009_017
+    white_nonh: B03002_003
+    black_nonh: B03002_004
+    asian_nonh: B03002_006
+    total_nonh: B03002_002
+    total_hisp: B03002_012
+    unit1d: B25024_002
+    unit1a: B25024_003
+    unit2: B25024_004
+    unit3_4: B25024_005
+    unit5_9: B25024_006
+    unit10_19: B25024_007
+    unit20_49: B25024_008
+    unit50p: B25024_009
+    mobile: B25024_010
+    boat_RV_Van: B25024_011
+    employed: B23025_004
+    armedforces: B23025_006
+    hhinc000_010: B19001_002
+    hhinc010_015: B19001_003
+    hhinc015_020: B19001_004
+    hhinc020_025: B19001_005
+    hhinc025_030: B19001_006
+    hhinc030_035: B19001_007
+    hhinc035_040: B19001_008
+    hhinc040_045: B19001_009
+    hhinc045_050: B19001_010
+    hhinc050_060: B19001_011
+    hhinc060_075: B19001_012
+    hhinc075_100: B19001_013
+    hhinc100_125: B19001_014
+    hhinc125_150: B19001_015
+    hhinc150_200: B19001_016
+    hhinc200p: B19001_017
+    occ_m_manage:    C24010_005   # Management
+    occ_m_prof_biz:  C24010_006   # Business & financial
+    occ_m_prof_comp: C24010_007   # Computer, engineering & science
+    occ_m_svc_comm:  C24010_012   # Community & social service
+    occ_m_prof_leg:  C24010_013   # Legal
+    occ_m_prof_edu:  C24010_014   # Education, training & library
+    occ_m_svc_ent:   C24010_015   # Arts, design, entertainment, sports, media
+    occ_m_prof_heal: C24010_016   # Healthcare practitioners & tech
+    occ_m_svc_heal:  C24010_020   # Healthcare support
+    occ_m_svc_fire:  C24010_022   # Fire fighting & prevention 
+    occ_m_svc_law:   C24010_023   # Law enforcement
+    occ_m_ret_eat:   C24010_024   # Food prep & serving
+    occ_m_man_build: C24010_025   # Building & grounds cleaning
+    occ_m_svc_pers:  C24010_026   # Personal care & service
+    occ_m_ret_sales: C24010_028   # Sales & related
+    occ_m_svc_off:   C24010_029   # Office & admin support
+    occ_m_man_nat:   C24010_030   # Natural resources/construction
+    occ_m_man_prod:  C24010_034   # Production & material moving
+    occ_f_manage:    C24010_041   # female Management
+    occ_f_prof_biz:  C24010_042   # female Business & financial
+    occ_f_prof_comp: C24010_043   # female Computer, engineering & science
+    occ_f_svc_comm:  C24010_048   # female Community & social service
+    occ_f_prof_leg:  C24010_049   # female Legal
+    occ_f_prof_edu:  C24010_050   # female Education, training & library
+    occ_f_svc_ent:   C24010_051   # female Arts, entertainment, sports, media
+    occ_f_prof_heal: C24010_052   # female Healthcare practitioners & tech
+    occ_f_svc_heal:  C24010_056   # female Healthcare support
+    occ_f_svc_fire:  C24010_058   # female Fire fighting & prevention
+    occ_f_svc_law:   C24010_059   # female Law enforcement
+    occ_f_ret_eat:   C24010_060   # female Food prep & serving
+    occ_f_man_build: C24010_061   # female Building & grounds cleaning
+    occ_f_svc_pers:  C24010_062   # female Personal care & service
+    occ_f_ret_sales: C24010_064   # female Sales & related
+    occ_f_svc_off:   C24010_065   # female Office & admin support
+    occ_f_man_nat:   C24010_066   # female Natural resources/construction
+    occ_f_man_prod:  C24010_070   # female Production & material moving
   ACS_TRACT_VARIABLES:
-    hhwrks0_: B08202_002
-    hhwrks1_: B08202_003
-    hhwrks2_: B08202_004
-    hhwrks3p_: B08202_005
-    ownkidsyes_: B25012_003
-    rentkidsyes_: B25012_011
-    ownkidsno_: B25012_009
-    rentkidsno_: B25012_017
+    hhwrks0: B08202_002
+    hhwrks1: B08202_003
+    hhwrks2: B08202_004
+    hhwrks3p: B08202_005
+    ownkidsyes: B25012_003
+    rentkidsyes: B25012_011
+    ownkidsno: B25012_009
+    rentkidsno: B25012_017
   DHC_TRACT_VARIABLES:
     gq_inst_m_0017: PCT19_004N
     gq_noninst_m_0017_univ: PCT19_024N
@@ -244,8 +246,8 @@ variables:
     TOTHH_target: B19001_001E   # Total households
     TOTPOP_target: B01001_001E   # Total population
     HHPOP_target: B28005_001E   # Household population
-    employed_: B23025_004E   # Civilian employed residents
-    armedforces_: B23025_006E   # Armed forces
+    employed: B23025_004E   # Civilian employed residents
+    armedforces: B23025_006E   # Armed forces
 
 
 

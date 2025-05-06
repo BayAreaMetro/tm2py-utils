@@ -1,77 +1,15 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""
-create_taz_data.py
-
-End-to-end TAZ data pipeline for Travel Model One and Two.
-Loads all settings (constants, paths, geo, variable mappings) from config.yaml.
-Defines 14 sequential steps to create TAZ-level data from Census and LODES data.
-
-
- - Household- and population-based variables are based on the ACS5-year dataset which centers around the
-   given year, or the latest ACS5-year dataset that is available (see variable, ACS_5year). 
-   The script fetches this data using tidycensus.
-
- - ACS block group variables used in all instances where not suppressed. If suppressed at the block group 
-   level, tract-level data used instead. Suppressed variables may change if ACS_5year is changed. This 
-   should be checked, as this change could cause the script not to work.
-
- - Group quarter data is not available below state level from ACS, so 2020 Decennial census numbers
-   are used instead, and then scaled (if applicable)
-
- - Wage/Salary Employment data is sourced from LODES for the given year, or the latest LODES dataset that is available.
-   (See variable, LODES_YEAR)
- - Self-employed persons are also added from taz_self_employed_workers_[year].csv
- 
- - If ACS1-year data is available that is more recent than that used above, these totals are used to scale
-   the above at a county-level.
-
- - Employed Residents, which includes people who live *and* work in the Bay Area are quite different
-   between ACS and LODES, with ACS regional totals being much higher than LODES regional totals.
-   This script includes a parameter, EMPRES_LODES_WEIGHT, which can be used to specify a blended target
-   between the two.
-
-"""
 import logging
 import os
 import sys
-from pathlib import Path
-
-import pandas as pd
 import yaml
 import requests
+from pathlib import Path
+import pandas as pd
 from census import Census
-import time
-from common import retrieve_census_variables, census_to_df
-
-
-
-CONFIG_PATH = Path(__file__).parent / 'config.yaml'
-with CONFIG_PATH.open() as f:
-    cfg = yaml.safe_load(f)
-
-CONSTANTS = cfg['constants']
-GEO       = cfg['geo_constants']
-PATHS     = cfg['paths']
-VARIABLES = cfg['variables']
-
-KEY_FILE = PATHS['census_api_key_file']
-with open(KEY_FILE, 'r') as f:
-    CENSUS_API_KEY = f.read().strip()
-
-# Default processing year from config
-YEAR = CONSTANTS['years'][0]
-DECENNIAL_YEAR  = CONSTANTS['DECENNIAL_YEAR']
-ACS_5YR_LATEST  = CONSTANTS['ACS_5YEAR_LATEST']
-
-# ------------------------------
-# Import helper functions from common.py
-# ------------------------------
-sys.path.insert(0, str(Path(__file__).parent))
 from common import (
+    retrieve_census_variables,
     census_to_df,
     download_acs_blocks,
-    retrieve_census_variables,
     fix_rounding_artifacts,
     map_acs5year_household_income_to_tm1_categories,
     update_gqpop_to_county_totals,
@@ -79,76 +17,62 @@ from common import (
     make_hhsizes_consistent_with_population,
 )
 
-# ------------------------------
-# STEP 1: Fetch block-level population (Decennial PL)
-# ------------------------------
-import logging
-import pandas as pd
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-def step1_fetch_block_data(c, year):
-    """
-    Fetch 2020 dec/pl block‐level total population (P1_001N),
-    construct the 15‐digit block GEOID from state/county/tract/block,
-    derive blockgroup & tract, and keep state & county.
-    Returns columns:
-      - state        : 2-digit state FIPS
-      - county       : 3-digit county FIPS
-      - block_geoid  : full 15-digit block GEOID
-      - blockgroup   : 12-digit block-group FIPS
-      - tract        : 11-digit tract FIPS
-      - pop          : block population (int)
-    """
-    logger = logging.getLogger(__name__)
+# Load configuration
+CONFIG_PATH = Path(__file__).parent / 'config.yaml'
+with CONFIG_PATH.open() as f:
+    cfg = yaml.safe_load(f)
 
-    # Config
-    dec_year     = CONSTANTS['DECENNIAL_YEAR']              # e.g. 2020
-    state_code   = GEO['STATE_CODE']                        # e.g. "06"
-    county_codes = list(GEO['BA_COUNTY_FIPS_CODES'].keys()) # e.g. ["001","013",…]
-    
-    # 1) Retrieve P1_001N from dec/pl
+CONSTANTS = cfg['constants']
+GEO = cfg['geo_constants']
+PATHS = cfg['paths']
+VARIABLES = cfg['variables']
+
+# Census API Key
+with open(PATHS['census_api_key_file'], 'r') as f:
+    CENSUS_API_KEY = f.read().strip()
+
+# Default processing years and geographic constants
+YEAR = CONSTANTS['years'][0]
+DECENNIAL_YEAR = CONSTANTS['DECENNIAL_YEAR']
+ACS_5YR_LATEST = CONSTANTS['ACS_5YEAR_LATEST']
+STATE_CODE = GEO['STATE_CODE']
+BAYCOUNTIES = GEO['BAYCOUNTIES']
+
+# Initialize Census API client
+census_client = Census(CENSUS_API_KEY)
+
+def step1_fetch_block_data(census_client):
+    """Fetch block-level total population from decennial census."""
     records = []
-    for county in county_codes:
+    for county in BAYCOUNTIES:
         try:
             recs = retrieve_census_variables(
-                c, dec_year, 'dec/pl',
-                ['P1_001N'],      # total population
-                for_geo='block',
-                state=state_code,
-                county=county
+                census_client, DECENNIAL_YEAR, 'dec/pl', ['P1_001N'],
+                for_geo='block', state=STATE_CODE, county=county
             )
             records.extend(recs)
         except Exception as e:
-            logger.error(f"Error fetching {dec_year} PL for county {county}: {e}")
+            logger.error(f"Error fetching data for county {county}: {e}")
+
     df = pd.DataFrame(records)
-    logger.info(f"step1 fetched columns: {df.columns.tolist()}")
 
-    # 2) Pad and keep state & county
-    df['state']  = df['state'].astype(str).str.zfill(2)
-    df['county'] = df['county'].astype(str).str.zfill(3)
+    df['state'] = df['state'].str.zfill(2)
+    df['county'] = df['county'].str.zfill(3)
+    df['tract'] = df['tract'].str.zfill(6)
+    df['block'] = df['block'].str.zfill(4)
 
-    # 3) Pad tract (6) and block (4) then build full block_geoid
-    df['tract'] = df['tract'].astype(str).str.zfill(6)
-    df['block'] = df['block'].astype(str).str.zfill(4)
     df['block_geoid'] = df['state'] + df['county'] + df['tract'] + df['block']
-
-    # 4) Derive blockgroup & tract keys
     df['blockgroup'] = df['block_geoid'].str[:12]
-    df['tract']      = df['block_geoid'].str[:11]
+    df['tract'] = df['block_geoid'].str[:11]
 
-    # 5) Coerce population
-    df['pop'] = (
-        pd.to_numeric(df.get('P1_001N', 0), errors='coerce')
-          .fillna(0)
-          .astype(int)
-    )
+    df['pop'] = pd.to_numeric(df.get('P1_001N', 0), errors='coerce').fillna(0).astype(int)
 
-    # 6) Return the columns step5 needs
-    return df[['state','county','block_geoid','blockgroup','tract','pop']]
+    return df[['state', 'county', 'block_geoid', 'blockgroup', 'tract', 'pop']]
 
-
-# ------------------------------
-# STEP 2: Fetch ACS block-group variables
-# ------------------------------
 def step2_fetch_acs_bg(c, year):
     """
     Fetch ACS 5-year block-group vars and return a DataFrame
@@ -211,6 +135,60 @@ def step2_fetch_acs_bg(c, year):
             logger.warning(f"ACS BG: expected {api_var!r} not in results, filling zeros for {new_var}")
             df[new_var] = 0
 
+    return df
+
+def step2b_compute_bg_vars(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Compute block-group-level demographic and employment variables:
+      1. Build age bins by summing male+female cohorts
+      2. Aggregate occupation columns into summary fields
+    Expects raw ACS block-group columns (no trailing underscores), e.g.:
+      'male0_4', 'female0_4', …, 'pers_occ_management', etc.
+    Returns a DataFrame with new bg-level aggregates.
+    """
+    df = df.copy()
+    
+    # 1) Age bins
+    df['age0004'] = df['male0_4'] + df['female0_4']
+    df['age0519'] = (
+        df[['male5_9', 'male10_14', 'male15_17', 'male18_19']].sum(axis=1) +
+        df[['female5_9', 'female10_14', 'female15_17', 'female18_19']].sum(axis=1)
+    )
+    df['age2044'] = (
+        df[['male20', 'male21', 'male22_24', 'male25_29', 'male30_34', 'male35_39', 'male40_44']].sum(axis=1) +
+        df[['female20', 'female21', 'female22_24', 'female25_29', 'female30_34', 'female35_39', 'female40_44']].sum(axis=1)
+    )
+    df['age4564'] = (
+        df[['male45_49', 'male50_54', 'male55_59', 'male60_61', 'male62_64']].sum(axis=1) +
+        df[['female45_49', 'female50_54', 'female55_59', 'female60_61', 'female62_64']].sum(axis=1)
+    )
+    df['age65p'] = (
+        df[['male65_66', 'male67_69', 'male70_74', 'male75_79', 'male80_84', 'male85p']].sum(axis=1) +
+        df[['female65_66', 'female67_69', 'female70_74', 'female75_79', 'female80_84', 'female85p']].sum(axis=1)
+    )
+
+    cats = [
+      'manage','prof_biz','prof_comp','svc_comm','prof_leg','prof_edu',
+      'svc_ent','prof_heal','svc_heal','svc_fire','svc_law','ret_eat',
+      'man_build','svc_pers','ret_sales','svc_off','man_nat','man_prod'
+    ]
+    
+    # 2) Employment / occupation summaries
+    for cat in cats:
+        df[f'occ_{cat}'] = df[f'occ_m_{cat}'] + df[f'occ_f_{cat}']
+    
+    # 2) Now your combined bins exactly as in R:
+    # total across all occupations:
+    occ_cols = [f'occ_{cat}' for cat in cats]
+    df['emp_occ_total'] = df[occ_cols].sum(axis=1)
+    # service + retail
+    df['emp_service_retail'] = df['occ_svc_comm'] + df['occ_svc_ent'] \
+                             + df['occ_svc_heal'] + df['occ_svc_fire'] \
+                             + df['occ_svc_law']  + df['occ_svc_pers'] \
+                             + df['occ_svc_off']  + df['occ_ret_sell']  # adjust if needed
+    # manual + military = natural resources + production/moving
+    df['emp_manual_military'] = df['occ_man_nat'] + df['occ_man_build'] \
+                              + df['occ_man_prod']
     return df
 # ------------------------------
 # STEP 3: Fetch ACS tract variables
@@ -286,76 +264,34 @@ def step3_fetch_acs_tract(c, year=YEAR, max_retries=3, backoff=5):
     return out
 
 
-# Step 4: Fetch DHC tract variables (Detailed Housing Characteristics)
-# ------------------------------
-def step4_fetch_dhc_tract(c, year=DECENNIAL_YEAR):
-    """
-    Download decennial DHC variables for tracts using the Census API.
-    Returns a DataFrame with columns:
-      - tract       : 11-digit GEOID (state+county+tract)
-      - one column per VARIABLES['DHC_TRACT_VARIABLES'] key
-      - county_fips : 3-digit county FIPS (from the raw API response)
-      - County_Name : full county name (matches GEO['BA_COUNTY_FIPS_CODES'])
-    """
-    import requests
-
-    # 1) pick a valid decennial year
-    dec_year = year if year in (2000, 2010, 2020) else DECENNIAL_YEAR
-
-    # 2) pull your mapping of clean names → API codes
-    var_map = VARIABLES.get('DHC_TRACT_VARIABLES', {})
-    if not var_map:
-        raise ValueError("CONFIG ERROR: DHC_TRACT_VARIABLES is empty")
-
-    fetch_vars = list(var_map.values())
-    state      = GEO['STATE_CODE']
-    counties   = list(GEO['BA_COUNTY_FIPS_CODES'].keys())
-
-    # 3) fetch JSON for each county
+def step4_fetch_dhc_tract(census_client):
+    """Fetch DHC tract variables."""
+    var_map = VARIABLES['DHC_TRACT_VARIABLES']
     rows = []
-    for cnt in counties:
+
+    for cnt in BAYCOUNTIES:
         resp = requests.get(
-            f"https://api.census.gov/data/{dec_year}/dec/dhc",
+            f"https://api.census.gov/data/{DECENNIAL_YEAR}/dec/dhc",
             params={
-                'get': ",".join(fetch_vars),
+                'get': ",".join(var_map.values()),
                 'for': 'tract:*',
-                'in':  f"state:{state}+county:{cnt}",
+                'in': f"state:{STATE_CODE}+county:{cnt}",
                 'key': CENSUS_API_KEY
             }
         )
-        if resp.status_code != 200:
-            logging.error(f"DHC fetch failed ({cnt}): {resp.status_code}")
-            continue
-        data = resp.json()
-        cols = data[0]
-        for vals in data[1:]:
-            rows.append(dict(zip(cols, vals)))
-
-    if not rows:
-        raise RuntimeError(f"No DHC data for decennial year {dec_year}")
+        if resp.status_code == 200:
+            data = resp.json()
+            cols = data[0]
+            rows.extend([dict(zip(cols, vals)) for vals in data[1:]])
+        else:
+            logger.error(f"Failed to fetch DHC for county {cnt}: {resp.status_code}")
 
     df = pd.DataFrame(rows)
-
-    # 4) build the full 11-digit tract GEOID
-    df['tract'] = (
-        df['state'].str.zfill(2) +
-        df['county'].str.zfill(3) +
-        df['tract'].str.zfill(6)
-    )
-
-    # 5) pull out each API field into its clean name
-    out = pd.DataFrame({'tract': df['tract']})
+    df['tract'] = df['state'].str.zfill(2) + df['county'].str.zfill(3) + df['tract'].str.zfill(6)
     for clean_name, api_code in var_map.items():
-        out[clean_name] = (
-            pd.to_numeric(df[api_code], errors='coerce')
-              .fillna(0)
-              .astype(int)
-        )
+        df[clean_name] = pd.to_numeric(df[api_code], errors='coerce').fillna(0).astype(int)
 
-    # 6) retain the raw county FIPS from df
-    out['county_fips'] = df['county'].astype(str).str.zfill(3)
-    # 7) map to full county name
-    out['County_Name'] = out['county_fips'].map(GEO['BA_COUNTY_FIPS_CODES'])
+    df['county_fips'] = df['county'].str.zfill(3)
+    df['County_Name'] = df['county_fips'].map(GEO['BA_COUNTY_FIPS_CODES'])
 
-    return out
-    
+    return df[['tract'] + list(var_map.keys()) + ['county_fips', 'County_Name']]

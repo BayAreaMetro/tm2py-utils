@@ -168,12 +168,12 @@ def step9_summarize_tract_to_taz(acs_df, weights_df):
 
     # 3) Write merged for inspection
     merged_path = os.path.join(os.getcwd(), 'step9_merged.csv')
-    merged.to_csv(merged_path, index=False)
+    #merged.to_csv(merged_path, index=False)
     logger.info(f"Wrote merged tract-to-TAZ to {merged_path}")
 
     # 4) Compute weighted ACS variables
-    acs_vars = ['hhwrks0_', 'hhwrks1_', 'hhwrks2_', 'hhwrks3p_',
-                'ownkidsyes_', 'rentkidsyes_', 'ownkidsno_', 'rentkidsno_']
+    acs_vars = ['hhwrks0', 'hhwrks1', 'hhwrks2', 'hhwrks3p',
+                'ownkidsyes', 'rentkidsyes', 'ownkidsno', 'rentkidsno']
     for var in acs_vars:
         merged[f'weighted_{var}'] = merged[var] * merged['weight']
 
@@ -191,17 +191,8 @@ def step9_summarize_tract_to_taz(acs_df, weights_df):
 
     # 7) Write summary for inspection
     summary_path = os.path.join(os.getcwd(), 'step9_taz_summary.csv')
-    taz_df.to_csv(summary_path, index=False)
+    #taz_df.to_csv(summary_path, index=False)
     logger.info(f"Wrote TAZ ACS summary to {summary_path}")
 
     return taz_df
-""" 
-if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
-    # For demonstration, users must supply df_bg and df_acs_tr + crosswalks
-    # Example usage - assume hhinc, acs_tr provided
-    weights_block = compute_block_weights(PATHS)
-    taz_hhinc = step8_summarize_to_taz(hhinc, weights_block)
-    weights_tract = compute_tract_weights(PATHS)
-    taz_acs = step9_summarize_tract_to_taz(acs_tr, weights_tract)
-    print("Module summarize_to_taz loaded") """
+

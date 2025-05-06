@@ -102,33 +102,71 @@ def step5_compute_block_shares(df_blk, df_bg):
 
     return df[['block_geoid','blockgroup'] + bg_vars + ['pop_share']]
 
-def step6_build_workingdata(shares, acs_tr, dhc_tr):
+import pandas as pd
+import logging
+
+def step6_build_workingdata(
+    shares: pd.DataFrame,
+    acs_bg: pd.DataFrame,
+    acs_tr: pd.DataFrame,
+    dhc_tr: pd.DataFrame
+) -> pd.DataFrame:
     """
-    Merge block‐level shares (with ACS‐BG vars) + ACS‐tract + DHC‐tract
-    into a “working” block table. Keeps all original shares columns.
+    Step 6: Build the “working” block‐level DataFrame by:
+      a) Copying shares to avoid fragmentation warnings
+      b) Ensuring 'blockgroup' is a 12-digit string and deriving 'tract'
+      c) Merging BG-level ACS summaries (acs_bg)
+      d) Merging tract-level ACS (acs_tr) with merge indicators & logs
+      e) Merging tract-level DHC (dhc_tr) with merge indicators & logs
+
+    Parameters
+    ----------
+    shares : DataFrame
+        Block-to-BG weight shares. Must have 'blockgroup' column.
+    acs_bg : DataFrame
+        BG-level ACS summary from step2b_compute_bg_vars. Must have 'blockgroup'.
+    acs_tr : DataFrame
+        Tract-level ACS variables. Must have 'tract'.
+    dhc_tr : DataFrame
+        Tract-level group-quarters (DHC). Must have 'tract'.
+
+    Returns
+    -------
+    DataFrame
+        A block-level “working” table containing:
+        - all original shares columns
+        - all BG summaries (age bins, emp_occ_*, etc.)
+        - all tract ACS variables
+        - all tract DHC variables
     """
     # a) Copy to avoid fragmentation warnings
-    df_work = shares.copy()
+    df = shares.copy()
 
-    # b) Ensure blockgroup (12d) and tract (11d)
-    df_work['blockgroup'] = df_work['blockgroup'].astype(str).str.zfill(12)
-    df_work['tract']      = df_work['blockgroup'].str[:11]
+    # b) Ensure blockgroup (12 digits) and derive tract (first 11)
+    df['blockgroup'] = df['blockgroup'].astype(str).str.zfill(12)
+    df['tract'] = df['blockgroup'].str[:11]
 
     logger = logging.getLogger(__name__)
-    logger.info(f"step6 inputs ▶ shares={df_work.shape}, acs_tr={acs_tr.shape}, dhc_tr={dhc_tr.shape}")
+    logger.info(f"step6 inputs ▶ shares={shares.shape}, acs_bg={acs_bg.shape}, acs_tr={acs_tr.shape}, dhc_tr={dhc_tr.shape}")
 
-    # c) Merge ACS‐tract (11d key)
-    m2 = df_work.merge(acs_tr, on='tract', how='left', indicator='tr_merge')
+    # c) Merge BG‐level ACS summaries
+    m1 = df.merge(acs_bg, on='blockgroup', how='left', indicator='bg_merge')
+    logger.info(f"bg_merge counts → {m1['bg_merge'].value_counts().to_dict()}")
+    df = m1.drop(columns=['bg_merge'])
+
+    # d) Merge tract‐level ACS
+    m2 = df.merge(acs_tr, on='tract', how='left', indicator='tr_merge')
     logger.info(f"tr_merge counts → {m2['tr_merge'].value_counts().to_dict()}")
-    df_work = m2.drop(columns=['tr_merge'])
+    df = m2.drop(columns=['tr_merge'])
 
-    # d) Merge DHC‐tract (11d key)
-    m3 = df_work.merge(dhc_tr, on='tract', how='left', indicator='dhc_merge')
+    # e) Merge tract‐level DHC (group quarters)
+    m3 = df.merge(dhc_tr, on='tract', how='left', indicator='dhc_merge')
     logger.info(f"dhc_merge counts → {m3['dhc_merge'].value_counts().to_dict()}")
     df_final = m3.drop(columns=['dhc_merge'])
 
     logger.info(f"step6 output shape ▶ {df_final.shape}")
     return df_final
+
 
 
 
