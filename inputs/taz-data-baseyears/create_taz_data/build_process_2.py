@@ -56,95 +56,65 @@ def step5_compute_block_shares(
 ) -> pd.DataFrame:
     """
     Disaggregate BG-level aggregates to blocks by block-population share,
-    then compute block-to-tract share.
+    then compute block-to-tract share, carrying through all ACS BG variables
+    except geographic identifier columns.
 
     Returns columns:
-      ['block_geoid','blockgroup','tract', <bg_aggregates>, 'pop_share','sharetract']
+      ['block_geoid','blockgroup','tract', <bg_aggregates>,
+       'tothh','hhpop','hhinc000_010'... 'hhinc200p', 'pop_share','sharetract']
     """
     logger = logging.getLogger(__name__)
 
-    # Copy inputs
+    # Copy BG input and prepare
     df_bg2 = df_bg.copy()
-    logger.info("[step5] initial df_bg2 shape=%s", df_bg2.shape)
-    logger.info("[step5] df_bg2 columns: %s", df_bg2.columns.tolist())
-
-    # Rename and drop unwanted cols that will collide
     if 'blockgroup' not in df_bg2:
         raise KeyError("step5: missing 'blockgroup' in ACS BG data")
-    df_bg2 = df_bg2.rename(columns={'blockgroup':'BG_GEOID'})
-    # drop the raw 'tract' from BG table to avoid collision when merging
+    # rename to avoid collision
+    df_bg2 = df_bg2.rename(columns={'blockgroup': 'BG_GEOID'})
+    # drop tract if present
     if 'tract' in df_bg2.columns:
         df_bg2 = df_bg2.drop(columns=['tract'])
-    logger.info("[step5] cleaned df_bg2 columns: %s", df_bg2.columns.tolist())
+    # restore merge key
+    df_bg2['blockgroup'] = df_bg2['BG_GEOID']
+
+    # Determine BG variables to carry: all columns except geo IDs
+    geo_ids = {'BG_GEOID', 'blockgroup', 'state', 'county'}
+    carry_cols = [c for c in df_bg2.columns if c not in geo_ids]
 
     # Start from blocks
     df = df_blk.copy()
-    logger.info("[step5] initial df shape=%s", df.shape)
-    logger.info("[step5] df columns: %s", df.columns.tolist())
     if 'block_geoid' not in df or 'pop' not in df:
         raise KeyError("step5: block data must include 'block_geoid' and 'pop'")
-
-    # Derive blockgroup and tract
-    df['blockgroup'] = (
-        df['block_geoid'].astype(str)
-          .str.slice(0,12)
-          .str.zfill(12)
-    )
+    # derive blockgroup & tract
+    df['blockgroup'] = df['block_geoid'].astype(str).str.slice(0,12).str.zfill(12)
     df['tract'] = df['blockgroup'].str.slice(0,11)
-    logger.info("[step5] after deriving keys, df columns: %s", df.columns.tolist())
 
-    # Compute BG totals and pop_share
+    # compute shares
     df['bg_pop'] = df.groupby('blockgroup')['pop'].transform('sum')
     df['pop_share'] = np.where(df['bg_pop']>0, df['pop']/df['bg_pop'], 0)
-
-    # Compute tract totals and sharetract
     df['tract_pop'] = df.groupby('tract')['pop'].transform('sum')
     df['sharetract'] = np.where(df['tract_pop']>0, df['pop']/df['tract_pop'], 0)
 
-    # Prepare BG aggregates (compute missing bins)
-    if 'age0004' not in df_bg2:
-        df_bg2['age0004'] = df_bg2['male0_4'] + df_bg2['female0_4']
-    if 'SFDU' not in df_bg2:
-        df_bg2['SFDU'] = df_bg2['unit1d'] + df_bg2['unit1a'] + df_bg2['mobile'] + df_bg2['boat_RV_Van']
-        df_bg2['MFDU'] = df_bg2[['unit2','unit3_4','unit5_9','unit10_19','unit20_49','unit50p']].sum(axis=1)
-    if 'hh_own' not in df_bg2:
-        df_bg2['hh_own'] = df_bg2[['own1','own2','own3','own4','own5','own6','own7p']].sum(axis=1)
-        df_bg2['hh_rent'] = df_bg2[['rent1','rent2','rent3','rent4','rent5','rent6','rent7p']].sum(axis=1)
-    if 'hh_size_1' not in df_bg2:
-        df_bg2['hh_size_1'] = df_bg2['own1'] + df_bg2['rent1']
-        df_bg2['hh_size_2'] = df_bg2['own2'] + df_bg2['rent2']
-        df_bg2['hh_size_3'] = df_bg2['own3'] + df_bg2['rent3']
-        df_bg2['hh_size_4_plus'] = df_bg2[['own4','own5','own6','own7p','rent4','rent5','rent6','rent7p']].sum(axis=1)
-    logger.info("[step5] after computing aggregates, df_bg2 columns: %s", df_bg2.columns.tolist())
-
-    # Ensure merge key present
-    df_bg2['blockgroup'] = df_bg2['BG_GEOID']
-
-    # Merge BG aggregates into block table on 'blockgroup'
+    # merge BG variables into block-level DF
     df = df.merge(
-        df_bg2,
+        df_bg2[['blockgroup'] + carry_cols],
         on='blockgroup', how='left', indicator='bg_merge'
     )
-    logger.info("[step5] bg_merge counts → %s", df['bg_merge'].value_counts().to_dict())
+    logger.info("[step5] bg_merge counts -> %s", df['bg_merge'].value_counts().to_dict())
     df = df.drop(columns=['bg_merge'])
 
-    # List of BG aggregate columns to weight
-    bg_vars = [
-        'age0004', 'SFDU','MFDU', 'hh_own','hh_rent',
-        'hh_size_1','hh_size_2','hh_size_3','hh_size_4_plus'
-    ]
+    # weight all carried BG vars by pop_share
+    for col in carry_cols:
+        df[col] = df['pop_share'] * df[col].fillna(0)
 
-    # Apply weighting
-    for var in bg_vars:
-        df[var] = df['pop_share'] * df[var].fillna(0)
-
-    # Final selection
-    out = df[
-        ['block_geoid','blockgroup','tract']
-        + bg_vars + ['pop_share','sharetract']
-    ]
+    # select final: identifiers, carried vars, shares
+    final_cols = ['block_geoid','blockgroup','tract'] + carry_cols + ['pop_share','sharetract']
+    out = df[final_cols]
     logger.info("[step5] output columns: %s", out.columns.tolist())
     return out
+
+
+
     return df[['block_geoid','blockgroup','tract'] + bg_vars + ['pop_share','sharetract']]
 def step6_build_workingdata(
     shares: pd.DataFrame,
@@ -199,22 +169,28 @@ def step6_build_workingdata(
 # ------------------------------
 def step7_process_household_income(df_working, year=ACS_5YR_LATEST):
     """
-    Allocate ACS block-group income bins into TM1 HHINCQ1–4 by share.
-    Returns a DataFrame with:
-      - blockgroup : 12-digit FIPS
+    Allocate ACS block‑group income bins into TM1 HHINCQ1–4 by share.
+    Accepts df_working columns named either “tothh”, “hhinc000_010”, … 
+    or “tothh_”, “hhinc000_010_”, … and produces:
+      - blockgroup : 12‑digit FIPS
       - HHINCQ1..HHINCQ4 : int
     """
     mapping = map_acs5year_household_income_to_tm1_categories(year)
-    # 1) Build raw‐code → working‐col map, but only keep those actually in df_working
+
+    # 1) Build raw‐code → working‐col map, matching either suffix or no‑suffix
     code_to_col = {}
     for new_var, old_code in VARIABLES['ACS_BG_VARIABLES'].items():
-        # only pick the B19001 bins
         if not old_code.startswith("B19001_"):
             continue
+        # prefer bare name, else trailing‑underscore name
         if new_var in df_working.columns:
-            code_to_col[old_code] = new_var
+            col = new_var
+        elif new_var + "_" in df_working.columns:
+            col = new_var + "_"
         else:
-            logging.warning(f"step7: ACS_BG_VARIABLES defines '{new_var}' but working DF lacks that column")
+            logging.warning(f"step7: ACS_BG_VARIABLES defines '{new_var}' but working DF lacks both '{new_var}' and '{new_var}_'")
+            continue
+        code_to_col[old_code] = col
 
     # 2) Kick off output keyed on blockgroup
     if "blockgroup" not in df_working.columns:
@@ -230,13 +206,14 @@ def step7_process_household_income(df_working, year=ACS_5YR_LATEST):
         share    = float(row["share"])
         col      = code_to_col.get(acs_code)
         if col is None:
-            logging.warning(f"step7: no working‐column mapped for ACS code {acs_code}")
+            logging.warning(f"step7: no working‑column mapped for ACS code {acs_code}")
             continue
         out[f"HHINCQ{q}"] += df_working[col].fillna(0) * share
 
     # 4) Round and cast
     for q in (1,2,3,4):
         out[f"HHINCQ{q}"] = out[f"HHINCQ{q}"].round().astype(int)
+
     return out
 
 """ if __name__ == '__main__':
