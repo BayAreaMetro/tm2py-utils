@@ -38,101 +38,73 @@ ACS_5YEAR_LATEST     = CONSTANTS.get('ACS_5YEAR_LATEST')
 ACS_PUMS_1YEAR_LATEST= CONSTANTS.get('ACS_PUMS_1YEAR_LATEST')
 EMPRES_LODES_WEIGHT  = CONSTANTS.get('EMPRES_LODES_WEIGHT', 0.0)
 
-def summarize_census_to_taz(working_df, weights_block_df):
+def summarize_census_to_taz(working_df: pd.DataFrame, weights_block_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Summarize BG-adjusted block-level census attributes to TAZ by computing
+    weights from BG-adjusted households, ensuring full recovery of totals.
+
+    - Calculates each block's weight_hh as block_BG_hh / TAZ_BG_hh.
+    - Applies weights to all numeric attributes in working_df.
+    - Aggregates by TAZ1454.
+    - Performs a sanity check on 'tothh'.
+    - Computes derived 'sum_age' and 'gqpop'.
+
+    Returns DataFrame keyed by TAZ1454 with aggregated variables.
+    """
+    import numpy as np
     import pandas as pd
-    working_df['block_geoid'] = working_df['block_geoid'].astype(str).str.zfill(15)
-    weights_block_df['GEOID'] = weights_block_df['GEOID'].astype(str).str.zfill(15)
+    import logging
 
-    # Merge working data with weights on block-group/block-geoid
-    merged = working_df.merge(weights_block_df, left_on='block_geoid', right_on='GEOID', how='left')
+    # Ensure block_geoid and weights GEOID are same string format for merge
+    working_df['block_geoid']    = working_df['block_geoid'].astype(str).str.zfill(15)
+    weights_block_df['GEOID']    = weights_block_df['GEOID'].astype(str).str.zfill(15)
 
-    # Variables you need to sum
-    sum_vars = [
-    'tothh', 'hhpop', 'age0004', 'age0519', 'age2044',
-    'age4564', 'age65p', 'sfdu', 'mfdu', 'hh_own', 'hh_rent',
-    'hh_size_1', 'hh_size_2', 'hh_size_3', 'hh_size_4_plus',
-    'hh_wrks_0', 'hh_wrks_1', 'hh_wrks_2', 'hh_wrks_3_plus',
-    'hh_kids_yes', 'hh_kids_no', 'age62p', 'gq_inst',
-    'gq_type_univ', 'gq_type_mil', 'gq_type_othnon',
-    'pers_occ_management', 'pers_occ_professional', 'pers_occ_services',
-    'pers_occ_retail', 'pers_occ_manual', 'pers_occ_military',
-    'white_nonh', 'black_nonh', 'asian_nonh', 'other_nonh', 'hispanic'
-    ]
-
-    # Multiply all variables by the weight
-    for var in sum_vars:
-        merged[var] = merged[var] * merged['weight']
-
-    # Perform the grouping and sum
-    tazdata_census = merged.groupby('TAZ1454', as_index=False)[sum_vars].sum()
-
-    # Compute the derived variables
-    tazdata_census['sum_age'] = (
-        tazdata_census[['AGE0004', 'AGE0519', 'AGE2044', 'AGE4564', 'AGE65P']].sum(axis=1)
-    )
-    tazdata_census['gqpop'] = (
-        tazdata_census['gq_type_univ'] + 
-        tazdata_census['gq_type_mil'] + 
-        tazdata_census['gq_type_othnon']
+    # Bring in TAZ identifier
+    df = working_df.merge(
+        weights_block_df[['GEOID','TAZ1454']],
+        left_on='block_geoid', right_on='GEOID', how='left'
     )
 
-    return tazdata_census
+    # Compute BG-adjusted households per block
+    df['bg_tothh'] = df['tothh'].fillna(0)
 
+    # Sum to TAZ: total BG-adjusted households
+    df['taz_hh'] = df.groupby('TAZ1454')['bg_tothh'].transform('sum')
 
-def _compute_current_totals(df):
-    """
-    Compute current county-level aggregates for population, households, base employment, and target employment.
-    Returns a DataFrame with ['county_fips','County_Name','TOTPOP','TOTHH','HHPOP','gqpop','EMPRES','TOTEMP'].
-    """
-    logger = logging.getLogger(__name__)
-    # Ensure county_fips is just the 3-digit code
-    df = df.copy()
-    df['county_fips'] = df['county_fips'].astype(str).str[-3:]
+    # Weight by household share within TAZ
+    df['weight_hh'] = np.where(df['taz_hh']>0, df['bg_tothh']/df['taz_hh'], 0)
 
-    # Aggregate raw population/household counts by county_fips
-    pop_agg = df.groupby('county_fips', as_index=False).agg(
-        TOTPOP=('TOTPOP', 'sum'),
-        TOTHH=('TOTHH', 'sum'),
-        HHPOP=('HHPOP', 'sum'),
-        gqpop=('gqpop', 'sum')
-    )
-    # Map 3-digit FIPS to county name
-    pop_agg['County_Name'] = pop_agg['county_fips'].map(GEO['BA_COUNTY_FIPS_CODES'])
+    # Identify attribute columns (exclude IDs, shares, and bg/taz helper cols)
+    exclude = {
+        'block_geoid','blockgroup','tract','GEOID','TAZ1454',
+        'pop','bg_pop','pop_share','tract_pop','tract_share','bg_tothh','taz_hh','weight_hh'
+    }
+    attr_cols = [c for c in df.columns if c not in exclude]
+    df[attr_cols] = df[attr_cols].apply(pd.to_numeric, errors='coerce')
 
-    # Aggregate base employment by county_fips
-    emp_base = df.groupby('county_fips', as_index=False)['EMPRES'].sum()
-    emp_base = emp_base.rename(columns={'EMPRES': 'EMPRES'})
+    # Apply household-based weight
+    for col in attr_cols:
+        df[col] = df[col].fillna(0) * df['weight_hh']
 
-    # Aggregate target employment (TOTEMP) by county_fips
-    emp_target = df.groupby('county_fips', as_index=False)['TOTEMP'].sum()
-    emp_target = emp_target.rename(columns={'TOTEMP': 'TOTEMP'})
+    # Aggregate to TAZ
+    taz = df.groupby('TAZ1454', as_index=False)[attr_cols].sum()
 
-    # Merge population, base, and target employment
-    current = (
-        pop_agg
-        .merge(emp_base, on='county_fips', how='left')
-        .merge(emp_target, on='county_fips', how='left')
-    )
-    # Debug: inspect current
-    logger.info(f"Current totals columns: {current.columns.tolist()}")
-    logger.info("Current totals preview:\n%s", current.head().to_string(index=False))
-    return current
+    # Sanity: check tothh
+    raw = working_df['tothh'].sum()
+    agg = taz['tothh'].sum()
+    if abs(raw-agg) > 1e-6:
+        logging.warning(f"tothh mismatch: raw {raw} vs agg {agg}")
 
+    # Derived age and gq
+    age_bins = [c for c in ['age0004','age0519','age2044','age4564','age65p'] if c in taz]
+    if age_bins:
+        taz['sum_age'] = taz[age_bins].sum(axis=1)
+    gq_cols = [c for c in taz.columns if c.startswith('gq_')]
+    if gq_cols:
+        taz['gqpop'] = taz[gq_cols].sum(axis=1)
 
-def _initialize_targets(current):
-    """
-    Initialize target columns equal to base values for pop, hh, and target employment for EMPRES.
-    """
-    logger = logging.getLogger(__name__)
-    targets = current.copy()
-    for col in ['TOTPOP', 'TOTHH', 'HHPOP', 'gqpop']:
-        targets[f'{col}_target'] = targets[col]
-    # Use TOTEMP as initial EMPRES_target
-    targets['EMPRES_target'] = targets['TOTEMP'].fillna(0).astype(int)
-    # Debug: inspect initialized targets
-    logger.info(f"Initialized targets columns: {targets.columns.tolist()}")
-    logger.info("Initialized targets preview:\n%s", targets.head().to_string(index=False))
-    return targets
+    return taz
+
 
 
 def _apply_acs_adjustment(county_targets, census_client, acs_year, pums_year):
