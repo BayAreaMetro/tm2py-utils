@@ -25,90 +25,68 @@ GEO  = cfg['geo_constants']
 # ------------------------------
 # STEP 8: Weighted summarize block-group ACS -> TAZ
 # ------------------------------
-def compute_block_weights(paths: dict) -> pd.DataFrame:
-    """
-    Load block-to-TAZ crosswalk and compute weights by blockgroup.
-    Returns DataFrame with ['GEOID','blockgroup','TAZ1454','weight'].
-    """
+def compute_block_weights(paths):
     cw_path = Path(paths['block2020_to_taz1454_csv'])
     df = pd.read_csv(cw_path, dtype={'blockgroup': str})
-    df['block_POPULATION'] = pd.to_numeric(df['block_POPULATION'], errors='coerce').fillna(0)
-    df['group_pop'] = df.groupby('blockgroup')['block_POPULATION'].transform('sum').replace({0:1})
-    df['weight'] = df['block_POPULATION'] / df['group_pop']
-    return df[['GEOID','blockgroup','TAZ1454','weight']]
+
+    # ensure numeric
+    df['block_POP'] = pd.to_numeric(df['block_POPULATION'], errors='coerce').fillna(0)
+
+    # 1) (Optional) block‐group share (for allocating BG vars to blocks)
+    df['BG_pop']     = df.groupby('blockgroup')['block_POP'].transform('sum').replace({0:1})
+    df['share_bg']   = df['block_POP'] / df['BG_pop']
+
+    # 2) TAZ‐level share (so sums to 1 per TAZ)
+    df['TAZ_pop']    = df.groupby('TAZ1454')['block_POP'].transform('sum').replace({0:1})
+    df['weight']  = df['block_POP'] / df['TAZ_pop']
+
+    return df[['GEOID','blockgroup','TAZ1454','share_bg','weight']]
 
 
-def step8_summarize_to_taz(data_df, weights_df):
+def step8_summarize_to_taz(hhinc: pd.DataFrame, weights: pd.DataFrame) -> pd.DataFrame:
     """
-    Summarize blockgroup-level household income data into TAZ.
-
-    Expects:
-      - data_df    : DataFrame with columns ['blockgroup', 'HHINCQ1','HHINCQ2','HHINCQ3','HHINCQ4']
-      - weights_df : DataFrame with columns including a blockgroup identifier, a TAZ identifier, and 'weight'
-
-    Returns:
-      - DataFrame with columns ['taz', 'weighted_HHINCQ1', 'weighted_HHINCQ2',
-        'weighted_HHINCQ3', 'weighted_HHINCQ4']
+    Aggregate HHINCQ1–4 from block-groups to TAZ using share_bg weights.
+    Assumes weights DataFrame contains 'share_bg' column.
+    Returns DataFrame indexed by TAZ1454 with columns HHINCQ1–HHINCQ4.
     """
-    import pandas as pd
-    import logging
+    # Validate inputs
+    for col in ['blockgroup','HHINCQ1','HHINCQ2','HHINCQ3','HHINCQ4']:
+        if col not in hhinc.columns:
+            raise KeyError(f"step8: missing '{col}' in hhinc DataFrame")
+    for col in ['blockgroup','TAZ1454','share_bg']:
+        if col not in weights.columns:
+            raise KeyError(f"step8: missing '{col}' in weights DataFrame")
 
-    logger = logging.getLogger(__name__)
-
-    # Debug: show incoming DataFrame schemas
-    logger.info(f"data_df columns: {data_df.columns.tolist()}")
-    logger.info(f"weights_df columns: {weights_df.columns.tolist()}")
-
-    # Identify the blockgroup key in weights_df
-    block_keys = ['blockgroup', 'block', 'GEOID']
-    right_block_key = next((col for col in block_keys if col in weights_df.columns), None)
-    if right_block_key is None:
-        raise KeyError(
-            "weights_df must contain a blockgroup identifier column: one of {}".format(block_keys)
-        )
-
-    # Identify the TAZ key in weights_df
-    taz_keys = ['TAZ1454', 'TAZ', 'taz']
-    right_taz_key = next((col for col in taz_keys if col in weights_df.columns), None)
-    if right_taz_key is None:
-        raise KeyError(
-            "weights_df must contain a TAZ identifier column: one of {}".format(taz_keys)
-        )
-
-    # Ensure weight column exists
-    if 'weight' not in weights_df.columns:
-        raise KeyError("weights_df must contain a 'weight' column")
-
-    logger.info(f"Using blockgroup key: {right_block_key}, TAZ key: {right_taz_key}")
-
-    # 1) Merge data_df with weights_df on blockgroup
-    df = data_df.merge(
-        weights_df[[right_block_key, right_taz_key, 'weight']],
-        left_on='blockgroup', right_on=right_block_key,
-        how='left'
+    # Merge on blockgroup, retaining all hhinc rows
+    merged = hhinc.merge(
+        weights[['blockgroup','TAZ1454','share_bg']],
+        on='blockgroup', how='left', indicator=True
     )
-    missing_w = df['weight'].isna().sum()
-    if missing_w > 0:
-        logger.warning(f"{missing_w} records missing crosswalk weight")
+    logging.info(f"step8: merged hhinc ({len(hhinc)}) with share_bg ({len(weights)}) -> {len(merged)} rows")
+    missing = merged['_merge'].value_counts().get('left_only', 0)
+    if missing:
+        logging.warning(f"step8: {missing} blockgroups had no share_bg and will contribute zero")
+    merged.drop(columns=['_merge'], inplace=True)
 
-    # Drop duplicate key column if needed
-    if right_block_key != 'blockgroup':
-        df = df.drop(columns=[right_block_key])
+    # Apply share_bg to allocate household quartiles
+    for q in range(1,5):
+        merged[f'HHINCQ{q}_w'] = merged[f'HHINCQ{q}'] * merged['share_bg']
 
-    # Rename TAZ column to 'taz' for consistency
-    if right_taz_key != 'taz':
-        df = df.rename(columns={right_taz_key: 'taz'})
+        # Group by TAZ and sum weighted quartiles
+    taz = merged.groupby('TAZ1454')[[f'HHINCQ{q}_w' for q in range(1,5)]].sum().reset_index()
+    taz.columns = ['TAZ1454'] + [f'HHINCQ{q}' for q in range(1,5)]
 
-    # 2) Compute weighted values for each household income quartile
-    quartiles = ['HHINCQ1', 'HHINCQ2', 'HHINCQ3', 'HHINCQ4']
-    for q in quartiles:
-        df[f'weighted_{q}'] = df[q] * df['weight']
+    # Final rounding
+    for q in range(1,5):
+        taz[f'HHINCQ{q}'] = taz[f'HHINCQ{q}'].round().astype(int)
 
-    # 3) Aggregate to TAZ
-    agg_dict = {f'weighted_{q}': 'sum' for q in quartiles}
-    taz_df = df.groupby('taz', as_index=False).agg(agg_dict)
+    # Sanity-check totals
+    block_total = hhinc[[f'HHINCQ{q}' for q in range(1,5)]].sum().sum()
+    taz_total   = taz.sum().sum()
+    diff = block_total - taz_total
+    logging.info(f"step8: total HH at blockgroup={block_total}, at TAZ={taz_total}, diff={diff}")
 
-    return taz_df
+    return taz
 
 # ------------------------------
 # STEP 9: Tract -> TAZ summarize

@@ -208,6 +208,7 @@ variables:
     occ_f_svc_off:   C24010_065   # female Office & admin support
     occ_f_man_nat:   C24010_066   # female Natural resources/construction
     occ_f_man_prod:  C24010_070   # female Production & material moving
+    
   ACS_TRACT_VARIABLES:
     hhwrks0: B08202_002
     hhwrks1: B08202_003
