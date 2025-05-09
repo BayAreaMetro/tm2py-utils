@@ -28,6 +28,10 @@ ACS_PUMS_5YEAR_LATEST  = CONSTANTS['ACS_PUMS_5YEAR_LATEST']
 YEAR            = CONSTANTS['years'][0]
 VARIABLES = cfg['variables']
 
+YEAR = CONSTANTS['years'][0]
+ACS_5YR = CONSTANTS['ACS_5YEAR_LATEST']
+PUMS_1YR = CONSTANTS['ACS_PUMS_1YEAR_LATEST']
+
 # Ensure project modules on path
 sys.path.insert(0, str(Path(__file__).parent))
 
@@ -53,6 +57,9 @@ from summarize_to_taz_3 import (
 # Integrate & scale functions, including county targets builder
 from integrate_emp_scale_4 import (
     summarize_census_to_taz,
+    _add_institutional_gq,
+    _apply_acs_adjustment,
+
     build_county_targets,
     step10_integrate_employment,
     step11_compute_scale_factors,
@@ -71,11 +78,7 @@ def main():
     with open(key_path) as f:
         api_key = f.read().strip()
     c = Census(api_key, year=None)
-
-    YEAR = CONSTANTS['DECENNIAL_YEAR']
-    ACS_5YR = CONSTANTS['ACS_5YEAR_LATEST']
-    PUMS_1YR = CONSTANTS['ACS_PUMS_1YEAR_LATEST']
-
+    """
     # Steps 1–4: fetch data
     logging.info('Step 1: fetch block data')
     blocks = step1_fetch_block_data(c)
@@ -109,17 +112,8 @@ def main():
     sanity_check_df(weights_block, "compute_block_weights")
     taz_hhinc = step8_summarize_to_taz(hhinc, weights_block)
     sanity_check_df(taz_hhinc, "taz_hhinc")
-    #logging.info('Step 9: summarize ACS tract to TAZ')
-    #weights_tract = compute_tract_weights(PATHS)
-    #sanity_check_df(weights_tract, "compute_tract_weights")
-    #taz_acs = step9_summarize_tract_to_taz(acs_tr, weights_tract)
-    #sanity_check_df(taz_acs, "step9_summarize_tract_to_taz")
-
-    # Combine TAZ summaries
-    logging.info('Combining TAZ summaries')
-    taz_hhinc['taz'] = taz_hhinc['taz'].astype(str)
-    taz_acs['taz'] = taz_acs['taz'].astype(str)
-    taz_base = taz_hhinc.merge(taz_acs, on='taz', how='left')
+    taz_hhinc['taz'] = taz_hhinc['TAZ1454'].astype(str)
+    taz_base = taz_hhinc  # now contains HHINCQ1–4 plus all the other TAZ‐level fields
     sanity_check_df(taz_base, 'taz_base')
   
 
@@ -131,13 +125,37 @@ def main():
     # Step 10: integrate employment
     # Step 10: merge census & employment into taz_base
     logging.info('Step 10: integrate census & employment')
+    taz_base['taz'] = taz_base['taz1454'].astype(str)
+    taz_census['taz'] =taz_census['TAZ1454'].astype(str)
+    taz_census['taz'] = (
+    pd.to_numeric(taz_census['taz'], errors='coerce')
+      .fillna(0).astype(int)
+      .astype(str).str.zfill(4)
+    )
+# Ensure taz_base.taz is also zero-padded
+    taz_base['taz'] = taz_base['taz'].astype(str).str.zfill(4)
     taz_base = step10_integrate_employment(taz_base, taz_census, YEAR)
     sanity_check_df(taz_base, "step10_integrate_employment")
+    
+    # write out unscaled TAZ data
+    out_root = os.path.expandvars(PATHS['output_root'])
+    year_dir = os.path.join(out_root, str(YEAR))
+    os.makedirs(year_dir, exist_ok=True)
+    taz_base.to_csv(os.path.join(year_dir, "taz_unscaled_to_cnty.csv"), index=False)
+
+    dhc_tr.to_csv(os.path.join(year_dir, "dhc_tract.csv"), index=False)
+    """
+
+    out_root = os.path.expandvars(PATHS['output_root'])
+    year_dir = os.path.join(out_root, str(YEAR))
+    taz_base= pd.read_csv(os.path.join(year_dir, "taz_unscaled_to_cnty.csv"))
+    dhc_tr= pd.read_csv(os.path.join(year_dir, "dhc_tract.csv"))
+
 
     # Build and merge county targets
     logging.info('Building county targets')
     county_targets = build_county_targets(
-        tazdata_census = taz_base,     # now has HHPOP, GQPOP, TOTHH, TOTPOP, EMPRES, TOTEMP…
+        tazdata_census = taz_base,     
         dhc_gqpop = dhc_tr,
         acs_5year = ACS_5YR,
         acs_pums_1year = PUMS_1YR,
@@ -146,7 +164,7 @@ def main():
     sanity_check_df(county_targets, "county_targets")
     
     merge_ct = (
-        county_targets[['county_fips','EMPRES','TOTEMP']]
+        county_targets[['county_fips','empres','totemp']]
         .rename(columns={'EMPRES':'county_base','TOTEMP':'county_target',
                          'county_fips' : 'County_Name'})
     )

@@ -43,132 +43,165 @@ def summarize_census_to_taz(working_df: pd.DataFrame, weights_block_df: pd.DataF
     Summarize BG-adjusted block-level census attributes to TAZ by computing
     weights from BG-adjusted households, ensuring full recovery of totals.
 
-    - Calculates each block's weight_hh as block_BG_hh / TAZ_BG_hh.
-    - Applies weights to all numeric attributes in working_df.
-    - Aggregates by TAZ1454.
-    - Performs a sanity check on 'tothh'.
-    - Computes derived 'sum_age' and 'gqpop'.
-
-    Returns DataFrame keyed by TAZ1454 with aggregated variables.
+    Returns DataFrame keyed by ['taz','county_fips'] with aggregated variables.
     """
     import numpy as np
     import pandas as pd
     import logging
 
-    # Ensure block_geoid and weights GEOID are same string format for merge
-    working_df['block_geoid']    = working_df['block_geoid'].astype(str).str.zfill(15)
-    weights_block_df['GEOID']    = weights_block_df['GEOID'].astype(str).str.zfill(15)
+    logger = logging.getLogger(__name__)
+    logger.info("Starting summarize_census_to_taz: %d blocks, %d weight rows", 
+                len(working_df), len(weights_block_df))
 
-    # Bring in TAZ identifier
+    # Standardize block GEOID formats
+    working_df['block_geoid'] = working_df['block_geoid'].astype(str).str.zfill(15)
+    weights_block_df['GEOID'] = weights_block_df['GEOID'].astype(str).str.zfill(15)
+    logger.debug("After zero-fill: working_df.block_geoid sample: %s", 
+                 working_df['block_geoid'].head().tolist())
+
+    # Merge weights to working records
+    weights_block_df = weights_block_df.rename(columns={'GEOID':'block_geoid'})
     df = working_df.merge(
-        weights_block_df[['GEOID','TAZ1454']],
-        left_on='block_geoid', right_on='GEOID', how='left'
+        weights_block_df[['block_geoid','TAZ1454']],
+        on='block_geoid', how='left', validate='many_to_one'
     )
+    logger.info("After merge: %d rows, %d missing TAZ1454", 
+                len(df), df['TAZ1454'].isna().sum())
 
-    # Compute BG-adjusted households per block
+    # Derive county_fips directly from block_geoid
+    df['county_fips'] = df['block_geoid'].str[:5]
+
+    # Compute BG-adjusted totals
     df['bg_tothh'] = df['tothh'].fillna(0)
+    df['bg_hhpop'] = df['hhpop'].fillna(0)
+    logger.debug("BG sums sample: %s", df[['bg_tothh','bg_hhpop']].head().to_string(index=False))
 
-    # Sum to TAZ: total BG-adjusted households
-    df['taz_hh'] = df.groupby('TAZ1454')['bg_tothh'].transform('sum')
+    # TAZ-level sums of BG-adjusted households and pop
+    df['taz_bg_hh'] = df.groupby('TAZ1454')['bg_tothh'].transform('sum')
+    df['taz_bg_pop'] = df.groupby('TAZ1454')['bg_hhpop'].transform('sum')
+    logger.debug("TAZ BG totals sample: %s", 
+                 df.groupby('TAZ1454')[['taz_bg_hh','taz_bg_pop']].first().head().to_string())
 
-    # Weight by household share within TAZ
-    df['weight_hh'] = np.where(df['taz_hh']>0, df['bg_tothh']/df['taz_hh'], 0)
+    # Compute block weights
+    df['weight_hh'] = np.where(df['taz_bg_hh']>0, df['bg_tothh']/df['taz_bg_hh'], 0)
+    logger.debug("Weight_hh stats: %s", df['weight_hh'].describe().to_string())
 
-    # Identify attribute columns (exclude IDs, shares, and bg/taz helper cols)
-    exclude = {
-        'block_geoid','blockgroup','tract','GEOID','TAZ1454',
-        'pop','bg_pop','pop_share','tract_pop','tract_share','bg_tothh','taz_hh','weight_hh'
-    }
-    attr_cols = [c for c in df.columns if c not in exclude]
-    df[attr_cols] = df[attr_cols].apply(pd.to_numeric, errors='coerce')
+    # Identify attribute columns to weight
+    numeric_cols = [c for c in df.columns if np.issubdtype(df[c].dtype, np.number)]
+    no_weight = {'bg_tothh','bg_hhpop','tothh','hhpop','taz_bg_hh','taz_bg_pop','weight_hh','TAZ1454','taz'}
+    attr_cols = [c for c in numeric_cols if c not in no_weight]
+    logger.info("Attributes to be weighted: %s", attr_cols)
 
-    # Apply household-based weight
+    # Apply household-based weight to attributes
     for col in attr_cols:
         df[col] = df[col].fillna(0) * df['weight_hh']
+    logger.debug("After weighting sample: %s", df[attr_cols].head().to_string(index=False))
 
-    # Aggregate to TAZ
-    taz = df.groupby('TAZ1454', as_index=False)[attr_cols].sum()
+    # Aggregate weighted attributes to TAZ and county
+    taz = df.groupby(['TAZ1454','county_fips'], as_index=False)[attr_cols].sum()
+    logger.info("After aggregate: %d TAZ-county rows", len(taz))
 
-    # Sanity: check tothh
-    raw = working_df['tothh'].sum()
-    agg = taz['tothh'].sum()
-    if abs(raw-agg) > 1e-6:
-        logging.warning(f"tothh mismatch: raw {raw} vs agg {agg}")
+    # Restore true totals
+    restore = df.groupby(['TAZ1454','county_fips'])[['bg_tothh','bg_hhpop']].sum()
+    restore = restore.rename(columns={'bg_tothh':'tothh','bg_hhpop':'hhpop'}).reset_index()
+    taz = taz.merge(restore, on=['TAZ1454','county_fips'], how='left')
+    logger.info("Restored true tothh and hhpop: sample %s", 
+                taz[['tothh','hhpop']].head().to_string(index=False))
+        # Compute gqpop as totpop - hhpop if not present
+    if 'gqpop' not in taz.columns:
+        taz['gqpop'] = taz.get('totpop', taz['hhpop']) - taz['hhpop']
 
-    # Derived age and gq
-    age_bins = [c for c in ['age0004','age0519','age2044','age4564','age65p'] if c in taz]
-    if age_bins:
-        taz['sum_age'] = taz[age_bins].sum(axis=1)
-    gq_cols = [c for c in taz.columns if c.startswith('gq_')]
-    if gq_cols:
-        taz['gqpop'] = taz[gq_cols].sum(axis=1)
-
+    # Ensure taz key
+    if 'taz' not in taz.columns:
+        taz['taz'] = taz['TAZ1454'].astype(str).str.zfill(4)
+    logger.info("Final TAZ columns: %s", taz.columns.tolist())
     return taz
 
 
 
-def _apply_acs_adjustment(county_targets, census_client, acs_year, pums_year):
-    """
-    Adjust county_targets using ACS 1-year estimates when acs_year < pums_year + 2.
-    Returns updated county_targets.
-    """
+
+
+def _apply_acs_adjustment(county_targets: pd.DataFrame,
+                          census_client,
+                          acs_year: int,
+                          pums_year: int) -> pd.DataFrame:
+    import logging, time
     logger = logging.getLogger(__name__)
-    var_map = VARIABLES.get('ACS_1YEAR_TARGET_VARS')
-    if not var_map:
-        raise ValueError("CONFIG ERROR: 'ACS_1YEAR_TARGET_VARS' missing in VARIABLES.")
+    logger.info(f"Applying ACS1 adjustment for pums_year={pums_year}")
+    # Use canonical ACS1 codes
+    var_map = {
+        'TOTHH_target':  'B11016_001E',
+        'TOTPOP_target': 'B01003_001E',
+        'HHPOP_target':  'B09019_001E',
+        'employed':      'B23025_004E',
+        'armedforces':   'B23025_005E'
+    }
 
-    if acs_year >= pums_year + 2:
-        return county_targets
+    # Ensure county_fips are strings and zero-padded 5-digit FIPS
+    county_targets['county_fips'] = (
+        county_targets['county_fips']
+        .astype(int).astype(str)
+        .str.zfill(5)
+    ).str.extract(r'(\d{1,5})$')[0].str.zfill(5)
 
-    logger.info("Applying ACS 1-year county targets adjustment")
     records = []
     for cnt in county_targets['county_fips']:
-        # Retry logic
+        # Debug: log county before call
+        logger.info(f"About to call ACS1 for county_fips={cnt}")
+        # Extract 3-digit county code for API
+        county_arg = cnt[-3:]
+        logger.info(f"Fetching ACS1 for county {county_arg}")
+
         recs = []
-        for attempt in range(3):
+        for attempt in range(1, 4):
             try:
-                recs = census_client.acs5.state_county(
-                    list(var_map.values()), GEO['STATE_CODE'], cnt,
+                logger.debug(
+                    f"ACS1 call: vars={list(var_map.values())}, state={GEO['STATE_CODE']},"
+                    f" county={county_arg}, year={pums_year}"
+                )
+                recs = census_client.acs1.state_county(
+                    list(var_map.values()),
+                    GEO['STATE_CODE'],
+                    county_arg,
                     year=pums_year
                 )
+                logger.debug(f"ACS1 response for {cnt} (arg {county_arg}): {recs}")
                 break
             except Exception as e:
-                logger.warning(f"ACS API failed for {cnt} (attempt {attempt+1}): {e}")
-                time.sleep(2 ** attempt)
+                logger.error(f"ACS1 failure for {county_arg} attempt {attempt}: {e}")
+                time.sleep(2 ** (attempt - 1))
         if not recs:
-            logger.error(f"No ACS data for county {cnt}, skipping ACS adjustment")
+            logger.error(f"No ACS1 data for county {county_arg} after retries, skipping ACS adjustment")
             continue
 
-        for r in recs:
-            name = r.get('NAME', '').replace(' County, California', '')
-            row = {'county_fips': cnt, 'County_Name': name}
+        # Normalize header/value or dict format
+        if isinstance(recs[0], list):
+            header, values = recs[0], (recs[1] if len(recs) > 1 else [])
+            recs_to_process = [dict(zip(header, values))]
+        else:
+            recs_to_process = recs
+
+        for r in recs_to_process:
+            row = {'county_fips': cnt}
             for out_col, code in var_map.items():
                 row[out_col] = int(float(r.get(code, 0)))
             records.append(row)
 
+    logger.info(f"Total ACS records: {len(records)}")
     df_acs = pd.DataFrame(records)
     if df_acs.empty:
+        logger.warning("No ACS1 records collected; returning original county_targets")
         return county_targets
 
-    # Derive gqpop_target and EMPRES_target
-    df_acs['gqpop_target'] = df_acs['TOTPOP_target'] - df_acs['HHPOP_target']
-    df_acs['EMPRES_target'] = df_acs['employed_'] + df_acs['armedforces_']
-
-    cols = [
-        'county_fips', 'County_Name',
-        'TOTHH_target', 'TOTPOP_target', 'HHPOP_target', 'gqpop_target', 'EMPRES_target'
-    ]
-    df_acs = df_acs[cols]
-
-    # Merge and overwrite
+    # Merge ACS targets
     merged = county_targets.merge(
-        df_acs, on=['county_fips', 'County_Name'], how='left', suffixes=('', '_acs')
+        df_acs, on='county_fips', how='left', suffixes=('', '_acs')
     )
-    for col in [
-        'TOTHH_target', 'TOTPOP_target', 'HHPOP_target', 'gqpop_target', 'EMPRES_target'
-    ]:
-        merged[col] = merged[f'{col}_acs'].fillna(merged[col])
-        merged = merged.drop(columns=[f'{col}_acs'])
+    # Overwrite with ACS where available
+    for col in [c for c in df_acs.columns if c != 'county_fips']:
+        merged[col] = merged[f"{col}_acs"].fillna(merged[col])
+        merged.drop(columns=[f"{col}_acs"], inplace=True)
+
     return merged
 
 
@@ -185,46 +218,95 @@ def _add_institutional_gq(county_targets, dhc_gqpop):
 
 
 def build_county_targets(
-    tazdata_census,
-    dhc_gqpop,
-    acs_5year,
-    acs_pums_1year,
+    tazdata_census: pd.DataFrame,
+    dhc_gqpop: pd.DataFrame,
+    acs_5year: int,
+    acs_pums_1year: int,
     census_client
-):
+) -> pd.DataFrame:
     """
-    Orchestrate county-level target building by sequencing subtasks.
+    Compute county targets from TAZ-level census data in one pass.
+
+    Parameters
+    ----------
+    tazdata_census : DataFrame
+        Must include at least ['county_fips','tothh','hhpop','empres','gqpop']
+        (and optionally 'totpop','totemp' if already computed).
+    dhc_gqpop : DataFrame
+        Group-quarters totals for each county.
+    acs_5year : int
+        ACS 5-year vintage (e.g. 2023).
+    acs_pums_1year : int
+        PUMS 1-year vintage (e.g. 2023).
+    census_client :
+        Your Census API client instance.
+
+
+    Returns
+    -------
+    county_targets : DataFrame
+        One row per county_fips, with columns:
+          - tothh, hhpop, empres, gqpop, totpop, totemp  
+          - their *_target counterparts  
+          - *_diff diagnostics  
+        All numeric columns cast to int and filtered to valid_counties.
     """
     logger = logging.getLogger(__name__)
+    tazdata_census.columns = tazdata_census.columns.str.lower()
+    # ---- Normalize county_fips and drop invalid ----
 
-    # Debug: inspect input
-    logger.info(f"build_county_targets received tazdata_census shape: {tazdata_census.shape}")
-    logger.info("tazdata_census preview:\n%s", tazdata_census.head().to_string(index=False))
 
-    # Step 1: current totals
-    current = _compute_current_totals(tazdata_census)
-    # Step 2: initialize targets
-    county_targets = _initialize_targets(current)
-    # Step 3: ACS adjustment
+    # ---- Step 1: current totals ----
+    # ensure totpop/totemp exist
+    if 'totpop' not in tazdata_census:
+        tazdata_census['totpop'] = tazdata_census['hhpop'] + tazdata_census.get('gqpop', 0)
+
+
+    current = (
+        tazdata_census.groupby('county_fips')[[
+            'tothh','hhpop','empres','gqpop','totpop','totemp'
+        ]].sum()
+        .reset_index()
+    )
+
+    # ---- Step 2: initialize targets ----
+    # Compute current totals per county and set up target columns
+    targets = current.rename(columns={
+        'tothh':  'tothh_target',
+        'hhpop':  'hhpop_target',
+        'empres': 'empres_target',
+        'gqpop':  'gqpop_target',
+        'totpop': 'totpop_target',
+        'totemp': 'totemp_target'
+    })
+    # Merge original current values back so we keep both actual and target
+    county_targets = targets.merge(
+        current,
+        on='county_fips'
+    )
+    # Now county_targets has columns: county_fips, *_target, tothh, hhpop, empres, gqpop, totpop, totemp
+    # above: keeps both current and *_target columns
+
+    # ---- Step 3: ACS adjustment ----
     county_targets = _apply_acs_adjustment(
         county_targets, census_client, acs_5year, acs_pums_1year
     )
-    # Step 4: institutional GQ
+
+    # ---- Step 4: institutional GQ adjustment ----
     county_targets = _add_institutional_gq(county_targets, dhc_gqpop)
 
-    # Debug: inspect final before cast
-    logger.info(f"County targets before final cast columns: {county_targets.columns.tolist()}")
-    logger.info("County targets before final cast preview:\n%s", county_targets.head().to_string(index=False))
+    # ---- Step 5: compute diffs ----
+    for metric in ['tothh','hhpop','gqpop','totpop','empres','totemp']:
+        county_targets[f'{metric}_diff'] = (
+            county_targets[f'{metric}_target'] - county_targets[metric]
+        )
 
-    # Final cast - ensure all numeric fields are ints
-    for col in [
-        'TOTPOP','TOTHH','HHPOP','gqpop','TOTEMP',
-        'TOTPOP_target','TOTHH_target','HHPOP_target','gqpop_target',
-        'EMPRES','EMPRES_target'
-    ]:
-        county_targets[col] = county_targets[col].astype(int)
+    # ---- Step 6: cast all numeric columns to int ----
+    num_cols = county_targets.select_dtypes(include='number').columns
+    county_targets[num_cols] = county_targets[num_cols].round().astype(int)
 
-    logger.info(f"Final county_targets columns: {county_targets.columns.tolist()}")
-    logger.info("Final county_targets preview:\n%s", county_targets.head().to_string(index=False))
+
+    logger.info("Final county_targets columns: %s", county_targets.columns.tolist())
     return county_targets
 # ------------------------------
 # STEP 10: Integrate employment
@@ -254,7 +336,14 @@ def step10_integrate_employment(
         - all original taz_base columns (plus every census field, merged & coalesced),
         - EMPRES (wage & salary) and TOTEMP (total) employment columns.
     """
-
+    if 'taz1454' in taz_census.columns:
+        taz_census['taz'] = (
+            pd.to_numeric(taz_census['taz1454'], errors='coerce')
+            .fillna(0).astype(int)
+            .astype(str).str.zfill(4)
+        )
+    # Ensure taz_base.taz is zero‑padded string
+    taz_base['taz'] = taz_base['taz'].astype(str).str.zfill(4)
 
     logger = logging.getLogger(__name__)
 
@@ -264,7 +353,7 @@ def step10_integrate_employment(
         on="taz",
         how="left",
         suffixes=("", "_cns")
-    ).fillna(0)
+    )
 
     # --- 2) Auto-coalesce every "_cns" column back into its base name ---
     cns_cols = [c for c in merged.columns if c.endswith("_cns")]
@@ -328,6 +417,7 @@ def step10_integrate_employment(
 
     logger.info("Employment integrated into TAZ base")
     return final
+
 
 def step11_compute_scale_factors(
     taz_df: pd.DataFrame,
