@@ -55,75 +55,74 @@ def step5_compute_block_shares(
     df_bg: pd.DataFrame
 ) -> pd.DataFrame:
     """
-    Disaggregate BG-level aggregates to blocks by block-population share,
-    then compute block-to-tract share, carrying through only BG-level ACS variables.
-
-    Ensures pop_share is normalized to sum to 1 within each blockgroup.
-
-    Returns columns:
-      ['block_geoid','blockgroup','tract','pop', <numeric BG vars>, 'pop_share','tract_share']
+    Disaggregate BG-level ACS variables to blocks by block-population share,
+    then compute block-to-tract share.  Returns one row per block:
+      ['block_geoid','blockgroup','tract','pop',
+       <all numeric BG vars allocated to the block>,
+       'share_bg','tract_share']
     """
+    import numpy as np
+    import logging
+
     logger = logging.getLogger(__name__)
 
-    # Copy BG input and validate key
+    # 1) Prepare BG data
     df_bg2 = df_bg.copy()
-    if 'blockgroup' not in df_bg2:
+    if 'blockgroup' not in df_bg2.columns:
         raise KeyError("step5: missing 'blockgroup' in ACS BG data")
 
-    # Rename BG key and drop unintended tract column
-    df_bg2 = df_bg2.rename(columns={'blockgroup': 'BG_GEOID'})
-    df_bg2 = df_bg2.drop(columns=['tract'], errors='ignore')
+    # rename for clarity, then re-create blockgroup key
+    df_bg2 = df_bg2.rename(columns={'blockgroup':'BG_GEOID'})
     df_bg2['blockgroup'] = df_bg2['BG_GEOID']
+    # drop any accidental 'tract' column
+    df_bg2 = df_bg2.drop(columns=['tract'], errors='ignore')
 
-    # Exclude geo/string columns
-    geo_ids = {'BG_GEOID', 'blockgroup', 'state', 'county', 'County_Name', 'block group'}
-    carry_cols = [c for c in df_bg2.columns if c not in geo_ids]
+    # identify exactly the ACS_BG_VARIABLES you want to allocate
+    geo_cols = {'BG_GEOID','blockgroup','state','county','County_Name'}
+    bg_vars = [c for c in df_bg2.columns if c not in geo_cols]
 
-    # Coerce BG vars to numeric
-    df_bg2[carry_cols] = df_bg2[carry_cols].apply(pd.to_numeric, errors='coerce')
+    # coerce them to numeric (fill NAs with zero)
+    df_bg2[bg_vars] = df_bg2[bg_vars].apply(pd.to_numeric, errors='coerce').fillna(0)
 
-    # Start from blocks
+    # 2) Start from your block-level frame
     df = df_blk.copy()
-    if 'block_geoid' not in df or 'pop' not in df:
+    if 'block_geoid' not in df.columns or 'pop' not in df.columns:
         raise KeyError("step5: block data must include 'block_geoid' and 'pop'")
 
-    # Derive blockgroup & tract
-    df['blockgroup'] = df['block_geoid'].astype(str).str.slice(0, 12).str.zfill(12)
-    df['tract'] = df['blockgroup'].str.slice(0, 11)
+    # derive blockgroup & tract
+    df['blockgroup'] = df['block_geoid'].astype(str).str[:12].str.zfill(12)
+    df['tract']      = df['blockgroup'].str[:11]
 
-    # Compute raw BG pop and initial pop_share
-    df['bg_pop'] = df.groupby('blockgroup')['pop'].transform('sum')
-    df['pop_share'] = np.where(df['bg_pop']>0, df['pop']/df['bg_pop'], 0)
+    # 3) compute block-to-BG share (share_bg)
+    df['bg_pop']     = df.groupby('blockgroup')['pop'].transform('sum')
+    df['share_bg']   = np.where(df['bg_pop']>0, df['pop']/df['bg_pop'], 0)
+    # normalize so shares sum to 1 in each BG
+    df['share_bg']   = df['share_bg'] / df.groupby('blockgroup')['share_bg'].transform('sum')
 
-    # Normalize pop_share within each blockgroup
-    sum_shares = df.groupby('blockgroup')['pop_share'].transform('sum')
-    df['pop_share'] = np.where(sum_shares>0, df['pop_share']/sum_shares, 0)
+    # 4) compute block-to-tract share (if you still need it)
+    df['tract_pop']  = df.groupby('tract')['pop'].transform('sum')
+    df['tract_share']= np.where(df['tract_pop']>0, df['pop']/df['tract_pop'], 0)
 
-    # Compute tract totals and tract_share
-    df['tract_pop'] = df.groupby('tract')['pop'].transform('sum')
-    df['tract_share'] = np.where(df['tract_pop']>0, df['pop']/df['tract_pop'], 0)
-
-    # Merge BG variables into block-level DF
+    # 5) bring in the BG vars and allocate
     df = df.merge(
-        df_bg2[['blockgroup'] + carry_cols],
-        on='blockgroup', how='left', indicator='bg_merge'
+        df_bg2[['blockgroup'] + bg_vars],
+        on='blockgroup', how='left', validate='many_to_one', indicator='bg_merge'
     )
     logger.info("[step5] bg_merge counts -> %s", df['bg_merge'].value_counts().to_dict())
     df = df.drop(columns=['bg_merge'])
 
-    # After merge, select numeric carries
-    numeric_cols = [c for c in carry_cols if np.issubdtype(df[c].dtype, np.number)]
+    for var in bg_vars:
+        df[var] = df[var] * df['share_bg']
 
-    # Weight numeric BG vars by pop_share
-    for col in numeric_cols:
-        df[col] = df['pop_share'] * df[col].fillna(0)
-
-    # Final selection: include original block pop for downstream use
-    final_cols = ['block_geoid','blockgroup','tract','pop'] + numeric_cols + ['pop_share','tract_share']
+    # 6) select and return
+    final_cols = (
+      ['block_geoid','blockgroup','tract','pop']
+      + bg_vars
+      + ['share_bg','tract_share']
+    )
     out = df[final_cols]
     logger.info("[step5] output columns: %s", out.columns.tolist())
     return out
-
 
     return df[['block_geoid','blockgroup','tract'] + bg_vars + ['pop_share','sharetract']]
 def step6_build_workingdata(

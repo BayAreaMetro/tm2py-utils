@@ -125,7 +125,7 @@ def main():
     # Step 10: integrate employment
     # Step 10: merge census & employment into taz_base
     logging.info('Step 10: integrate census & employment')
-    taz_base['taz'] = taz_base['taz1454'].astype(str)
+    taz_base['taz'] = taz_base['TAZ1454'].astype(str)
     taz_census['taz'] =taz_census['TAZ1454'].astype(str)
     taz_census['taz'] = (
     pd.to_numeric(taz_census['taz'], errors='coerce')
@@ -134,28 +134,28 @@ def main():
     )
 # Ensure taz_base.taz is also zero-padded
     taz_base['taz'] = taz_base['taz'].astype(str).str.zfill(4)
-    taz_base = step10_integrate_employment(taz_base, taz_census, YEAR)
+    taz_base_out = step10_integrate_employment(taz_base, taz_census, YEAR)
     sanity_check_df(taz_base, "step10_integrate_employment")
-    
+
     # write out unscaled TAZ data
     out_root = os.path.expandvars(PATHS['output_root'])
     year_dir = os.path.join(out_root, str(YEAR))
     os.makedirs(year_dir, exist_ok=True)
     taz_base.to_csv(os.path.join(year_dir, "taz_unscaled_to_cnty.csv"), index=False)
-
+    taz_census.to_csv(os.path.join(year_dir, "taz_census.csv"), index=False)
     dhc_tr.to_csv(os.path.join(year_dir, "dhc_tract.csv"), index=False)
-    """
 
+    """
     out_root = os.path.expandvars(PATHS['output_root'])
     year_dir = os.path.join(out_root, str(YEAR))
     taz_base= pd.read_csv(os.path.join(year_dir, "taz_unscaled_to_cnty.csv"))
     dhc_tr= pd.read_csv(os.path.join(year_dir, "dhc_tract.csv"))
-
+    taz_census= pd.read_csv(os.path.join(year_dir, "taz_census.csv"))
 
     # Build and merge county targets
     logging.info('Building county targets')
     county_targets = build_county_targets(
-        tazdata_census = taz_base,     
+        tazdata_census = taz_census,     
         dhc_gqpop = dhc_tr,
         acs_5year = ACS_5YR,
         acs_pums_1year = PUMS_1YR,

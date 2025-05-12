@@ -204,6 +204,8 @@ def step2b_compute_bg_vars(df: pd.DataFrame) -> pd.DataFrame:
     df['hh_size_2']      = df['own2']  + df['rent2']
     df['hh_size_3']      = df['own3']  + df['rent3']
     df['hh_size_4_plus'] = df[['own4','own5','own6','own7p','rent4','rent5','rent6','rent7p']].sum(axis=1)
+    
+    df['empres'] = df['employed'] + df['armedforces']
     return df
 # ------------------------------
 # STEP 3: Fetch ACS tract variables

@@ -244,9 +244,9 @@ variables:
     gq_noninst_f_65p_mil: PCT19_186N
     gq_noninst_f_65p_oth: PCT19_189N
   ACS_1YEAR_TARGET_VARS:
-    TOTHH_target: B11016_001E   # Total households
-    TOTPOP_target: B01003_001E   # Total population
-    HHPOP_target: B28005_001E   # Household population
+    tothh_target: B11016_001E   # Total households
+    totpop_target: B01003_001E   # Total population
+    hhpop_target: B28005_001E   # Household population
     employed: B23025_004E   # Civilian employed residents
     armedforces: B23025_006E   # Armed forces
 
