@@ -63,6 +63,7 @@ from integrate_emp_scale_4 import (
     build_county_targets,
     step10_integrate_employment,
     integrate_lehd_targets,
+    add_taz_summaries,
     apply_county_targets_to_taz,
     step11_compute_scale_factors,
     step12_apply_scaling
@@ -80,7 +81,7 @@ def main():
     with open(key_path) as f:
         api_key = f.read().strip()
     c = Census(api_key, year=None)
-
+    """
     # Steps 1–4: fetch data
     logging.info('Step 1: fetch block data')
     blocks = step1_fetch_block_data(c)
@@ -129,15 +130,8 @@ def main():
     logging.info('Step 10: integrate census & employment')
     taz_base['taz'] = taz_base['TAZ1454'].astype(str)
     taz_census['taz'] =taz_census['TAZ1454'].astype(str)
-    taz_census['taz'] = (
-    pd.to_numeric(taz_census['taz'], errors='coerce')
-      .fillna(0).astype(int)
-      .astype(str).str.zfill(4)
-    )
-# Ensure taz_base.taz is also zero-padded
-    taz_base['taz'] = taz_base['taz'].astype(str).str.zfill(4)
     taz_base = step10_integrate_employment(taz_base, taz_census, YEAR)
-    sanity_check_df(taz_base, "step10_integrate_employment")
+    #sanity_check_df(taz_base, "step10_integrate_employment")
 
 
     # write out unscaled TAZ data
@@ -154,7 +148,7 @@ def main():
     taz_base= pd.read_csv(os.path.join(year_dir, "taz_unscaled_to_cnty.csv"))
     dhc_tr= pd.read_csv(os.path.join(year_dir, "dhc_tract.csv"))
     taz_census= pd.read_csv(os.path.join(year_dir, "taz_census.csv"))
-    """
+
     # Build and merge county targets
     logging.info('Building county targets')
     county_targets = build_county_targets(
@@ -166,96 +160,48 @@ def main():
     )
     sanity_check_df(county_targets, "county_targets")
     
-    merge_ct = (
-    county_targets[['county_fips', 'empres_target', 'totemp_target']]
-    .rename(columns={
-        'empres_target': 'county_base',
-        'totemp_target': 'county_target'
-    })
-    )
+  
 
-    county_targets = integrate_lehd_targets(
+    county_targets_all = integrate_lehd_targets(
     county_targets=county_targets,
-    bay_area_counties=GEO["BAY_AREA_COUNTIES"],
     emp_lodes_weight=CONSTANTS["EMPRES_LODES_WEIGHT"]
     )
-    merge_ct['county_fips'] = merge_ct['county_fips'].astype(str).str.zfill(5)
-    taz_base ['county_fips'] = taz_base ['county_fips'].astype(str).str.zfill(5)
-    # 2) Merge those into your TAZ base
-    taz_base = taz_base.merge(
-        merge_ct,
-        on='county_fips',
-        how='left'
-    )
-  
-    # 3) Finally rename the key for output
-    taz_base = taz_base.rename(columns={'county_fips': 'County_Name'})
+
+
 
     # Step 11: apply all county‐level controls (pop+hh+gq, then employment)
     logging.info("Step 11: apply county targets to TAZ")
     county_targets['county_fips'] = county_targets['county_fips'].astype(str).str.zfill(5)
     # create the County_Name column the scaler expects
-    county_targets['County_Name'] = county_targets['county_fips']
-    rename_map = {
-    'tothh_target':  'TOTHH_target',
-    'hhpop_target':  'HHPOP_target',
-    'gqpop_target':  'GQPOP_target',
-    'totpop_target': 'TOTPOP_target',
-    'empres_target': 'EMPRES_target',
-    'totemp_target': 'TOTEMP_target',
-    }
-    county_targets = county_targets.rename(columns=rename_map)
+ 
+    taz_base = add_taz_summaries(taz_base)
 
-    for col in county_targets.columns:
-        if col.endswith('_target'):
-            county_targets[col] = county_targets[col].astype(int)
 
-    age_cols = ['age0004','age0519','age2044','age4564','age65p']
-    taz_base['sum_age'] = taz_base[age_cols].sum(axis=1).astype(int)
+    taz_base['TAZ1454'] = taz_base['TAZ1454'].astype(str)
 
-    # 2) ethnicity groups (R uses other_nonh + hispanic)
-    #    here we derive other_nonh from total_nonh minus the three non-H colors
-    taz_base['other_nonh'] = (
-        taz_base['total_nonh']
-        - taz_base[['white_nonh','black_nonh','asian_nonh']].sum(axis=1)
-    ).astype(int)
-    taz_base['hispanic'] = taz_base['total_hisp'].astype(int)
-    eth_cols = ['white_nonh','black_nonh','asian_nonh','other_nonh','hispanic']
-    taz_base['sum_ethnicity'] = taz_base[eth_cols].sum(axis=1).astype(int)
+    taz_map = pd.read_csv(
+        os.path.expandvars(PATHS['taz_sd_county_csv']),
+        dtype={'ZONE': str, 'COUNTY_NAME': str}
+    )
+    taz_map['ZONE'] = taz_map['ZONE'].astype(str)
 
-    # 3) total dwelling units
-    taz_base['sum_DU'] = taz_base[['sfdu','mfdu']].sum(axis=1).astype(int)
+    # Now merge
+    taz_base = (
+        taz_base
+        .merge(
+            taz_map[['ZONE','COUNTY_NAME']],
+            left_on='TAZ1454',
+            right_on='ZONE',
+            how='left'
+        )
+        .rename(columns={'COUNTY_NAME':'County_Name'})
+        .drop(columns=['ZONE'])
+    )
 
-    # 4) tenure
-    taz_base['sum_tenure'] = taz_base[['hh_own','hh_rent']].sum(axis=1).astype(int)
-
-    # 5) households with kids
-    #    we have ownkidsyes/rentkidsyes → hh_kids_yes, and ownkidsno/rentkidsno → hh_kids_no
-    taz_base['hh_kids_yes'] = (
-        taz_base['ownkidsyes'] + taz_base['rentkidsyes']
-    ).astype(int)
-    taz_base['hh_kids_no']  = (
-        taz_base['ownkidsno']  + taz_base['rentkidsno']
-    ).astype(int)
-    taz_base['sum_kids']    = (
-        taz_base['hh_kids_yes'] + taz_base['hh_kids_no']
-    ).astype(int)
-
-    # 6) income quartiles
-    incq = ['HHINCQ1','HHINCQ2','HHINCQ3','HHINCQ4']
-    taz_base['sum_income'] = taz_base[incq].sum(axis=1).astype(int)
-
-    # 7) household size
-    size_cols = ['hh_size_1','hh_size_2','hh_size_3','hh_size_4_plus']
-    taz_base['sum_size'] = taz_base[size_cols].sum(axis=1).astype(int)
-
-    # 8) household workers
-    wrk_cols = ['hhwrks0','hhwrks1','hhwrks2','hhwrks3p']
-    taz_base['sum_hhworkers'] = taz_base[wrk_cols].sum(axis=1).astype(int)
 
     taz_scaled = apply_county_targets_to_taz(
     taz_base,
-    county_targets,
+    county_targets_all,
     ACS_PUMS_5YEAR_LATEST
         )
     

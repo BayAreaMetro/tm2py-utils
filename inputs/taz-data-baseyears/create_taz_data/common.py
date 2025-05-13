@@ -183,56 +183,63 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def fix_rounding_artifacts(df_copy, id_var, sum_var, partial_vars):
+def fix_rounding_artifacts(
+    df: pd.DataFrame,
+    id_var: str,
+    sum_var: str,
+    partial_vars: List[str]
+) -> pd.DataFrame:
     """
     After scaling and rounding, ensure that for each group (by id_var),
     the sum_var exactly equals the sum of its partial_vars by distributing
-    any small (+1) discrepancies across the largest partials.
+    any small discrepancies across the largest partials.
     """
-    # Work on a copy so we don’t disturb the loop
-    result = df_copy.copy()
+    logger = logging.getLogger(__name__)
+    result = df.copy()
 
-    # Group by the identifier
+    # How many IDs are duplicated?
+    dup_ids = result[id_var][result[id_var].duplicated(keep=False)].unique()
+    logger.debug(f"fix_rounding_artifacts: {len(dup_ids)} {id_var}(s) duplicated before adjustment")
+
     for idx, group in result.groupby(id_var):
+        # all values are already ints (after rounding)
         current_total = int(group[sum_var].iloc[0])
-        partial_sums = group[partial_vars].iloc[0].astype(int)
-        partial_total = partial_sums.sum()
+        partial_vals  = group[partial_vars].iloc[0].astype(int)
+        partial_total = partial_vals.sum()
 
-        # Desired total from the (already-rounded) sum_var
-        target_total = current_total
-
-        # Compute how many units we need to add
-        discrepancy = target_total - partial_total
-
-        # Force discrepancy to a plain Python int (for slicing)
-        try:
-            discrepancy = int(discrepancy)
-        except Exception:
-            logger.warning(
-                "Could not cast discrepancy %r to int; rounding",
-                discrepancy
-            )
-            discrepancy = int(round(discrepancy))
-
+        discrepancy = current_total - partial_total
         if discrepancy == 0:
             continue
 
-        # Sort partial columns by their unrounded contribution (descending)
+        # find partials sorted by their original size
         sorted_vars = (
-            df_copy.loc[df_copy[id_var] == idx, partial_vars]
-                  .iloc[0]
-                  .sort_values(ascending=False)
-                  .index
-                  .tolist()
+            df.loc[df[id_var] == idx, partial_vars]
+              .iloc[0]
+              .sort_values(ascending=False)
+              .index
+              .tolist()
         )
 
-        # Only add +1 to the top `discrepancy` columns
-        if discrepancy > 0:
-            for var in sorted_vars[:discrepancy]:
-                result.at[idx, var] += 1
+        mask = (result[id_var] == idx)
 
-        # (If you ever need to handle negative discrepancies,
-        # you could similarly subtract from the smallest partials.)
+        if discrepancy > 0:
+            # add +1 to the top 'discrepancy' partials
+            for var in sorted_vars[:discrepancy]:
+                result.loc[mask, var] = result.loc[mask, var] + 1
+        else:
+            # subtract 1 from the smallest partials if negative
+            for var in sorted_vars[-discrepancy:]:
+                result.loc[mask, var] = result.loc[mask, var] - 1
+
+        logger.debug(
+            f"Adjusted {id_var}={idx}: "
+            f"{sum_var}={current_total}, partial_sum={partial_total}, "
+            f"discrepancy={discrepancy}"
+        )
+
+    # final check
+    post_dups = result[id_var][result[id_var].duplicated(keep=False)].nunique()
+    logger.debug(f"fix_rounding_artifacts: {post_dups} {id_var}(s) still duplicated after adjustment")
 
     return result
 
@@ -342,6 +349,15 @@ def update_tazdata_to_county_target(
         Rounding artifacts are corrected via fix_rounding_artifacts.
     """
     # 1) Compute current county sums of sum_var
+def update_tazdata_to_county_target(source_df: pd.DataFrame,
+                                   target_df: pd.DataFrame,
+                                   sum_var: str,
+                                   partial_vars: list) -> pd.DataFrame:
+    """
+    Scale TAZ-level data so county-level totals for `sum_var` match the targets in `target_df`.
+    Also scales the specified `partial_vars` proportionally.
+    """
+    # 1) Compute current county sums of sum_var
     current = (
         source_df
         .groupby('County_Name')[sum_var]
@@ -349,32 +365,47 @@ def update_tazdata_to_county_target(
         .reset_index()
     )
 
-    # 2) Bring in the county targets
-    target_col = f'{sum_var}_target'
-    merged = pd.merge(
-        current,
-        target_df[['County_Name', target_col]],
-        on='County_Name',
-    )
+    # 2) Extract target column
+    target_col = f"{sum_var}_target"
+    target_key = target_df[['County_Name', target_col]]
 
-    # 3) Calculate the scale factor for each county
-    merged['scale'] = merged[target_col] / merged[sum_var]
+    # —— DEBUG BLOCK START —— #
 
-    # 4) Apply scaling to each TAZ in the county
+
+    dup_curr = current['County_Name'][current['County_Name'].duplicated(keep=False)]
+    dup_targ = target_key['County_Name'][target_key['County_Name'].duplicated(keep=False)]
+
+    # —— DEBUG BLOCK END —— #
+
+    # 3) Merge them
+    merged = pd.merge(current, target_key, on='County_Name')
+
+
+
+    # 4) Compute scale factors
+    try:
+        merged['scale'] = merged[target_col] / merged[sum_var]
+    except ValueError as err:
+        logger.error("Failed to align for sum_var=%s; merged index: %s",
+                     sum_var, list(merged.index))
+        raise
+
+    # 5) Apply scaling to each TAZ in the county
     result = source_df.copy()
     for _, row in merged.iterrows():
+        county = row['County_Name']
         scale = row['scale']
         # If scale is essentially 1, skip
         if abs(scale - 1) < 1e-4:
             continue
 
-        mask = result['County_Name'] == row['County_Name']
+        mask = result['County_Name'] == county
         # Scale the sum_var and each partial_var
         result.loc[mask, sum_var] *= scale
         for var in partial_vars:
             result.loc[mask, var] *= scale
 
-        # Round them to integers
+        # Round to integers
         cols = [sum_var] + partial_vars
         result.loc[mask, cols] = result.loc[mask, cols].round(0)
 
