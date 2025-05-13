@@ -179,37 +179,62 @@ def download_acs_blocks(
     return df
 
 
-def fix_rounding_artifacts(df, id_var, sum_var, partial_vars, logging_on=True):
+import logging
+
+logger = logging.getLogger(__name__)
+
+def fix_rounding_artifacts(df_copy, id_var, sum_var, partial_vars):
     """
-    Fix rounding artifacts by adjusting partial variable values to match the sum variable.
+    After scaling and rounding, ensure that for each group (by id_var),
+    the sum_var exactly equals the sum of its partial_vars by distributing
+    any small (+1) discrepancies across the largest partials.
     """
-    df_copy = df.copy()
-    for idx, row in df_copy.iterrows():
-        partial_sum = sum(row[var] for var in partial_vars)
-        target_sum = row[sum_var]
-        discrepancy = target_sum - partial_sum
-        if discrepancy != 0:
-            if logging_on:
-                logging.info(f"Fixing rounding artifact for {id_var}={row[id_var]}: {sum_var}={target_sum} but partial sum={partial_sum} (discrepancy={discrepancy})")
-            # Small discrepancy
-            if abs(discrepancy) <= len(partial_vars):
-                if discrepancy > 0:
-                    sorted_vars = sorted(partial_vars, key=lambda x: row[x], reverse=True)
-                    for var in sorted_vars[:discrepancy]:
-                        df_copy.at[idx, var] += 1
-                else:
-                    sorted_vars = [var for var in sorted(partial_vars, key=lambda x: row[x]) if row[var] > 0]
-                    for var in sorted_vars[:abs(discrepancy)]:
-                        df_copy.at[idx, var] -= 1
-            else:
-                proportions = {var: (row[var] / partial_sum) if partial_sum > 0 else (1.0 / len(partial_vars)) for var in partial_vars}
-                remaining = discrepancy
-                for var in partial_vars[:-1]:
-                    adjustment = int(discrepancy * proportions[var])
-                    df_copy.at[idx, var] += adjustment
-                    remaining -= adjustment
-                df_copy.at[idx, partial_vars[-1]] += remaining
-    return df_copy
+    # Work on a copy so we don’t disturb the loop
+    result = df_copy.copy()
+
+    # Group by the identifier
+    for idx, group in result.groupby(id_var):
+        current_total = int(group[sum_var].iloc[0])
+        partial_sums = group[partial_vars].iloc[0].astype(int)
+        partial_total = partial_sums.sum()
+
+        # Desired total from the (already-rounded) sum_var
+        target_total = current_total
+
+        # Compute how many units we need to add
+        discrepancy = target_total - partial_total
+
+        # Force discrepancy to a plain Python int (for slicing)
+        try:
+            discrepancy = int(discrepancy)
+        except Exception:
+            logger.warning(
+                "Could not cast discrepancy %r to int; rounding",
+                discrepancy
+            )
+            discrepancy = int(round(discrepancy))
+
+        if discrepancy == 0:
+            continue
+
+        # Sort partial columns by their unrounded contribution (descending)
+        sorted_vars = (
+            df_copy.loc[df_copy[id_var] == idx, partial_vars]
+                  .iloc[0]
+                  .sort_values(ascending=False)
+                  .index
+                  .tolist()
+        )
+
+        # Only add +1 to the top `discrepancy` columns
+        if discrepancy > 0:
+            for var in sorted_vars[:discrepancy]:
+                result.at[idx, var] += 1
+
+        # (If you ever need to handle negative discrepancies,
+        # you could similarly subtract from the smallest partials.)
+
+    return result
 
 
 def scale_data_to_targets(source_df, target_df, id_var, sum_var, partial_vars, logging_on=False):

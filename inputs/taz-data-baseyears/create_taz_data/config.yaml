@@ -10,6 +10,7 @@ constants:
     "2021": 1.72
     "2022": 1.81
     "2023": 1.88
+  USPS_PER_THOUSAND_JOBS: 1.83
 
   years:
     - 2023
