@@ -13,7 +13,7 @@ from pathlib import Path
 import yaml
 from census import Census
 import pandas as pd
-from common import sanity_check_df, apply_county_targets_to_taz
+from common import sanity_check_df, apply_county_targets_to_taz, update_tazdata_to_county_target
 
 
 # Load configuration
@@ -74,6 +74,7 @@ from finalize_pipeline_5 import (
 )
 
 def main():
+    
     logging.basicConfig(level=logging.INFO)
     # Load API key
     import os
@@ -213,6 +214,6 @@ def main():
     sanity_check_df(taz_joined, "step13_join_pba2015")
     step14_write_outputs(taz_joined, YEAR)
     logging.info("Pipeline complete")
-
+    """
 if __name__ == '__main__':
     main()

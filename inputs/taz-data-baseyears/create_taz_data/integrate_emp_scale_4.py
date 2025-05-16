@@ -517,11 +517,9 @@ def integrate_lehd_targets(
         lehd_h[['County_Name','EMPRES_LEHD_target']],
         on='County_Name', how='left'
     ).fillna({'EMPRES_LEHD_target':0})
-    if 'EMPRES_target' not in updated.columns:
-        updated['EMPRES_target'] = 0
     updated['EMPRES_target'] = (
         emp_lodes_weight * updated['EMPRES_LEHD_target'] +
-        (1 - emp_lodes_weight) * updated['EMPRES_target']
+        (1 - emp_lodes_weight) * updated['empres_target']
     )
     updated.drop(columns=['EMPRES_LEHD_target'], inplace=True)
 
@@ -566,7 +564,6 @@ def integrate_lehd_targets(
     logger.info(f"Group quarters population: {totals['gqpop']:.0f}")
     logger.info(f"Total population: target {totals['totpop_target']:.0f}, actual {totals['totpop']:.0f}, diff {totals['totpop_diff']:.0f}")
     logger.info(f"LODES target blended: {totals['empres_target']:.0f}, actual {totals['empres']:.0f}, diff {totals['empres_diff']:.0f}")
-    logger.info(f"Total jobs: target {totals['totemp_target']:.0f}, actual {totals['totemp']:.0f}, diff {totals.get('totemp_diff', 0):.0f}")
     return updated
     return updated
 
@@ -692,9 +689,24 @@ def apply_county_targets_to_taz(
     popsyn_acs_pums_5year: int
 ) -> pd.DataFrame:
     logger = logging.getLogger(__name__)
-    df = taz_df.copy()
+    logger.info("Starting apply_county_targets_to_taz()")
 
-    # 1) Uppercase your base columns
+    # 0) Sanity-check and clean inputs
+    logger.debug("Original taz_df shape: %s", taz_df.shape)
+    taz_df = taz_df.loc[:, ~taz_df.columns.duplicated()]
+    logger.debug("Dropped duplicate columns, new taz_df shape: %s", taz_df.shape)
+    if taz_df['TAZ1454'].duplicated().any():
+        dup = taz_df.loc[taz_df['TAZ1454'].duplicated(), 'TAZ1454'].unique()
+        logger.warning("Found duplicate TAZ1454 IDs: %s (will collapse)", dup)
+
+    logger.debug("Original county_targets shape: %s", county_targets.shape)
+    if county_targets['County_Name'].duplicated().any():
+        dup_ct = county_targets.loc[county_targets['County_Name'].duplicated(), 'County_Name'].unique()
+        logger.warning("Dropping duplicate County_Name rows: %s", dup_ct)
+        county_targets = county_targets.drop_duplicates(subset='County_Name', keep='first')
+    logger.debug("Cleaned county_targets shape: %s", county_targets.shape)
+
+    # 1) Uppercase key columns in TAZ
     lower_to_upper = {
         'tothh':  'TOTHH',
         'hhpop':  'HHPOP',
@@ -703,145 +715,97 @@ def apply_county_targets_to_taz(
         'empres': 'EMPRES',
         'totemp': 'TOTEMP',
     }
-    df = df.rename(columns=lower_to_upper)
+    taz = taz_df.rename(columns=lower_to_upper)
+    logger.debug("Renamed TAZ columns: %s", list(lower_to_upper.values()))
 
-    # 2) Uppercase the *_target columns in county_targets
-    rename_tg = {f"{lc}_target": f"{uc}_target" for lc, uc in lower_to_upper.items()}
-    county_targets = county_targets.rename(columns=rename_tg)
+    # 2) Collapse across all rows by TAZ1454
+    before = len(taz)
+    agg_dict = {}
+    for col in taz.columns:
+        if col == 'TAZ1454':
+            continue
+        if col == 'County_Name':
+            agg_dict[col] = 'first'
+        elif pd.api.types.is_numeric_dtype(taz[col]):
+            agg_dict[col] = 'sum'
+        else:
+            agg_dict[col] = 'first'
+    taz = taz.groupby('TAZ1454', as_index=False).agg(agg_dict)
+    after = len(taz)
+    logger.info("Collapsed from %d rows to %d unique TAZ1454 rows", before, after)
 
-    # 3) Drop duplicated columns in county_targets, keep only what we need
-    county_targets = county_targets.loc[:, ~county_targets.columns.duplicated()]
-    target_cols = [c for c in county_targets.columns if isinstance(c, str) and c.endswith('_target')]
-    county_targets = county_targets[['County_Name'] + target_cols]
-    logger.debug("→ Final county_targets columns: %s", county_targets.columns.tolist())
-    
-    id_col = 'TAZ1454'
-    geo_cols = ['County_Name']
-    numeric_cols = [
-        c for c in df.columns
-        if c not in geo_cols + [id_col] and pd.api.types.is_numeric_dtype(df[c])
-    ]
-    agg_dict = {c: 'sum'   for c in numeric_cols}
-    agg_dict.update({c: 'first' for c in geo_cols})
+    # 3) Prepare county_targets (keep County_Name column)
+    rename_tg = {
+        f"{lc}_target": f"{uc}_target"
+        for lc, uc in lower_to_upper.items()
+    }
+    ct = county_targets.rename(columns=rename_tg)
+    logger.debug("Renamed target columns: %s", list(rename_tg.values()))
+    target_cols = [c for c in ct.columns if c.endswith('_target')]
+    ct = ct[['County_Name'] + target_cols]
+    logger.debug("Final county_targets columns: %s", ct.columns.tolist())
 
-    df = (
-        df
-        .groupby(id_col, as_index=False)
-        .agg(agg_dict)
-    )
+    # 4) Build derived sum_*_target fields
+    ct['sum_age_target']       = ct['TOTPOP_target']
+    ct['sum_ethnicity_target'] = ct['TOTPOP_target']
+    ct['sum_DU_target']        = ct['TOTHH_target']
+    ct['sum_tenure_target']    = ct['TOTHH_target']
+    ct['sum_kids_target']      = ct['TOTHH_target']
+    ct['sum_income_target']    = ct['TOTHH_target']
+    ct['sum_size_target']      = ct['TOTHH_target']
+    ct['sum_hhworkers_target'] = ct['TOTHH_target']
+    logger.debug("Built derived sum_*_target fields")
 
-    # 4) Build the additional derived targets up front
-    #    sum_age_target and sum_ethnicity_target both use total population
-    county_targets['sum_age_target']        = county_targets['TOTPOP_target']
-    county_targets['sum_ethnicity_target']  = county_targets['TOTPOP_target']
-    #    sum_DU_target and sum_tenure_target both use total households
-    county_targets['sum_DU_target']         = county_targets['TOTHH_target']
-    county_targets['sum_tenure_target']     = county_targets['TOTHH_target']
-    #    sum_kids_target uses households too
-    county_targets['sum_kids_target']       = county_targets['TOTHH_target']
-    #    sum_income_target, sum_size_target, sum_hhworkers_target
-    #    also use total households
-    county_targets['sum_income_target']     = county_targets['TOTHH_target']
-    county_targets['sum_size_target']       = county_targets['TOTHH_target']
-    county_targets['sum_hhworkers_target']  = county_targets['TOTHH_target']
-
-    # 5) Scale EMPRES + occupations
-    logger.info("Scaling EMPRES (self-employment) and occupations")
-    df = update_tazdata_to_county_target(
-        source_df    = df,
-        target_df    = county_targets,
-        sum_var      = 'EMPRES',
-        partial_vars = [
+    # 5) Scaling steps
+    steps = [
+        ('EMPRES & occupations', 'EMPRES', [
             'occ_manage','occ_prof_biz','occ_prof_comp','occ_svc_comm',
             'occ_prof_leg','occ_prof_edu','occ_svc_ent','occ_prof_heal',
             'occ_svc_heal','occ_svc_fire','occ_svc_law','occ_ret_eat',
             'occ_man_build','occ_svc_pers','occ_ret_sales','occ_svc_off',
             'occ_man_nat','occ_man_prod'
-        ]
-    )
+        ]),
+        ('age groups',       'sum_age',       ['age0004','age0519','age2044','age4564','age65p']),
+        ('ethnicity groups', 'sum_ethnicity', ['white_nonh','black_nonh','asian_nonh','other_nonh','hispanic']),
+        ('dwelling units',   'sum_DU',        ['sfdu','mfdu']),
+        ('tenure',           'sum_tenure',    ['hh_own','hh_rent']),
+        ('households with kids','sum_kids',   ['hh_kids_yes','hh_kids_no']),
+        ('income quartiles', 'sum_income',    ['HHINCQ1','HHINCQ2','HHINCQ3','HHINCQ4']),
+        ('household size',   'sum_size',      ['hh_size_1','hh_size_2','hh_size_3','hh_size_4_plus']),
+        ('household workers','sum_hhworkers', ['hhwrks0','hhwrks1','hhwrks2','hhwrks3p'])
+    ]
 
-    # 6) Scale age groups
-    df = update_tazdata_to_county_target(
-        source_df    = df,
-        target_df    = county_targets,
-        sum_var      = 'sum_age',
-        partial_vars = ['age0004','age0519','age2044','age4564','age65p']
-    )
+    for name, sum_var, parts in steps:
+        logger.info("Scaling %s …", name)
+        taz = update_tazdata_to_county_target(
+            source_df    = taz,
+            target_df    = ct,
+            sum_var      = sum_var,
+            partial_vars = parts
+        )
+        logger.debug(
+            "After %s scaling — head of %s and partials:\n%s",
+            name, sum_var, taz[['TAZ1454', sum_var] + parts].head(3)
+        )
 
-    # 7) Scale ethnicity groups
-    df = update_tazdata_to_county_target(
-        source_df    = df,
-        target_df    = county_targets,
-        sum_var      = 'sum_ethnicity',
-        partial_vars = ['white_nonh','black_nonh','asian_nonh','other_nonh','hispanic']
-    )
+        if sum_var in ('sum_size', 'sum_hhworkers'):
+            kind = 'hh_size' if sum_var == 'sum_size' else 'hh_wrks'
+            taz = make_hhsizes_consistent_with_population(
+                source_df             = taz,
+                target_df             = ct,
+                size_or_workers       = kind,
+                popsyn_ACS_PUMS_5year = popsyn_acs_pums_5year
+            )
+            logger.debug("Applied consistency for %s", kind)
 
-    # 8) Scale dwelling units
-    df = update_tazdata_to_county_target(
-        source_df    = df,
-        target_df    = county_targets,
-        sum_var      = 'sum_DU',
-        partial_vars = ['sfdu','mfdu']
-    )
+    # 6) Final housekeeping
+    taz['TOTHH']  = taz['sum_size']
+    taz['TOTPOP'] = taz['HHPOP'] + taz['GQPOP']
+    logger.info("Finished apply_county_targets_to_taz(); final shape: %s", taz.shape)
 
-    # 9) Scale tenure
-    df = update_tazdata_to_county_target(
-        source_df    = df,
-        target_df    = county_targets,
-        sum_var      = 'sum_tenure',
-        partial_vars = ['hh_own','hh_rent']
-    )
+    return taz
 
-    # 10) Scale households with kids
-    df = update_tazdata_to_county_target(
-        source_df    = df,
-        target_df    = county_targets,
-        sum_var      = 'sum_kids',
-        partial_vars = ['hh_kids_yes','hh_kids_no']
-    )
 
-    # 11) Scale income quartiles
-    df = update_tazdata_to_county_target(
-        source_df    = df,
-        target_df    = county_targets,
-        sum_var      = 'sum_income',
-        partial_vars = ['HHINCQ1','HHINCQ2','HHINCQ3','HHINCQ4']
-    )
-
-    # 12) Scale household size + consistency
-    df = update_tazdata_to_county_target(
-        source_df             = df,
-        target_df             = county_targets,
-        sum_var               = 'sum_size',
-        partial_vars          = ['hh_size_1','hh_size_2','hh_size_3','hh_size_4_plus']
-    )
-    df = make_hhsizes_consistent_with_population(
-        source_df             = df,
-        target_df             = county_targets,
-        size_or_workers       = 'hh_size',
-        popsyn_acs_pums_5year = popsyn_acs_pums_5year
-    )
-
-    # 13) Scale household workers + consistency
-    df = update_tazdata_to_county_target(
-        source_df    = df,
-        target_df    = county_targets,
-        sum_var      = 'sum_hhworkers',
-        partial_vars = ['hhwrks0','hhwrks1','hhwrks2','hhwrks3p']
-    )
-    df = make_hhsizes_consistent_with_population(
-        source_df             = df,
-        target_df             = county_targets,
-        size_or_workers       = 'hh_wrks',
-        popsyn_acs_pums_5year = popsyn_acs_pums_5year
-    )
-
-    # 14) Final housekeeping
-    df['TOTHH']  = df['sum_size']
-    df['TOTPOP'] = df['HHPOP'] + df['GQPOP']
-
-    logger.info("Finished apply_county_targets_to_taz")
-    return df
 
 
 
