@@ -44,13 +44,12 @@ from common import (
     make_hhsizes_consistent_with_population,
 )
 
-import logging
-import pandas as pd
+
 
 # ------------------------------
 # STEP 5: Disaggregate ACS BG vars to block level
 # ------------------------------
-def step5_compute_block_shares(
+def compute_block_shares(
     df_blk: pd.DataFrame,
     df_bg: pd.DataFrame
 ) -> pd.DataFrame:
@@ -125,7 +124,7 @@ def step5_compute_block_shares(
     return out
 
     return df[['block_geoid','blockgroup','tract'] + bg_vars + ['pop_share','sharetract']]
-def step6_build_workingdata(
+def build_workingdata(
     shares: pd.DataFrame,
     acs_tr: pd.DataFrame,
     dhc_tr: pd.DataFrame
@@ -176,7 +175,7 @@ def step6_build_workingdata(
 # ------------------------------
 # STEP 7: Map ACS income bins to TM1 quartiles
 # ------------------------------
-def step7_process_household_income(df_working, year=ACS_5YR_LATEST):
+def process_household_income(df_working, year=ACS_5YR_LATEST):
     """
     Allocate ACS block‑group income bins into TM1 HHINCQ1–4 by share.
     Accepts df_working columns named either “tothh”, “hhinc000_010”, … 
@@ -225,17 +224,3 @@ def step7_process_household_income(df_working, year=ACS_5YR_LATEST):
 
     return out
 
-""" if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
-    # The following dataframes must be provided by upstream process:
-    # blocks, acs_bg, acs_tr, dhc_tr
-    # For example, they could be imported or loaded prior to calling this module.
-
-    # Run STEP 5–7
-    shares = step5_compute_block_shares(blocks, acs_bg)
-    working = step6_build_workingdata(shares, acs_tr, dhc_tr)
-    hhinc = step7_process_household_income(working, ACS_5YR_LATEST)
-
-    logging.info("Completed steps 5–7: share rows=%d, working rows=%d, hhinc rows=%d", 
-                 shares.shape[0], working.shape[0], hhinc.shape[0])
- """

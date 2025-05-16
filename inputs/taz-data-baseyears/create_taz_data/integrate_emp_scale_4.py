@@ -38,83 +38,6 @@ ACS_5YEAR_LATEST     = CONSTANTS.get('ACS_5YEAR_LATEST')
 ACS_PUMS_1YEAR_LATEST= CONSTANTS.get('ACS_PUMS_1YEAR_LATEST')
 EMPRES_LODES_WEIGHT  = CONSTANTS.get('EMPRES_LODES_WEIGHT', 0.0)
 
-def summarize_census_to_taz(
-    working_df: pd.DataFrame,
-    weights_block_df: pd.DataFrame
-) -> pd.DataFrame:
-    """
-    Summarize block-level census attributes (including HHPOP and gqpop)
-    to TAZ by applying block→TAZ weights, then aggregating up to TAZ & county.
-    """
-    import numpy as np
-    import pandas as pd
-    import logging
-
-    logger = logging.getLogger(__name__)
-    logger.info(
-        "Starting summarize_census_to_taz: %d blocks, %d weight rows",
-        len(working_df), len(weights_block_df)
-    )
-
-    # 1) Merge in block→TAZ weights
-    df = working_df.copy()
-    df['block_geoid'] = df['block_geoid'].astype(str).str.zfill(15)
-    w = weights_block_df.copy()
-    w['block_geoid'] = w['GEOID'].astype(str).str.zfill(15)
-    df = df.merge(
-        w[['block_geoid','TAZ1454','weight']],
-        on='block_geoid', how='left', validate='many_to_one'
-    )
-    missing = df['weight'].isna().sum()
-    logger.info("After merge: %d rows, %d missing weight", len(df), missing)
-    if missing:
-        logger.warning("Some blocks have no TAZ weight – check your crosswalk")
-
-    # 2) Compute weighted attributes
-    # Include every numeric field except weight/key columns
-    numeric = df.select_dtypes(include=[np.number]).columns.tolist()
-    skip = {'weight','TAZ1454'}
-    to_weight = [c for c in numeric if c not in skip]
-    logger.debug("Fields to weight: %s", to_weight)
-
-    for col in to_weight:
-        df[f'{col}_w'] = df[col] * df['weight']
-
-    # 3) Aggregate weighted sums to TAZ & county
-    agg_cols = [f'{c}_w' for c in to_weight] + ['TAZ1454']
-    taz = (
-        df.groupby(['TAZ1454', 'county_fips'], as_index=False)[agg_cols]
-          .sum()
-    )
-
-    # 4) Strip “_w” suffix to restore original names
-    rename_map = {f'{c}_w': c for c in to_weight}
-    taz = taz.rename(columns=rename_map)
-
-    # 5) Build final population/employment totals
-    taz['taz']    = taz['TAZ1454'].astype(int).astype(str).str.zfill(4)
-    taz['totpop'] = taz['hhpop'] + taz['gqpop']
-    taz['empres'] = taz.get('employed', 0)
-    taz['totemp'] = taz['empres'] + taz.get('armedforces', 0)
-
-    # 6) Diagnostics
-    raw_hh = working_df.get('hhpop', pd.Series(0)).sum()
-    raw_gq = working_df.get('gqpop', pd.Series(0)).sum()
-    ag_hh  = taz['hhpop'].sum()
-    ag_gq  = taz['gqpop'].sum()
-    logger.info(
-        "HHPOP raw=%.0f → aggregated=%.0f; GQPOP raw=%.0f → aggregated=%.0f",
-        raw_hh, ag_hh, raw_gq, ag_gq
-    )
-
-    logger.info("Finished summarize_census_to_taz; final columns: %s", taz.columns.tolist())
-    return taz
-
-
-
-
-
-
 
 def _apply_acs_adjustment(county_targets: pd.DataFrame,
                           census_client,
@@ -336,99 +259,106 @@ def build_county_targets(
 # ------------------------------
 # STEP 10: Integrate employment
 # ------------------------------
-def step10_integrate_employment(
+def integrate_employment(
     taz_base: pd.DataFrame,
     taz_census: pd.DataFrame,
     year: int
 ) -> pd.DataFrame:
-    """
-    1) Merge taz_base + taz_census, coalesce "_cns" suffix cols.
-    2) Rename EMPRES/TOTEMP to EMPRES_CNS/TOTEMP_CNS if present.
-    3) Preserve and rename HHPOP and gqpop to HHPOP and GQPOP.
-    4) Load & collapse LODES WAC, ensuring int taz.
-    5) Load & sum self-employment, int taz.
-    6) Build df_emp seeded on all_zones (int), compute LDES cols.
-    7) Merge side-by-side.
-    """
-    import os
-    import numpy as np
-    import pandas as pd
-    import logging
-
     logger = logging.getLogger(__name__)
 
-    # 0) Ensure TAZ key consistency
-    taz_base = taz_base.copy()
-    taz_base["taz"] = taz_base["taz"].astype(int)
+    # 0) Key hygiene: ensure a single int 'TAZ1454' column
+    taz_base['TAZ1454']   = taz_base['TAZ1454'].astype(int)
+    taz_census['TAZ1454'] = taz_census['TAZ1454'].astype(int)
 
-    # 1) Census merge & coalesce
+    # 1) Census merge & coalesce, with indicator
     merged = taz_base.merge(
-        taz_census.assign(taz=lambda df: df["taz"].astype(int)),
-        on="taz", how="left", suffixes=("", "_cns")
+        taz_census,
+        on='TAZ1454',
+        how='left',
+        suffixes=('', '_cns'),
+        indicator=True
     )
-    for cns in [c for c in merged if c.endswith("_cns")]:
+    logger.info("step10 merge indicator counts:\n%s", merged['_merge'].value_counts())
+
+    # If any mismatches, show a sample
+    mismatches = (merged['_merge'] != 'both').sum()
+    if mismatches:
+        logger.warning("integrate_employment: %d TAZs failed to match census rows", mismatches)
+        sample_bad = (
+            merged.loc[merged['_merge'] != 'both', 'TAZ1454']
+            .drop_duplicates()
+            .tolist()[:10]
+        )
+        logger.debug("Unmatched TAZ1454 examples: %s", sample_bad)
+
+    # 2) Coalesce any census-side columns
+    census_cols = [c for c in merged.columns if c.endswith('_cns')]
+    for cns in census_cols:
         base = cns[:-4]
-        if base not in merged:
-            merged[base] = np.nan
-        merged[base] = merged[base].fillna(merged[cns]).astype(int)
-    merged.drop(columns=[c for c in merged if c.endswith("_cns")], inplace=True)
+        merged[base] = merged.get(base, pd.Series(dtype=int)).fillna(merged[cns]).astype(int)
+    merged.drop(columns=census_cols + ['_merge'], inplace=True)
 
-    # 2) Preserve census EMPRES/TOTEMP
-    if "EMPRES" in merged:
-        merged.rename(columns={"EMPRES": "EMPRES_CNS"}, inplace=True)
-    if "TOTEMP" in merged:
-        merged.rename(columns={"TOTEMP": "TOTEMP_CNS"}, inplace=True)
+    # 3) Rename original EMPRES/TOTEMP (if they existed in taz_base)
+    if 'EMPRES' in merged.columns:
+        merged.rename(columns={'EMPRES': 'EMPRES_CNS'}, inplace=True)
+    if 'TOTEMP' in merged.columns:
+        merged.rename(columns={'TOTEMP': 'TOTEMP_CNS'}, inplace=True)
 
-    # 3) Preserve and rename HHPOP and group quarters from census
-    if "hhpop" in merged.columns:
-        # hhpop may already exist after coalesce
-        merged.rename(columns={"hhpop": "HHPOP"}, inplace=True)
-    if "gqpop" in merged.columns:
-        merged.rename(columns={"gqpop": "GQPOP"}, inplace=True)
-    logger.info("Post-census merge columns: %s", ", ".join(merged.columns))
+    # 4) Preserve and rename HHPOP and GQPOP from census
+    if 'hhpop' in merged.columns:
+        merged.rename(columns={'hhpop': 'HHPOP'}, inplace=True)
+    if 'gqpop' in merged.columns:
+        merged.rename(columns={'gqpop': 'GQPOP'}, inplace=True)
+    logger.info("Post-census merge columns: %s", merged.columns.tolist())
 
-    # 4) Load & collapse LODES
-    path_lodes = os.path.expandvars(PATHS["wage_salary_csv"])
-    lodes = pd.read_csv(path_lodes, dtype=str)
-    lodes["taz"] = lodes["TAZ1454"].astype(int)
-    lodes["TOTEMP"] = pd.to_numeric(lodes["TOTEMP"], errors="coerce").fillna(0).astype(int)
-    df_lodes = lodes.groupby("taz", as_index=False)["TOTEMP"].sum()
-    usps_factor = CONSTANTS["USPS_PER_THOUSAND_JOBS"]/1000
-    df_lodes["TOTEMP"] = (df_lodes["TOTEMP"] * (1+usps_factor)).round().astype(int)
-    logger.info(f"Collapsed LODES to {len(df_lodes)} zones")
+    # 5) Load & collapse LODES WAC
+    lodes = pd.read_csv(os.path.expandvars(PATHS['wage_salary_csv']), dtype=str)
+    lodes['taz'] = lodes['TAZ1454'].astype(int)
+    lodes['TOTEMP'] = pd.to_numeric(lodes['TOTEMP'], errors='coerce').fillna(0).astype(int)
+    df_lodes = lodes.groupby('taz', as_index=False)['TOTEMP'].sum()
+    usps_factor = CONSTANTS['USPS_PER_THOUSAND_JOBS'] / 1000
+    df_lodes['EMPRES_LDES'] = (df_lodes['TOTEMP'] * (1 + usps_factor)).round().astype(int)
+    df_lodes = df_lodes[['taz', 'EMPRES_LDES']]
+    logger.info("Collapsed LODES to %d zones", len(df_lodes))
 
-    # 5) Load & sum self-employment
-    path_self = os.path.expandvars(PATHS["self_employment_csv"])
-    df_self = pd.read_csv(path_self, dtype=str)
-    df_self["taz"] = df_self["zone_id"].astype(int)
-    df_self["emp_self"] = pd.to_numeric(df_self["value"], errors="coerce").fillna(0).astype(int)
-    self_emp = df_self.groupby("taz", as_index=False)["emp_self"].sum()
-    logger.info(f"Self-emp covers {len(self_emp)} zones")
+    # 6) Load & sum self‐employment
+    df_self = pd.read_csv(os.path.expandvars(PATHS['self_employment_csv']), dtype=str)
+    df_self['taz'] = df_self['zone_id'].astype(int)
+    df_self['emp_self'] = pd.to_numeric(df_self['value'], errors='coerce').fillna(0).astype(int)
+    df_self = df_self.groupby('taz', as_index=False)['emp_self'].sum()
+    logger.info("Self-emp covers %d zones", len(df_self))
 
-    # 6) Seed on all zones, then join employment data
-    all_zones = merged[["taz"]].drop_duplicates()
+    # 7) Seed on all zones and compute LDES totals
+    all_zones = pd.DataFrame({'taz': merged['TAZ1454'].unique()})
     df_emp = (
         all_zones
-        .merge(df_lodes,  on="taz", how="left")
-        .merge(self_emp,  on="taz", how="left")
+        .merge(df_lodes, on='taz', how='left')
+        .merge(df_self, on='taz', how='left')
         .fillna(0)
     )
-    df_emp["EMPRES_LDES"] = df_emp["TOTEMP"].astype(int)
-    df_emp["TOTEMP_LDES"] = (df_emp["EMPRES_LDES"] + df_emp["emp_self"].astype(int)).astype(int)
-    logger.info(f"Built df_emp for {len(df_emp)} zones; SUM EMPRES_LDES={df_emp['EMPRES_LDES'].sum():,}")
+    df_emp['TOTEMP_LDES'] = (df_emp['EMPRES_LDES'] + df_emp['emp_self']).astype(int)
+    logger.info(
+        "Built df_emp for %d zones; SUM EMPRES_LDES=%d",
+        len(df_emp), df_emp['EMPRES_LDES'].sum()
+    )
 
-    # 7) Merge into final
+    # 8) Final merge
     final = merged.merge(
-        df_emp[["taz","EMPRES_LDES","TOTEMP_LDES"]],
-        on="taz", how="left"
+        df_emp[['taz', 'EMPRES_LDES', 'TOTEMP_LDES']],
+        left_on='TAZ1454', right_on='taz',
+        how='left'
     ).fillna(0)
-    for col in ("EMPRES_CNS","TOTEMP_CNS","EMPRES_LDES","TOTEMP_LDES"):  
-        if col in final:
+
+    # 9) Cast to int
+    for col in ['EMPRES_CNS', 'TOTEMP_CNS', 'EMPRES_LDES', 'TOTEMP_LDES']:
+        if col in final.columns:
             final[col] = final[col].astype(int)
 
-    logger.info("step10_integrate_employment complete; final columns: %s", ", ".join(final.columns))
+    logger.info(
+        "step10_integrate_employment complete; final columns: %s",
+        final.columns.tolist()
+    )
     return final
-
 
     logger.info("Employment integrated into TAZ base")
     return final
@@ -556,7 +486,7 @@ def integrate_lehd_targets(
     return updated
 
 
-def step11_compute_scale_factors(
+def compute_scale_factors(
     taz_df: pd.DataFrame,
     taz_targeted: pd.DataFrame,
     base_col: str,
@@ -619,9 +549,52 @@ def step11_compute_scale_factors(
     return scale_df
 
 
-def add_taz_summaries(taz_df: pd.DataFrame) -> pd.DataFrame:
+
+
+
+
+
+
+    return result
+
+def apply_scaling(taz_df: pd.DataFrame,
+                         taz_targeted: pd.DataFrame,
+                         scale_key: str = 'taz',
+                         vars_to_scale: List[str] = None) -> pd.DataFrame:
     """
-    Adds summary columns to a TAZ-level DataFrame:
+    Merge in scale_factor and multiply each designated variable by it.
+    """
+    # 1) Compute scale factors
+    scale_df = step11_compute_scale_factors(
+        taz_df,
+        taz_targeted,
+        key=scale_key,
+        target_col='county_target',
+        base_col='county_base'
+    )
+
+    # 2) Merge onto TAZ
+    df = taz_df.merge(scale_df, on=scale_key, how='left')
+
+    # 3) Apply scaling to each variable
+    if vars_to_scale is None:
+        # default to all numeric columns except the key
+        vars_to_scale = [
+            c for c in df.columns
+            if c not in (scale_key, 'scale_factor')
+               and pd.api.types.is_numeric_dtype(df[c])
+        ]
+
+    for col in vars_to_scale:
+        df[col] = df[col] * df['scale_factor']
+
+    return df
+
+def add_taz_summaries(taz_df: pd.DataFrame) -> pd.DataFrame:  
+    """
+    Adds summary columns to a TAZ-level DataFrame and merges county names:
+      - Reads taz_sd_county_csv from PATHS
+      - Merges COUNTY_NAME into the TAZ data
       - sum_age: total population aged 0–4, 5–19, 20–44, 45–64, 65+
       - other_nonh, hispanic, sum_ethnicity: derives ethnic group totals
       - sum_DU: total dwelling units
@@ -631,7 +604,24 @@ def add_taz_summaries(taz_df: pd.DataFrame) -> pd.DataFrame:
       - sum_size: total households by size category
       - sum_hhworkers: total households by number of workers
     """
-    df = taz_df.copy()
+    # 0) Merge in county names
+    taz_map = pd.read_csv(
+        os.path.expandvars(PATHS['taz_sd_county_csv']),
+        dtype={'ZONE': str, 'COUNTY_NAME': str}
+    )
+    taz_map['ZONE'] = taz_map['ZONE'].astype(str)
+
+    df = (
+        taz_df.copy()
+        .merge(
+            taz_map[['ZONE', 'COUNTY_NAME']],
+            left_on='TAZ1454',
+            right_on='ZONE',
+            how='left'
+        )
+        .rename(columns={'COUNTY_NAME': 'County_Name'})
+        .drop(columns=['ZONE'])
+    )
 
     # 1) Age groups
     age_cols = ['age0004', 'age0519', 'age2044', 'age4564', 'age65p']
@@ -671,6 +661,7 @@ def add_taz_summaries(taz_df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
+
 def apply_county_targets_to_taz(
     taz_df: pd.DataFrame,
     county_targets: pd.DataFrame,
@@ -694,7 +685,7 @@ def apply_county_targets_to_taz(
         county_targets = county_targets.drop_duplicates(subset='County_Name', keep='first')
     logger.debug("Cleaned county_targets shape: %s", county_targets.shape)
 
-    # 1) Uppercase key columns in TAZ, including group quarters
+    # 1) Uppercase key columns in TAZ
     lower_to_upper = {
         'tothh':  'TOTHH',
         'hhpop':  'HHPOP',
@@ -705,57 +696,90 @@ def apply_county_targets_to_taz(
     }
     taz = taz_df.rename(columns=lower_to_upper)
     logger.debug("Renamed TAZ columns: %s", list(lower_to_upper.values()))
-    # Ensure we only carry the aggregated group-quarters pop
-    # Drop any detailed DHC columns from earlier steps (they start with 'gq_')
-    detailed_gq = [c for c in taz.columns if c.startswith('gq_') and c.lower() != 'gqpop']
-    if detailed_gq:
-        logger.debug("Dropping detailed DHC fields: %s", detailed_gq)
-        taz = taz.drop(columns=detailed_gq)
-    # ensure GQPOP is present
-    assert 'GQPOP' in taz.columns, "GQPOP is missing in TAZ data"
-    logger.debug("GQPOP sample: %s", taz['GQPOP'].head().tolist())("Applied consistency for %s", kind)
 
-    # 8) Final housekeeping
-    taz['TOTHH'] = taz['sum_size']
+    # 2) Collapse across all rows by TAZ1454
+    before = len(taz)
+    agg_dict = {}
+    for col in taz.columns:
+        if col == 'TAZ1454':
+            continue
+        if col == 'County_Name':
+            agg_dict[col] = 'first'
+        elif pd.api.types.is_numeric_dtype(taz[col]):
+            agg_dict[col] = 'sum'
+        else:
+            agg_dict[col] = 'first'
+    taz = taz.groupby('TAZ1454', as_index=False).agg(agg_dict)
+    after = len(taz)
+    logger.info("Collapsed from %d rows to %d unique TAZ1454 rows", before, after)
 
+    # 3) Prepare county_targets (keep County_Name column)
+    rename_tg = {
+        f"{lc}_target": f"{uc}_target"
+        for lc, uc in lower_to_upper.items()
+    }
+    ct = county_targets.rename(columns=rename_tg)
+    logger.debug("Renamed target columns: %s", list(rename_tg.values()))
+    target_cols = [c for c in ct.columns if c.endswith('_target')]
+    ct = ct[['County_Name'] + target_cols]
+    logger.debug("Final county_targets columns: %s", ct.columns.tolist())
+
+    # 4) Build derived sum_*_target fields
+    ct['sum_age_target']       = ct['TOTPOP_target']
+    ct['sum_ethnicity_target'] = ct['TOTPOP_target']
+    ct['sum_DU_target']        = ct['TOTHH_target']
+    ct['sum_tenure_target']    = ct['TOTHH_target']
+    ct['sum_kids_target']      = ct['TOTHH_target']
+    ct['sum_income_target']    = ct['TOTHH_target']
+    ct['sum_size_target']      = ct['TOTHH_target']
+    ct['sum_hhworkers_target'] = ct['TOTHH_target']
+    logger.debug("Built derived sum_*_target fields")
+
+    # 5) Scaling steps
+    steps = [
+        ('EMPRES & occupations', 'EMPRES', [
+            'occ_manage','occ_prof_biz','occ_prof_comp','occ_svc_comm',
+            'occ_prof_leg','occ_prof_edu','occ_svc_ent','occ_prof_heal',
+            'occ_svc_heal','occ_svc_fire','occ_svc_law','occ_ret_eat',
+            'occ_man_build','occ_svc_pers','occ_ret_sales','occ_svc_off',
+            'occ_man_nat','occ_man_prod'
+        ]),
+        ('age groups',       'sum_age',       ['age0004','age0519','age2044','age4564','age65p']),
+        ('ethnicity groups', 'sum_ethnicity', ['white_nonh','black_nonh','asian_nonh','other_nonh','hispanic']),
+        ('dwelling units',   'sum_DU',        ['sfdu','mfdu']),
+        ('tenure',           'sum_tenure',    ['hh_own','hh_rent']),
+        ('households with kids','sum_kids',   ['hh_kids_yes','hh_kids_no']),
+        ('income quartiles', 'sum_income',    ['HHINCQ1','HHINCQ2','HHINCQ3','HHINCQ4']),
+        ('household size',   'sum_size',      ['hh_size_1','hh_size_2','hh_size_3','hh_size_4_plus']),
+        ('household workers','sum_hhworkers', ['hhwrks0','hhwrks1','hhwrks2','hhwrks3p'])
+    ]
+
+    for name, sum_var, parts in steps:
+        logger.info("Scaling %s …", name)
+        taz = update_tazdata_to_county_target(
+            source_df    = taz,
+            target_df    = ct,
+            sum_var      = sum_var,
+            partial_vars = parts
+        )
+        logger.debug(
+            "After %s scaling — head of %s and partials:\n%s",
+            name, sum_var, taz[['TAZ1454', sum_var] + parts].head(3)
+        )
+
+        if sum_var in ('sum_size', 'sum_hhworkers'):
+            kind = 'hh_size' if sum_var == 'sum_size' else 'hh_wrks'
+            taz = make_hhsizes_consistent_with_population(
+                source_df             = taz,
+                target_df             = ct,
+                size_or_workers       = kind,
+                popsyn_ACS_PUMS_5year = popsyn_acs_pums_5year
+            )
+            logger.debug("Applied consistency for %s", kind)
+
+    # 6) Final housekeeping
+    taz['TOTHH']  = taz['sum_size']
+    taz['TOTPOP'] = taz['HHPOP'] + taz['GQPOP']
     logger.info("Finished apply_county_targets_to_taz(); final shape: %s", taz.shape)
+
     return taz
-
-
-
-
-
-    return result
-
-def step12_apply_scaling(taz_df: pd.DataFrame,
-                         taz_targeted: pd.DataFrame,
-                         scale_key: str = 'taz',
-                         vars_to_scale: List[str] = None) -> pd.DataFrame:
-    """
-    Merge in scale_factor and multiply each designated variable by it.
-    """
-    # 1) Compute scale factors
-    scale_df = step11_compute_scale_factors(
-        taz_df,
-        taz_targeted,
-        key=scale_key,
-        target_col='county_target',
-        base_col='county_base'
-    )
-
-    # 2) Merge onto TAZ
-    df = taz_df.merge(scale_df, on=scale_key, how='left')
-
-    # 3) Apply scaling to each variable
-    if vars_to_scale is None:
-        # default to all numeric columns except the key
-        vars_to_scale = [
-            c for c in df.columns
-            if c not in (scale_key, 'scale_factor')
-               and pd.api.types.is_numeric_dtype(df[c])
-        ]
-
-    for col in vars_to_scale:
-        df[col] = df[col] * df['scale_factor']
-
-    return df

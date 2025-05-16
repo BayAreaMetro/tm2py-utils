@@ -13,6 +13,7 @@ import logging
 import pandas as pd
 from pathlib import Path
 import yaml
+import numpy as np
 
 # Load configuration
 CONFIG_PATH = Path(__file__).parent / 'config.yaml'
@@ -43,7 +44,7 @@ def compute_block_weights(paths):
     return df[['GEOID','blockgroup','TAZ1454','share_bg','weight']]
 
 
-def step8_summarize_to_taz(hhinc: pd.DataFrame, weights: pd.DataFrame) -> pd.DataFrame:
+def summarize_to_taz(hhinc: pd.DataFrame, weights: pd.DataFrame) -> pd.DataFrame:
     """
     Aggregate HHINCQ1–4 from block-groups to TAZ using share_bg weights.
     Assumes weights DataFrame contains 'share_bg' column.
@@ -89,7 +90,7 @@ def step8_summarize_to_taz(hhinc: pd.DataFrame, weights: pd.DataFrame) -> pd.Dat
     return taz
 
 # ------------------------------
-# STEP 9: Tract -> TAZ summarize
+# STEP 10: Tract -> TAZ summarize
 # ------------------------------
 def compute_tract_weights(paths: dict) -> pd.DataFrame:
     """
@@ -107,7 +108,7 @@ def compute_tract_weights(paths: dict) -> pd.DataFrame:
     return df.rename(columns={tract_col: 'tract', taz_col: 'taz'})[['tract','taz','weight']]
 
 
-def step9_summarize_tract_to_taz(acs_df, weights_df):
+def summarize_tract_to_taz(acs_df, weights_df):
     """
     Summarize tract-level ACS data into TAZ, writing intermediate CSVs.
 
@@ -123,6 +124,7 @@ def step9_summarize_tract_to_taz(acs_df, weights_df):
     import os
     import pandas as pd
     import logging
+    import numpy as np
 
     logger = logging.getLogger(__name__)
 
@@ -173,4 +175,104 @@ def step9_summarize_tract_to_taz(acs_df, weights_df):
     logger.info(f"Wrote TAZ ACS summary to {summary_path}")
 
     return taz_df
+
+def summarize_census_to_taz(
+    working_df: pd.DataFrame,
+    weights_block_df: pd.DataFrame
+) -> pd.DataFrame:
+    """
+    Summarize block-level census attributes to TAZ by applying
+    population-based block→TAZ weights, then aggregating up to TAZ & county.
+    Includes group quarters (gqpop) in totals and diagnostics.
+    Logs raw vs. aggregated totals and issues warnings if any key total < 1M.
+    """
+    logger = logging.getLogger(__name__)
+    logger.info(
+        "Starting summarize_census_to_taz: %d blocks, %d weight rows",
+        len(working_df), len(weights_block_df)
+    )
+
+    # --- 0) Diagnostic: raw sums in working_df
+    raw_totals = {
+        'tothh': working_df.get('tothh', pd.Series(0)).sum(),
+        'hhpop': working_df.get('hhpop', pd.Series(0)).sum(),
+        'gqpop': working_df.get('gqpop', pd.Series(0)).sum(),
+        'employed': working_df.get('employed', pd.Series(0)).sum(),
+        'armedforces': working_df.get('armedforces', pd.Series(0)).sum(),
+    }
+    logger.info("Raw working_df sums: %s", raw_totals)
+
+    # --- 1) Standardize GEOIDs and merge weight
+    df = working_df.copy()
+    df['block_geoid'] = df['block_geoid'].astype(str).str.zfill(15)
+
+    w = weights_block_df.copy()
+    w['GEOID'] = w['GEOID'].astype(str).str.zfill(15)
+    w = w.rename(columns={'GEOID': 'block_geoid'})
+
+    df = df.merge(
+        w[['block_geoid','TAZ1454','weight']],
+        on='block_geoid', how='left', validate='many_to_one'
+    )
+    missing = df['weight'].isna().sum()
+    logger.info("After merge: %d rows, %d missing weight", len(df), missing)
+    if missing:
+        logger.warning("Some blocks have no TAZ weight – check your crosswalk")
+
+    # --- 2) Check weight sums by TAZ
+    ws = df.groupby('TAZ1454')['weight'].sum()
+    desc = ws.describe()
+    logger.info(
+        "TAZ weight sums: min=%0.3f mean=%0.3f max=%0.3f",
+        desc['min'], desc['mean'], desc['max']
+    )
+
+    # --- 3) Derive county_fips
+    df['county_fips'] = df['block_geoid'].str[:5]
+
+    # --- 4) Identify numeric block-level attrs including gqpop
+    numeric = [c for c in df.columns if np.issubdtype(df[c].dtype, np.number)]
+    skip = {'weight','TAZ1454'}
+    attr_cols = [c for c in numeric if c not in skip]
+    logger.debug("Will weight these columns: %s", attr_cols)
+
+    # --- 5) Apply weights and aggregate to TAZ & county
+    for col in attr_cols:
+        df[col] = df[col] * df['weight']
+    taz = df.groupby(['TAZ1454','county_fips'], as_index=False)[attr_cols].sum()
+    logger.info("Aggregated to %d TAZ‐county rows", len(taz))
+
+    # --- 6) Add string TAZ key
+    taz['taz'] = taz['TAZ1454'].astype(int).astype(str).str.zfill(4)
+
+    # --- 7) Derive totals including group quarters
+    taz['totpop'] = taz.get('hhpop', 0) + taz.get('gqpop', 0)
+    taz['empres'] = taz.get('employed', 0)
+    taz['totemp'] = taz['empres'] + taz.get('armedforces', 0)
+
+    # --- 8) Diagnostic: compare raw vs. aggregated sums
+    agg_totals = {
+        'tothh': taz.get('tothh', pd.Series(0)).sum(),
+        'hhpop': taz['hhpop'].sum(),
+        'gqpop': taz['gqpop'].sum(),
+        'pop': taz['totpop'].sum(),
+        'emp': taz['totemp'].sum()
+    }
+    logger.info("TAZ aggregated sums: %s", agg_totals)
+
+    # --- 9) Warnings if anything < 1M
+    if agg_totals['tothh'] < 1_000_000:
+        logger.warning("Total households (%.0f) < 1,000,000", agg_totals['tothh'])
+    if agg_totals['pop'] < 1_000_000:
+        logger.warning("Total population (%.0f) < 1,000,000", agg_totals['pop'])
+    if agg_totals['emp'] < 1_000_000:
+        logger.warning("Total employment (%.0f) < 1,000,000", agg_totals['emp'])
+
+    logger.info(
+        "Finished summarize_census_to_taz: columns = %s",
+        taz.columns.tolist()
+    )
+    return taz
+
+
 

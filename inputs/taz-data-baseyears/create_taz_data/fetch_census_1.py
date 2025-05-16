@@ -46,7 +46,7 @@ BAYCOUNTIES = GEO['BAYCOUNTIES']
 # Initialize Census API client
 census_client = Census(CENSUS_API_KEY)
 
-def step1_fetch_block_data(census_client):
+def fetch_block_data(census_client):
     """Fetch block-level total population from decennial census."""
     records = []
     for county in BAYCOUNTIES:
@@ -74,7 +74,7 @@ def step1_fetch_block_data(census_client):
 
     return df[['state', 'county', 'block_geoid', 'blockgroup', 'tract', 'pop']]
 
-def step2_fetch_acs_bg(c, year):
+def fetch_acs_bg(c, year):
     """
     Fetch ACS 5-year block-group vars and return a DataFrame
     with:
@@ -138,7 +138,7 @@ def step2_fetch_acs_bg(c, year):
 
     return df
 
-def step2b_compute_bg_vars(df: pd.DataFrame) -> pd.DataFrame:
+def compute_bg_vars(df: pd.DataFrame) -> pd.DataFrame:
     """
     Compute block-group-level demographic and employment variables:
       1. Build age bins by summing male+female cohorts
@@ -210,7 +210,7 @@ def step2b_compute_bg_vars(df: pd.DataFrame) -> pd.DataFrame:
 # ------------------------------
 # STEP 3: Fetch ACS tract variables
 # ------------------------------
-def step3_fetch_acs_tract(c, year=YEAR, max_retries=3, backoff=5):
+def fetch_acs_tract(c, year=YEAR, max_retries=3, backoff=5):
     var_map  = VARIABLES.get('ACS_TRACT_VARIABLES', {})
     if not var_map:
         raise ValueError('CONFIG ERROR: ACS_TRACT_VARIABLES empty')
@@ -281,7 +281,7 @@ def step3_fetch_acs_tract(c, year=YEAR, max_retries=3, backoff=5):
     return out
 
 
-def step4_fetch_dhc_tract(census_client):
+def fetch_dhc_tract(census_client):
     """Fetch and assemble DHC tract group-quarters variables."""
     import requests, logging, pandas as pd
     logger = logging.getLogger(__name__)

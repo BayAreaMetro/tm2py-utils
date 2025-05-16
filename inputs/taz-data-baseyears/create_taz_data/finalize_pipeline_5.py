@@ -12,7 +12,7 @@ with CONFIG_PATH.open() as f:
 PATHS = cfg['paths']
 
 
-def step13_join_pba2015(df_taz):
+def join_pba2015(df_taz):
     """
     Join your TAZ-level outputs to the Plan Bay Area 2015 TAZ data
     (land-use/blueprint) so you can carry those attributes forward.
@@ -49,7 +49,7 @@ def step13_join_pba2015(df_taz):
     
     return df_out
 
-def step14_write_outputs(taz: pd.DataFrame, year: int) -> None:
+def write_outputs(taz: pd.DataFrame, year: int) -> None:
     """
     Write out the same suite of CSVs that the original R script did,
     using the fully-joined TAZ‐level DataFrame `taz`.
