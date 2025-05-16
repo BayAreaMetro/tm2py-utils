@@ -12,7 +12,7 @@ with CONFIG_PATH.open() as f:
 PATHS = cfg['paths']
 
 
-def join_pba2015(df_taz):
+def join_pba2015(df_taz: pd.DataFrame) -> pd.DataFrame:
     """
     Join your TAZ-level outputs to the Plan Bay Area 2015 TAZ data
     (land-use/blueprint) so you can carry those attributes forward.
@@ -25,28 +25,33 @@ def join_pba2015(df_taz):
     Returns
     -------
     pandas.DataFrame
-        All columns from df_taz plus all columns from the PBA2015 file,
+        All columns from df_taz plus selected columns from the PBA2015 file,
         merged on the TAZ identifier.
     """
-    # 1) load the PBA 2015 TAZ data
+    # 1) load the PBA 2015 TAZ data from the 'census2015' sheet
     pba_path = os.path.expandvars(PATHS['pba_taz_2015'])
-    df_pba  = pd.read_excel(pba_path, dtype=str)
+    df_pba  = pd.read_excel(pba_path, sheet_name="census2015", dtype=str)
     
-    # 2) detect the TAZ column in the PBA file
-    pba_cols = df_pba.columns.tolist()
-    taz_col = next(c for c in pba_cols if 'taz' in c.lower())
+    # 2) detect and standardize the TAZ column
+
     
-    # 3) standardize the name and type
-    df_pba = df_pba.rename(columns={taz_col: 'taz'})
-    df_pba['taz'] = df_pba['taz'].astype(str)
-    
+    df_pba['taz'] = df_pba['ZONE'].astype(str)
+
+    # 3) select only the desired columns
+    keep_cols = [
+        'taz', 'SD', 'TOTACRE', 'RESACRE', 'CIACRE',
+        'PRKCST', 'OPRKCST', 'AREATYPE', 'HSENROLL',
+        'COLLFTE', 'COLLPTE', 'TOPOLOGY', 'TERMINAL', 'ZERO'
+    ]
+    existing = [c for c in keep_cols if c in df_pba.columns]
+    df_pba = df_pba[existing]
+
     # 4) ensure df_taz.taz is string
     df_taz = df_taz.copy()
     df_taz['taz'] = df_taz['taz'].astype(str)
-    
+
     # 5) merge
     df_out = df_taz.merge(df_pba, on='taz', how='left')
-    
     return df_out
 
 def write_outputs(taz: pd.DataFrame, year: int) -> None:
