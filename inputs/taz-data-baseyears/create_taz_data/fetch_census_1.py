@@ -282,10 +282,15 @@ def step3_fetch_acs_tract(c, year=YEAR, max_retries=3, backoff=5):
 
 
 def step4_fetch_dhc_tract(census_client):
-    """Fetch DHC tract variables."""
+    """Fetch and assemble DHC tract group-quarters variables."""
+    import requests, logging, pandas as pd
+    logger = logging.getLogger(__name__)
+
+    # Map of clean variable names to DHC API codes
     var_map = VARIABLES['DHC_TRACT_VARIABLES']
     rows = []
 
+    # Fetch DHC data for each Bay Area county
     for cnt in BAYCOUNTIES:
         resp = requests.get(
             f"https://api.census.gov/data/{DECENNIAL_YEAR}/dec/dhc",
@@ -303,12 +308,30 @@ def step4_fetch_dhc_tract(census_client):
         else:
             logger.error(f"Failed to fetch DHC for county {cnt}: {resp.status_code}")
 
+    # Build DataFrame
     df = pd.DataFrame(rows)
-    df['tract'] = df['state'].str.zfill(2) + df['county'].str.zfill(3) + df['tract'].str.zfill(6)
-    for clean_name, api_code in var_map.items():
-        df[clean_name] = pd.to_numeric(df[api_code], errors='coerce').fillna(0).astype(int)
+    df['tract'] = (
+        df['state'].str.zfill(2) +
+        df['county'].str.zfill(3) +
+        df['tract'].str.zfill(6)
+    )
 
+    # Convert each detailed DHC variable to int
+    for clean_name, api_code in var_map.items():
+        df[clean_name] = (
+            pd.to_numeric(df[api_code], errors='coerce')
+              .fillna(0)
+              .astype(int)
+        )
+
+    # Sum all group-quarters components into a single gqpop column
+    dhc_fields = list(var_map.keys())
+    df['gqpop'] = df[dhc_fields].sum(axis=1)
+
+    # Attach geographic identifiers
     df['county_fips'] = df['county'].str.zfill(3)
     df['County_Name'] = df['county_fips'].map(GEO['BA_COUNTY_FIPS_CODES'])
 
-    return df[['tract'] + list(var_map.keys()) + ['county_fips', 'County_Name']]
+    # Return tract-level DHC with gqpop
+    return df[['tract'] + dhc_fields + ['gqpop', 'county_fips', 'County_Name']]
+

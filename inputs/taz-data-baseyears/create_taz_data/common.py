@@ -519,12 +519,11 @@ def make_hhsizes_consistent_with_population(
     source_df : DataFrame
         TAZ-level data containing 'TAZ1454', 'County_Name', and the household size/worker buckets.
     target_df : DataFrame
-        County-level targets, must include 'County_Name' and a column
-        named 'TOTHH_target' (total households target).
+        County-level targets, must include 'County_Name' and 'TOTHH_target' (total households target).
     size_or_workers : str
         Either 'hh_size' for household size buckets or 'hh_wrks' for households by workers.
     popsyn_ACS_PUMS_5year : int
-        Year of ACS PUMS five-year dataset, for compatibility (unused here).
+        Year of ACS PUMS five-year dataset (unused here).
 
     Returns
     -------
@@ -532,29 +531,55 @@ def make_hhsizes_consistent_with_population(
         Adjusted TAZ-level DataFrame with either 'sum_size' or 'sum_hhworkers'
         scaled to match the county-level 'TOTHH_target'.
     """
-    # Determine which partial variables to adjust
+    import logging
+    from common import update_tazdata_to_county_target
+
+    logger = logging.getLogger(__name__)
+    logger.info("Entering make_hhsizes_consistent_with_population(size_or_workers=%s)", size_or_workers)
+    logger.info("Source DF shape: %s", source_df.shape)
+    logger.info("Target DF shape before rename: %s", target_df.shape)
+
+    # 1) Determine which partial variables and sum_var to adjust
     if size_or_workers == 'hh_size':
-        sum_var = 'sum_size'
-        partial_vars = ['hh_size_1', 'hh_size_2', 'hh_size_3', 'hh_size_4_plus']
+        sum_var      = 'sum_size'
+        partial_vars = ['hh_size_1','hh_size_2','hh_size_3','hh_size_4_plus']
     elif size_or_workers == 'hh_wrks':
-        sum_var = 'sum_hhworkers'
-        partial_vars = ['hh_wrks_0', 'hh_wrks_1', 'hh_wrks_2', 'hh_wrks_3_plus']
+        sum_var      = 'sum_hhworkers'
+        partial_vars = ['hh_wrks0','hh_wrks1','hh_wrks2','hh_wrks3p']
     else:
         raise ValueError(f"size_or_workers must be 'hh_size' or 'hh_wrks', got {size_or_workers}")
+    logger.info("Selected sum_var=%s with buckets=%s", sum_var, partial_vars)
 
-    # Rename TOTHH_target in target_df to match sum_var_target
+    # 2) Copy and rename TOTHH_target → <sum_var>_target
     targets = target_df.copy()
+    logger.info("Copied target_df; shape now: %s", targets.shape)
     targets = targets.rename(columns={'TOTHH_target': f'{sum_var}_target'})
+    logger.info("Renamed 'TOTHH_target' to '%s'", f'{sum_var}_target')
 
-    # Use the generic scaling function
-    from common import update_tazdata_to_county_target
+    # 3) Drop any duplicate columns created by the rename
+    before_cols = len(targets.columns)
+    targets = targets.loc[:, ~targets.columns.duplicated()]
+    after_cols = len(targets.columns)
+    logger.info("Dropped %d duplicate columns; final targets shape: %s",
+                before_cols - after_cols, targets.shape)
+    logger.info("Final targets columns: %s", targets.columns.tolist())
+
+    # 4) Log summary before scaling
+    logger.info("About to scale %s for %d TAZ rows using %d buckets",
+                sum_var, source_df.shape[0], len(partial_vars))
+
+    # 5) Call the generic scaling function
     adjusted = update_tazdata_to_county_target(
-        source_df,
-        targets,
-        sum_var,
-        partial_vars
+        source_df    = source_df,
+        target_df    = targets,
+        sum_var      = sum_var,
+        partial_vars = partial_vars
     )
+    logger.info("Exiting make_hhsizes_consistent_with_population; adjusted shape: %s",
+                adjusted.shape)
+
     return adjusted
+
 
 def update_gqpop_to_county_totals(source_df, target_df, acs1year):
     """
