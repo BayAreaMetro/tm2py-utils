@@ -4,38 +4,22 @@ author: "Suzanne Childress"
 date: "`r Sys.Date()`"
 output:
   html_document:
-    highlight: tango  # code highlighting style with gray background for code blocks
+    highlight: tango
     theme: default
-editor_options: 
-  markdown: 
-    wrap: 72
 ---
-
-<!-- Custom CSS to ensure code blocks have a gray background -->
-
-```{=html}
-<style>
-pre, code {
-  background-color: #f5f5f5;
-  padding: 8px;
-  border-radius: 4px;
-}
-</style>
-```
 
 ```{r setup, include=FALSE}
 # Setup chunk: load libraries and set global options
 knitr::opts_chunk$set(
   echo = TRUE,
   message = FALSE,
-  warning = FALSE,
-  background = "#f5f5f5"  # ensures code chunk background in some themes
+  warning = FALSE
 )
 
 library(data.table)    # Fast data import and manipulation
 library(tidyverse)     # ggplot2, dplyr, tidyr
-library(lubridate)     # Date-time parsing
-library(fuzzyjoin)     # Rolling/fuzzy joins if needed
+library(lubridate)     # Date-time parsing (hms)
+library(stringr)
 
 # Set working directory to where your logs live
 setwd("C:/GitHub/tm2py-utils/perf-mon")
@@ -43,97 +27,176 @@ setwd("C:/GitHub/tm2py-utils/perf-mon")
 
 # Convert .blg to CSV
 
-```{=html}
-<!--
-We detect the most recent .blg file and convert it with relog.exe.
-This requires that relog.exe be on your PATH (Windows).
--->
-```
-
-```{r convert_blg, eval=FALSE}
-# Find latest .blg file
-blg_files <- list.files(pattern = "\\.blg$", full.names = TRUE)
-blg_file  <- blg_files[which.max(file.info(blg_files)$mtime)]
-
-# Convert to CSV (adjust output filename if you like)
-system2("relog", args = c(shQuote(blg_file), "-f", "CSV", "-o", "perfmon.csv"))
+```{r convert_blg, eval=FALSE, cache=TRUE}
+# Skip conversion if CSV already exists
+if (!file.exists("perfmon.csv")) {
+  blg_files <- list.files(pattern = "\\.blg$", full.names = TRUE)
+  blg_file  <- blg_files[which.max(file.info(blg_files)$mtime)]
+  message("Starting relog conversion for: ", blg_file)
+  system2(
+    "relog",
+    args = c(shQuote(blg_file), "-f", "CSV", "-o", "perfmon.csv"),
+    stdout = "", stderr = ""
+  )
+  if (!file.exists("perfmon.csv")) stop("perfmon.csv not created. Check relog call.")
+} else {
+  message("perfmon.csv already exists; skipping conversion.")
+}
 ```
 
 # Read & Tidy Performance Monitor Data
 
 ```{r read_perf}
-# Locate the CSV just created
-perf_csvs <- list.files(pattern = "perfmon\\.csv$", full.names = TRUE)
-perf_file <- perf_csvs[1]
+# Locate and read the CSV (skip first metadata line) using base R
+perf_file <- list.files(pattern = "^perfmon\\.csv$", full.names = TRUE)[1]
+perf_raw  <- read.csv(
+  perf_file,
+  sep          = ",",
+  skip         = 0,
+  header       = TRUE,
+  check.names  = FALSE,
+  comment.char = "",
+  stringsAsFactors = FALSE
+)
 
-# Read and tidy
-perf_raw <- fread(perf_file, skip = 1)
+perf_raw <- perf_raw %>%
+  filter(if_all(everything(), ~ !is.na(.) & . != ""))
+
+# Rename first column to "Time"
+names(perf_raw)[1] <- "Time"
+
+# Simplify metric names: strip everything up to last backslash '\'
+orig_names     <- names(perf_raw)
+simple_names   <- c(
+  "Time",
+  gsub("^.*\\\\", "", orig_names[-1])
+)
+names(perf_raw) <- simple_names
+
+# Pivot to long format and parse timestamps
 perf <- perf_raw %>%
-  rename(Timestamp = `#DateTime`) %>%
-  mutate(
-    Timestamp = mdy_hms(Timestamp),    # parse timestamp
-    across(-Timestamp, as.numeric)     # convert counters to numeric
-  ) %>%
   pivot_longer(
-    -Timestamp,
+    cols      = -Time,
     names_to  = "Metric",
     values_to = "Value"
-  )
+  ) %>%
+  mutate(
+    Timestamp = today() + as.numeric(hms(Time)),
+    Value     = as.numeric(Value)
+  ) %>%
+  select(Timestamp, Metric, Value)
 ```
 
 # Read & Parse Model Run Log
 
 ```{r read_model_logs}
-# Find the most recent model-run log (starts with tm2py_run)
-log_files <- list.files(pattern = "^tm2py_run.*\\.txt$", full.names = TRUE)
-model_log <- log_files[which.max(file.info(log_files)$mtime)]
+model_files <- list.files(pattern = "^tm2py_run.*\\.log$", full.names = TRUE)
+message("Found log files: ", paste(basename(model_files), collapse=", "))
+if (length(model_files) == 0) {
+  stop("No tm2py_run log files found in working directory: ", getwd())
+}
+model_log <- model_files[which.max(file.info(model_files)$mtime)]
+message("Using log file: ", basename(model_log))
 
-# Extract timestamp and message
 lines <- readLines(model_log)
-model_events <- tibble(raw = lines) %>%
-  extract(
-    raw,
-    into  = c("Timestamp", "Level", "Message"),
-    regex = "^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})\\s+(\\w+):\\s+(.*)$"
-  ) %>%
-  mutate(
-    Timestamp = ymd_hms(Timestamp)
-  ) %>%
-  select(Timestamp, Level, Message)
+
 ```
 
-# Visualizations with ggplot2
+```{r parse_model_logs}
+# Define pattern: captures Date, Time, Level, and Message
+datetime_str <- gsub("[()]", "", substr(lines, 1, 22))
+Timestamp    <- dmy_hms(datetime_str)
 
-Below we overlay model-run events as dashed vertical lines on various
-PerfMon counters.
+# Extract Level and Message by splitting at first colon after timestamp
+# Remove the timestamp and any leading spaces
+rest <- substr(lines, 23, nchar(lines))
+# Level is before first ':'
+Level   <- str_trim(sub(":.*$", "", rest))
+# Message is after the first ':'
+Message <- str_trim(sub("^[^:]+:\\s*", "", rest))
+
+# Build events tibble
+model_events <- tibble(
+  Timestamp = Timestamp,
+  Level     = Level,
+  Message   = Message
+) %>%
+  filter(Level %in% c("INFO", "STATUS"))
+```
+
+
+# Visualizations with ggplot2
 
 ```{r plot_cpu_mem}
 # CPU & Memory usage
 cpu_mem <- perf %>%
-  filter(Metric %in% c(
-    "Processor(_Total)_% Processor Time",
-    "Memory_% Committed Bytes In Use"
-  ))
+  filter(str_detect(Metric, "% Processor Time") |
+         str_detect(Metric, "Available MBytes") |
+         str_detect(Metric, "Pages/sec"))
 
 ggplot(cpu_mem, aes(x = Timestamp, y = Value, color = Metric)) +
   geom_line() +
   geom_vline(data = model_events, aes(xintercept = Timestamp),
              linetype = "dashed", color = "red", alpha = 0.6) +
-  geom_text(data = model_events,
-            aes(x = Timestamp, y = Inf, label = Message),
-            angle = 90, vjust = -0.5, hjust = 0, size = 2.5) +
   labs(
-    title = "CPU & Memory Usage vs Model Steps",
+    title = "CPU & Memory Usage",
     x     = "Time",
-    y     = "Value",
-    color = "Metric"
+    y     = "Value"
   ) +
   theme_minimal()
 ```
 
-\`\`\`{r plot_io_net} \# Disk I/O & Network throughput io_net \<- perf
-%\>% filter(Metric %in% c( "PhysicalDisk(\_Total)\_Disk Transfers/sec",
-"Network Interface(\_Total)\_Bytes Total/sec" ))
+```{r plot_io_net}
+# Disk I/O & Network throughput
+io_net <- perf %>%
+  filter(str_detect(Metric, "Avg\\. Disk sec/Read") |
+         str_detect(Metric, "Avg\\. Disk sec/Write") |
+         str_detect(Metric, "Current Disk Queue Length") |
+         str_detect(Metric, "Bytes Total/sec"))
 
 ggplot(io_net, aes(x = Timestamp, y = Value, color = Metric)) +
-geom_line() + geom_vline(data
+  geom_line() +
+  geom_vline(data = model_events, aes(xintercept = Timestamp),
+             linetype = "dashed", alpha = 0.5) +
+  labs(
+    title = "Disk I/O & Network Throughput",
+    x     = "Time",
+    y     = "Value"
+  ) +
+  theme_minimal()
+```
+
+```{r plot_faceted}
+# Faceted view of key metrics
+perf %>%
+  filter(str_detect(Metric, "% Processor Time") |
+         str_detect(Metric, "Available MBytes") |
+         str_detect(Metric, "Pages/sec") |
+         str_detect(Metric, "Avg\\. Disk sec") |
+         str_detect(Metric, "Bytes Total/sec") |
+         str_detect(Metric, "Context Switches/sec") |
+         str_detect(Metric, "% Usage")) %>%
+  ggplot(aes(x = Timestamp, y = Value)) +
+  geom_line() +
+  facet_wrap(~ Metric, scales = "free_y", ncol = 1) +
+  geom_vline(data = model_events, aes(xintercept = Timestamp),
+             linetype = "dashed", alpha = 0.5) +
+  labs(
+    title = "PerfMon Counters with Model Events",
+    x     = "Time",
+    y     = "Value"
+  ) +
+  theme_minimal()
+```
+
+# Save Plots to Files
+
+```{r save_plots}
+ggsave("cpu_mem_vs_model.png", width = 10, height = 6)
+ggsave("io_net_vs_model.png",  width = 10, height = 6)
+ggsave("faceted_counters.png", width = 6,  height = 10)
+```
+
+
+
+
