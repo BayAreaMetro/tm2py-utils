@@ -13,14 +13,20 @@ output:
 knitr::opts_chunk$set(
   echo = TRUE,
   message = FALSE,
-  warning = FALSE
+  warning = FALSE,
+  results='asis'
 )
 
 library(data.table)    # Fast data import and manipulation
 library(tidyverse)     # ggplot2, dplyr, tidyr
 library(lubridate)     # Date-time parsing (hms)
 library(stringr)
-
+library(grid)
+library(ggrepel)
+library(ggplot2)
+library(plotly)
+library(htmlwidgets)
+library(htmltools)
 # Set working directory to where your logs live
 setwd("C:/GitHub/tm2py-utils/perf-mon")
 ```
@@ -62,28 +68,28 @@ perf_raw  <- read.csv(
 perf_raw <- perf_raw %>%
   filter(if_all(everything(), ~ !is.na(.) & . != ""))
 
-# Rename first column to "Time"
-names(perf_raw)[1] <- "Time"
+# Rename first column to "Timestamp" and parse full datetime
+names(perf_raw)[1] <- "Timestamp"
+perf_raw <- perf_raw %>%
+  mutate(
+    Timestamp = mdy_hms(Timestamp)  # parse "MM/DD/YYYY HH:MM:SS.fraction"
+  )
 
-# Simplify metric names: strip everything up to last backslash '\'
+# Simplify metric names: remove any path prefix up to last slash/backslash
 orig_names     <- names(perf_raw)
-simple_names   <- c(
-  "Time",
-  gsub("^.*\\\\", "", orig_names[-1])
-)
+simple_names   <- gsub(".*\\\\", "", orig_names)  # 
 names(perf_raw) <- simple_names
 
-# Pivot to long format and parse timestamps
+# Pivot to long format and convert values
 perf <- perf_raw %>%
   pivot_longer(
-    cols      = -Time,
+    cols      = -Timestamp,
     names_to  = "Metric",
     values_to = "Value"
   ) %>%
   mutate(
-    Timestamp = today() + as.numeric(hms(Time)),
-    Value     = as.numeric(Value)
-  ) %>%
+    Value = as.numeric(Value)
+  )%>%
   select(Timestamp, Metric, Value)
 ```
 
@@ -123,80 +129,178 @@ model_events <- tibble(
 ) %>%
   filter(Level %in% c("INFO", "STATUS"))
 ```
+# Align Data
 
-
-# Visualizations with ggplot2
-
-```{r plot_cpu_mem}
-# CPU & Memory usage
-cpu_mem <- perf %>%
-  filter(str_detect(Metric, "% Processor Time") |
-         str_detect(Metric, "Available MBytes") |
-         str_detect(Metric, "Pages/sec"))
-
-ggplot(cpu_mem, aes(x = Timestamp, y = Value, color = Metric)) +
-  geom_line() +
-  geom_vline(data = model_events, aes(xintercept = Timestamp),
-             linetype = "dashed", color = "red", alpha = 0.6) +
-  labs(
-    title = "CPU & Memory Usage",
-    x     = "Time",
-    y     = "Value"
-  ) +
-  theme_minimal()
+```{r align_data}
+# Filter PerfMon to last event timestamp
+cutoff_ts <- max(model_events$Timestamp)
+perf      <- perf %>% filter(Timestamp <= cutoff_ts)
+message("PerfMon data filtered through ", cutoff_ts)
 ```
 
-```{r plot_io_net}
-# Disk I/O & Network throughput
-io_net <- perf %>%
-  filter(str_detect(Metric, "Avg\\. Disk sec/Read") |
-         str_detect(Metric, "Avg\\. Disk sec/Write") |
-         str_detect(Metric, "Current Disk Queue Length") |
-         str_detect(Metric, "Bytes Total/sec"))
+# Faceted Plot of Metrics with Event Labels
 
-ggplot(io_net, aes(x = Timestamp, y = Value, color = Metric)) +
-  geom_line() +
-  geom_vline(data = model_events, aes(xintercept = Timestamp),
-             linetype = "dashed", alpha = 0.5) +
-  labs(
-    title = "Disk I/O & Network Throughput",
-    x     = "Time",
-    y     = "Value"
-  ) +
-  theme_minimal()
+# Individual Interactive Charts with Significant Event Annotations
+
+```{r plot_individual, echo=FALSE, results='asis'}
+
+# ------------------------------------------------------------------------------
+# Custom CSS for the range slider
+# ------------------------------------------------------------------------------
+custom_css <- "
+.rangeslider-mask-min, .rangeslider-mask-max {
+  fill: steelblue !important;
+  fill-opacity: 0.3 !important;
+}
+.rangeslider-slidebox {
+  fill: lightyellow !important;
+  fill-opacity: 0.2 !important;
+}
+.rangeslider-handle-min, .rangeslider-handle-max {
+  fill: orange !important;
+  stroke: orange !important;
+}
+"
+
+# ------------------------------------------------------------------------------
+# 1) Identify the “high CPU” window (top 25% of % Processor Time)
+# ------------------------------------------------------------------------------
+cpu_df     <- perf %>% filter(Metric == "% Processor Time")
+cpu_thresh <- quantile(cpu_df$Value, 0.75, na.rm = TRUE)
+high_cpu   <- cpu_df %>% filter(Value >= cpu_thresh)
+min_ts     <- min(high_cpu$Timestamp)
+max_ts     <- max(high_cpu$Timestamp)
+
+# ------------------------------------------------------------------------------
+# 2) Define metric priority order
+# ------------------------------------------------------------------------------
+priority <- c(
+  "% Processor Time",
+  "% Privileged Time",
+  "% DPC Time",
+  "% Interrupt Time",
+  "Processor Queue Length",
+  "Context Switches/sec",
+  "Available MBytes",
+  "% Disk Time",
+  "Bytes Total/sec"
+)
+metrics <- c(
+  priority[priority %in% unique(perf$Metric)],
+  setdiff(unique(perf$Metric), priority)
+)
+
+# ------------------------------------------------------------------------------
+# 3) Build one plot per metric: top‐10 in red, + 1/5th of the rest in gray
+# ------------------------------------------------------------------------------
+plots <- lapply(metrics, function(m) {
+  df <- perf %>% filter(Metric == m)
+
+  # compute absolute deltas at each model event
+  deltas <- sapply(model_events$Timestamp, function(ts) {
+    i    <- which.min(abs(df$Timestamp - ts))
+    prev <- if (i > 1) df$Value[i - 1] else NA
+    nxt  <- if (i < nrow(df)) df$Value[i + 1] else NA
+    abs(nxt - prev)
+  })
+
+  # attach deltas to events
+  events_df <- model_events %>% mutate(delta = deltas)
+
+  # top 10 biggest jumps → red, thick lines
+  top_events <- events_df %>%
+    slice_max(order_by = delta, n = 10, with_ties = FALSE) %>%
+    mutate(Message = str_trunc(Message, 20, side = "right"))
+
+  # the remaining events → sample 1 out of 5 → gray, dashed thin lines
+  other_events <- anti_join(events_df, top_events, by = "Timestamp")
+  sampled_others <- other_events %>%
+    arrange(Timestamp) %>%
+    slice(seq(1, n(), by = 5)) %>%
+    mutate(Message = str_trunc(Message, 20, side = "right"))
+
+  # base time‐series trace
+  fig <- plot_ly(
+    df,
+    x    = ~Timestamp,
+    y    = ~Value,
+    type = 'scatter',
+    mode = 'lines',
+    name = m
+  )
+
+  # add red segments + labels for top_events
+  if (nrow(top_events) > 0) {
+    fig <- fig %>%
+      add_segments(
+        data       = top_events,
+        x          = ~Timestamp, xend = ~Timestamp,
+        y          = 0,           yend = max(df$Value, na.rm = TRUE),
+        inherit    = FALSE,
+        showlegend = FALSE,
+        line       = list(color = 'red', width = 3)
+      ) %>%
+      add_annotations(
+        data        = top_events,
+        x           = ~Timestamp,
+        y           = max(df$Value, na.rm = TRUE),
+        text        = ~Message,
+        showarrow   = FALSE,
+        textangle   = -45,
+        font        = list(color = 'red', size = 8),
+        allowOverlap = FALSE
+      )
+  }
+
+  # add gray dashed segments + labels for sampled_others
+  if (nrow(sampled_others) > 0) {
+    fig <- fig %>%
+      add_segments(
+        data       = sampled_others,
+        x          = ~Timestamp, xend = ~Timestamp,
+        y          = 0,           yend = max(df$Value, na.rm = TRUE),
+        inherit    = FALSE,
+        showlegend = FALSE,
+        line       = list(color = 'gray', dash = 'dash', width = 1)
+      ) %>%
+      add_annotations(
+        data        = sampled_others,
+        x           = ~Timestamp,
+        y           = max(df$Value, na.rm = TRUE),
+        text        = ~Message,
+        showarrow   = FALSE,
+        textangle   = -45,
+        font        = list(color = 'gray', size = 8),
+        allowOverlap = FALSE
+      )
+  }
+
+  # layout with styled range slider & selector buttons
+  fig <- fig %>% layout(
+    title = m,
+    xaxis = list(
+      title        = list(text = "Time", standoff = 20),
+      rangeselector = list(
+        buttons = list(
+          list(count = 1,  label = "1h", step = "hour", stepmode = "backward"),
+          list(count = 6,  label = "6h", step = "hour", stepmode = "backward"),
+          list(step  = "all", label = "All")
+        )
+      ),
+      rangeslider = list(visible = TRUE),
+      type        = 'date',
+      range       = c(min_ts, max_ts)
+    ),
+    yaxis  = list(title = "Value"),
+    margin = list(l = 80, r = 20, t = 50, b = 50)
+  )
+
+  # inject custom CSS for slider styling
+  htmlwidgets::prependContent(fig, tags$style(HTML(custom_css)))
+})
+
+# ------------------------------------------------------------------------------
+# 4) Embed all widgets in the HTML output
+# ------------------------------------------------------------------------------
+tagList(plots)
 ```
-
-```{r plot_faceted}
-# Faceted view of key metrics
-perf %>%
-  filter(str_detect(Metric, "% Processor Time") |
-         str_detect(Metric, "Available MBytes") |
-         str_detect(Metric, "Pages/sec") |
-         str_detect(Metric, "Avg\\. Disk sec") |
-         str_detect(Metric, "Bytes Total/sec") |
-         str_detect(Metric, "Context Switches/sec") |
-         str_detect(Metric, "% Usage")) %>%
-  ggplot(aes(x = Timestamp, y = Value)) +
-  geom_line() +
-  facet_wrap(~ Metric, scales = "free_y", ncol = 1) +
-  geom_vline(data = model_events, aes(xintercept = Timestamp),
-             linetype = "dashed", alpha = 0.5) +
-  labs(
-    title = "PerfMon Counters with Model Events",
-    x     = "Time",
-    y     = "Value"
-  ) +
-  theme_minimal()
-```
-
-# Save Plots to Files
-
-```{r save_plots}
-ggsave("cpu_mem_vs_model.png", width = 10, height = 6)
-ggsave("io_net_vs_model.png",  width = 10, height = 6)
-ggsave("faceted_counters.png", width = 6,  height = 10)
-```
-
-
-
-
