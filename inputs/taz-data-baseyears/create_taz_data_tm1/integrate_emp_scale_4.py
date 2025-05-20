@@ -257,7 +257,7 @@ def build_county_targets(
     logger.info("Final county_targets columns: %s", county_targets.columns.tolist())
     return county_targets
 # ------------------------------
-# STEP 10: Integrate employment
+#  Integrate employment
 # ------------------------------
 def integrate_employment(
     taz_base: pd.DataFrame,

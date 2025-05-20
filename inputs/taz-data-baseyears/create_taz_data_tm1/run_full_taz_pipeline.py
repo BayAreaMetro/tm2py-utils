@@ -13,7 +13,7 @@ from pathlib import Path
 import yaml
 from census import Census
 import pandas as pd
-from common import sanity_check_df, apply_county_targets_to_taz, update_tazdata_to_county_target
+from common import sanity_check_df, apply_county_targets_to_taz
 
 
 # Load configuration
@@ -77,9 +77,7 @@ def main():
         api_key = f.read().strip()
     c = Census(api_key, year=None)
 
-    out_root = os.path.expandvars(PATHS['output_root'])
-    year_dir = os.path.join(out_root, str(YEAR))
-    os.makedirs(year_dir, exist_ok=True)
+
     # fetch Census data
     logging.info('Fetch block data')
     blocks = fetch_block_data(c)
@@ -116,13 +114,6 @@ def main():
     logging.info('integrate census & employment')
     taz_base_emp = integrate_employment(taz_base, taz_census, YEAR)
 
-    # write out unscaled TAZ data
-    out_root = os.path.expandvars(PATHS['output_root'])
-    year_dir = os.path.join(out_root, str(YEAR))
-    os.makedirs(year_dir, exist_ok=True)
-    taz_base_emp.to_csv(os.path.join(year_dir, "taz_unscaled_to_cnty.csv"), index=False)
-    taz_census.to_csv(os.path.join(year_dir, "taz_census.csv"), index=False)
-    dhc_tr.to_csv(os.path.join(year_dir, "dhc_tract.csv"), index=False)
 
     # Build and merge county targets
     logging.info('Building county targets')
@@ -139,7 +130,7 @@ def main():
     emp_lodes_weight=CONSTANTS["EMPRES_LODES_WEIGHT"]
     )
 
-    # Step 11: apply all county‐level controls (pop+hh+gq, then employment)
+    # Apply all county‐level controls (pop+hh+gq, then employment)
     logging.info("Apply county targets to TAZ")
     county_targets['county_fips'] = county_targets['county_fips'].astype(str).str.zfill(5)
     taz_base_emp['TAZ1454'] = taz_base_emp['TAZ1454'].astype(str)
@@ -153,7 +144,6 @@ def main():
         )
 
     # join PBA2015 and write outputs
-    taz_scaled= pd.read_csv(os.path.join(year_dir, "taz_scaled_to_cnty.csv"))
     logging.info("join PBA2015 and write outputs")
     pba_path = os.path.expandvars(PATHS['pba_taz_2015'])
     df_pba  = pd.read_excel(pba_path, sheet_name="census2015", dtype=str)

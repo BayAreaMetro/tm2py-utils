@@ -34,14 +34,7 @@ ACS_5YR_LATEST  = CONSTANTS['ACS_5YEAR_LATEST']
 # ------------------------------
 sys.path.insert(0, str(Path(__file__).parent))
 from common import (
-    census_to_df,
-    download_acs_blocks,
-    retrieve_census_variables,
-    fix_rounding_artifacts,
-    map_acs5year_household_income_to_tm1_categories,
-    update_gqpop_to_county_totals,
-    update_tazdata_to_county_target,
-    make_hhsizes_consistent_with_population,
+    map_acs5year_household_income_to_tm1_categories
 )
 
 
@@ -130,7 +123,7 @@ def build_workingdata(
     dhc_tr: pd.DataFrame
 ) -> pd.DataFrame:
     """
-    Step 6: Build the working block-level DataFrame by merging in:
+     Build the working block-level DataFrame by merging in:
       - weighted tract-level ACS variables
       - weighted tract-level DHC variables
 
@@ -144,7 +137,7 @@ def build_workingdata(
     df['blockgroup'] = df['blockgroup'].astype(str).str.zfill(12)
     df['tract'] = df['blockgroup'].str[:11]
 
-    logger.info(f"step6 inputs ▶ shares={df.shape}, acs_tr={acs_tr.shape}, dhc_tr={dhc_tr.shape}")
+    logger.info(f"inputs ▶ shares={df.shape}, acs_tr={acs_tr.shape}, dhc_tr={dhc_tr.shape}")
 
     acs_tr = acs_tr.copy()
     acs_tr['tract'] = acs_tr['tract'].astype(str)
@@ -166,7 +159,7 @@ def build_workingdata(
     logger.info(f"dhc_merge → {m2['dhc_merge'].value_counts().to_dict()}")
     df_final = m2.drop(columns=['dhc_merge'])
 
-    logger.info(f"step6 output shape ▶ {df_final.shape}")
+    logger.info(f"output shape ▶ {df_final.shape}")
     return df_final
 
 

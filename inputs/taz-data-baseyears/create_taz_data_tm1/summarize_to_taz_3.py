@@ -5,8 +5,8 @@ summarize_to_taz.py
 
 Module for summarizing ACS data to TAZ geographies.
 Executes:
-  STEP 8: Weighted summary of block-group ACS to TAZ
-  STEP 9: Weighted summary of tract ACS to TAZ
+ Weighted summary of block-group ACS to TAZ
+ Weighted summary of tract ACS to TAZ
 """
 import os
 import logging
@@ -24,7 +24,7 @@ PATHS = cfg['paths']
 GEO  = cfg['geo_constants']
 
 # ------------------------------
-# STEP 8: Weighted summarize block-group ACS -> TAZ
+#  Weighted summarize block-group ACS -> TAZ
 # ------------------------------
 def compute_block_weights(paths):
     cw_path = Path(paths['block2020_to_taz1454_csv'])
@@ -53,10 +53,10 @@ def summarize_to_taz(hhinc: pd.DataFrame, weights: pd.DataFrame) -> pd.DataFrame
     # Validate inputs
     for col in ['blockgroup','HHINCQ1','HHINCQ2','HHINCQ3','HHINCQ4']:
         if col not in hhinc.columns:
-            raise KeyError(f"step8: missing '{col}' in hhinc DataFrame")
+            raise KeyError(f"missing '{col}' in hhinc DataFrame")
     for col in ['blockgroup','TAZ1454','share_bg']:
         if col not in weights.columns:
-            raise KeyError(f"step8: missing '{col}' in weights DataFrame")
+            raise KeyError(f" missing '{col}' in weights DataFrame")
 
     # Merge on blockgroup, retaining all hhinc rows
     merged = hhinc.merge(
@@ -90,7 +90,7 @@ def summarize_to_taz(hhinc: pd.DataFrame, weights: pd.DataFrame) -> pd.DataFrame
     return taz
 
 # ------------------------------
-# STEP 10: Tract -> TAZ summarize
+#  Tract -> TAZ summarize
 # ------------------------------
 def compute_tract_weights(paths: dict) -> pd.DataFrame:
     """
