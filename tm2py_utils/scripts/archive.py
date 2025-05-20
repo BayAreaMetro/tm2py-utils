@@ -1,0 +1,78 @@
+#%%
+import zipfile
+from itertools import chain
+from pathlib import Path
+import argparse
+import py7zr
+from tqdm import tqdm
+#%%
+
+def archive(model_run_dir: Path | str, archive_dir: Path | str):
+
+    if isinstance(model_run_dir, str):
+        model_run_dir = Path(model_run_dir)
+
+    if isinstance(archive_dir, str):
+        archive_dir = Path(archive_dir)
+
+    
+    # for now we want to start by including everything in the directory
+    files_in_included_directories = list(
+        chain(
+            model_run_dir.glob("acceptance/**/*"), 
+            model_run_dir.glob("CTRAMP/**/*"), 
+            model_run_dir.glob("ctramp_output/**/*"), 
+            model_run_dir.glob("demand_matrices/**/*"), 
+            model_run_dir.glob("emme_project/**/*"), 
+            model_run_dir.glob("inputs/**/*"), 
+            model_run_dir.glob("logs/**/*"), 
+            model_run_dir.glob("output_summaries/**/*"), 
+        )
+    )
+    
+    # we want to exclude these files because they are too large
+    excluded_sub_directories = list(
+        chain(
+            model_run_dir.glob("emme_project/*/emmemat"), 
+        )
+    )
+
+    # exclude everything that isnt a file or a directory
+    files_to_archive = [file_to_archive.resolve() for file_to_archive in files_in_included_directories
+        if (
+            not any(
+                file_to_archive.resolve().is_relative_to(dir_to_exclude.resolve())
+                for dir_to_exclude in excluded_sub_directories
+            )
+        ) and (
+            not file_to_archive.is_dir()
+        )
+    ]
+    
+    archive_items = {
+        str(file.relative_to(model_run_dir)): str(file)
+        for file in files_to_archive
+    }
+
+    # Create the .7z archive
+    # with py7zr.SevenZipFile(archive_dir, 'w') as archive:
+    #     archive.write(archive_items)
+    with py7zr.SevenZipFile(archive_dir, mode='w') as archive:
+        for file in tqdm(files_to_archive):
+            print(file)
+            arcname = file.relative_to(model_run_dir)
+            archive.write(file, arcname)
+
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Archive utility")
+    parser.add_argument("model_directory", help="Directory of model run to archive")
+    parser.add_argument("archive_directory", help="Directory where the models would like to be archived")
+    args = parser.parse_args()
+
+    # Your logic here
+    archive(args.model_directory, args.archive_directory)
+
+if __name__ == "__main__":
+    main()
