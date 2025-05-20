@@ -80,7 +80,6 @@ def main():
     out_root = os.path.expandvars(PATHS['output_root'])
     year_dir = os.path.join(out_root, str(YEAR))
     os.makedirs(year_dir, exist_ok=True)
-    """
     # fetch Census data
     logging.info('Fetch block data')
     blocks = fetch_block_data(c)
@@ -125,12 +124,6 @@ def main():
     taz_census.to_csv(os.path.join(year_dir, "taz_census.csv"), index=False)
     dhc_tr.to_csv(os.path.join(year_dir, "dhc_tract.csv"), index=False)
 
-    out_root = os.path.expandvars(PATHS['output_root'])
-    year_dir = os.path.join(out_root, str(YEAR))
-    taz_base_emp= pd.read_csv(os.path.join(year_dir, "taz_unscaled_to_cnty.csv"))
-    dhc_tr= pd.read_csv(os.path.join(year_dir, "dhc_tract.csv"))
-    taz_census= pd.read_csv(os.path.join(year_dir, "taz_census.csv"))
-
     # Build and merge county targets
     logging.info('Building county targets')
     county_targets = build_county_targets(
@@ -158,9 +151,7 @@ def main():
     county_targets_all,
     ACS_PUMS_5YEAR_LATEST
         )
-    
-    taz_scaled.to_csv(os.path.join(year_dir, "taz_scaled_to_cnty.csv"), index=False)
-    """
+
     # join PBA2015 and write outputs
     taz_scaled= pd.read_csv(os.path.join(year_dir, "taz_scaled_to_cnty.csv"))
     logging.info("join PBA2015 and write outputs")
@@ -169,6 +160,6 @@ def main():
 
     write_out_all(taz_scaled, df_pba, baseline_year=BASELINE_YEAR, target_year=YEAR)
     logging.info("Pipeline complete")
-    """
+ 
 if __name__ == '__main__':
     main()
