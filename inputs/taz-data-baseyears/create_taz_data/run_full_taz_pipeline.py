@@ -30,6 +30,7 @@ YEAR            = CONSTANTS['years'][0]
 VARIABLES = cfg['variables']
 
 YEAR = CONSTANTS['years'][0]
+BASELINE_YEAR = CONSTANTS["BASELINE_YEAR"]
 ACS_5YR = CONSTANTS['ACS_5YEAR_LATEST']
 PUMS_1YR = CONSTANTS['ACS_PUMS_1YEAR_LATEST']
 
@@ -63,8 +64,7 @@ from integrate_emp_scale_4 import (
     apply_county_targets_to_taz
 )
 from finalize_pipeline_5 import (
-    join_pba2015,
-    write_outputs
+    write_out_all
 )
 
 def main():
@@ -76,6 +76,10 @@ def main():
     with open(key_path) as f:
         api_key = f.read().strip()
     c = Census(api_key, year=None)
+
+    out_root = os.path.expandvars(PATHS['output_root'])
+    year_dir = os.path.join(out_root, str(YEAR))
+    os.makedirs(year_dir, exist_ok=True)
     """
     # fetch Census data
     logging.info('Fetch block data')
@@ -121,7 +125,6 @@ def main():
     taz_census.to_csv(os.path.join(year_dir, "taz_census.csv"), index=False)
     dhc_tr.to_csv(os.path.join(year_dir, "dhc_tract.csv"), index=False)
 
-    """
     out_root = os.path.expandvars(PATHS['output_root'])
     year_dir = os.path.join(out_root, str(YEAR))
     taz_base_emp= pd.read_csv(os.path.join(year_dir, "taz_unscaled_to_cnty.csv"))
@@ -157,12 +160,14 @@ def main():
         )
     
     taz_scaled.to_csv(os.path.join(year_dir, "taz_scaled_to_cnty.csv"), index=False)
-
+    """
     # join PBA2015 and write outputs
+    taz_scaled= pd.read_csv(os.path.join(year_dir, "taz_scaled_to_cnty.csv"))
     logging.info("join PBA2015 and write outputs")
-    taz_joined = join_pba2015(taz_scaled)
+    pba_path = os.path.expandvars(PATHS['pba_taz_2015'])
+    df_pba  = pd.read_excel(pba_path, sheet_name="census2015", dtype=str)
 
-    write_outputs(taz_joined, YEAR)
+    write_out_all(taz_scaled, df_pba, baseline_year=BASELINE_YEAR, target_year=YEAR)
     logging.info("Pipeline complete")
     """
 if __name__ == '__main__':

@@ -12,196 +12,198 @@ with CONFIG_PATH.open() as f:
 PATHS = cfg['paths']
 
 
-def join_pba2015(df_taz: pd.DataFrame) -> pd.DataFrame:
+import os
+import pandas as pd
+
+import os
+import pandas as pd
+
+def write_out_all(
+    df_taz: pd.DataFrame,
+    PBA_base: pd.DataFrame,
+    baseline_year: int,
+    target_year: int,
+    taz_sd_county_csv: str = "./geographies/taz-superdistrict-county.csv"
+):
     """
-    Join your TAZ-level outputs to the Plan Bay Area 2015 TAZ data
-    (land-use/blueprint) so you can carry those attributes forward.
-
-    Parameters
-    ----------
-    df_taz : pandas.DataFrame
-        Must contain a 'taz' column (string or numeric).
-
-    Returns
-    -------
-    pandas.DataFrame
-        All columns from df_taz plus selected columns from the PBA2015 file,
-        merged on the TAZ identifier.
+    1) Pull selected PBA blueprint cols and merge onto df_taz
+    2) Write baseline-year district summary from PBA_base
+    3) Write target-year outputs (district, land-use, popsims, long) from the joined frame
     """
-    # 1) load the PBA 2015 TAZ data from the 'census2015' sheet
-    pba_path = os.path.expandvars(PATHS['pba_taz_2015'])
-    df_pba  = pd.read_excel(pba_path, sheet_name="census2015", dtype=str)
-    
-    # 2) detect and standardize the TAZ column
-
-    
-    df_pba['taz'] = df_pba['ZONE'].astype(str)
-
-    # 3) select only the desired columns
-    keep_cols = [
-        'taz', 'SD', 'TOTACRE', 'RESACRE', 'CIACRE',
-        'PRKCST', 'OPRKCST', 'AREATYPE', 'HSENROLL',
-        'COLLFTE', 'COLLPTE', 'TOPOLOGY', 'TERMINAL', 'ZERO'
+    # a) Select & join blueprint fields (mirroring R’s select + left_join)
+    # Define the blueprint columns, excluding the join key 'ZONE'
+    joiner_cols = [
+        "SD", "TOTACRE", "RESACRE", "CIACRE",
+        "SFDU", "MFDU", "PRKCST", "OPRKCST", "AREATYPE",
+        "HSENROLL", "COLLFTE", "COLLPTE",
+        "TOPOLOGY", "TERMINAL", "ZERO"
     ]
-    existing = [c for c in keep_cols if c in df_pba.columns]
-    df_pba = df_pba[existing]
+    if "gqpop" not in PBA_base.columns:
+        PBA_base = PBA_base.assign(
+            gqpop=lambda d: d["TOTPOP"].astype(int) - d["HHPOP"].astype(int)
+        )
+    # Include gqpop in joiner
+    joiner_cols.append("gqpop")
 
-    # 4) ensure df_taz.taz is string
+    # Subset once, including ZONE exactly once
+    PBA_sub = PBA_base[["ZONE"] + joiner_cols].copy()
+    PBA_sub = PBA_sub.drop_duplicates(subset=["ZONE"])
+    PBA_sub["taz"] = PBA_sub["ZONE"].astype(str)
+
+    # Prepare df_taz and detect its key
     df_taz = df_taz.copy()
-    df_taz['taz'] = df_taz['taz'].astype(str)
+    if 'TAZ1454' in df_taz.columns:
+        df_taz['taz'] = df_taz['TAZ1454'].astype(str)
+    elif 'ZONE' in df_taz.columns:
+        df_taz['taz'] = df_taz['ZONE'].astype(str)
+    else:
+        raise KeyError("Could not find 'TAZ1454' or 'ZONE' in df_taz")
 
-    # 5) merge
-    df_out = df_taz.merge(df_pba, on='taz', how='left')
-    return df_out
+    # Merge blueprint onto df_taz
+    taz_joined = df_taz.merge(
+        PBA_sub.drop(columns=["ZONE"]),
+        on="taz",
+        how="left"
+    )
 
-def write_outputs(taz: pd.DataFrame, year: int) -> None:
-    """
-    Write out the same suite of CSVs that the original R script did,
-    using the fully-joined TAZ‐level DataFrame `taz`.
-    """
-    # 1) Prepare output directory
-    out_root = os.path.expandvars(PATHS['output_root'])
-    year_dir = os.path.join(out_root, str(year))
-    os.makedirs(year_dir, exist_ok=True)
+    # Drop any merge artifacts
+    for col in ("taz_x", "taz_y"):
+        if col in taz_joined.columns:
+            taz_joined = taz_joined.drop(columns=[col])
 
-    # 2) --- Ethnicity ---
-    ethnic = taz[[
-        'TAZ1454',
-        'hispanic','white_nonh','black_nonh','asian_nonh','other_nonh',
-        'TOTPOP','COUNTY','County_Name'
-    ]]
-    ethnic_path = os.path.join(year_dir, "TAZ1454_Ethnicity.csv")
-    ethnic.to_csv(ethnic_path, index=False)
-    logging.info(f"Wrote {ethnic_path}")
-
-    # 3) --- TAZ Land Use file ---
-    taz_landuse = taz.copy()
-    taz_landuse['hhlds'] = taz_landuse['TOTHH']
-    landuse_cols = [
-        'TAZ1454','DISTRICT','SD','COUNTY','TOTHH','HHPOP','TOTPOP','EMPRES',
-        'SFDU','MFDU','HHINCQ1','HHINCQ2','HHINCQ3','HHINCQ4','TOTACRE',
-        'RESACRE','CIACRE','SHPOP62P','TOTEMP','AGE0004','AGE0519','AGE2044',
-        'AGE4564','AGE65P','RETEMPN','FPSEMPN','HEREMPN','AGREMPN','MWTEMPN',
-        'OTHEMPN','PRKCST','OPRKCST','AREATYPE','HSENROLL','COLLFTE','COLLPTE',
-        'TERMINAL','TOPOLOGY','ZERO','hhlds','gqpop'
+    # b) Baseline-year district summary from raw PBA_base
+    summary_cols = [
+        "TOTHH", "HHPOP", "TOTPOP", "EMPRES", "SFDU", "MFDU",
+        "HHINCQ1", "HHINCQ2", "HHINCQ3", "HHINCQ4", "TOTEMP",
+        "AGE0004", "AGE0519", "AGE2044", "AGE4564", "AGE65P",
+        "RETEMPN", "FPSEMPN", "HEREMPN", "AGREMPN", "MWTEMPN", "OTHEMPN",
+        "HSENROLL", "COLLFTE", "COLLPTE"
     ]
-    landuse = taz_landuse[landuse_cols]
-    landuse_path = os.path.join(year_dir, f"TAZ1454_{year}_Land Use.csv")
-    landuse.to_csv(landuse_path, index=False, quotechar='"')
-    logging.info(f"Wrote {landuse_path}")
-
-    # 4) --- District summary for 2015 (from PBA2015 sheet) ---
-    pba = pd.read_excel(
-        os.path.expandvars(PATHS['pba_taz_2015']),
-        sheet_name="census2015",
-        dtype=str
+    existing_base = [c for c in summary_cols if c in PBA_base.columns]
+    df_base_summary = (
+        PBA_base.groupby("DISTRICT", as_index=False)[existing_base]
+                  .sum()
+                  .assign(
+                      gqpop=lambda d: (
+                          d["TOTPOP"].astype(float) - d["HHPOP"].astype('float')
+                      )
+                  )
     )
-    num_vars = [
-        'TOTHH','HHPOP','TOTPOP','EMPRES','SFDU','MFDU',
-        'HHINCQ1','HHINCQ2','HHINCQ3','HHINCQ4','TOTEMP',
-        'AGE0004','AGE0519','AGE2044','AGE4564','AGE65P',
-        'RETEMPN','FPSEMPN','HEREMPN','AGREMPN','MWTEMPN',
-        'OTHEMPN','HSENROLL','COLLFTE','COLLPTE'
+    os.makedirs(str(baseline_year), exist_ok=True)
+    base_path = os.path.join(
+        str(baseline_year), f"TAZ1454 {baseline_year} District Summary.csv"
+    )
+    df_base_summary.to_csv(base_path, index=False, quoting=1)
+    print(f"Wrote {base_path}")
+
+    # c) Target-year district summary from joined frame
+    existing_target = [c for c in summary_cols if c in taz_joined.columns]
+    df_target_summary = (
+        taz_joined.groupby("DISTRICT", as_index=False)[existing_target]
+                  .sum()
+                  .assign(
+                      gqpop=lambda d: (
+                          d["TOTPOP"].astype(int) - d["HHPOP"].astype(int)
+                      )
+                  )
+    )
+    os.makedirs(str(target_year), exist_ok=True)
+    target_path = os.path.join(
+        str(target_year), f"TAZ1454 {target_year} District Summary.csv"
+    )
+    df_target_summary.to_csv(target_path, index=False, quoting=1)
+    print(f"Wrote {target_path}")
+
+    # d) Land-use CSV (target year)
+    landuse_cols = ["ZONE"] + joiner_cols + ["TOTHH", "HHPOP", "TOTPOP", "EMPRES", "SHPOP62P"]
+    landuse_existing = [c for c in landuse_cols if c in taz_joined.columns]
+    df_landuse = taz_joined[landuse_existing].copy()
+    df_landuse["hhlds"] = df_landuse["TOTHH"]
+    landuse_path = os.path.join(
+        str(target_year), f"TAZ1454 {target_year} Land Use.csv"
+    )
+    df_landuse.to_csv(landuse_path, index=False, quoting=1)
+    print(f"Wrote {landuse_path}")
+
+    # e) Popsim variables (TAZ, region, county)
+    pops_vars = [
+        "TAZ", "TOTHH", "TOTPOP", "hh_own", "hh_rent", "hh_size_1",
+        "hh_size_2", "hh_size_3", "hh_size_4_plus", "hh_wrks_0",
+        "hh_wrks_1", "hh_wrks_2", "hh_wrks_3_plus", "hh_kids_no",
+        "hh_kids_yes", "HHINCQ1", "HHINCQ2", "HHINCQ3", "HHINCQ4",
+        "AGE0004", "AGE0519", "AGE2044", "AGE4564", "AGE65P",
+        "gqpop", "gq_type_univ", "gq_type_mil", "gq_type_othnon"
     ]
-    for v in num_vars:
-        pba[v] = pd.to_numeric(pba[v], errors='coerce').fillna(0)
-    pba['gqpop'] = pba['TOTPOP'] - pba['HHPOP']
-    summary_2015 = (
-        pba
-        .groupby('DISTRICT', as_index=False)[ num_vars + ['TOTPOP','gqpop'] ]
-        .sum()
+    df_popsim = (
+        taz_joined.rename(columns={"ZONE": "TAZ", "gqpop": "gq_tot_pop"})
+                  .loc[:, [c for c in pops_vars if c in taz_joined.columns]]
     )
-    path_2015 = os.path.join(year_dir, f"TAZ1454_2015_District Summary.csv")
-    summary_2015.to_csv(path_2015, index=False, quotechar='"')
-    logging.info(f"Wrote {path_2015}")
-
-    # 5) --- District summary for target year ---
-    # re‐use our taz_landuse table as the “census” base
-    df = taz_landuse.copy()
-    for v in num_vars + ['gqpop']:
-        df[v] = pd.to_numeric(df[v], errors='coerce').fillna(0)
-    summary_year = (
-        df
-        .groupby('DISTRICT', as_index=False)[ num_vars + ['TOTPOP','gqpop'] ]
-        .sum()
+    pops_path = os.path.join(
+        str(target_year), f"TAZ1454 {target_year} Popsim Vars.csv"
     )
-    path_year = os.path.join(year_dir, f"TAZ1454_{year}_District Summary.csv")
-    summary_year.to_csv(path_year, index=False, quotechar='"')
-    logging.info(f"Wrote {path_year}")
+    df_popsim.to_csv(pops_path, index=False, quoting=1)
+    print(f"Wrote {pops_path}")
 
-    # 6) --- Popsim Vars ---
-    pops = taz.rename(columns={'TAZ1454':'TAZ','gqpop':'gq_tot_pop'})[[
-        'TAZ','TOTHH','TOTPOP','hh_own','hh_rent',
-        'hh_size_1','hh_size_2','hh_size_3','hh_size_4_plus',
-        'hh_wrks_0','hh_wrks_1','hh_wrks_2','hh_wrks_3_plus',
-        'hh_kids_no','hh_kids_yes',
-        'HHINCQ1','HHINCQ2','HHINCQ3','HHINCQ4',
-        'AGE0004','AGE0519','AGE2044','AGE4564','AGE65P',
-        'gq_tot_pop','gq_type_univ','gq_type_mil','gq_type_othnon'
-    ]]
-    pops_path = os.path.join(year_dir, f"TAZ1454_{year}_Popsim Vars.csv")
-    pops.to_csv(pops_path, index=False, quotechar='"')
-    logging.info(f"Wrote {pops_path}")
-
-    # 7) --- Region‐level Popsim Vars ---
-    region = pops.copy()
-    region['REGION'] = 1
-    region_sum = region.groupby('REGION', as_index=False)[ 'gq_tot_pop' ].sum()
-    region_path = os.path.join(year_dir, f"TAZ1454_{year}_Popsim Vars Region.csv")
-    region_sum.rename(columns={'gq_tot_pop':'gq_num_hh_region'}) \
-              .to_csv(region_path, index=False, quotechar='"')
-    logging.info(f"Wrote {region_path}")
-
-    # 8) --- County‐level Popsim Vars ---
-    county_pop = pops.rename(columns={'TAZ':'ignored'}) \
-        .groupby('COUNTY', as_index=False).agg({
-            'gq_type_univ':'sum','gq_type_mil':'sum','gq_type_othnon':'sum'
-        })
-    # you can expand with any other pers_occ_... sums here
-    county_path = os.path.join(year_dir, f"TAZ1454_{year}_Popsim Vars County.csv")
-    county_pop.to_csv(county_path, index=False, quotechar='"')
-    logging.info(f"Wrote {county_path}")
-
-    # 9) --- Tableau‐friendly long for 2015 ---
-    # we'll need your TAZ→SD→County_Name→DISTRICT_NAME crosswalk
-    xw = pd.read_csv(os.path.expandvars(PATHS['taz_sd_county_csv']), dtype=str)
-    xw = xw.rename(columns=lambda c: c.strip()).loc[:, ['ZONE','County_Name','DISTRICT_NAME']]
-    pba_long = (
-        pba
-        .assign(gqpop=lambda df: df['TOTPOP'] - df['HHPOP'], Year=2015)
-        .merge(xw, on='ZONE', how='left')
-        .melt(
-            id_vars=['ZONE','DISTRICT','DISTRICT_NAME','COUNTY','County_Name','Year'],
-            value_vars=num_vars + ['SHPOP62P','TOTEMP','AGE0004','AGE0519','AGE2044','AGE4564','AGE65P','RETEMPN','FPSEMPN','HEREMPN','AGREMPN','MWTEMPN','OTHEMPN','PRKCST','OPRKCST','HSENROLL','COLLFTE','COLLPTE','gqpop'],
-            var_name='Variable',
-            value_name='Value'
-        )
+    # region
+    df_region = (
+        df_popsim.assign(REGION=1)
+                 .groupby("REGION", as_index=False)["gq_tot_pop"]
+                 .sum()
+                 .rename(columns={"gq_tot_pop": "gq_num_hh_region"})
     )
-    long15_path = os.path.join(year_dir, f"TAZ1454_2015_long.csv")
-    pba_long.to_csv(long15_path, index=False, quotechar='"')
-    logging.info(f"Wrote {long15_path}")
-
-    # 10) --- Tableau‐friendly long for target year ---
-    census_long = (
-        taz
-        .assign(Year=year)
-        .melt(
-            id_vars=['TAZ1454','DISTRICT','DISTRICT_NAME','COUNTY','County_Name','Year'],
-            value_vars=num_vars + ['SHPOP62P','TOTEMP','AGE0004','AGE0519','AGE2044','AGE4564','AGE65P','RETEMPN','FPSEMPN','HEREMPN','AGREMPN','MWTEMPN','OTHEMPN','PRKCST','OPRKCST','HSENROLL','COLLFTE','COLLPTE','gqpop'],
-            var_name='Variable',
-            value_name='Value'
-        )
+    region_path = os.path.join(
+        str(target_year), f"TAZ1454 {target_year} Popsim Vars Region.csv"
     )
-    longyr_path = os.path.join(year_dir, f"TAZ1454_{year}_long.csv")
-    census_long.to_csv(longyr_path, index=False, quotechar='"')
-    logging.info(f"Wrote {longyr_path}")
+    df_region.to_csv(region_path, index=False, quoting=1)
+    print(f"Wrote {region_path}")
 
-""" 
-    if __name__ == '__main__':
-        logging.basicConfig(level=logging.INFO)
-        # Assume `taz` DataFrame is provided (e.g., from previous pipeline)
-        taz = pd.DataFrame()
-        year = CONSTANTS['years'][0]
-        df = step13_join_pba2015(taz)
-        step14_write_outputs(df, year)
-        print('Finalize pipeline executed') """
+    # f) County popsims
+    occ_cols = [
+        "pers_occ_management", "pers_occ_professional", "pers_occ_services",
+        "pers_occ_retail", "pers_occ_manual", "pers_occ_military"
+    ]
+    df_county = (
+        taz_joined.groupby("COUNTY", as_index=False)
+                  [[c for c in occ_cols if c in taz_joined.columns]]
+                  .sum()
+    )
+    county_path = os.path.join(
+        str(target_year), f"TAZ1454 {target_year} Popsim Vars County.csv"
+    )
+    df_county.to_csv(county_path, index=False, quoting=1)
+    print(f"Wrote {county_path}")
+
+    # g) Long-format outputs (baseline & target)
+    taz_sd = pd.read_csv(taz_sd_county_csv)
+    id_vars = ["ZONE", "DISTRICT", "DISTRICT_NAME", "COUNTY", "County_Name"]
+
+    base_value_vars = [c for c in summary_cols + ["gqpop"] if c in PBA_base.columns]
+    df_base_long = (
+        PBA_base.assign(Year=baseline_year,
+                        gqpop=lambda d: d["TOTPOP"].astype(int) - d["HHPOP"].astype(int))
+                 .merge(taz_sd[["ZONE", "County_Name", "DISTRICT_NAME"]],
+                        on="ZONE", how="left")
+                 .melt(id_vars=id_vars + ["Year"],
+                       value_vars=base_value_vars,
+                       var_name="Variable",
+                       value_name="Value")
+    )
+    base_long_path = os.path.join(
+        str(baseline_year), f"TAZ1454_{baseline_year}_long.csv"
+    )
+    df_base_long.to_csv(base_long_path, index=False, quoting=1)
+    print(f"Wrote {base_long_path}")
+
+    target_value_vars = [c for c in summary_cols + ["gqpop"] if c in taz_joined.columns]
+    df_target_long = (
+        taz_joined.assign(Year=target_year)
+                  .melt(id_vars=id_vars + ["Year"],
+                        value_vars=target_value_vars,
+                        var_name="Variable",
+                        value_name="Value")
+    )
+    target_long_path = os.path.join(
+        str(target_year), f"TAZ1454_{target_year}_long.csv"
+    )
+    df_target_long.to_csv(target_long_path, index=False, quoting=1)
+    print(f"Wrote {target_long_path}")
