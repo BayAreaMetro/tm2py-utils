@@ -12,3 +12,4 @@ lubridate
 ggrepel
 plotly
 htmlwidgets
+htmltools

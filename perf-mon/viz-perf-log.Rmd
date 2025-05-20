@@ -138,6 +138,11 @@ perf      <- perf %>% filter(Timestamp <= cutoff_ts)
 message("PerfMon data filtered through ", cutoff_ts)
 ```
 
+```{r}
+write.csv(perf, 'perf_mon_out.csv')
+write.csv(model_events, 'model_events.csv')
+```
+
 # Faceted Plot of Metrics with Event Labels
 
 # Individual Interactive Charts with Significant Event Annotations
@@ -175,14 +180,28 @@ max_ts     <- max(high_cpu$Timestamp)
 # 2) Define metric priority order
 # ------------------------------------------------------------------------------
 priority <- c(
+  # CPU
   "% Processor Time",
   "% Privileged Time",
   "% DPC Time",
   "% Interrupt Time",
+
+  # System
   "Processor Queue Length",
   "Context Switches/sec",
+
+  # Memory
+  "% Committed Bytes In Use",
   "Available MBytes",
+  "Pages/sec",
+
+  # Disk
   "% Disk Time",
+  "Avg. Disk sec/Read",
+  "Avg. Disk sec/Write",
+  "Current Disk Queue Length",
+
+  # Network
   "Bytes Total/sec"
 )
 metrics <- c(
