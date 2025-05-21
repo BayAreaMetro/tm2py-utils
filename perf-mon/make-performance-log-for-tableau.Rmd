@@ -1,0 +1,107 @@
+---
+title: "Make Performance Log for Tableau"
+output: html_notebook
+---
+
+# Overhead
+```{r overhead, include = FALSE}
+packages_vector <- c("tidyverse")
+need_to_install <- packages_vector[!(packages_vector %in% installed.packages()[,"Package"])]
+
+if (length(need_to_install)) install.packages(need_to_install)
+
+for (package in packages_vector) {
+  library(package, character.only = TRUE)
+}
+
+```
+
+# Remote I/O
+```{r remote-io}
+model_events_file <- "./model_events.csv"
+cpu_perform_file <- "./perfmon.csv"
+
+output_file <- "./performance-log-for-tableau.csv"
+```
+
+# Data Reads
+```{r data-reads}
+model_df <- read_csv(model_events_file, 
+                     col_names = c("index", "timestamp", "level", "message"),
+                     col_types = cols(
+                       index = col_double(),
+                       timestamp = col_datetime(format = ""),
+                       level = col_character(),
+                       message = col_character()),
+                     skip = 1L)
+
+cpu_df <- read_csv(cpu_perform_file, 
+                   col_names = c("timestamp",
+                                 "committed_bytes_in_use",
+                                 "available_mbytes",
+                                 "pages_per_sec",
+                                 "network_bytes_per_sec",
+                                 "avg_disk_read_per_sec",
+                                 "avg_disk_write_per_sec",
+                                 "disk_queue_length",
+                                 "percent_processor_time",
+                                 "context_switches_per_sec",
+                                 "processor_queue_length"),
+                   col_types = cols(
+                     timestamp = col_character(),
+                     committed_bytes_in_use = col_double(),
+                     available_mbytes = col_double(),
+                     pages_per_sec = col_double(),
+                     network_bytes_per_sec = col_double(),
+                     avg_disk_read_per_sec = col_double(),
+                     avg_disk_write_per_sec = col_double(),
+                     disk_queue_length = col_double(),
+                     percent_processor_time = col_double(),
+                     context_switches_per_sec = col_double(),
+                     processor_queue_length = col_double()),
+                   skip = 1L)
+
+```
+
+# Reductions
+```{r reductions}
+model_join_df <- model_df %>%
+  mutate(iteration = if_else(str_detect(message, "Start iteration"), str_replace(message, "Start iteration ", ""), as.character(NA))) %>%
+  fill(iteration) %>%
+  mutate(iteration = as.integer(iteration)) %>%
+  mutate(model_step_duration = timestamp - lag(timestamp)) %>%
+  select(index, iteration, model_step_duration)
+
+working_df <- cpu_df %>%
+  mutate(timestamp = mdy_hms(timestamp)) %>%
+  mutate(cpu_index = row_number()) %>%
+  mutate(seconds_since_start = timestamp - first(timestamp)) %>%
+  mutate(duration_in_seconds = timestamp - lag(timestamp)) %>%
+  mutate(mbytes_used = max(cpu_df$available_mbytes) - available_mbytes)
+
+join_df <- working_df %>%
+  cross_join(., select(model_df, model_index = index, time = timestamp)) %>%
+  filter(timestamp <= time) %>%
+  group_by(cpu_index) %>%
+  summarise(index = min(model_index), .groups = "drop")
+
+output_df <- working_df %>%
+  left_join(., join_df, by = c("cpu_index")) %>%
+  left_join(., select(model_df, index, level, message), by = c("index")) %>%
+  left_join(., model_join_df, by = c("index")) %>%
+  rename(model_index = index) %>%
+  group_by(model_index) %>%
+  mutate(model_step_max_memory = max(mbytes_used),
+         model_step_max_cpu = max(percent_processor_time)) %>%
+  ungroup() %>%
+  arrange(seconds_since_start)
+  
+
+```
+
+# Writes
+```{r writes}
+write_csv(output_df, output_file)
+
+```
+
