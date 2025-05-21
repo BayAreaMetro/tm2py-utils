@@ -1,13 +1,15 @@
 #%%
 import zipfile
-from itertools import chain
+from itertools import chain, pairwise
 from pathlib import Path
 import argparse
 import py7zr
 from tqdm import tqdm
+import subprocess
+
 #%%
 
-def archive(model_run_dir: Path | str, archive_dir: Path | str):
+def archive(model_run_dir: Path | str, archive_dir: Path | str, CHUNK_SIZE: int = 100):
 
     if isinstance(model_run_dir, str):
         model_run_dir = Path(model_run_dir)
@@ -48,22 +50,52 @@ def archive(model_run_dir: Path | str, archive_dir: Path | str):
             not file_to_archive.is_dir()
         )
     ]
+    files_to_archive = [file.relative_to(model_run_dir) for file in files_to_archive]
     
-    archive_items = {
-        str(file.relative_to(model_run_dir)): str(file)
-        for file in files_to_archive
-    }
-
     # Create the .7z archive
     # with py7zr.SevenZipFile(archive_dir, 'w') as archive:
     #     archive.write(archive_items)
-    with py7zr.SevenZipFile(archive_dir, mode='w') as archive:
-        for file in tqdm(files_to_archive):
-            print(file)
-            arcname = file.relative_to(model_run_dir)
-            archive.write(file, arcname)
+    # with py7zr.SevenZipFile(archive_dir, mode='w') as archive:
+    #     for file in tqdm(files_to_archive):
+    #         print(file)
+    #         arcname = file.relative_to(model_run_dir)
+    #         archive.write(file, arcname)
+
+    # using python bindings is slower, we may be are better off just using 7z.exe
+    for start, end in tqdm(
+        list(
+            pairwise(
+                chain(
+                    range(0, len(files_to_archive), CHUNK_SIZE), 
+                    [len(files_to_archive)]
+                )
+            )
+        )
+    ):
+        cmd = [r"C:\Users\USLP095001\code\MTC\tm2py-utils\bin\7z.exe", "a", str(archive_dir)] + files_to_archive[start:end]
+
+        process = subprocess.Popen(
+            cmd,
+            cwd=model_run_dir,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1
+        )
+
+        # Print or parse output line-by-line
+        for line in process.stdout:
+            print(line.strip())  # Could add parsing logic for progress indication
+
+        process.wait()
+
+        if process.returncode != 0:
+            raise RuntimeError("7z command failed.")
 
 
+
+def parse_cli_archive(args):
+    archive(args.model_directory, args.archive_directory)
 
 def main():
     parser = argparse.ArgumentParser(description="Archive utility")
