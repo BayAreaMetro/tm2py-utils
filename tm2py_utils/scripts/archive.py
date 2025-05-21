@@ -1,21 +1,29 @@
 #%%
-import zipfile
 from itertools import chain, pairwise
 from pathlib import Path
 import argparse
 import py7zr
 from tqdm import tqdm
+from datetime import datetime
 import subprocess
 
 #%%
 
-def archive(model_run_dir: Path | str, archive_dir: Path | str, CHUNK_SIZE: int = 100):
+def archive(model_run_dir: Path | str, archive_dir: Path | str, name: str="", CHUNK_SIZE: int = 100):
 
     if isinstance(model_run_dir, str):
         model_run_dir = Path(model_run_dir)
 
     if isinstance(archive_dir, str):
         archive_dir = Path(archive_dir)
+    
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    if len(name) > 0:
+        archive_name = f"{timestamp}_{name}"
+    else:
+        archive_name = f"{timestamp}"
+    
+    archive_path = archive_dir / f"{archive_name}.7z"
 
     
     # for now we want to start by including everything in the directory
@@ -55,9 +63,8 @@ def archive(model_run_dir: Path | str, archive_dir: Path | str, CHUNK_SIZE: int 
     # Create the .7z archive
     # with py7zr.SevenZipFile(archive_dir, 'w') as archive:
     #     archive.write(archive_items)
-    # with py7zr.SevenZipFile(archive_dir, mode='w') as archive:
+    # with py7zr.SevenZipFile(archive_path, mode='w') as archive:
     #     for file in tqdm(files_to_archive):
-    #         print(file)
     #         arcname = file.relative_to(model_run_dir)
     #         archive.write(file, arcname)
 
@@ -72,7 +79,7 @@ def archive(model_run_dir: Path | str, archive_dir: Path | str, CHUNK_SIZE: int 
             )
         )
     ):
-        cmd = [r"C:\Users\USLP095001\code\MTC\tm2py-utils\bin\7z.exe", "a", str(archive_dir)] + files_to_archive[start:end]
+        cmd = [r"C:\Users\USLP095001\code\MTC\tm2py-utils\bin\7z.exe", "a", str(archive_path)] + files_to_archive[start:end]
 
         process = subprocess.Popen(
             cmd,
@@ -92,10 +99,16 @@ def archive(model_run_dir: Path | str, archive_dir: Path | str, CHUNK_SIZE: int 
         if process.returncode != 0:
             raise RuntimeError("7z command failed.")
 
+    print("Successfully Archived Model Run")
+    with open(model_run_dir / "ARCHIVED.txt", "w") as file:
+        # Write some text to the file
+        file.write(f"This model run {archive_name} has been archived into:\n")
+        file.write(f"{str(archive_path)}")
+
 
 
 def parse_cli_archive(args):
-    archive(args.model_directory, args.archive_directory)
+    archive(args.model_directory, args.archive_directory, args.name)
 
 def main():
     parser = argparse.ArgumentParser(description="Archive utility")
