@@ -51,6 +51,7 @@ pip install -e .
 ## Examples / Features
 if the package was installed correctly you should be able to run the below
 ### Acceptance Criteria
+Generate files related to acceptance criteria
 ```python
 from tm2py_utils.acceptance.canonical import Canonical
 from tm2py_utils.acceptance.observed import Observed
@@ -73,4 +74,28 @@ s = Simulated(canonical=c, scenario_file=scenario_config_file, model_file=model_
 a = Acceptance(canonical=c, simulated=s, observed=o, output_file_root=output_folder_root)
 
 a.make_acceptance(make_transit=True, make_roadway=True, make_other=True)
+```
+
+### Archive model run
+Archive important Files of a specific model run into an archive directory.
+
+assuming your environment is active, you can ensure this by running:
+```cmd
+\path\to\venv\Scripts\activate
+```
+
+A model run can then be archived using:
+```cmd
+tm2py-utils archive path\to\model\run path\to\model\run
+```
+or
+
+```cmd
+tm2py-utils archive path\to\model\run path\to\model\run -n "run name"
+```
+
+Alternatively python script can be used
+```python
+from tm2py_utils.scripts.archive import parse_cli_archive
+parse_cli_archive(r"model\run\directory", r"archive\run\directory")
 ```
