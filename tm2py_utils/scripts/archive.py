@@ -10,13 +10,22 @@ import subprocess
 #%%
 
 def archive(model_run_dir: Path | str, archive_dir: Path | str, name: str="", CHUNK_SIZE: int = 100):
+    """
+    archive a model run by compressing a certain outputs of a model run and storing them in the archive folder
+    """
 
+    # Coerce Types
     if isinstance(model_run_dir, str):
         model_run_dir = Path(model_run_dir)
 
     if isinstance(archive_dir, str):
         archive_dir = Path(archive_dir)
+
+    # Get 7zip exe path, if you cant run this exe, you might be able to run another 
+    seven_zip_path = (Path(__file__).parent.parent / "bin" / "7z.exe").resolve()
+    assert seven_zip_path.exists(), f"expected to fine {seven_zip_path} but did not exist"
     
+    # Get Name of the Archive File
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     if len(name) > 0:
         archive_name = f"{timestamp}_{name}"
@@ -26,7 +35,7 @@ def archive(model_run_dir: Path | str, archive_dir: Path | str, name: str="", CH
     archive_path = archive_dir / f"{archive_name}.7z"
 
     
-    # for now we want to start by including everything in the directory
+    # Here we create all the subdirectories we explicitly want to include 
     files_in_included_directories = list(
         chain(
             model_run_dir.glob("acceptance/**/*"), 
@@ -40,14 +49,14 @@ def archive(model_run_dir: Path | str, archive_dir: Path | str, name: str="", CH
         )
     )
     
-    # we want to exclude these files because they are too large
+    # list of directories we want to exclude
     excluded_sub_directories = list(
         chain(
             model_run_dir.glob("emme_project/*/emmemat"), 
         )
     )
 
-    # exclude everything that isnt a file or a directory
+    # exclude everything that that is'nt a file, and is in an excluded sub directory 
     files_to_archive = [file_to_archive.resolve() for file_to_archive in files_in_included_directories
         if (
             not any(
@@ -60,15 +69,7 @@ def archive(model_run_dir: Path | str, archive_dir: Path | str, name: str="", CH
     ]
     files_to_archive = [file.relative_to(model_run_dir) for file in files_to_archive]
     
-    # Create the .7z archive
-    # with py7zr.SevenZipFile(archive_dir, 'w') as archive:
-    #     archive.write(archive_items)
-    # with py7zr.SevenZipFile(archive_path, mode='w') as archive:
-    #     for file in tqdm(files_to_archive):
-    #         arcname = file.relative_to(model_run_dir)
-    #         archive.write(file, arcname)
-
-    # using python bindings is slower, we may be are better off just using 7z.exe
+    # using python bindings (above) is slower, we may be are better off just using 7z.exe
     for start, end in tqdm(
         list(
             pairwise(
@@ -79,7 +80,8 @@ def archive(model_run_dir: Path | str, archive_dir: Path | str, name: str="", CH
             )
         )
     ):
-        cmd = [r"C:\Users\USLP095001\code\MTC\tm2py-utils\bin\7z.exe", "a", str(archive_path)] + files_to_archive[start:end]
+        # zip a chunk size 
+        cmd = [seven_zip_path, "a", str(archive_path)] + files_to_archive[start:end]
 
         process = subprocess.Popen(
             cmd,
@@ -99,11 +101,11 @@ def archive(model_run_dir: Path | str, archive_dir: Path | str, name: str="", CH
         if process.returncode != 0:
             raise RuntimeError("7z command failed.")
 
-    print("Successfully Archived Model Run")
+    # Success we want to mark the current directory as archived
     with open(model_run_dir / "ARCHIVED.txt", "w") as file:
-        # Write some text to the file
         file.write(f"This model run {archive_name} has been archived into:\n")
         file.write(f"{str(archive_path)}")
+    print("Successfully Archived Model Run")
 
 
 
