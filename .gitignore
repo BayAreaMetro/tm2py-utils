@@ -2,4 +2,3 @@ __pycache__/
 *.pyc
 *.py[cod]
 *.egg-info/
-tm2py_utils/acceptance/__pycache__/simulated.cpython-311.pyc
