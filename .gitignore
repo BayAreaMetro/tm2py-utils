@@ -2,3 +2,10 @@ __pycache__/
 *.pyc
 *.py[cod]
 *.egg-info/
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.dll
+*.exe
+

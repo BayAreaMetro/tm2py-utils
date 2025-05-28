@@ -1,0 +1,39 @@
+﻿=== TM2 Performance Monitor Script Instructions ===
+
+2. Starting the Monitor
+   a. Open PowerShell **as Administrator**.
+   b. Change to the script directory:
+        cd C:\Scripts
+   c. Run:
+        powershell.exe -ExecutionPolicy Bypass -File .\Setup-TravelModelMonitor.ps1 -StartImmediately
+   d. You should see confirmation in the console. A new .blg (binary log) and .csv will be created
+      in the output folder defined inside the script (by default: C:\PerfLogs\TM2-A).
+
+3. Stopping the Monitor
+   a. When you’re ready to stop (after your model run finishes), open PowerShell **as Administrator** again.
+   b. Navigate to the same folder:
+        cd C:\Scripts
+   c. Run:
+        powershell.exe -ExecutionPolicy Bypass -File .\Setup-TravelModelMonitor.ps1 -Stop
+   d. You’ll get a “stopped” message and the final .blg/.csv will be flushed to disk.
+
+4. Viewing & Exporting Reports
+   a. Launch **Performance Monitor** (perfmon.exe).
+   b. Go to **File → Open…** and select the .blg file (e.g. C:\PerfLogs\TM2-A\DataCollector01.blg).
+   c. To export CSV or HTML:
+      - In PerfMon’s Action menu pick **Data → Export List…** (or use the toolbar).
+      - Choose CSV or HTML and save it for sharing.
+
+5. Real-time Inspection
+   • You can open the .blg while it’s still writing; PerfMon will append new samples live.
+   • Just repeat the “Open…” steps above and it will stream incoming data.
+
+6. Tips
+   • Always run PowerShell as Administrator or you’ll get permission errors.
+   • If you don’t see output in C:\PerfLogs\TM2-A, check the script’s `$OutputPath` variable.
+   • Rename old logs or move them to archive to avoid overwriting.
+     ```
+
+— Copy all of the above into a .txt file (e.g. “PerfMon-Instructions.txt”) and keep it handy for every model run. —
+
+
