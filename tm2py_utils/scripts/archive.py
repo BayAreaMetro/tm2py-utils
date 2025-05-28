@@ -13,14 +13,13 @@ def archive(model_run_dir: Path | str, archive_dir: Path | str, name: str="", CH
     """
     archive a model run by compressing a certain outputs of a model run and storing them in the archive folder
     """
-
     # Coerce Types
     if isinstance(model_run_dir, str):
-        model_run_dir = Path(model_run_dir)
+        model_run_dir = Path(model_run_dir).resolve()
 
     if isinstance(archive_dir, str):
-        archive_dir = Path(archive_dir)
-
+        archive_dir = Path(archive_dir).resolve()
+    
     # Get 7zip exe path, if you cant run this exe, you might be able to run another 
     seven_zip_path = (Path(__file__).parent.parent / "bin" / "7z.exe").resolve()
     assert seven_zip_path.exists(), f"expected to fine {seven_zip_path} but did not exist"
