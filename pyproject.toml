@@ -5,6 +5,7 @@ description = "Your project description"
 authors = [
   { name = "WSP", email = "example@example.com" }
 ]
+
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -14,6 +15,7 @@ dependencies = [
   "requests",
   "scipy",
   "openmatrix",
+  "tqdm",
 ]
 
 [build-system]
@@ -22,3 +24,12 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["."]
+
+[tool.setuptools.package-data]
+"tm2py_utils" = ["bin/7z.exe", "bin/7z.dll"]
+
+[tool.setuptools]
+include-package-data = true
+
+[project.scripts]
+  tm2py-utils = "tm2py_utils.cli:main"
