@@ -1,0 +1,187 @@
+15-May-2025 (14:31:13)   INFO: Start iteration 0
+15-May-2025 (14:31:13)   INFO: Start Create highway time of day scenarios.
+15-May-2025 (14:36:31)   INFO:   Start Copy base to period scenarios and set per-period attributes
+15-May-2025 (14:36:57)   INFO:   End Copy base to period scenarios and set per-period attributes
+15-May-2025 (14:36:57)   INFO: End Create highway time of day scenarios.
+15-May-2025 (14:36:57)   INFO: Start Create transit time of day scenarios.
+15-May-2025 (14:36:57) STATUS:   Start prepare base scenario
+15-May-2025 (14:43:18) STATUS:   End prepare base scenario
+15-May-2025 (14:43:18)   INFO:   Start Copy base to period scenarios and set per-period attributes
+15-May-2025 (14:44:00)   INFO:   End Copy base to period scenarios and set per-period attributes
+15-May-2025 (14:44:00) STATUS:   Start remove transit lines from other periods
+15-May-2025 (14:44:00) STATUS:     Start period EA
+15-May-2025 (14:46:07) STATUS:     End period EA
+15-May-2025 (14:46:07) STATUS:     Start period AM
+15-May-2025 (14:48:21) STATUS:     End period AM
+15-May-2025 (14:48:21) STATUS:     Start period MD
+15-May-2025 (14:50:44) STATUS:     End period MD
+15-May-2025 (14:50:44) STATUS:     Start period PM
+15-May-2025 (14:53:08) STATUS:     End period PM
+15-May-2025 (14:53:08) STATUS:     Start period EV
+15-May-2025 (14:55:37) STATUS:     End period EV
+15-May-2025 (14:55:37) STATUS:   End remove transit lines from other periods
+15-May-2025 (14:55:37)   INFO: End Create transit time of day scenarios.
+15-May-2025 (14:55:37)   INFO: Start active mode skim
+15-May-2025 (14:55:37)   INFO:   Start Active modes shortest path skims emme_project\Database_active_south\emmebank
+15-May-2025 (15:35:31)   INFO:   End Active modes shortest path skims emme_project\Database_active_south\emmebank
+15-May-2025 (15:35:31)   INFO:   Start Active modes shortest path skims emme_project\Database_active_north\emmebank
+15-May-2025 (15:40:07)   INFO:   End Active modes shortest path skims emme_project\Database_active_north\emmebank
+15-May-2025 (15:40:07)   INFO: End active mode skim
+15-May-2025 (15:40:07)   INFO: Start AirPassenger run
+15-May-2025 (15:40:22)   INFO: End AirPassenger run
+15-May-2025 (15:40:22)   INFO: Start Prepare network attributes and modes
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328188-328206
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328192-328219
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328193-328268
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328199-328211
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328201-328151
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328203-328216
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328204-328246
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328208-328290
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328209-328169
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328211-328186
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328212-328264
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328216-328222
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328217-328291
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328219-328281
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328222-328112
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328227-328212
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328228-328283
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328232-328164
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328236-328201
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328241-328217
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328244-328181
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328246-328236
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328249-328183
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328254-328130
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328257-328128
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328262-328275
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328264-328204
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328267-328134
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328268-328254
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328269-328138
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328274-328145
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328275-328158
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328277-328269
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328281-328171
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328283-328156
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328287-328148
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 8002, link 328288-328178
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 3002, link 328289-328137
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 3002, link 328290-328267
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 3002, link 328291-328288
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 3002, link 328292-328203
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 3002, link 328293-328162
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 2002, link 328302-328315
+15-May-2025 (15:47:22)   WARN:   set tolls failed index lookup 4002, link 328488-326953
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328188-328206
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328192-328219
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328193-328268
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328199-328211
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328201-328151
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328203-328216
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328204-328246
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328208-328290
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328209-328169
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328211-328186
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328212-328264
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328216-328222
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328217-328291
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328219-328281
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328222-328112
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328227-328212
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328228-328283
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328232-328164
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328236-328201
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328241-328217
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328244-328181
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328246-328236
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328249-328183
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328254-328130
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328257-328128
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328262-328275
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328264-328204
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328267-328134
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328268-328254
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328269-328138
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328274-328145
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328275-328158
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328277-328269
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328281-328171
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328283-328156
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328287-328148
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 8002, link 328288-328178
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 3002, link 328289-328137
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 3002, link 328290-328267
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 3002, link 328291-328288
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 3002, link 328292-328203
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 3002, link 328293-328162
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 2002, link 328302-328315
+15-May-2025 (15:59:50)   WARN:   set tolls failed index lookup 4002, link 328488-326953
+15-May-2025 (16:11:37)   INFO: End Prepare network attributes and modes
+15-May-2025 (16:11:37) STATUS: Start Highway assignment and skims
+15-May-2025 (16:13:22) STATUS:   Start Highway assignment for period EA
+15-May-2025 (16:13:35)   INFO:     Start Run SOLA assignment without path analyses
+15-May-2025 (16:17:08)   INFO:     End Run SOLA assignment without path analyses
+15-May-2025 (16:17:16)   INFO:     Start Run SOLA assignment with path analyses
+15-May-2025 (16:27:45)   INFO:     End Run SOLA assignment with path analyses
+15-May-2025 (16:31:13) STATUS:   End Highway assignment for period EA
+15-May-2025 (16:31:13) STATUS:   Start Highway assignment for period AM
+15-May-2025 (16:31:24)   INFO:     Start Run SOLA assignment without path analyses
+15-May-2025 (16:40:00)   INFO:     End Run SOLA assignment without path analyses
+15-May-2025 (16:40:09)   INFO:     Start Run SOLA assignment with path analyses
+15-May-2025 (17:09:12)   INFO:     End Run SOLA assignment with path analyses
+15-May-2025 (17:12:53) STATUS:   End Highway assignment for period AM
+15-May-2025 (17:12:53) STATUS:   Start Highway assignment for period MD
+15-May-2025 (17:13:05)   INFO:     Start Run SOLA assignment without path analyses
+15-May-2025 (17:20:18)   INFO:     End Run SOLA assignment without path analyses
+15-May-2025 (17:20:26)   INFO:     Start Run SOLA assignment with path analyses
+15-May-2025 (17:44:06)   INFO:     End Run SOLA assignment with path analyses
+15-May-2025 (17:47:41) STATUS:   End Highway assignment for period MD
+15-May-2025 (17:47:41) STATUS:   Start Highway assignment for period PM
+15-May-2025 (17:47:52)   INFO:     Start Run SOLA assignment without path analyses
+15-May-2025 (18:03:56)   INFO:     End Run SOLA assignment without path analyses
+15-May-2025 (18:04:05)   INFO:     Start Run SOLA assignment with path analyses
+15-May-2025 (18:58:10)   INFO:     End Run SOLA assignment with path analyses
+15-May-2025 (19:01:53) STATUS:   End Highway assignment for period PM
+15-May-2025 (19:01:53) STATUS:   Start Highway assignment for period EV
+15-May-2025 (19:02:05)   INFO:     Start Run SOLA assignment without path analyses
+15-May-2025 (19:05:46)   INFO:     End Run SOLA assignment without path analyses
+15-May-2025 (19:05:55)   INFO:     Start Run SOLA assignment with path analyses
+15-May-2025 (19:16:23)   INFO:     End Run SOLA assignment with path analyses
+15-May-2025 (19:19:56) STATUS:   End Highway assignment for period EV
+15-May-2025 (19:19:56) STATUS: End Highway assignment and skims
+15-May-2025 (19:19:56)   INFO: Start SkimMAZCosts run
+15-May-2025 (19:30:45)   INFO: End SkimMAZCosts run
+15-May-2025 (19:30:45)   INFO: Start Prepare transit network attributes and update times from auto network.
+15-May-2025 (19:30:45) STATUS:   Start period EA
+15-May-2025 (19:39:29) STATUS:   End period EA
+15-May-2025 (19:39:29) STATUS:   Start period AM
+15-May-2025 (19:48:18) STATUS:   End period AM
+15-May-2025 (19:48:18) STATUS:   Start period MD
+15-May-2025 (19:57:45) STATUS:   End period MD
+15-May-2025 (19:57:45) STATUS:   Start period PM
+15-May-2025 (20:08:03) STATUS:   End period PM
+15-May-2025 (20:08:03) STATUS:   Start period EV
+15-May-2025 (20:16:55) STATUS:   End period EV
+15-May-2025 (20:17:00)   INFO: End Prepare transit network attributes and update times from auto network.
+15-May-2025 (20:17:00)   INFO: Start Transit assignments
+15-May-2025 (20:17:00)   INFO:   Start Prepare transit demand
+15-May-2025 (20:17:43)   INFO:   End Prepare transit demand
+15-May-2025 (20:25:50)   INFO:   Start Transit assignments for a time period
+15-May-2025 (20:58:29)   INFO:   End Transit assignments for a time period
+15-May-2025 (22:00:20)   INFO:   Start Transit assignments for a time period
+15-May-2025 (22:34:29)   INFO:   End Transit assignments for a time period
+15-May-2025 (23:39:07)   INFO:   Start Transit assignments for a time period
+16-May-2025 (00:13:11)   INFO:   End Transit assignments for a time period
+16-May-2025 (01:17:46)   INFO:   Start Transit assignments for a time period
+16-May-2025 (01:53:26)   INFO:   End Transit assignments for a time period
+16-May-2025 (02:58:29)   INFO:   Start Transit assignments for a time period
+16-May-2025 (03:32:06)   INFO:   End Transit assignments for a time period
+16-May-2025 (04:29:45)   INFO: End Transit assignments
+16-May-2025 (04:29:45)   INFO: Start Transit skims
+16-May-2025 (04:31:15) STATUS:   Start period transit skims
+16-May-2025 (10:20:28) STATUS:   End period transit skims
+16-May-2025 (10:20:28)   INFO: End Transit skims
+16-May-2025 (10:20:28)   INFO: Start iteration 1
+16-May-2025 (10:20:28)   INFO: Start HouseholdModel run
