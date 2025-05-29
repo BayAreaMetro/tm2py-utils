@@ -1,0 +1,443 @@
+---
+title: "Performance Monitor vs Model Run Analysis"
+author: "Suzanne Childress"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    highlight: tango
+    theme: default
+---
+This script takes in a model log file, a Performance Monitor log file, and outputs a  CSV file that can be used in Tableau to visualize the performance of a model run. Then it generates some facet plots in R Markdown that can be used to visualize the performance data, as well. It doesn't look as nice but it will run quickly if you just want to see something fast.
+
+
+This script expects you have two input  files the directory where this script is:
+1. A model log file: pattern = "^tm2py_run.*\\.log$"
+2. A Performance Monitor log file: pattern = "\\.blg$"
+If there's already some files like that in there from another run you can move it to old_logs.
+
+The script will convert the .blg file to a perfmon.csv file, read it in, and then parse the model log file. It will then align the data and write out one file for use in Tableau:
+perf_mon_out.csv
+This can then be read into Tableau.
+
+
+
+```{r setup, include=FALSE}
+# Global options
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  results = "asis"
+)
+
+# Set working directory to the folder containing this .Rmd file (works during knitting)
+knitr::opts_knit$set(root.dir = dirname(knitr::current_input()))
+
+# Load libraries
+library(data.table)
+library(tidyverse)    # includes ggplot2, dplyr, tidyr
+library(lubridate)
+library(stringr)
+library(grid)
+library(ggrepel)
+library(ggplot2)
+library(plotly)
+library(htmlwidgets)
+library(htmltools)
+
+# Optional: In RStudio only, also set working directory interactively
+if (requireNamespace("rstudioapi", quietly = TRUE) && rstudioapi::isAvailable()) {
+  try({
+    script_dir <- dirname(rstudioapi::getSourceEditorContext()$path)
+    setwd(script_dir)
+    message("Set working directory to script location (RStudio only)")
+  }, silent = TRUE)
+}
+```
+
+# Convert .blg to CSV
+
+```{r convert_blg, eval=FALSE, cache=TRUE}
+# Skip conversion if CSV already exists
+if (!file.exists("perfmon.csv")) {
+  blg_files <- list.files(pattern = "\\.blg$", full.names = TRUE)
+  blg_file  <- blg_files[which.max(file.info(blg_files)$mtime)]
+  message("Starting relog conversion for: ", blg_file)
+  system2(
+    "relog",
+    args = c(shQuote(blg_file), "-f", "CSV", "-o", "perfmon.csv"),
+    stdout = "", stderr = ""
+  )
+  if (!file.exists("perfmon.csv")) stop("perfmon.csv not created. Check relog call.")
+} else {
+  message("perfmon.csv already exists; skipping conversion.")
+}
+```
+
+# Read & Tidy Performance Monitor Data
+
+```{r read_perf}
+# Locate and read the CSV (skip first metadata line) using base R
+perf_file <- list.files(pattern = "^perfmon\\.csv$", full.names = TRUE)[1]
+perf_raw  <- read.csv(
+  perf_file,
+  sep          = ",",
+  skip         = 0,
+  header       = TRUE,
+  check.names  = FALSE,
+  comment.char = "",
+  stringsAsFactors = FALSE
+)
+
+perf_raw <- perf_raw %>%
+  filter(if_all(everything(), ~ !is.na(.) & . != ""))
+
+# Rename first column to "Timestamp" and parse full datetime
+names(perf_raw)[1] <- "Timestamp"
+perf_raw <- perf_raw %>%
+  mutate(
+    Timestamp = mdy_hms(Timestamp)  # parse "MM/DD/YYYY HH:MM:SS.fraction"
+  )
+
+# Simplify metric names: remove any path prefix up to last slash/backslash
+orig_names     <- names(perf_raw)
+simple_names   <- gsub(".*\\\\", "", orig_names)  # 
+names(perf_raw) <- simple_names
+
+# Pivot to long format and convert values
+perf <- perf_raw %>%
+  pivot_longer(
+    cols      = -Timestamp,
+    names_to  = "Metric",
+    values_to = "Value"
+  ) %>%
+  mutate(
+    Value = as.numeric(Value)
+  )%>%
+  select(Timestamp, Metric, Value)
+```
+
+# Read & Parse Model Run Log
+
+```{r read_model_logs}
+model_files <- list.files(pattern = "^tm2py_run.*\\.log$", full.names = TRUE)
+message("Found log files: ", paste(basename(model_files), collapse=", "))
+if (length(model_files) == 0) {
+  stop("No tm2py_run log files found in working directory: ", getwd())
+}
+model_log <- model_files[which.max(file.info(model_files)$mtime)]
+message("Using log file: ", basename(model_log))
+
+lines <- readLines(model_log)
+
+```
+
+```{r parse_model_logs}
+# Define pattern: captures Date, Time, Level, and Message
+datetime_str <- gsub("[()]", "", substr(lines, 1, 22))
+Timestamp    <- dmy_hms(datetime_str)
+
+# Extract Level and Message by splitting at first colon after timestamp
+# Remove the timestamp and any leading spaces
+rest <- substr(lines, 23, nchar(lines))
+# Level is before first ':'
+Level   <- str_trim(sub(":.*$", "", rest))
+# Message is after the first ':'
+Message <- str_trim(sub("^[^:]+:\\s*", "", rest))
+
+# Build events tibble
+model_events <- tibble(
+  Timestamp = Timestamp,
+  Level     = Level,
+  Message   = Message
+) %>%
+  filter(Level %in% c("INFO", "STATUS"))
+```
+# Align Data
+
+```{r align_data}
+# Filter PerfMon to last event timestamp
+cutoff_ts <- max(model_events$Timestamp)
+perf      <- perf %>% filter(Timestamp <= cutoff_ts)
+message("PerfMon data filtered through ", cutoff_ts)
+```
+
+```{r}
+write.csv(perf, 'perf_mon_out.csv')
+write.csv(model_events, 'model_events.csv')
+```
+# Write out to Tableau Friendly format
+## If we get time, we should streamline this writeout-read-in step. We probably don't need to write out the previous items.
+
+
+# Remote I/O
+```{r remote-io}
+model_events_file <- "./model_events.csv"
+cpu_perform_file <- "./perfmon.csv"
+
+output_file <- "./performance-log-for-tableau.csv"
+```
+
+# Data Reads
+```{r data-reads}
+model_df <- read_csv(model_events_file, 
+                     col_names = c("index", "timestamp", "level", "message"),
+                     col_types = cols(
+                       index = col_double(),
+                       timestamp = col_datetime(format = ""),
+                       level = col_character(),
+                       message = col_character()),
+                     skip = 1L)
+
+cpu_df <- read_csv(cpu_perform_file, 
+                   col_names = c("timestamp",
+                                 "committed_bytes_in_use",
+                                 "available_mbytes",
+                                 "pages_per_sec",
+                                 "network_bytes_per_sec",
+                                 "avg_disk_read_per_sec",
+                                 "avg_disk_write_per_sec",
+                                 "disk_queue_length",
+                                 "percent_processor_time",
+                                 "context_switches_per_sec",
+                                 "processor_queue_length"),
+                   col_types = cols(
+                     timestamp = col_character(),
+                     committed_bytes_in_use = col_double(),
+                     available_mbytes = col_double(),
+                     pages_per_sec = col_double(),
+                     network_bytes_per_sec = col_double(),
+                     avg_disk_read_per_sec = col_double(),
+                     avg_disk_write_per_sec = col_double(),
+                     disk_queue_length = col_double(),
+                     percent_processor_time = col_double(),
+                     context_switches_per_sec = col_double(),
+                     processor_queue_length = col_double()),
+                   skip = 1L)
+
+```
+
+# Reductions
+```{r reductions}
+model_join_df <- model_df %>%
+  mutate(iteration = if_else(str_detect(message, "Start iteration"), str_replace(message, "Start iteration ", ""), as.character(NA))) %>%
+  fill(iteration) %>%
+  mutate(iteration = as.integer(iteration)) %>%
+  mutate(model_step_duration = timestamp - lag(timestamp)) %>%
+  select(index, iteration, model_step_duration)
+
+working_df <- cpu_df %>%
+  mutate(timestamp = mdy_hms(timestamp)) %>%
+  mutate(cpu_index = row_number()) %>%
+  mutate(seconds_since_start = timestamp - first(timestamp)) %>%
+  mutate(duration_in_seconds = timestamp - lag(timestamp)) %>%
+  mutate(mbytes_used = max(cpu_df$available_mbytes) - available_mbytes)
+
+join_df <- working_df %>%
+  cross_join(., select(model_df, model_index = index, time = timestamp)) %>%
+  filter(timestamp <= time) %>%
+  group_by(cpu_index) %>%
+  summarise(index = min(model_index), .groups = "drop")
+
+output_df <- working_df %>%
+  left_join(., join_df, by = c("cpu_index")) %>%
+  left_join(., select(model_df, index, level, message), by = c("index")) %>%
+  left_join(., model_join_df, by = c("index")) %>%
+  rename(model_index = index) %>%
+  group_by(model_index) %>%
+  mutate(model_step_max_memory = max(mbytes_used),
+         model_step_max_cpu = max(percent_processor_time)) %>%
+  ungroup() %>%
+  arrange(seconds_since_start)
+  
+
+```
+
+# Writes
+```{r writes}
+write_csv(output_df, output_file)
+
+```
+
+
+
+# Faceted Plot of Metrics with Event Labels
+
+# Individual Interactive Charts with Significant Event Annotations
+
+```{r plot_individual, echo=FALSE, results='asis'}
+
+# ------------------------------------------------------------------------------
+# Custom CSS for the range slider
+# ------------------------------------------------------------------------------
+custom_css <- "
+.rangeslider-mask-min, .rangeslider-mask-max {
+  fill: steelblue !important;
+  fill-opacity: 0.3 !important;
+}
+.rangeslider-slidebox {
+  fill: lightyellow !important;
+  fill-opacity: 0.2 !important;
+}
+.rangeslider-handle-min, .rangeslider-handle-max {
+  fill: orange !important;
+  stroke: orange !important;
+}
+"
+
+# ------------------------------------------------------------------------------
+# 1) Identify the “high CPU” window (top 25% of % Processor Time)
+# ------------------------------------------------------------------------------
+cpu_df     <- perf %>% filter(Metric == "% Processor Time")
+cpu_thresh <- quantile(cpu_df$Value, 0.75, na.rm = TRUE)
+high_cpu   <- cpu_df %>% filter(Value >= cpu_thresh)
+min_ts     <- min(high_cpu$Timestamp)
+max_ts     <- max(high_cpu$Timestamp)
+
+# ------------------------------------------------------------------------------
+# 2) Define metric priority order
+# ------------------------------------------------------------------------------
+priority <- c(
+  # CPU
+  "% Processor Time",
+  "% Privileged Time",
+  "% DPC Time",
+  "% Interrupt Time",
+
+  # System
+  "Processor Queue Length",
+  "Context Switches/sec",
+
+  # Memory
+  "% Committed Bytes In Use",
+  "Available MBytes",
+  "Pages/sec",
+
+  # Disk
+  "% Disk Time",
+  "Avg. Disk sec/Read",
+  "Avg. Disk sec/Write",
+  "Current Disk Queue Length",
+
+  # Network
+  "Bytes Total/sec"
+)
+metrics <- c(
+  priority[priority %in% unique(perf$Metric)],
+  setdiff(unique(perf$Metric), priority)
+)
+
+# ------------------------------------------------------------------------------
+# 3) Build one plot per metric: top‐10 in red, + 1/5th of the rest in gray
+# ------------------------------------------------------------------------------
+plots <- lapply(metrics, function(m) {
+  df <- perf %>% filter(Metric == m)
+
+  # compute absolute deltas at each model event
+  deltas <- sapply(model_events$Timestamp, function(ts) {
+    i    <- which.min(abs(df$Timestamp - ts))
+    prev <- if (i > 1) df$Value[i - 1] else NA
+    nxt  <- if (i < nrow(df)) df$Value[i + 1] else NA
+    abs(nxt - prev)
+  })
+
+  # attach deltas to events
+  events_df <- model_events %>% mutate(delta = deltas)
+
+  # top 10 biggest jumps → red, thick lines
+  top_events <- events_df %>%
+    slice_max(order_by = delta, n = 10, with_ties = FALSE) %>%
+    mutate(Message = str_trunc(Message, 20, side = "right"))
+
+  # the remaining events → sample 1 out of 5 → gray, dashed thin lines
+  other_events <- anti_join(events_df, top_events, by = "Timestamp")
+  sampled_others <- other_events %>%
+    arrange(Timestamp) %>%
+    slice(seq(1, n(), by = 5)) %>%
+    mutate(Message = str_trunc(Message, 20, side = "right"))
+
+  # base time‐series trace
+  fig <- plot_ly(
+    df,
+    x    = ~Timestamp,
+    y    = ~Value,
+    type = 'scatter',
+    mode = 'lines',
+    name = m
+  )
+
+  # add red segments + labels for top_events
+  if (nrow(top_events) > 0) {
+    fig <- fig %>%
+      add_segments(
+        data       = top_events,
+        x          = ~Timestamp, xend = ~Timestamp,
+        y          = 0,           yend = max(df$Value, na.rm = TRUE),
+        inherit    = FALSE,
+        showlegend = FALSE,
+        line       = list(color = 'red', width = 3)
+      ) %>%
+      add_annotations(
+        data        = top_events,
+        x           = ~Timestamp,
+        y           = max(df$Value, na.rm = TRUE),
+        text        = ~Message,
+        showarrow   = FALSE,
+        textangle   = -45,
+        font        = list(color = 'red', size = 8),
+        allowOverlap = FALSE
+      )
+  }
+
+  # add gray dashed segments + labels for sampled_others
+  if (nrow(sampled_others) > 0) {
+    fig <- fig %>%
+      add_segments(
+        data       = sampled_others,
+        x          = ~Timestamp, xend = ~Timestamp,
+        y          = 0,           yend = max(df$Value, na.rm = TRUE),
+        inherit    = FALSE,
+        showlegend = FALSE,
+        line       = list(color = 'gray', dash = 'dash', width = 1)
+      ) %>%
+      add_annotations(
+        data        = sampled_others,
+        x           = ~Timestamp,
+        y           = max(df$Value, na.rm = TRUE),
+        text        = ~Message,
+        showarrow   = FALSE,
+        textangle   = -45,
+        font        = list(color = 'gray', size = 8),
+        allowOverlap = FALSE
+      )
+  }
+
+  # layout with styled range slider & selector buttons
+  fig <- fig %>% layout(
+    title = m,
+    xaxis = list(
+      title        = list(text = "Time", standoff = 20),
+      rangeselector = list(
+        buttons = list(
+          list(count = 1,  label = "1h", step = "hour", stepmode = "backward"),
+          list(count = 6,  label = "6h", step = "hour", stepmode = "backward"),
+          list(step  = "all", label = "All")
+        )
+      ),
+      rangeslider = list(visible = TRUE),
+      type        = 'date',
+      range       = c(min_ts, max_ts)
+    ),
+    yaxis  = list(title = "Value"),
+    margin = list(l = 80, r = 20, t = 50, b = 50)
+  )
+
+  # inject custom CSS for slider styling
+  htmlwidgets::prependContent(fig, tags$style(HTML(custom_css)))
+})
+
+# ------------------------------------------------------------------------------
+# 4) Embed all widgets in the HTML output
+# ------------------------------------------------------------------------------
+tagList(plots)
+```
