@@ -16,3 +16,6 @@ performance-log-for-tableau.csv
 
 
 This can then be read into Tableau.
+
+
+The script could use some cleanup because it writes out some intermediary files that aren't really necessary.
