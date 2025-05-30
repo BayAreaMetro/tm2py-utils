@@ -2,7 +2,6 @@
 
 library(foreign)
 
-setwd("M://Data//GIS layers//TM2_maz_taz_v2.2")
 F_INPUT  = "blocks_mazs_tazs.csv"
 F_OUTPUT = "blocks_mazs_tazs.dbf"
 

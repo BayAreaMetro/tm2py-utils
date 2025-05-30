@@ -4,7 +4,7 @@ MAZ and TAZ checker.
 
 Reads the definition of MAZs and TAZs in blocks_mazs_tazs.dbf (converted from csv using csv_to_dbf.R)
 
-The following verifcations are performed
+The following verifications are performed
   - Verifies that there are not multiple tazs or counties per maz
   - Verifies that there are not multiple counties per taz
   - Verifies that all blocks with nonzero land area are assigned a maz/taz
@@ -57,14 +57,13 @@ EXEMPT_TAZ = [287,                800095, 800203]
 
 EXEMPT_NOLAND_BLOCK = ["060133010003000"]
 
-# use python in c:\Program Files\ArcGIS\Pro\bin\Python\envs\arcgispro-py3
 # in order to import arcpy
 
 import argparse, csv, logging, os, sys
 import pandas
 import arcpy
 
-WORKSPACE          = "M:\\Data\\GIS layers\\TM2_maz_taz_v2.2"
+WORKSPACE          = "."
 CROSSWALK_ROOT     = "blocks_mazs_tazs"
 CROSSWALK_DBF      = os.path.join(WORKSPACE, "{0}.dbf".format(CROSSWALK_ROOT))
 
