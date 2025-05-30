@@ -59,24 +59,25 @@ EXEMPT_NOLAND_BLOCK = ["060133010003000"]
 
 # in order to import arcpy
 
-import argparse, csv, logging, os, sys
+import argparse, csv, logging, os, pathlib, sys
 import pandas
+# import geopandas
 import arcpy
 
-WORKSPACE          = "."
+WORKSPACE          = pathlib.Path(".")
 CROSSWALK_ROOT     = "blocks_mazs_tazs"
-CROSSWALK_DBF      = os.path.join(WORKSPACE, "{0}.dbf".format(CROSSWALK_ROOT))
+CROSSWALK_DBF      = WORKSPACE / f"{CROSSWALK_ROOT}.dbf"
 
-CENSUS_BLOCK_DIR   = "M:\\Data\\Census\\Geography\\tl_2010_06_tabblock10"
+CENSUS_BLOCK_DIR   = pathlib.Path("M:\\Data\\Census\\Geography\\tl_2010_06_tabblock10")
 CENSUS_BLOCK_ROOT  = "tl_2010_06_tabblock10_9CountyBayArea"
-CENSUS_BLOCK_SHP   = os.path.join(CENSUS_BLOCK_DIR, "{0}.shp".format(CENSUS_BLOCK_ROOT))
+CENSUS_BLOCK_SHP   = CENSUS_BLOCK_DIR /  f"{CENSUS_BLOCK_ROOT}.shp"
 CENSUS_BLOCK_COLS  = ["STATEFP10", "COUNTYFP10", "TRACTCE10", "BLOCKCE10", "GEOID10", "ALAND10", "AWATER10"]
 
-CENSUS_BLOCK_NEIGHBOR_DBF = os.path.join(CENSUS_BLOCK_DIR, "tl_2010_06_tabblock10_9CBA_neighbors.dbf")
+CENSUS_BLOCK_NEIGHBOR_DBF = CENSUS_BLOCK_DIR / "tl_2010_06_tabblock10_9CBA_neighbors.dbf"
 
 # output files
-LOG_FILE           = os.path.join(WORKSPACE, "maz_taz_checker.log")
-CROSSWALK_OUT      = os.path.join(WORKSPACE, "blocks_mazs_tazs_updated.csv")
+LOG_FILE           = WORKSPACE / "maz_taz_checker.log"
+CROSSWALK_OUT      = WORKSPACE / "blocks_mazs_tazs_updated.csv"
 MAZS_SHP           = "mazs_TM2_v2_2"
 TAZS_SHP           = "tazs_TM2_v2_2"
 
@@ -88,9 +89,9 @@ def move_small_block_to_neighbor(blocks_maz_df, blocks_neighbor_df,
     Returns number of blocks moved.
     """
     blocks_moved = 0
-    logging.info("move_small_block_to_neighbor for {0}".format(bigger_geo))
+    logging.info(f"move_small_block_to_neighbor for {bigger_geo}")
     for maz,row in maz_multiple_geo_df.iterrows():
-        logging.info("Attempting to fix maz {0:6d}".format(maz))
+        logging.info(f"Attempting to fix maz {maz:6d}")
 
         # these we'll leave; see Notes
         if maz in EXEMPT_MAZ:
@@ -99,7 +100,7 @@ def move_small_block_to_neighbor(blocks_maz_df, blocks_neighbor_df,
 
         # if it spans more than 3, leave it for now
         if row[bigger_geo] > 3:
-            logging.info("Spans more than 3 {0} elements {1} -- skipping".format(bigger_geo, row[bigger_geo]))
+            logging.info(f"Spans more than 3 {bigger_geo} elements {row[bigger_geo]} -- skipping")
             continue
 
         # if there's three, 25% or less is ok to move
@@ -111,15 +112,15 @@ def move_small_block_to_neighbor(blocks_maz_df, blocks_neighbor_df,
 
         # let's look at the blocks in this maz in the blocks_maz_df
         this_maz_blocks_df = blocks_maz_df.loc[ blocks_maz_df.maz == maz]
-        logging.debug("\n{0}".format(this_maz_blocks_df))
+        logging.debug(f"\n{this_maz_blocks_df}")
         this_maz_aland = this_maz_blocks_df.ALAND10.sum()
 
         # check if the odd one or two out are smaller
         this_maz_grouped = this_maz_blocks_df.groupby(bigger_geo)
         for name,group in this_maz_grouped:
             land_pct = group.ALAND10.sum()/this_maz_aland
-            logging.debug("group {0} has {1} rows and {2:.1f} percent of land".format(name, len(group), 100.0*land_pct))
-            logging.debug("\n{0}".format(group))
+            logging.debug(f"group {name} has {len(group)} rows and {100.0*land_pct:.1f} percent of land")
+            logging.debug(f"\n{group}")
 
             # is this land area too much to move?
             if land_pct > pct_threshold: continue
@@ -145,17 +146,16 @@ def move_small_block_to_neighbor(blocks_maz_df, blocks_neighbor_df,
                 this_block_neighbors.sort_values(by="LENGTH", ascending=False, inplace=True)
                 # print(this_block_neighbors)
                 this_neighbor_id = this_block_neighbors.nbr_GEOID1.iloc[0]
-                logging.info("  => block {0} picking up maz/taz from neighboring block {1}".format(this_block_id, this_neighbor_id))
+                logging.info(f"  => block {this_block_id} picking up maz/taz from neighboring block {this_neighbor_id}")
 
                 # look up the neighbor's maz and taz to inherit
                 match_row = crosswalk_out_df.loc[ crosswalk_out_df.GEOID10 == this_neighbor_id]
                 crosswalk_out_df.loc[ crosswalk_out_df.GEOID10 == this_block_id, "maz"] = match_row["maz"].iloc[0]
                 crosswalk_out_df.loc[ crosswalk_out_df.GEOID10 == this_block_id, "taz"] = match_row["taz"].iloc[0]
                 blocks_moved += 1
-                logging.debug("\n{0}".format(crosswalk_out_df.loc[ (crosswalk_out_df.GEOID10 == this_block_id)|
-                                                                   (crosswalk_out_df.GEOID10 == this_neighbor_id) ]))
+                logging.debug(f"\n{crosswalk_out_df.loc[ (crosswalk_out_df.GEOID10 == this_block_id)|(crosswalk_out_df.GEOID10 == this_neighbor_id) ]}")
 
-    logging.info("====> moved {0} blocks to neighbor".format(blocks_moved))
+    logging.info(f"====> moved {blocks_moved} blocks to neighbor")
     return blocks_moved
 
 def find_next_unused_taz_id(crosswalk_out_df, taz):
@@ -170,7 +170,7 @@ def find_next_unused_taz_id(crosswalk_out_df, taz):
         if unused_taz_id in taz_ids.values:
             unused_taz_id += 1
         else:
-            logging.debug("find_next_unused_taz_id for {0:6d} returning {1:6d}".format(taz, unused_taz_id))
+            logging.debug(f"find_next_unused_taz_id for {taz:6d} returning {unused_taz_id:6d}")
             return unused_taz_id
     return -1
 
@@ -182,11 +182,11 @@ def split_taz_for_tract(blocks_maz_df, taz_multiple_geo_df, crosswalk_out_df):
     tazs_split = 0
     logging.info("splitting taz for tract")
     for taz,row in taz_multiple_geo_df.iterrows():
-        logging.info("Attempting to fix taz {0:6d}".format(taz))
+        logging.info(f"Attempting to fix taz {taz:6d}")
 
         # if it spans more than 3, leave it for now
         if row[bigger_geo] > 3:
-            logging.info("Spans more than 3 {0} elements {1} -- skipping".format(bigger_geo, row[bigger_geo]))
+            logging.info(f"Spans more than 3 {bigger_geo} elements {row[bigger_geo]} -- skipping")
             continue
 
         # let's look at the blocks in this taz in the blocks_maz_df
@@ -197,7 +197,7 @@ def split_taz_for_tract(blocks_maz_df, taz_multiple_geo_df, crosswalk_out_df):
         this_taz_grouped = this_taz_blocks_df.groupby(bigger_geo)
         groups_aland = this_taz_grouped.agg({"ALAND10":"sum"})
         groups_aland["ALAND10_pct"] = groups_aland["ALAND10"]/this_taz_aland
-        logging.debug("\n{0}".format(groups_aland))
+        logging.debug(f"\n{groups_aland}")
 
         # if too small, punt
         if groups_aland["ALAND10_pct"].min() < 0.10:
@@ -211,7 +211,7 @@ def split_taz_for_tract(blocks_maz_df, taz_multiple_geo_df, crosswalk_out_df):
 
             # don't touch the first tract
             if first:
-                logging.info("  group {0} has {1:3d} rows and {2:.1f} percent of land".format(name, len(group), 100.0*land_pct))
+                logging.info(f"  group {name} has {len(group):3d} rows and {100.0*land_pct:.1f} percent of land")
                 first = False
                 continue
 
@@ -220,7 +220,7 @@ def split_taz_for_tract(blocks_maz_df, taz_multiple_geo_df, crosswalk_out_df):
 
             # convert these mazs into the new taz
             crosswalk_out_df.loc[ (crosswalk_out_df.taz==taz)&(crosswalk_out_df[bigger_geo]==name), "taz"] = new_taz_id
-            logging.info("  group {0} has {1:3d} rows and {2:.1f} percent of land => new taz {3:6d}".format(name, len(group), 100.0*land_pct, new_taz_id))
+            logging.info(f"  group {name} has {len(group):3d} rows and {100.0*land_pct:.1f} percent of land => new taz {new_taz_id:6d}")
             tazs_split += 1
 
     return tazs_split
@@ -236,7 +236,7 @@ def rename_fields(input_feature, output_feature, old_to_new):
 
     for (old_field_name, new_list) in old_to_new.items():
         if old_field_name not in existing_field_names:
-            message = "Field: {0} not in {1}".format(old_field_name, input_feature)
+            message = f"Field: {old_field_name} not in {input_feature}"
             raise Exception(message)
 
         mapping_index          = field_mappings.findFieldMapIndex(old_field_name)
@@ -285,33 +285,33 @@ def dissolve_into_shapefile(blocks_maz_layer, maz_or_taz):
         arcpy.Dissolve_management (blocks_maz_layer, "{0}_temp".format(shapefile),
                                    "{0}.{1}".format(CROSSWALK_ROOT, maz_or_taz), fields,
                                    "MULTI_PART", "DISSOLVE_LINES")
-        logging.info("Dissolved {0}s into {1}_temp.shp".format(maz_or_taz, shapefile))
+        logging.info(f"Dissolved {maz_or_taz}s into {shapefile}_temp.shp")
 
         # calculate partcount
-        my_layer = "my_{0}_layer".format(maz_or_taz)
-        arcpy.MakeFeatureLayer_management("{0}_temp.shp".format(shapefile), my_layer)
+        my_layer = f"my_{maz_or_taz}_layer"
+        arcpy.MakeFeatureLayer_management(f"{shapefile}_temp.shp", my_layer)
         arcpy.AddField_management(my_layer, "partcount", "SHORT", 6)
         arcpy.CalculateField_management(my_layer, "partcount", "!Shape.partCount!", "PYTHON3")
-        logging.info("Calculated part count for {0}s".format(maz_or_taz))
+        logging.info(f"Calculated part count for {maz_or_taz}s")
 
         # add perimeter.  In meters because ALAND10 is square meters
         arcpy.AddGeometryAttributes_management(my_layer, "PERIMETER_LENGTH_GEODESIC", "METERS")
-        logging.info("Calulated perimeter length for {0}s".format(maz_or_taz))
+        logging.info(f"Calulated perimeter length for {maz_or_taz}s")
 
         # add perimeter squared over area
         arcpy.AddField_management(my_layer, "psq_overa", "DOUBLE", 10, 0)
         arcpy.CalculateField_management(my_layer, "psq_overa", "!PERIM_GEO!*!PERIM_GEO!/!ALAND10!", "PYTHON3")
-        logging.info("Calculated perim*perim/area for {0}s".format(maz_or_taz))
+        logging.info(f"Calculated perim*perim/area for {maz_or_taz}s")
 
         # add acres from ALAND10
         SQUARE_METERS_PER_ACRE = 4046.86
         arcpy.AddField_management(my_layer, "acres", "DOUBLE", 10, 5)
         arcpy.CalculateField_management(my_layer, "acres", "!ALAND10!/{}".format(SQUARE_METERS_PER_ACRE))
-        logging.info("Calculated acres for {0}s".format(maz_or_taz))
+        logging.info(f"Calculated acres for {maz_or_taz}s")
 
         # delete maz/taz=0, that's not a real maz/taz
         arcpy.SelectLayerByAttribute_management(my_layer, "NEW_SELECTION", "{0} > 0".format(maz_or_taz))
-        logging.info("Selected out water for {0}s".format(maz_or_taz))
+        logging.info(f"Selected out water for {maz_or_taz}s")
 
         # Write the selected features to a new feature class and rename fields for clarity
         # todo: the alias names don't seem to be getting picked up, not sure why
@@ -322,7 +322,7 @@ def dissolve_into_shapefile(blocks_maz_layer, maz_or_taz):
         if maz_or_taz == "taz": old_to_new["maz"] = ["mazcount", "maz count"]
 
         rename_fields(my_layer, shapefile, old_to_new)
-        logging.info("Saving final {0}s into {1}.shp".format(maz_or_taz, shapefile))
+        logging.info(f"Saving final {maz_or_taz}s into {shapefile}.shp")
 
         # delete the temp
         arcpy.Delete_management("{0}_temp.shp".format(shapefile))
@@ -365,21 +365,21 @@ if __name__ == '__main__':
     logger.addHandler(fh)
 
     try:
-        arcpy.env.workspace = WORKSPACE
+        arcpy.env.workspace = str(WORKSPACE)
         arcpy.env.qualifiedFieldNames = False  # ?
 
         ########################################################
         # Create a feature layer from the 2010 block shapefile
         blocks_maz_layer = "blocks_maz_lyr"
-        arcpy.MakeFeatureLayer_management(CENSUS_BLOCK_SHP, blocks_maz_layer)
+        arcpy.MakeFeatureLayer_management(str(CENSUS_BLOCK_SHP), blocks_maz_layer)
         block_count = arcpy.GetCount_management(blocks_maz_layer)
-        logging.info("Created feature layer with {0} rows".format(block_count[0]))
+        logging.info(f"Created feature layer with {block_count[0]} rows")
 
         ########################################################
         # Join the census blocks to the maz/taz crosswalk
-        arcpy.AddJoin_management(blocks_maz_layer, "GEOID10", CROSSWALK_DBF, "GEOID10")
+        arcpy.AddJoin_management(blocks_maz_layer, "GEOID10", str(CROSSWALK_DBF), "GEOID10")
         block_join_count = arcpy.GetCount_management(blocks_maz_layer)
-        logging.info("Joined to crosswalk dbf resulting in {0} rows".format(block_join_count[0]))
+        logging.info(f"Joined to crosswalk dbf resulting in {block_join_count[0]} rows")
 
         # assert we didn't lose rows in the join
         assert(block_count[0]==block_join_count[0])
@@ -387,16 +387,16 @@ if __name__ == '__main__':
         # verify
         fields = arcpy.ListFields(blocks_maz_layer)
         for field in fields:
-            logging.info("  {0:50s} is a type of {1:15s} with a length of {2}".format(field.name, field.type, field.length))
+            logging.info(f"  {field.name:50s} is a type of {field.type:15s} with a length of {field.length}")
 
         # create Dataframe
-        fields = ["{0}.{1}".format(CENSUS_BLOCK_ROOT,colname) for colname in CENSUS_BLOCK_COLS]
-        fields.append("{0}.maz".format(CROSSWALK_ROOT))
-        fields.append("{0}.taz".format(CROSSWALK_ROOT))
+        fields = [f"{CENSUS_BLOCK_ROOT}.{colname}" for colname in CENSUS_BLOCK_COLS]
+        fields.append(f"{CROSSWALK_ROOT}.maz")
+        fields.append(f"{CROSSWALK_ROOT}.taz")
         blocks_maz_df = pandas.DataFrame(arcpy.da.FeatureClassToNumPyArray(
                         in_table=blocks_maz_layer,
                         field_names=fields))
-        logging.info("blocks_maz_df has length {0}".format(len(blocks_maz_df)))
+        logging.info(f"blocks_maz_df has length {len(blocks_maz_df)}")
 
         # shorten the fields
         short_fields = CENSUS_BLOCK_COLS
@@ -409,7 +409,7 @@ if __name__ == '__main__':
         blocks_maz_df["GEOID10_BG"]     = blocks_maz_df["GEOID10"].str[:12]
         blocks_maz_df["GEOID10_TRACT"]  = blocks_maz_df["GEOID10"].str[:11]
         blocks_maz_df["GEOID10_COUNTY"] = blocks_maz_df["GEOID10"].str[:5]
-        logging.info("\n{0}".format(blocks_maz_df.head()))
+        logging.info(f"\n{blocks_maz_df.head()}")
 
         # this is the one we'll modify and output
         crosswalk_out_df = blocks_maz_df[["GEOID10","maz","taz","GEOID10_TRACT"]]
@@ -418,7 +418,7 @@ if __name__ == '__main__':
         # Create a table from the 2010 block neighbor mapping
         # For use in move_small_block_to_neighbor()
         blocks_neighbor_df = pandas.DataFrame(arcpy.da.TableToNumPyArray(
-                        in_table=CENSUS_BLOCK_NEIGHBOR_DBF,
+                        in_table=str(CENSUS_BLOCK_NEIGHBOR_DBF),
                         field_names=["src_GEOID1","nbr_GEOID1","LENGTH","NODE_COUNT"]))
         blocks_neighbor_df["nbr_GEIOID10_BG"] = blocks_neighbor_df["nbr_GEOID1"].str[:12]
         # get the maz/taz for these neighbors
@@ -427,15 +427,15 @@ if __name__ == '__main__':
                                           how     ="left",
                                           left_on ="nbr_GEOID1",
                                           right_on="GEOID10")
-        logging.info("blocks_neighbor_df has length {0}".format(len(blocks_neighbor_df)))
-        logging.info("\n{0}".format(blocks_neighbor_df.head()))
+        logging.info(f"blocks_neighbor_df has length {len(blocks_neighbor_df)}")
+        logging.info(f"\n{blocks_neighbor_df.head()}")
 
     except Exception as err:
         logging.error(err.args[0])
 
-    logging.info("Number of unique GEOID10: {0}".format(blocks_maz_df.GEOID10.nunique()))
-    logging.info("  Min: {0}".format(blocks_maz_df.GEOID10.min()))
-    logging.info("  Max: {0}".format(blocks_maz_df.GEOID10.max()))
+    logging.info(f"Number of unique GEOID10: {blocks_maz_df.GEOID10.nunique()}")
+    logging.info(f"  Min: {blocks_maz_df.GEOID10.min()}")
+    logging.info(f"  Max: {blocks_maz_df.GEOID10.max()}")
     logging.info("")
 
     # maz 0 aren't real -- these are blocks without mazs
@@ -443,14 +443,14 @@ if __name__ == '__main__':
     blocks_nomaz_df = blocks_maz_df.loc[blocks_maz_df.maz == 0]
     blocks_maz_df   = blocks_maz_df.loc[blocks_maz_df.maz != 0]
 
-    logging.info("Number of unique maz: {0}".format(blocks_maz_df.maz.nunique()))
-    logging.info("   Min: {0}".format(blocks_maz_df.maz.min()))
-    logging.info("   Max: {0}".format(blocks_maz_df.maz.max()))
+    logging.info(f"Number of unique maz: {blocks_maz_df.maz.nunique()}")
+    logging.info(f"   Min: {blocks_maz_df.maz.min()}")
+    logging.info(f"   Max: {blocks_maz_df.maz.max()}")
     logging.info("")
 
-    logging.info("Number of unique taz: {0}".format(blocks_maz_df.taz.nunique()))
-    logging.info("   Min: {0}".format(blocks_maz_df.taz.min()))
-    logging.info("   Max: {0}".format(blocks_maz_df.taz.max()))
+    logging.info(f"Number of unique taz: {blocks_maz_df.taz.nunique()}")
+    logging.info(f"   Min: {blocks_maz_df.taz.min()}")
+    logging.info(f"   Max: {blocks_maz_df.taz.max()}")
     logging.info("")
 
     # if maz is zero, taz should be zero
@@ -466,19 +466,19 @@ if __name__ == '__main__':
         maz_geo_df = blocks_maz_df[["maz",bigger_geo]].groupby(["maz"]).agg("nunique")
         maz_multiple_geo_df = maz_geo_df.loc[ (maz_geo_df[bigger_geo] > 1) & ( maz_geo_df.index.isin(EXEMPT_MAZ)==False) ]
         if len(maz_multiple_geo_df) == 0:
-            logging.info("Verified one {0} per maz".format(bigger_geo))
+            logging.info(f"Verified one {bigger_geo} per maz")
             continue
 
         if bigger_geo in ["GEOID10_BG","GEOID10_TRACT"]:
             # warn and try to fix
-            logging.warning("Multiple {0} for a single maz: {1}".format(bigger_geo, len(maz_multiple_geo_df)))
-            logging.warning("\n{0}".format(maz_multiple_geo_df.head(30)))
+            logging.warning(f"Multiple {bigger_geo} for a single maz: {len(maz_multiple_geo_df)}")
+            logging.warning(f"\n{maz_multiple_geo_df.head(30)}")
             blocks_moved += move_small_block_to_neighbor(blocks_maz_df, blocks_neighbor_df,
                                                          maz_multiple_geo_df, bigger_geo, crosswalk_out_df)
         else:
             # fatal
-            logging.fatal("Multiple {0} for a single maz: {1}".format(bigger_geo, len(maz_multiple_geo_df)))
-            logging.fatal("\n{0}".format(maz_multiple_geo_df.head(30)))
+            logging.fatal(f"Multiple {bigger_geo} for a single maz: {len(maz_multiple_geo_df)}")
+            logging.fatal(f"\n{maz_multiple_geo_df.head(30)}")
             sys.exit(2)
 
     # verify one TRACT/COUNTY per unique taz
@@ -487,20 +487,20 @@ if __name__ == '__main__':
         taz_geo_df = blocks_maz_df[["taz",bigger_geo]].groupby(["taz"]).agg("nunique")
         taz_multiple_geo_df = taz_geo_df.loc[ (taz_geo_df[bigger_geo] > 1) & (taz_geo_df.index.isin(EXEMPT_TAZ)==False) ]
         if len(taz_multiple_geo_df) == 0:
-            logging.info("Verified one {0} per taz".format(bigger_geo))
+            logging.info(f"Verified one {bigger_geo} per taz")
             continue
 
         if bigger_geo in ["GEOID10_TRACT"]:
             # warn
-            logging.warning("Multiple {0} for a single taz: {1}".format(bigger_geo, len(taz_multiple_geo_df)))
-            logging.warning("\n{0}".format(taz_multiple_geo_df.head(30)))
+            logging.warning(f"Multiple {bigger_geo} for a single taz: {len(taz_multiple_geo_df)}")
+            logging.warning(f"\n{taz_multiple_geo_df.head(30)}")
             # try to fix if mazs are all stable (so blocks_moved == 0) -- that should be fixed first
             if blocks_moved == 0:
                 tazs_split = split_taz_for_tract(blocks_maz_df, taz_multiple_geo_df, crosswalk_out_df)
         else:
             # fatal
-            logging.fatal("Multiple {0} for a single taz: {1}".format(bigger_geo, len(taz_multiple_geo_df)))
-            logging.fatal("\n{0}".format(taz_multiple_geo_df.head(30)))
+            logging.fatal(f"Multiple {bigger_geo} for a single taz: {len(taz_multiple_geo_df)}")
+            logging.fatal(f"\n{taz_multiple_geo_df.head(30)}")
             sys.exit()
 
     # save updated draft crosswalk to look at if blocks have been moved or tazs have been split
@@ -508,48 +508,48 @@ if __name__ == '__main__':
         crosswalk_out_df = crosswalk_out_df[["GEOID10","maz","taz"]]
         crosswalk_out_df.sort_values(by="GEOID10", ascending=True, inplace=True)
         crosswalk_out_df.to_csv(CROSSWALK_OUT, index=False, quoting=csv.QUOTE_NONNUMERIC)
-        logging.info("Wrote updated draft crosswalk to {0}".format(CROSSWALK_OUT))
+        logging.info(f"Wrote updated draft crosswalk to {CROSSWALK_OUT}")
 
     # count blocks per maz
     count_df = blocks_maz_df[["GEOID10","maz"]].groupby(["maz"]).agg("nunique")
     logging.info("Number of blocks per maz: ")
-    logging.info("   Min: {0}".format(count_df["GEOID10"].min()))
-    logging.info("   Max: {0}".format(count_df["GEOID10"].max()))
-    logging.info("  Mean: {0}".format(count_df["GEOID10"].mean()))
+    logging.info(f"   Min: {count_df['GEOID10'].min()}")
+    logging.info(f"   Max: {count_df['GEOID10'].max()}")
+    logging.info(f"  Mean: {count_df['GEOID10'].mean()}")
     logging.info("")
 
     # count maz per taz
     count_df = blocks_maz_df[["maz","taz"]].groupby(["taz"]).agg("nunique")
     logging.info("Number of maz per taz: ")
-    logging.info("   Min: {0}".format(count_df["maz"].min()))
-    logging.info("   Max: {0}".format(count_df["maz"].max()))
-    logging.info("  Mean: {0}".format(count_df["maz"].mean()))
+    logging.info(f"   Min: {count_df['maz'].min()}")
+    logging.info(f"   Max: {count_df['maz'].max()}")
+    logging.info(f"  Mean: {count_df['maz'].mean()}")
     logging.info("")
 
     # lets look at the zeros
-    logging.info("Number of blocks without maz/taz: {0}".format(blocks_nomaz_df.GEOID10.nunique()))
+    logging.info(f"Number of blocks without maz/taz: {blocks_nomaz_df.GEOID10.nunique()}")
 
     # blocks with land should have mazs/tazs
     block_nomaz_land_df = blocks_nomaz_df.loc[ blocks_nomaz_df.ALAND10 > 0 ]
-    logging.info("Number of blocks without maz/taz with land area: {0}".format(len(block_nomaz_land_df)))
+    logging.info(f"Number of blocks without maz/taz with land area: {len(block_nomaz_land_df)}")
     if len(block_nomaz_land_df) > 0:
-        logging.fatal("\n{0}".format(block_nomaz_land_df))
+        logging.fatal(f"\n{block_nomaz_land_df}")
         logging.fatal("")
         sys.exit("ERROR")
 
     # blocks with no land should not have mazs/tazs
     blocks_maz_noland_df = blocks_maz_df.loc[ (blocks_maz_df.ALAND10 == 0)&(blocks_maz_df.GEOID10.isin(EXEMPT_NOLAND_BLOCK)==False) ]
-    logging.info("Number of blocks with maz/taz without land area: {0}".format(len(blocks_maz_noland_df)))
+    logging.info(f"Number of blocks with maz/taz without land area: {len(blocks_maz_noland_df)}")
     blocks_maz_noland_df[["GEOID10","ALAND10"]].to_csv("block_noland.csv", index=False)
     if len(blocks_maz_noland_df) > 0:
-        logging.fatal("\n{0}".format(blocks_maz_noland_df))
+        logging.fatal(f"\n{blocks_maz_noland_df}")
         logging.fatal("")
         sys.exit("ERROR")
 
     # verify maz/taz numbering alignment with http://bayareametro.github.io/travel-model-two/input/#micro-zonal-data
     maz_taz_county_check = blocks_maz_df.groupby("GEOID10_COUNTY").agg({'maz':['min','max'],
                                                                         'taz':['min','max']})
-    logging.info("maz_taz_county_check=\n{0}".format(str(maz_taz_county_check)))
+    logging.info(f"maz_taz_county_check=\n{maz_taz_county_check}")
 
     # if we're not instructed to do this, we're done
     if args.dissolve == False: sys.exit(0)
