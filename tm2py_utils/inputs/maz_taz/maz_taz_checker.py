@@ -74,12 +74,15 @@ CENSUS_BLOCK_SHP   = CENSUS_BLOCK_DIR /  f"{CENSUS_BLOCK_ROOT}.shp"
 CENSUS_BLOCK_COLS  = ["STATEFP10", "COUNTYFP10", "TRACTCE10", "BLOCKCE10", "GEOID10", "ALAND10", "AWATER10"]
 
 CENSUS_BLOCK_NEIGHBOR_DBF = CENSUS_BLOCK_DIR / "tl_2010_06_tabblock10_9CBA_neighbors.dbf"
+CENSUS_TRACT_PUMA  = pathlib.Path("M:\\Data\\Census\\Geography\\tl_2010_06_puma10\\2010_Census_Tract_to_2010_PUMA.txt")
 
 # output files
 LOG_FILE           = WORKSPACE / "maz_taz_checker.log"
 CROSSWALK_OUT      = WORKSPACE / "blocks_mazs_tazs_updated.csv"
 MAZS_SHP           = "mazs_TM2_v2_2"
 TAZS_SHP           = "tazs_TM2_v2_2"
+
+MAZ_TAZ_COUNTY_PUMA_FILE = "mazs_tazs_county_tract_PUMA.csv"
 
 
 def move_small_block_to_neighbor(blocks_maz_df, blocks_neighbor_df,
@@ -563,5 +566,56 @@ if __name__ == '__main__':
 
     dissolve_into_shapefile(blocks_maz_layer, "taz")
 
+    # create MAZ_TAZ_COUNTY_PUMA_FILE with columns,MAZ,TAZ,COUNTY,county_name,PUMA
+    census_tract_puma_df = pandas.read_csv(CENSUS_TRACT_PUMA, dtype=str)
+    census_tract_puma_df.rename(columns={
+        'STATEFP' :'STATEFP10',
+        'COUNTYFP':'COUNTYFP10',
+        'TRACTCE' :'TRACTCE10',
+        'PUMA5CE' :'PUMA10'
+    }, inplace=True)
+    logging.info(f"Read {CENSUS_TRACT_PUMA}; head=\n{census_tract_puma_df.head()}")
+    logging.info(f"blocks_maz_df len={len(blocks_maz_df):,}.head():\n{blocks_maz_df.head()}")
 
+    blocks_maz_df = pandas.merge(
+        left=blocks_maz_df,
+        right=census_tract_puma_df,
+        how='left',
+        on=['STATEFP10','COUNTYFP10','TRACTCE10'],
+        validate='many_to_one'
+    )
+    logging.info(f"blocks_maz_df len={len(blocks_maz_df):,}.head():\n{blocks_maz_df.head()}")
+
+    # this should be defined somewhere standard; mtcpy?
+    blocks_maz_df['county_name'] = blocks_maz_df.COUNTYFP10.map({
+        "001": "Alameda",
+        "013": "Contra Costa",
+        "041": "Marin",
+        "055": "Napa",
+        "075": "San Francisco",
+        "081": "San Mateo",
+        "085": "Santa Clara",
+        "095": "Solano",
+        "097": "Sonoma",
+    })
+    # https://github.com/BayAreaMetro/modeling-website/wiki/TazData
+    blocks_maz_df['COUNTY'] = blocks_maz_df.county_name.map({
+        "San Francisco": 1,
+        "San Mateo": 2,
+        "Santa Clara": 3,
+        "Alameda": 4,
+        "Contra Costa": 5,
+        "Solano": 6,
+        "Napa": 7,
+        "Sonoma": 8,
+        "Marin": 9,
+    })
+    # keep only these columns
+    blocks_maz_df.rename(columns={'maz':'MAZ','taz':'TAZ'}, inplace=True)
+    blocks_maz_df = blocks_maz_df[['MAZ','TAZ','COUNTY','county_name','COUNTYFP10','TRACTCE10','PUMA10']]
+    blocks_maz_df.sort_values(by='MAZ', inplace=True)
+    blocks_maz_df.drop_duplicates(inplace=True)
+    blocks_maz_df.to_csv(MAZ_TAZ_COUNTY_PUMA_FILE, index=False)
+
+    blocks_maz_df[['MAZ','TAZ','COUNTY','county_name']].to_csv("mazs_tazs_county.csv", index=False)
     sys.exit(0)
