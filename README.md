@@ -3,12 +3,6 @@ Travel Model Two utilities, including post-processing, summaraziation and other 
 To Run tm2py the [Travel Model Two (tm2) repo](https://github.com/BayAreaMetro/tm2py) for model running. 
 * __Note:__ tm2py-utils was separated out to allow for a the usage of a wide variety of packages without affecting / breaking the main model. This allows for fast development of utilities with relative stability of the model.
 
-## Author
-
-Lachlan Perrier  
-lachlan.perrier@wsp.com  
-WSP
-
 ## License
 
 [Include license info if applicable]
