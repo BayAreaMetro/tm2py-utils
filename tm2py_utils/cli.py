@@ -1,5 +1,5 @@
 import argparse
-from tm2py_utils.scripts.archive import parse_cli_archive
+from misc.archive import parse_cli_archive
 
 def main():
     parser = argparse.ArgumentParser(description="TM2PY CLI tool")
