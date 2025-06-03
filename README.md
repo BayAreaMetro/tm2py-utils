@@ -47,17 +47,15 @@ if the package was installed correctly you should be able to run the below
 ### Acceptance Criteria
 Generate files related to acceptance criteria
 ```python
-from tm2py_utils.acceptance.canonical import Canonical
-from tm2py_utils.acceptance.observed import Observed
-from tm2py_utils.acceptance.simulated import Simulated
-from tm2py_utils.acceptance.acceptance import Acceptance
+from tm2py_utils.summary.acceptance import Canonical, Simulated, Observed, Acceptance
 
 # Note, these will have to point to the correct files of a successfully run model
-scenario_config_file = "scenario_config.toml"
-model_config_file = "model_config.toml"
-canonical_crosswalk_file = "acceptance/canonical_crosswalk.toml"
-observed_config_file = "acceptance/observed_data.toml"
-output_folder_root = "output_summaries/"
+scenario_config_file = "../../examples/scenario_config.toml"
+model_config_file = "../../examples/model_config.toml"
+observed_config_file = "../../examples/observed_data.toml"
+canonical_crosswalk_file = "../../examples/canonical_crosswalk.toml"
+
+output_folder_root = "../../examples/temp_acceptance/"
 
 c = Canonical(canonical_crosswalk_file, scenario_file=scenario_config_file)
 
