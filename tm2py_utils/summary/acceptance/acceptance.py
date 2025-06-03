@@ -1,8 +1,8 @@
 """Methods to create Acceptance Criteria summaries from a tm2py model run."""
 
-from tm2py_utils.acceptance.simulated import Simulated
-from tm2py_utils.acceptance.observed import Observed
-from tm2py_utils.acceptance.canonical import Canonical
+from tm2py_utils.summary.acceptance.simulated import Simulated
+from tm2py_utils.summary.acceptance.observed import Observed
+from tm2py_utils.summary.acceptance.canonical import Canonical
 
 import numpy as np
 import os

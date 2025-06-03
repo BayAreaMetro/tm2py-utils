@@ -47,17 +47,17 @@ if the package was installed correctly you should be able to run the below
 ### Acceptance Criteria
 Generate files related to acceptance criteria
 ```python
-from tm2py_utils.acceptance.canonical import Canonical
-from tm2py_utils.acceptance.observed import Observed
-from tm2py_utils.acceptance.simulated import Simulated
-from tm2py_utils.acceptance.acceptance import Acceptance
+from tm2py_utils.summary.acceptance.canonical import Canonical
+from tm2py_utils.summary.acceptance.observed import Observed
+from tm2py_utils.summary.acceptance.simulated import Simulated
+from tm2py_utils.summary.acceptance.acceptance import Acceptance
 
 # Note, these will have to point to the correct files of a successfully run model
-scenario_config_file = "scenario_config.toml"
-model_config_file = "model_config.toml"
-canonical_crosswalk_file = "acceptance/canonical_crosswalk.toml"
-observed_config_file = "acceptance/observed_data.toml"
-output_folder_root = "output_summaries/"
+scenario_config_file = "tm2py_utils/examples/scenario_config.toml"
+model_config_file = "tm2py_utils/examples/model_config.toml"
+canonical_crosswalk_file = "tm2py_utils/examples/canonical_crosswalk.toml"
+observed_config_file = "tm2py_utils/examples/observed_data.toml"
+output_folder_root = "tm2py_utils/examples/temp_acceptance/"
 
 c = Canonical(canonical_crosswalk_file, scenario_file=scenario_config_file)
 
@@ -90,6 +90,6 @@ tm2py-utils archive path\to\model\run path\to\model\run -n "run name"
 
 Alternatively python script can be used
 ```python
-from tm2py_utils.scripts.archive import parse_cli_archive
+from tm2py_utils.misc.archive import parse_cli_archive
 parse_cli_archive(r"model\run\directory", r"archive\run\directory")
 ```
