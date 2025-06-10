@@ -35,7 +35,7 @@ WARMSTART_FILES_DIR = "E:/Box/Modeling and Surveys/Development/Travel Model Two 
 EMME_TEMPLATE_PROJECT_DIR = "E:/Box/Modeling and Surveys/Development/Travel Model Two Conversion/Model Inputs/2015-tm22-dev-sprint-03/emme_23_project_template"
 
 # github raw link for toml config files
-CONFIGS_GITHUB_PATH = "https://raw.githubusercontent.com/BayAreaMetro/travel-model-two-config/refs/heads/main/2015-tm22-dev-sprint-03"
+CONFIGS_GITHUB_PATH = "https://raw.githubusercontent.com/BayAreaMetro/tm2py-utils/refs/heads/main/tm2py_utils/config/develop"
 
 # travel model two release tag to fetch
 TRAVEL_MODEL_TWO_RELEASE_TAG = "TM2.2.4"
