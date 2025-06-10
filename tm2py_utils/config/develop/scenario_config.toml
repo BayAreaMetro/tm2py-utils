@@ -22,7 +22,7 @@
         "highway_maz_skim",
         "prepare_network_transit",
         "transit_assign", 
-        "transit_skim" 
+        "transit_skim",
     ]
     global_iteration_components = [
         "household",
@@ -30,16 +30,15 @@
         "truck",
         "highway_maz_assign",
         "highway",
+        #"drive_access_skims",
         "transit_assign",
         "transit_skim",
     ]
-    final_components = [
-	    #"post_processor"
-	]
+    final_components = []
     start_iteration = 0
     end_iteration = 3
 
 [warmstart]
     warmstart = true
-    use_warmstart_skim = true
-    use_warmstart_demand = false
+    use_warmstart_skim = false
+    use_warmstart_demand = true

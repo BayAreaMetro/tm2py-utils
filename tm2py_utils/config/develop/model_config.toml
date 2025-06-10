@@ -48,6 +48,7 @@
     TNC_ZPV_factor = 0.7
     ctramp_hh_file = "ctramp_output/householdData_{iteration}.csv"
 	highway_maz_ctramp_output_file = "ctramp_output/auto_{period}_MAZ_AUTO_{number}_{period}.omx"
+    sample_rate_by_iteration = [0.05, 0.5 , 1.0, 0.02, 0.02,]
 
     # demand matrices for assignment
     highway_demand_file = "demand_matrices/highway/household/TAZ_Demand_{period}_{iter}.omx"
@@ -509,6 +510,7 @@
     output_skim_filename_tmpl = "HWYSKM{time_period}_taz.omx"
     output_skim_matrixname_tmpl = "{time_period}_{mode}_{property}"
     max_iterations = 100
+    network_acceleration = true
     # labels entire highway network (any of the classes) + MAZ connectors
     generic_highway_mode_code = "c"
     # include other MAZs to estimate density (pop+jobs*2.5)/acres for each MAZ
@@ -918,6 +920,11 @@
         [[transit.classes.demand]]
             source = "household"
             name = "WLK_TRN_KNR"
+
+[post_processor]
+    network_shapefile_path = "output_summaries/network_shapefile_{iteration}_{period}.shp"
+    boardings_by_segment_file_path = "output_summaries/boardings_by_segment_{iteration}_{period}.csv"
+    boardings_by_segment_geofile_path = "output_summaries/boardings_by_segment_{iteration}_{period}.shp"
 
 [emme]
     num_processors = "MAX-1"
