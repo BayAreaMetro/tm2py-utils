@@ -11,16 +11,20 @@ library(purrr)
 ```{r read-shapefiles}
 # Define file paths
 maz_path <- "C:/GitHub/tm2py-utils/tm2py_utils/inputs/maz_taz/shapefiles/mazs_TM2_v2_2.shp"
-taz_path <- "C:/GitHub/tm2py-utils/tm2py_utils/inputs/maz_taz/shapefiles/tazs_TM2_v2_2.shp"
+# the maz file already has the tazs on there
 
 # Read shapefiles
 mazs <- st_read(maz_path, quiet = TRUE)
-tazs <- st_read(taz_path, quiet = TRUE)
+
 
 # Reproject to WGS84 for Leaflet and tidycensus compatibility
 crs_target <- 4326
 mazs_wgs <- st_transform(mazs, crs_target)
-tazs_wgs <- st_transform(tazs, crs_target)
+
+
+# Fix invalid geometries
+mazs_wgs <- st_make_valid(mazs_wgs)
+
 ```
 
 ```{r fetch-blocks, message=FALSE}
@@ -37,8 +41,8 @@ if (file.exists(key_path)) {
 }
 
 # Identify unique state and counties in the TAZ shapefile
-state_fp   <- unique(tazs_wgs$STATEFP)
-county_fps <- unique(tazs_wgs$COUNTYFP)
+state_fp   <- "06"  # California
+county_fps <- c("001", "013", "041", "055", "075", "081", "085", "095", "097")
 
 # Download 2020 Census blocks for each county
 blocks_list <- map(county_fps, function(county) {
@@ -60,20 +64,50 @@ blocks_wgs <- st_transform(blocks, crs_target)
 
 ```{r spatial-intersect}
 # Assign MAZ and TAZ to blocks via spatial join
-blocks_maz <- st_join(blocks_wgs, mazs_wgs, join = st_intersects, left = TRUE)
-blocks_maz_taz <- st_join(blocks_maz, tazs_wgs, join = st_intersects, left = TRUE)
+blocks_maz_taz <- st_join(blocks_wgs, mazs_wgs, join = st_intersects, left = TRUE)
 
+```
+
+```{r make-csv}
 # Prepare lookup table
 lookup_df <- blocks_maz_taz %>%
   st_drop_geometry() %>%
   transmute(
     GEOID20 = GEOID,
-    maz      = MAZ_ID,
-    taz      = TAZ_ID
+    maz      = maz,
+    taz      = taz
   )
 
 # Write CSV
-write.csv(lookup_df, "block_maz_taz_lookup.csv", row.names = FALSE)
+write.csv(lookup_df, "block_maz_taz_20.csv", row.names = FALSE)
+```
+```{r}
+library(dplyr)
+
+# Suppose `blocks_maz_taz` is your joined sf, and `lookup_df` is the st_drop_geometry() version
+# 1) How many MAZs per block?
+blocks_per_block <- lookup_df %>%
+  count(GEOID20, name = "maz_count")
+
+# 2) Summary stats
+blocks_per_block %>%
+  summarise(
+    total_blocks      = n(),
+    avg_maz_per_block = mean(maz_count),
+    max_maz_for_block = max(maz_count),
+    blocks_with_multi = sum(maz_count > 1)
+  )
+# This will tell you how many blocks overlap more than one MAZ, and by how many on average.
+
+# 3) How many blocks per MAZ?
+blocks_per_maz <- lookup_df %>%
+  count(maz, name = "block_count")
+
+# 4) Where are the hotspots?
+#    e.g. list blocks that overlap > 10 MAZs
+blocks_per_block %>%
+  filter(maz_count > 10) %>%
+  arrange(desc(maz_count))
 ```
 
 ```{r leaflet-map, message=FALSE}
