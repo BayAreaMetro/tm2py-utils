@@ -1,6 +1,13 @@
+
+---
+title: "MAZ and Census Block 2020 analysis"
+output: html_document
+---
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(sf)
+library(lwgeom)      # for st_make_valid
 library(leaflet)
 library(htmlwidgets)
 library(tidycensus)
@@ -8,132 +15,124 @@ library(dplyr)
 library(purrr)
 ```
 
-```{r read-shapefiles}
+```{r read-maz-shapefile}
 # Define file paths
+
+# Load MAZ shapefile from dissolved 2010 Blocks
+
 maz_path <- "C:/GitHub/tm2py-utils/tm2py_utils/inputs/maz_taz/shapefiles/mazs_TM2_v2_2.shp"
-# the maz file already has the tazs on there
-
-# Read shapefiles
 mazs <- st_read(maz_path, quiet = TRUE)
-
-
-# Reproject to WGS84 for Leaflet and tidycensus compatibility
-crs_target <- 4326
-mazs_wgs <- st_transform(mazs, crs_target)
-
-
-# Fix invalid geometries
-mazs_wgs <- st_make_valid(mazs_wgs)
-
+mazs_wgs <- mazs %>%
+  st_transform(4326) %>%
+  st_make_valid()
 ```
 
 ```{r fetch-blocks, message=FALSE}
-# Set your Census API key (run once)
+# Load Census API key
 key_path <- "M:/Data/Census/new_key/api-key"
 if (file.exists(key_path)) {
   key <- readLines(key_path)
   census_api_key(key, install = TRUE, overwrite = TRUE)
-} else {
-  # Fallback: use existing environment variable or manually set
-  if (Sys.getenv("CENSUS_API_KEY") == "") {
-    stop("Census API key not found. Place it in M:/census_api_key.txt or set CENSUS_API_KEY env var.")
-  }
+} else if (Sys.getenv("CENSUS_API_KEY") == "") {
+  stop("Census API key not found. Place in M:/Data/Census/new_key/api-key or set CENSUS_API_KEY env var.")
 }
+# Define Bay Area FIPS
+state_fp <- "06"
+county_fps <- c("001","013","041","055","075","081","085","095","097")
+# Download 2020 Census Blocks
+tblocks <- map_dfr(county_fps, ~ get_decennial(
+  geography = "block",
+  variables = "P1_001N",
+  year      = 2020,
+  state     = state_fp,
+  county    = .x,
+  geometry  = TRUE,
+  output    = "wide"
+))
+blocks_wgs <- tblocks %>%
+  st_transform(4326) %>%
+  st_make_valid()
+```
 
-# Identify unique state and counties in the TAZ shapefile
-state_fp   <- "06"  # California
-county_fps <- c("001", "013", "041", "055", "075", "081", "085", "095", "097")
-
-# Download 2020 Census blocks for each county
-blocks_list <- map(county_fps, function(county) {
-  get_decennial(
-    geography = "block",
-    variables = "P1_001N",  # total population; geometry only is needed
-    year = 2020,
-    state = state_fp,
-    county = county,
-    geometry = TRUE,
-    output = "wide"
+```{r compute-areas-and-intersect}
+# Compute area for blocks and MAZs
+blocks_wgs <- blocks_wgs %>%
+  mutate(block_area = as.numeric(st_area(geometry)))
+mazs_wgs <- mazs_wgs %>%
+  mutate(maz_area = as.numeric(st_area(geometry)))
+# Intersection to compute percentage overlaps
+intersect_bm <- st_intersection(blocks_wgs, mazs_wgs)
+intersect_bm <- intersect_bm %>%
+  mutate(
+    area_int = as.numeric(st_area(geometry)),
+    pct_block_in_maz = area_int / block_area,
+    pct_maz_in_block = area_int / maz_area
   )
-})
-blocks <- do.call(rbind, blocks_list)
-
-# Transform blocks to match CRS
-blocks_wgs <- st_transform(blocks, crs_target)
 ```
 
-```{r spatial-intersect}
-# Assign MAZ and TAZ to blocks via spatial join
-blocks_maz_taz <- st_join(blocks_wgs, mazs_wgs, join = st_intersects, left = TRUE)
-
-```
-
-```{r make-csv}
-# Prepare lookup table
-lookup_df <- blocks_maz_taz %>%
+```{r write-out-lookup}
+# Create lookup table of block to MAZ with overlap percentages
+lookup_df <- intersect_bm %>%
   st_drop_geometry() %>%
   transmute(
     GEOID20 = GEOID,
     maz      = maz,
-    taz      = taz
-  )
-
-# Write CSV
-write.csv(lookup_df, "block_maz_taz_20.csv", row.names = FALSE)
+    pct_block_in_maz,
+    pct_maz_in_block
+  ) %>%
+  distinct()
+write.csv(lookup_df, "block_maz_lookup.csv", row.names = FALSE)
 ```
-```{r}
-library(dplyr)
 
-# Suppose `blocks_maz_taz` is your joined sf, and `lookup_df` is the st_drop_geometry() version
-# 1) How many MAZs per block?
-blocks_per_block <- lookup_df %>%
-  count(GEOID20, name = "maz_count")
+```{r diagnose-splits}
+# Diagnose MAZ splits across blocks
+maz_block_counts <- lookup_df %>%
+  count(maz, name = "block_count") %>%
+  arrange(desc(block_count))
+print(summary(maz_block_counts$block_count))
+single_block_mazs <- filter(maz_block_counts, block_count == 1)
+cat("MAZs fully within one block:", nrow(single_block_mazs), "\n")
+multi_block_mazs <- filter(maz_block_counts, block_count > 1)
+cat("MAZs split across blocks:", nrow(multi_block_mazs), "\n")
+write.csv(maz_block_counts, "maz_block_counts.csv", row.names = FALSE)
+```
 
-# 2) Summary stats
-blocks_per_block %>%
-  summarise(
-    total_blocks      = n(),
-    avg_maz_per_block = mean(maz_count),
-    max_maz_for_block = max(maz_count),
-    blocks_with_multi = sum(maz_count > 1)
-  )
-# This will tell you how many blocks overlap more than one MAZ, and by how many on average.
-
-# 3) How many blocks per MAZ?
-blocks_per_maz <- lookup_df %>%
-  count(maz, name = "block_count")
-
-# 4) Where are the hotspots?
-#    e.g. list blocks that overlap > 10 MAZs
-blocks_per_block %>%
-  filter(maz_count > 10) %>%
-  arrange(desc(maz_count))
+```{r check-bg-groups}
+# Verify one BG per MAZ using 2010 vintage Block Groups
+bgs <- map_dfr(county_fps, ~ get_decennial(
+  geography = "block group",
+  variables = "P1_001N",
+  year      = 2010,
+  state     = state_fp,
+  county    = .x,
+  geometry  = TRUE,
+  output    = "wide"
+)) %>%
+  st_transform(4326) %>%
+  st_make_valid()
+bg_maz <- st_join(bgs, mazs_wgs, join = st_intersects)
+bg_counts <- bg_maz %>%
+  st_drop_geometry() %>%
+  distinct(GEOID, MAZ_ID) %>%
+  count(MAZ_ID, name = "bg_count")
+print(summary(bg_counts$bg_count))
+cat("MAZs with one BG:", sum(bg_counts$bg_count == 1), "\n")
+cat("MAZs with multiple BGs:", sum(bg_counts$bg_count > 1), "\n")
+write.csv(bg_counts, "maz_bg_counts.csv", row.names = FALSE)
 ```
 
 ```{r leaflet-map, message=FALSE}
-# Create interactive map including blocks
+# Plot Blocks and MAZs
+gg_blocks <- blocks_wgs
 map <- leaflet() %>%
   addTiles() %>%
-  addPolygons(data = tazs_wgs,
-              color = "black", weight = 1,
-              fill = FALSE, group = "TAZs") %>%
-  addPolygons(data = mazs_wgs,
-              color = "blue", fillOpacity = 0.3,
-              group = "MAZs") %>%
-  addPolygons(data = blocks_wgs,
-              color = "gray", weight = 0.2, fill = FALSE,
-              group = "Blocks") %>%
-  addLayersControl(
-    overlayGroups = c("Blocks", "MAZs", "TAZs"),
-    options = layersControlOptions(collapsed = FALSE)
-  )
-
+  addPolygons(data = gg_blocks, color = "gray", weight = 0.5, fill = FALSE, group = "Blocks", label = ~GEOID) %>%
+  addPolygons(data = mazs_wgs, color = "blue", weight = 1, fill = FALSE, group = "MAZs", label = ~MAZ_ID) %>%
+  addLayersControl(overlayGroups = c("Blocks","MAZs"), options = layersControlOptions(collapsed = FALSE))
 map
 ```
 
-```{r save-widget, eval=FALSE}
-# Save the interactive map as a standalone HTML file
-htmlwidgets::saveWidget(map, "maz_taz_block_map.html", selfcontained = TRUE)
+```{r save-map, eval=FALSE}
+htmlwidgets::saveWidget(map, "maz_block_map.html", selfcontained = TRUE)
 ```
-
 
