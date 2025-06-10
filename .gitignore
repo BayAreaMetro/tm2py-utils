@@ -12,3 +12,4 @@ __pycache__/
 *.dll
 *.exe
 
+tm2py_utils/inputs/maz_taz/maz_taz_map.html
