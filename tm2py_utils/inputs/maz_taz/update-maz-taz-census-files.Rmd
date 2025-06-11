@@ -13,6 +13,8 @@ library(htmlwidgets)
 library(tidycensus)
 library(dplyr)
 library(purrr)
+library(glue)
+library(readr)
 ```
 
 ```{r read-maz-shapefile}
@@ -54,36 +56,6 @@ blocks_wgs <- tblocks %>%
   st_make_valid()
 ```
 
-```{r compute-areas-and-intersect}
-# Compute area for blocks and MAZs
-blocks_wgs <- blocks_wgs %>%
-  mutate(block_area = as.numeric(st_area(geometry)))
-mazs_wgs <- mazs_wgs %>%
-  mutate(maz_area = as.numeric(st_area(geometry)))
-# Intersection to compute percentage overlaps
-intersect_bm <- st_intersection(blocks_wgs, mazs_wgs)
-intersect_bm <- intersect_bm %>%
-  mutate(
-    area_int = as.numeric(st_area(geometry)),
-    pct_block_in_maz = area_int / block_area,
-    pct_maz_in_block = area_int / maz_area
-  )
-```
-
-```{r write-out-lookup}
-# Create lookup table of block to MAZ with overlap percentages
-lookup_df <- intersect_bm %>%
-  st_drop_geometry() %>%
-  transmute(
-    GEOID20 = GEOID,
-    maz      = maz,
-    pct_block_in_maz,
-    pct_maz_in_block
-  ) %>%
-  distinct()
-write.csv(lookup_df, "block_maz_lookup.csv", row.names = FALSE)
-```
-
 ```{r diagnose-splits}
 # Diagnose MAZ splits across blocks
 maz_block_counts <- lookup_df %>%
@@ -102,7 +74,7 @@ write.csv(maz_block_counts, "maz_block_counts.csv", row.names = FALSE)
 bgs <- map_dfr(county_fps, ~ get_decennial(
   geography = "block group",
   variables = "P1_001N",
-  year      = 2010,
+  year      = 2020,
   state     = state_fp,
   county    = .x,
   geometry  = TRUE,
@@ -111,10 +83,13 @@ bgs <- map_dfr(county_fps, ~ get_decennial(
   st_transform(4326) %>%
   st_make_valid()
 bg_maz <- st_join(bgs, mazs_wgs, join = st_intersects)
+```
+
+```{r}
 bg_counts <- bg_maz %>%
   st_drop_geometry() %>%
-  distinct(GEOID, MAZ_ID) %>%
-  count(MAZ_ID, name = "bg_count")
+  distinct(GEOID, maz) %>%
+  count(maz, name = "bg_count")
 print(summary(bg_counts$bg_count))
 cat("MAZs with one BG:", sum(bg_counts$bg_count == 1), "\n")
 cat("MAZs with multiple BGs:", sum(bg_counts$bg_count > 1), "\n")
@@ -126,8 +101,8 @@ write.csv(bg_counts, "maz_bg_counts.csv", row.names = FALSE)
 gg_blocks <- blocks_wgs
 map <- leaflet() %>%
   addTiles() %>%
-  addPolygons(data = gg_blocks, color = "gray", weight = 0.5, fill = FALSE, group = "Blocks", label = ~GEOID) %>%
-  addPolygons(data = mazs_wgs, color = "blue", weight = 1, fill = FALSE, group = "MAZs", label = ~MAZ_ID) %>%
+  addPolygons(data = gg_blocks, color = "red", weight = 1, fill = FALSE, group = "Blocks", label = ~GEOID) %>%
+  addPolygons(data = mazs_wgs, color = "blue", weight = 1, fill = FALSE, group = "MAZs", label = ~maz) %>%
   addLayersControl(overlayGroups = c("Blocks","MAZs"), options = layersControlOptions(collapsed = FALSE))
 map
 ```
@@ -136,3 +111,71 @@ map
 htmlwidgets::saveWidget(map, "maz_block_map.html", selfcontained = TRUE)
 ```
 
+
+
+trying to look at intersects
+
+```{r compute-areas-and-intersect-by-county, message=FALSE}
+
+counties <- county_fps
+county_lookups <- vector("list", length(counties))
+names(county_lookups) <- counties
+
+for (cty in counties) {
+  message(glue("⏳  Processing county {state_fp}-{cty} ..."))
+  
+  # subset blocks to this county
+  blocks_cty <- blocks_wgs %>%
+    filter(substr(GEOID, 1, 5) == paste0(state_fp, cty))
+  
+  if (nrow(blocks_cty) == 0) {
+    warning(glue("  ➔ no blocks found for county {cty}, skipping"))
+    next
+  }
+  
+head(maz_sel$MAZ_ID, 10)
+table(nchar(as.character(maz_sel$MAZ_ID)))
+  
+  # intersect blocks and MAZs
+  ints <- st_intersection(
+    blocks_cty %>% select(GEOID, block_area),
+    maz_cty
+  )
+  
+  lookup_cty <- ints %>%
+    mutate(
+      area_int         = as.numeric(st_area(geometry)),
+      pct_block_in_maz = area_int / block_area
+    ) %>%
+    st_drop_geometry() %>%
+    transmute(
+      GEOID,
+      maz               = maz,
+      pct_block_in_maz
+    ) %>%
+    distinct()
+  
+  write_csv(lookup_cty, glue("block_maz_lookup_{cty}.csv"))
+  county_lookups[[cty]] <- lookup_cty
+  
+  # clean up and free memory
+  rm(blocks_cty, maz_cty, ints, lookup_cty)
+  gc()
+}
+
+```
+  
+```  {r check-intersection, message=FALSE}
+  
+  # compute just pct_block_in_maz
+
+
+# bind all counties together, drop any NULLs
+lookup_df <- bind_rows(compact(county_lookups))
+
+# write a full lookup if you like
+write_csv(lookup_df, "block_maz_lookup_full.csv")
+
+message("✅  Done with all counties.")
+
+```
