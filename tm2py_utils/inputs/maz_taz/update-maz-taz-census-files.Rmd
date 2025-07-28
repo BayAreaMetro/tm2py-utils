@@ -101,8 +101,8 @@ write.csv(bg_counts, "maz_bg_counts.csv", row.names = FALSE)
 gg_blocks <- blocks_wgs
 map <- leaflet() %>%
   addTiles() %>%
-  addPolygons(data = gg_blocks, color = "red", weight = 1, fill = FALSE, group = "Blocks", label = ~GEOID) %>%
-  addPolygons(data = mazs_wgs, color = "blue", weight = 1, fill = FALSE, group = "MAZs", label = ~maz) %>%
+  addPolygons(data = mazs_wgs, color = "blue", weight = 1, fill = FALSE, group = "MAZs", label = maz) %>%
+  addPolygons(data = gg_blocks, color = "red", weight = 1, dashArray = "5,5", fill = FALSE, group = "Blocks", label = GEOID, options = pathOptions(bringToFront = TRUE)) %>%
   addLayersControl(overlayGroups = c("Blocks","MAZs"), options = layersControlOptions(collapsed = FALSE))
 map
 ```

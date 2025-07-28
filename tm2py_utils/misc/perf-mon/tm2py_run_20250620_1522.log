@@ -1,0 +1,444 @@
+20-Jun-2025 (15:23:22)   INFO: Start iteration 0
+20-Jun-2025 (15:23:22)   INFO: Start Create highway time of day scenarios.
+20-Jun-2025 (15:27:15)   INFO:   Start Copy base to period scenarios and set per-period attributes
+20-Jun-2025 (15:27:36)   INFO:   End Copy base to period scenarios and set per-period attributes
+20-Jun-2025 (15:27:36)   INFO: End Create highway time of day scenarios.
+20-Jun-2025 (15:27:36)   INFO: Start Create transit time of day scenarios.
+20-Jun-2025 (15:27:36) STATUS:   Start prepare base scenario
+20-Jun-2025 (15:30:51) STATUS:   End prepare base scenario
+20-Jun-2025 (15:30:51)   INFO:   Start Copy base to period scenarios and set per-period attributes
+20-Jun-2025 (15:31:47)   INFO:   End Copy base to period scenarios and set per-period attributes
+20-Jun-2025 (15:31:48) STATUS:   Start remove transit lines from other periods
+20-Jun-2025 (15:31:48) STATUS:     Start period EA
+20-Jun-2025 (15:34:19) STATUS:     End period EA
+20-Jun-2025 (15:34:19) STATUS:     Start period AM
+20-Jun-2025 (15:36:55) STATUS:     End period AM
+20-Jun-2025 (15:36:55) STATUS:     Start period MD
+20-Jun-2025 (15:39:42) STATUS:     End period MD
+20-Jun-2025 (15:39:42) STATUS:     Start period PM
+20-Jun-2025 (15:42:37) STATUS:     End period PM
+20-Jun-2025 (15:42:37) STATUS:     Start period EV
+20-Jun-2025 (15:45:24) STATUS:     End period EV
+20-Jun-2025 (15:45:24) STATUS:   End remove transit lines from other periods
+20-Jun-2025 (15:45:24)   INFO: End Create transit time of day scenarios.
+20-Jun-2025 (15:45:24)   INFO: Start active mode skim
+20-Jun-2025 (15:45:24)   INFO:   Start Active modes shortest path skims emme_project\Database_active_south\emmebank
+20-Jun-2025 (16:22:58)   INFO:   End Active modes shortest path skims emme_project\Database_active_south\emmebank
+20-Jun-2025 (16:22:58)   INFO:   Start Active modes shortest path skims emme_project\Database_active_north\emmebank
+20-Jun-2025 (16:26:47)   INFO:   End Active modes shortest path skims emme_project\Database_active_north\emmebank
+20-Jun-2025 (16:26:47)   INFO: End active mode skim
+20-Jun-2025 (16:26:47)   INFO: Start AirPassenger run
+20-Jun-2025 (16:27:02)   INFO: End AirPassenger run
+20-Jun-2025 (16:27:02)   INFO: Start Prepare network attributes and modes
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328188-328206
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328192-328219
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328193-328268
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328199-328211
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328201-328151
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328203-328216
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328204-328246
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328208-328290
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328209-328169
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328211-328186
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328212-328264
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328216-328222
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328217-328291
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328219-328281
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328222-328112
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328227-328212
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328228-328283
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328232-328164
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328236-328201
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328241-328217
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328244-328181
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328246-328236
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328249-328183
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328254-328130
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328257-328128
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328262-328275
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328264-328204
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328267-328134
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328268-328254
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328269-328138
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328274-328145
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328275-328158
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328277-328269
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328281-328171
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328283-328156
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328287-328148
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 8002, link 328288-328178
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 3002, link 328289-328137
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 3002, link 328290-328267
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 3002, link 328291-328288
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 3002, link 328292-328203
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 3002, link 328293-328162
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 2002, link 328302-328315
+20-Jun-2025 (16:35:54)   WARN:   set tolls failed index lookup 4002, link 328488-326953
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328188-328206
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328192-328219
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328193-328268
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328199-328211
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328201-328151
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328203-328216
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328204-328246
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328208-328290
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328209-328169
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328211-328186
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328212-328264
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328216-328222
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328217-328291
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328219-328281
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328222-328112
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328227-328212
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328228-328283
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328232-328164
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328236-328201
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328241-328217
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328244-328181
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328246-328236
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328249-328183
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328254-328130
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328257-328128
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328262-328275
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328264-328204
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328267-328134
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328268-328254
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328269-328138
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328274-328145
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328275-328158
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328277-328269
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328281-328171
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328283-328156
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328287-328148
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 8002, link 328288-328178
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 3002, link 328289-328137
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 3002, link 328290-328267
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 3002, link 328291-328288
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 3002, link 328292-328203
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 3002, link 328293-328162
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 2002, link 328302-328315
+20-Jun-2025 (16:52:36)   WARN:   set tolls failed index lookup 4002, link 328488-326953
+20-Jun-2025 (17:06:50)   INFO: End Prepare network attributes and modes
+20-Jun-2025 (17:06:50) STATUS: Start Highway assignment and skims
+20-Jun-2025 (17:08:23) STATUS: Running highway assignments in process: EA, AM, MD, PM, EV
+20-Jun-2025 (17:08:24) STATUS:   Start Run EA highway assignment
+20-Jun-2025 (17:08:24)   INFO:     Start Run SOLA assignment (no path analyses)
+20-Jun-2025 (17:12:21)   INFO:     End Run SOLA assignment (no path analyses)
+20-Jun-2025 (17:12:23)   INFO:     Start Run SOLA assignment with path analyses and highway reliability
+20-Jun-2025 (17:28:59)   INFO:     End Run SOLA assignment with path analyses and highway reliability
+20-Jun-2025 (17:33:47) STATUS:   End Run EA highway assignment
+20-Jun-2025 (17:33:47) STATUS:   Start Run AM highway assignment
+20-Jun-2025 (17:33:47)   INFO:     Start Run SOLA assignment (no path analyses)
+20-Jun-2025 (17:45:18)   INFO:     End Run SOLA assignment (no path analyses)
+20-Jun-2025 (17:45:20)   INFO:     Start Run SOLA assignment with path analyses and highway reliability
+20-Jun-2025 (18:36:15)   INFO:     End Run SOLA assignment with path analyses and highway reliability
+20-Jun-2025 (18:40:52) STATUS:   End Run AM highway assignment
+20-Jun-2025 (18:40:52) STATUS:   Start Run MD highway assignment
+20-Jun-2025 (18:40:52)   INFO:     Start Run SOLA assignment (no path analyses)
+20-Jun-2025 (18:47:09)   INFO:     End Run SOLA assignment (no path analyses)
+20-Jun-2025 (18:47:11)   INFO:     Start Run SOLA assignment with path analyses and highway reliability
+20-Jun-2025 (19:17:19)   INFO:     End Run SOLA assignment with path analyses and highway reliability
+20-Jun-2025 (19:22:06) STATUS:   End Run MD highway assignment
+20-Jun-2025 (19:22:06) STATUS:   Start Run PM highway assignment
+20-Jun-2025 (19:22:07)   INFO:     Start Run SOLA assignment (no path analyses)
+20-Jun-2025 (19:40:52)   INFO:     End Run SOLA assignment (no path analyses)
+20-Jun-2025 (19:40:54)   INFO:     Start Run SOLA assignment with path analyses and highway reliability
+20-Jun-2025 (21:08:31)   INFO:     End Run SOLA assignment with path analyses and highway reliability
+20-Jun-2025 (21:13:48) STATUS:   End Run PM highway assignment
+20-Jun-2025 (21:13:48) STATUS:   Start Run EV highway assignment
+20-Jun-2025 (21:13:48)   INFO:     Start Run SOLA assignment (no path analyses)
+20-Jun-2025 (21:18:03)   INFO:     End Run SOLA assignment (no path analyses)
+20-Jun-2025 (21:18:05)   INFO:     Start Run SOLA assignment with path analyses and highway reliability
+20-Jun-2025 (21:34:05)   INFO:     End Run SOLA assignment with path analyses and highway reliability
+20-Jun-2025 (21:38:52) STATUS:   End Run EV highway assignment
+20-Jun-2025 (21:38:52) STATUS: End Highway assignment and skims
+20-Jun-2025 (21:38:52)   INFO: Start SkimMAZCosts run
+20-Jun-2025 (21:49:39)   INFO: End SkimMAZCosts run
+20-Jun-2025 (21:49:39)   INFO: Start Prepare transit network attributes and update times from auto network.
+20-Jun-2025 (21:49:39) STATUS:   Start period EA
+20-Jun-2025 (21:58:54) STATUS:   End period EA
+20-Jun-2025 (21:58:54) STATUS:   Start period AM
+20-Jun-2025 (22:10:47) STATUS:   End period AM
+20-Jun-2025 (22:10:47) STATUS:   Start period MD
+20-Jun-2025 (22:21:54) STATUS:   End period MD
+20-Jun-2025 (22:21:54) STATUS:   Start period PM
+20-Jun-2025 (22:34:28) STATUS:   End period PM
+20-Jun-2025 (22:34:28) STATUS:   Start period EV
+20-Jun-2025 (22:45:43) STATUS:   End period EV
+20-Jun-2025 (22:45:50)   INFO: End Prepare transit network attributes and update times from auto network.
+20-Jun-2025 (22:45:50)   INFO: Start Transit assignments
+20-Jun-2025 (22:45:50)   INFO:   Start Prepare transit demand
+20-Jun-2025 (22:46:20)   INFO:   End Prepare transit demand
+20-Jun-2025 (22:55:54)   INFO:   Start Transit assignments for a time period
+20-Jun-2025 (23:31:05)   INFO:   End Transit assignments for a time period
+20-Jun-2025 (23:44:40)   INFO:   Start Transit assignments for a time period
+21-Jun-2025 (00:25:34)   INFO:   End Transit assignments for a time period
+21-Jun-2025 (00:37:45)   INFO:   Start Transit assignments for a time period
+21-Jun-2025 (01:10:41)   INFO:   End Transit assignments for a time period
+21-Jun-2025 (01:22:30)   INFO:   Start Transit assignments for a time period
+21-Jun-2025 (02:04:49)   INFO:   End Transit assignments for a time period
+21-Jun-2025 (02:17:48)   INFO:   Start Transit assignments for a time period
+21-Jun-2025 (02:51:45)   INFO:   End Transit assignments for a time period
+21-Jun-2025 (02:54:20)   INFO: End Transit assignments
+21-Jun-2025 (02:54:20)   INFO: Start Transit skims
+21-Jun-2025 (02:54:20) STATUS:   Start period transit skims
+21-Jun-2025 (07:10:36) STATUS:   End period transit skims
+21-Jun-2025 (07:10:36)   INFO: End Transit skims
+21-Jun-2025 (07:10:36)   INFO: Start iteration 1
+21-Jun-2025 (07:10:36)   INFO: Start HouseholdModel run
+21-Jun-2025 (08:32:24)   INFO:   Start Prepare household demand matrices.
+21-Jun-2025 (09:01:51)   INFO:   End Prepare household demand matrices.
+21-Jun-2025 (09:01:51)   INFO: End HouseholdModel run
+21-Jun-2025 (09:01:51)   INFO: Start InternalExternal run
+21-Jun-2025 (09:01:56)   INFO:   Start TimePeriodSplit run
+21-Jun-2025 (09:02:09)   INFO:   End TimePeriodSplit run
+21-Jun-2025 (09:02:09)   INFO:   Start ExternalTollChoice run
+21-Jun-2025 (09:05:58)   INFO:   End ExternalTollChoice run
+21-Jun-2025 (09:05:58)   INFO:   Start InternalExternal _export_results
+21-Jun-2025 (09:08:37)   INFO:   End InternalExternal _export_results
+21-Jun-2025 (09:08:39)   INFO: End InternalExternal run
+21-Jun-2025 (09:08:39)   INFO: Start CommercialVehicleModel run
+21-Jun-2025 (09:08:39)   INFO:   Start CommercialVehicleTripGeneration run
+21-Jun-2025 (09:08:39)   INFO:   End CommercialVehicleTripGeneration run
+21-Jun-2025 (09:08:39)   INFO:   Start CommercialVehicleTripDistribution run
+21-Jun-2025 (09:09:22)   INFO:   End CommercialVehicleTripDistribution run
+21-Jun-2025 (09:09:22)   INFO:   Start CommercialVehicleTimeOfDay run
+21-Jun-2025 (09:09:24)   INFO:   End CommercialVehicleTimeOfDay run
+21-Jun-2025 (09:09:24)   INFO:   Start CommercialVehicleTollChoice run
+21-Jun-2025 (09:14:39)   INFO:   End CommercialVehicleTollChoice run
+21-Jun-2025 (09:18:54)   INFO: End CommercialVehicleModel run
+21-Jun-2025 (09:18:54)   INFO: Start AssignMAZSPDemand run
+21-Jun-2025 (09:18:55) STATUS:   Start MAZ assign for period EA scenario 11
+21-Jun-2025 (09:19:52) STATUS:   End MAZ assign for period EA scenario 11
+21-Jun-2025 (09:19:52) STATUS:   Start MAZ assign for period AM scenario 12
+21-Jun-2025 (09:20:47) STATUS:   End MAZ assign for period AM scenario 12
+21-Jun-2025 (09:20:47) STATUS:   Start MAZ assign for period MD scenario 13
+21-Jun-2025 (09:21:43) STATUS:   End MAZ assign for period MD scenario 13
+21-Jun-2025 (09:21:43) STATUS:   Start MAZ assign for period PM scenario 14
+21-Jun-2025 (09:22:38) STATUS:   End MAZ assign for period PM scenario 14
+21-Jun-2025 (09:22:38) STATUS:   Start MAZ assign for period EV scenario 15
+21-Jun-2025 (09:23:33) STATUS:   End MAZ assign for period EV scenario 15
+21-Jun-2025 (09:23:33)   INFO: End AssignMAZSPDemand run
+21-Jun-2025 (09:23:33) STATUS: Start Highway assignment and skims
+21-Jun-2025 (09:26:29) STATUS: Running highway assignments in process: EA, AM, MD, PM, EV
+21-Jun-2025 (09:26:29) STATUS:   Start Run EA highway assignment
+21-Jun-2025 (09:26:29)   INFO:     Start Run SOLA assignment (no path analyses)
+21-Jun-2025 (09:30:34)   INFO:     End Run SOLA assignment (no path analyses)
+21-Jun-2025 (09:30:37)   INFO:     Start Run SOLA assignment with path analyses and highway reliability
+21-Jun-2025 (09:46:43)   INFO:     End Run SOLA assignment with path analyses and highway reliability
+21-Jun-2025 (10:10:25) STATUS:   End Run EA highway assignment
+21-Jun-2025 (10:10:25) STATUS:   Start Run AM highway assignment
+21-Jun-2025 (10:10:25)   INFO:     Start Run SOLA assignment (no path analyses)
+21-Jun-2025 (10:16:05)   INFO:     End Run SOLA assignment (no path analyses)
+21-Jun-2025 (10:16:07)   INFO:     Start Run SOLA assignment with path analyses and highway reliability
+21-Jun-2025 (10:39:44)   INFO:     End Run SOLA assignment with path analyses and highway reliability
+21-Jun-2025 (11:01:36) STATUS:   End Run AM highway assignment
+21-Jun-2025 (11:01:36) STATUS:   Start Run MD highway assignment
+21-Jun-2025 (11:01:37)   INFO:     Start Run SOLA assignment (no path analyses)
+21-Jun-2025 (11:09:22)   INFO:     End Run SOLA assignment (no path analyses)
+21-Jun-2025 (11:09:24)   INFO:     Start Run SOLA assignment with path analyses and highway reliability
+21-Jun-2025 (11:43:24)   INFO:     End Run SOLA assignment with path analyses and highway reliability
+21-Jun-2025 (12:05:31) STATUS:   End Run MD highway assignment
+21-Jun-2025 (12:05:31) STATUS:   Start Run PM highway assignment
+21-Jun-2025 (12:05:31)   INFO:     Start Run SOLA assignment (no path analyses)
+21-Jun-2025 (12:15:42)   INFO:     End Run SOLA assignment (no path analyses)
+21-Jun-2025 (12:15:44)   INFO:     Start Run SOLA assignment with path analyses and highway reliability
+21-Jun-2025 (12:57:25)   INFO:     End Run SOLA assignment with path analyses and highway reliability
+21-Jun-2025 (13:18:19) STATUS:   End Run PM highway assignment
+21-Jun-2025 (13:18:19) STATUS:   Start Run EV highway assignment
+21-Jun-2025 (13:18:20)   INFO:     Start Run SOLA assignment (no path analyses)
+21-Jun-2025 (13:22:13)   INFO:     End Run SOLA assignment (no path analyses)
+21-Jun-2025 (13:22:15)   INFO:     Start Run SOLA assignment with path analyses and highway reliability
+21-Jun-2025 (13:37:38)   INFO:     End Run SOLA assignment with path analyses and highway reliability
+21-Jun-2025 (13:58:31) STATUS:   End Run EV highway assignment
+21-Jun-2025 (13:58:31) STATUS: End Highway assignment and skims
+21-Jun-2025 (13:58:31)   INFO: Start Transit assignments
+21-Jun-2025 (13:58:31)   INFO:   Start Prepare transit demand
+21-Jun-2025 (13:59:01)   INFO:   End Prepare transit demand
+21-Jun-2025 (14:07:37)   INFO:   Start Transit assignments for a time period
+21-Jun-2025 (14:37:49)   INFO:   End Transit assignments for a time period
+21-Jun-2025 (14:48:31)   INFO:   Start Transit assignments for a time period
+21-Jun-2025 (16:54:04)   INFO:   End Transit assignments for a time period
+21-Jun-2025 (17:05:58)   INFO:   Start Transit assignments for a time period
+21-Jun-2025 (17:37:44)   INFO:   End Transit assignments for a time period
+21-Jun-2025 (17:49:05)   INFO:   Start Transit assignments for a time period
+21-Jun-2025 (19:10:39)   INFO:   End Transit assignments for a time period
+21-Jun-2025 (19:22:45)   INFO:   Start Transit assignments for a time period
+21-Jun-2025 (19:54:09)   INFO:   End Transit assignments for a time period
+21-Jun-2025 (19:56:55)   INFO: End Transit assignments
+21-Jun-2025 (19:56:55)   INFO: Start Transit skims
+21-Jun-2025 (19:56:56) STATUS:   Start period transit skims
+22-Jun-2025 (02:07:53) STATUS:   End period transit skims
+22-Jun-2025 (02:07:53)   INFO: End Transit skims
+22-Jun-2025 (02:07:53)   INFO: Start iteration 2
+22-Jun-2025 (02:07:53)   INFO: Start HouseholdModel run
+22-Jun-2025 (06:17:53)   INFO:   Start Prepare household demand matrices.
+22-Jun-2025 (06:55:22)   INFO:   End Prepare household demand matrices.
+22-Jun-2025 (06:55:22)   INFO: End HouseholdModel run
+22-Jun-2025 (06:55:22)   INFO: Start InternalExternal run
+22-Jun-2025 (06:55:23)   INFO:   Start TimePeriodSplit run
+22-Jun-2025 (06:55:35)   INFO:   End TimePeriodSplit run
+22-Jun-2025 (06:55:35)   INFO:   Start ExternalTollChoice run
+22-Jun-2025 (06:59:52)   INFO:   End ExternalTollChoice run
+22-Jun-2025 (06:59:52)   INFO:   Start InternalExternal _export_results
+22-Jun-2025 (07:03:17)   INFO:   End InternalExternal _export_results
+22-Jun-2025 (07:03:18)   INFO: End InternalExternal run
+22-Jun-2025 (07:03:18)   INFO: Start CommercialVehicleModel run
+22-Jun-2025 (07:03:18)   INFO:   Start CommercialVehicleTripGeneration run
+22-Jun-2025 (07:03:18)   INFO:   End CommercialVehicleTripGeneration run
+22-Jun-2025 (07:03:18)   INFO:   Start CommercialVehicleTripDistribution run
+22-Jun-2025 (07:03:36)   INFO:   End CommercialVehicleTripDistribution run
+22-Jun-2025 (07:03:36)   INFO:   Start CommercialVehicleTimeOfDay run
+22-Jun-2025 (07:03:38)   INFO:   End CommercialVehicleTimeOfDay run
+22-Jun-2025 (07:03:38)   INFO:   Start CommercialVehicleTollChoice run
+22-Jun-2025 (07:09:25)   INFO:   End CommercialVehicleTollChoice run
+22-Jun-2025 (07:15:05)   INFO: End CommercialVehicleModel run
+22-Jun-2025 (07:15:05)   INFO: Start AssignMAZSPDemand run
+22-Jun-2025 (07:15:05) STATUS:   Start MAZ assign for period EA scenario 11
+22-Jun-2025 (07:16:11) STATUS:   End MAZ assign for period EA scenario 11
+22-Jun-2025 (07:16:11) STATUS:   Start MAZ assign for period AM scenario 12
+22-Jun-2025 (07:17:13) STATUS:   End MAZ assign for period AM scenario 12
+22-Jun-2025 (07:17:13) STATUS:   Start MAZ assign for period MD scenario 13
+22-Jun-2025 (07:18:15) STATUS:   End MAZ assign for period MD scenario 13
+22-Jun-2025 (07:18:15) STATUS:   Start MAZ assign for period PM scenario 14
+22-Jun-2025 (07:19:16) STATUS:   End MAZ assign for period PM scenario 14
+22-Jun-2025 (07:19:16) STATUS:   Start MAZ assign for period EV scenario 15
+22-Jun-2025 (07:20:16) STATUS:   End MAZ assign for period EV scenario 15
+22-Jun-2025 (07:20:16)   INFO: End AssignMAZSPDemand run
+22-Jun-2025 (07:20:16) STATUS: Start Highway assignment and skims
+22-Jun-2025 (07:24:13) STATUS: Running highway assignments in process: EA, AM, MD, PM, EV
+22-Jun-2025 (07:24:13) STATUS:   Start Run EA highway assignment
+22-Jun-2025 (07:24:13)   INFO:     Start Run SOLA assignment (no path analyses)
+22-Jun-2025 (07:28:23)   INFO:     End Run SOLA assignment (no path analyses)
+22-Jun-2025 (07:28:25)   INFO:     Start Run SOLA assignment with path analyses and highway reliability
+22-Jun-2025 (07:45:21)   INFO:     End Run SOLA assignment with path analyses and highway reliability
+22-Jun-2025 (08:11:39) STATUS:   End Run EA highway assignment
+22-Jun-2025 (08:11:39) STATUS:   Start Run AM highway assignment
+22-Jun-2025 (08:11:40)   INFO:     Start Run SOLA assignment (no path analyses)
+22-Jun-2025 (08:17:25)   INFO:     End Run SOLA assignment (no path analyses)
+22-Jun-2025 (08:17:27)   INFO:     Start Run SOLA assignment with path analyses and highway reliability
+22-Jun-2025 (08:41:51)   INFO:     End Run SOLA assignment with path analyses and highway reliability
+22-Jun-2025 (09:08:32) STATUS:   End Run AM highway assignment
+22-Jun-2025 (09:08:32) STATUS:   Start Run MD highway assignment
+22-Jun-2025 (09:08:33)   INFO:     Start Run SOLA assignment (no path analyses)
+22-Jun-2025 (09:15:37)   INFO:     End Run SOLA assignment (no path analyses)
+22-Jun-2025 (09:15:39)   INFO:     Start Run SOLA assignment with path analyses and highway reliability
+22-Jun-2025 (09:46:25)   INFO:     End Run SOLA assignment with path analyses and highway reliability
+22-Jun-2025 (10:12:24) STATUS:   End Run MD highway assignment
+22-Jun-2025 (10:12:24) STATUS:   Start Run PM highway assignment
+22-Jun-2025 (10:12:24)   INFO:     Start Run SOLA assignment (no path analyses)
+22-Jun-2025 (10:22:43)   INFO:     End Run SOLA assignment (no path analyses)
+22-Jun-2025 (10:22:45)   INFO:     Start Run SOLA assignment with path analyses and highway reliability
+22-Jun-2025 (11:05:07)   INFO:     End Run SOLA assignment with path analyses and highway reliability
+22-Jun-2025 (11:31:40) STATUS:   End Run PM highway assignment
+22-Jun-2025 (11:31:40) STATUS:   Start Run EV highway assignment
+22-Jun-2025 (11:31:40)   INFO:     Start Run SOLA assignment (no path analyses)
+22-Jun-2025 (11:35:49)   INFO:     End Run SOLA assignment (no path analyses)
+22-Jun-2025 (11:35:51)   INFO:     Start Run SOLA assignment with path analyses and highway reliability
+22-Jun-2025 (11:51:26)   INFO:     End Run SOLA assignment with path analyses and highway reliability
+22-Jun-2025 (12:17:48) STATUS:   End Run EV highway assignment
+22-Jun-2025 (12:17:48) STATUS: End Highway assignment and skims
+22-Jun-2025 (12:17:48)   INFO: Start Transit assignments
+22-Jun-2025 (12:17:48)   INFO:   Start Prepare transit demand
+22-Jun-2025 (12:18:21)   INFO:   End Prepare transit demand
+22-Jun-2025 (12:27:14)   INFO:   Start Transit assignments for a time period
+22-Jun-2025 (12:58:20)   INFO:   End Transit assignments for a time period
+22-Jun-2025 (13:09:28)   INFO:   Start Transit assignments for a time period
+22-Jun-2025 (15:28:46)   INFO:   End Transit assignments for a time period
+22-Jun-2025 (15:41:49)   INFO:   Start Transit assignments for a time period
+22-Jun-2025 (16:13:46)   INFO:   End Transit assignments for a time period
+22-Jun-2025 (16:25:11)   INFO:   Start Transit assignments for a time period
+22-Jun-2025 (17:58:04)   INFO:   End Transit assignments for a time period
+22-Jun-2025 (18:11:24)   INFO:   Start Transit assignments for a time period
+22-Jun-2025 (18:42:39)   INFO:   End Transit assignments for a time period
+22-Jun-2025 (18:45:51)   INFO: End Transit assignments
+22-Jun-2025 (18:45:51)   INFO: Start Transit skims
+22-Jun-2025 (18:45:51) STATUS:   Start period transit skims
+23-Jun-2025 (00:34:34) STATUS:   End period transit skims
+23-Jun-2025 (00:34:34)   INFO: End Transit skims
+23-Jun-2025 (00:34:34)   INFO: Start iteration 3
+23-Jun-2025 (00:34:34)   INFO: Start HouseholdModel run
+23-Jun-2025 (07:57:05)   INFO:   Start Prepare household demand matrices.
+23-Jun-2025 (08:38:42)   INFO:   End Prepare household demand matrices.
+23-Jun-2025 (08:38:43)   INFO: End HouseholdModel run
+23-Jun-2025 (08:38:43)   INFO: Start InternalExternal run
+23-Jun-2025 (08:38:43)   INFO:   Start TimePeriodSplit run
+23-Jun-2025 (08:38:56)   INFO:   End TimePeriodSplit run
+23-Jun-2025 (08:38:56)   INFO:   Start ExternalTollChoice run
+23-Jun-2025 (08:43:21)   INFO:   End ExternalTollChoice run
+23-Jun-2025 (08:43:21)   INFO:   Start InternalExternal _export_results
+23-Jun-2025 (08:47:35)   INFO:   End InternalExternal _export_results
+23-Jun-2025 (08:47:36)   INFO: End InternalExternal run
+23-Jun-2025 (08:47:36)   INFO: Start CommercialVehicleModel run
+23-Jun-2025 (08:47:36)   INFO:   Start CommercialVehicleTripGeneration run
+23-Jun-2025 (08:47:37)   INFO:   End CommercialVehicleTripGeneration run
+23-Jun-2025 (08:47:37)   INFO:   Start CommercialVehicleTripDistribution run
+23-Jun-2025 (08:47:57)   INFO:   End CommercialVehicleTripDistribution run
+23-Jun-2025 (08:47:57)   INFO:   Start CommercialVehicleTimeOfDay run
+23-Jun-2025 (08:48:00)   INFO:   End CommercialVehicleTimeOfDay run
+23-Jun-2025 (08:48:00)   INFO:   Start CommercialVehicleTollChoice run
+23-Jun-2025 (08:53:57)   INFO:   End CommercialVehicleTollChoice run
+23-Jun-2025 (08:59:41)   INFO: End CommercialVehicleModel run
+23-Jun-2025 (08:59:41)   INFO: Start AssignMAZSPDemand run
+23-Jun-2025 (08:59:41) STATUS:   Start MAZ assign for period EA scenario 11
+23-Jun-2025 (09:00:49) STATUS:   End MAZ assign for period EA scenario 11
+23-Jun-2025 (09:00:49) STATUS:   Start MAZ assign for period AM scenario 12
+23-Jun-2025 (09:01:52) STATUS:   End MAZ assign for period AM scenario 12
+23-Jun-2025 (09:01:52) STATUS:   Start MAZ assign for period MD scenario 13
+23-Jun-2025 (09:03:50) STATUS:   End MAZ assign for period MD scenario 13
+23-Jun-2025 (09:03:50) STATUS:   Start MAZ assign for period PM scenario 14
+23-Jun-2025 (09:04:55) STATUS:   End MAZ assign for period PM scenario 14
+23-Jun-2025 (09:04:55) STATUS:   Start MAZ assign for period EV scenario 15
+23-Jun-2025 (09:05:58) STATUS:   End MAZ assign for period EV scenario 15
+23-Jun-2025 (09:05:58)   INFO: End AssignMAZSPDemand run
+23-Jun-2025 (09:05:58) STATUS: Start Highway assignment and skims
+23-Jun-2025 (09:10:03) STATUS: Running highway assignments in process: EA, AM, MD, PM, EV
+23-Jun-2025 (09:10:03) STATUS:   Start Run EA highway assignment
+23-Jun-2025 (09:10:03)   INFO:     Start Run SOLA assignment (no path analyses)
+23-Jun-2025 (09:14:44)   INFO:     End Run SOLA assignment (no path analyses)
+23-Jun-2025 (09:14:46)   INFO:     Start Run SOLA assignment with path analyses and highway reliability
+23-Jun-2025 (09:36:22)   INFO:     End Run SOLA assignment with path analyses and highway reliability
+23-Jun-2025 (10:04:06) STATUS:   End Run EA highway assignment
+23-Jun-2025 (10:04:06) STATUS:   Start Run AM highway assignment
+23-Jun-2025 (10:04:06)   INFO:     Start Run SOLA assignment (no path analyses)
+23-Jun-2025 (10:09:55)   INFO:     End Run SOLA assignment (no path analyses)
+23-Jun-2025 (10:09:58)   INFO:     Start Run SOLA assignment with path analyses and highway reliability
+23-Jun-2025 (10:34:28)   INFO:     End Run SOLA assignment with path analyses and highway reliability
+23-Jun-2025 (11:01:21) STATUS:   End Run AM highway assignment
+23-Jun-2025 (11:01:21) STATUS:   Start Run MD highway assignment
+23-Jun-2025 (11:01:22)   INFO:     Start Run SOLA assignment (no path analyses)
+23-Jun-2025 (11:09:18)   INFO:     End Run SOLA assignment (no path analyses)
+23-Jun-2025 (11:09:20)   INFO:     Start Run SOLA assignment with path analyses and highway reliability
+23-Jun-2025 (11:43:41)   INFO:     End Run SOLA assignment with path analyses and highway reliability
+23-Jun-2025 (12:10:13) STATUS:   End Run MD highway assignment
+23-Jun-2025 (12:10:13) STATUS:   Start Run PM highway assignment
+23-Jun-2025 (12:10:13)   INFO:     Start Run SOLA assignment (no path analyses)
+23-Jun-2025 (12:21:41)   INFO:     End Run SOLA assignment (no path analyses)
+23-Jun-2025 (12:21:43)   INFO:     Start Run SOLA assignment with path analyses and highway reliability
+23-Jun-2025 (13:06:11)   INFO:     End Run SOLA assignment with path analyses and highway reliability
+23-Jun-2025 (13:33:45) STATUS:   End Run PM highway assignment
+23-Jun-2025 (13:33:45) STATUS:   Start Run EV highway assignment
+23-Jun-2025 (13:33:45)   INFO:     Start Run SOLA assignment (no path analyses)
+23-Jun-2025 (13:38:03)   INFO:     End Run SOLA assignment (no path analyses)
+23-Jun-2025 (13:38:05)   INFO:     Start Run SOLA assignment with path analyses and highway reliability
+23-Jun-2025 (13:53:56)   INFO:     End Run SOLA assignment with path analyses and highway reliability
+23-Jun-2025 (14:21:50) STATUS:   End Run EV highway assignment
+23-Jun-2025 (14:21:50) STATUS: End Highway assignment and skims
+23-Jun-2025 (14:21:50)   INFO: Start Transit assignments
+23-Jun-2025 (14:21:50)   INFO:   Start Prepare transit demand
+23-Jun-2025 (14:22:24)   INFO:   End Prepare transit demand
+23-Jun-2025 (14:30:36)   INFO:   Start Transit assignments for a time period
+23-Jun-2025 (15:02:19)   INFO:   End Transit assignments for a time period
+23-Jun-2025 (16:02:02)   INFO:   Start Transit assignments for a time period
+23-Jun-2025 (18:21:42)   INFO:   End Transit assignments for a time period
+23-Jun-2025 (19:31:29)   INFO:   Start Transit assignments for a time period
+23-Jun-2025 (20:04:31)   INFO:   End Transit assignments for a time period
+23-Jun-2025 (21:12:59)   INFO:   Start Transit assignments for a time period
+23-Jun-2025 (22:37:49)   INFO:   End Transit assignments for a time period
+23-Jun-2025 (23:48:47)   INFO:   Start Transit assignments for a time period
+24-Jun-2025 (00:23:16)   INFO:   End Transit assignments for a time period
+24-Jun-2025 (01:19:07)   INFO: End Transit assignments
+24-Jun-2025 (01:19:07)   INFO: Start Transit skims
+24-Jun-2025 (01:19:07) STATUS:   Start period transit skims
+24-Jun-2025 (07:13:43) STATUS:   End period transit skims
+24-Jun-2025 (07:13:43)   INFO: End Transit skims

@@ -189,31 +189,45 @@ model_df <- read_csv(model_events_file,
                        message = col_character()),
                      skip = 1L)
 
-cpu_df <- read_csv(cpu_perform_file, 
-                   col_names = c("timestamp",
-                                 "committed_bytes_in_use",
-                                 "available_mbytes",
-                                 "pages_per_sec",
-                                 "network_bytes_per_sec",
-                                 "avg_disk_read_per_sec",
-                                 "avg_disk_write_per_sec",
-                                 "disk_queue_length",
-                                 "percent_processor_time",
-                                 "context_switches_per_sec",
-                                 "processor_queue_length"),
-                   col_types = cols(
-                     timestamp = col_character(),
-                     committed_bytes_in_use = col_double(),
-                     available_mbytes = col_double(),
-                     pages_per_sec = col_double(),
-                     network_bytes_per_sec = col_double(),
-                     avg_disk_read_per_sec = col_double(),
-                     avg_disk_write_per_sec = col_double(),
-                     disk_queue_length = col_double(),
-                     percent_processor_time = col_double(),
-                     context_switches_per_sec = col_double(),
-                     processor_queue_length = col_double()),
-                   skip = 1L)
+cpu_df <- read_csv(cpu_perform_file,
+  skip      = 1L,
+  col_names = c(
+    "timestamp",
+    "committed_bytes_in_use",
+    "available_mbytes",
+    "committed_bytes",
+    "pages_per_sec",
+    "bytes_total_per_sec",
+    "percent_disk_time",
+    "avg_disk_sec_read",
+    "avg_disk_sec_write",
+    "current_disk_queue_length",
+    "percent_dpc_time",
+    "percent_interrupt_time",
+    "percent_privileged_time",
+    "percent_processor_time",
+    "context_switches_per_sec",
+    "processor_queue_length"
+  ),
+  col_types = cols(
+    timestamp                 = col_character(),
+    committed_bytes_in_use    = col_double(),
+    available_mbytes          = col_double(),
+    committed_bytes           = col_double(),
+    pages_per_sec             = col_double(),
+    bytes_total_per_sec       = col_double(),
+    percent_disk_time         = col_double(),
+    avg_disk_sec_read         = col_double(),
+    avg_disk_sec_write        = col_double(),
+    current_disk_queue_length = col_double(),
+    percent_dpc_time          = col_double(),
+    percent_interrupt_time    = col_double(),
+    percent_privileged_time   = col_double(),
+    percent_processor_time    = col_double(),
+    context_switches_per_sec  = col_double(),
+    processor_queue_length    = col_double()
+  )
+)
 
 ```
 
@@ -353,7 +367,167 @@ plots <- lapply(metrics, function(m) {
   other_events <- anti_join(events_df, top_events, by = "Timestamp")
   sampled_others <- other_events %>%
     arrange(Timestamp) %>%
-    slice(seq(1, n(), by = 5)) %>%
+    slice(seq(1, n(), by = 20)) %>%
+    mutate(Message = str_trunc(Message, 20, side = "right"))
+
+  # base time‐series trace
+  fig <- plot_ly(
+    df,
+    x    = ~Timestamp,
+    y    = ~Value,
+    type = 'scatter',
+    mode = 'lines',
+    name = m
+  )
+
+  # add red segments + labels for top_events
+  if (nrow(top_events) > 0) {
+    fig <- fig %>%
+      add_segments(
+        data       = top_events,
+        x          = ~Timestamp, xend = ~Timestamp,
+        y          = 0,           yend = max(df$Value, na.rm = TRUE),
+        inherit    = FALSE,
+        showlegend = FALSE,
+        line       = list(color = 'red', width = 3)
+      ) %>%
+      add_annotations(
+        data        = top_events,
+        x           = ~Timestamp,
+        y           = max(df$Value, na.rm = TRUE),
+        text        = ~Message,
+        showarrow   = FALSE,
+        textangle   = -45,
+        font        = list(color = 'red', size = 8),
+        allowOverlap = FALSE
+      )
+  }
+
+  # add gray dashed segments + labels for sampled_others
+  if (nrow(sampled_others) > 0) {
+    fig <- fig %>%
+      add_segments(
+        data       = sampled_others,
+        x          = ~Timestamp, xend = ~Timestamp,
+        y          = 0,           yend = max(df$Value, na.rm = TRUE),
+        inherit    = FALSE,
+        showlegend = FALSE,
+        line       = list(color = 'gray', dash = 'dash', width = 1)
+      ) %>%
+      add_annotations(
+        data        = sampled_others,
+        x           = ~Timestamp,
+        y           = max(df$Value, na.rm = TRUE),
+        text        = ~Message,
+        showarrow   = FALSE,
+        textangle   = -45,
+        font        = list(color = 'gray', size = 8),
+        allowOverlap = FALSE
+      )
+  }
+
+  # layout with styled range slider & selector buttons
+  fig <- fig %>% layout(
+    title = m,
+    xaxis = list(
+      title        = list(text = "Time", standoff = 20),
+      rangeselector = list(
+        buttons = list(
+          list(count = 1,  label = "1h", step = "hour", stepmode = "backward"),
+          list(count = 6,  label = "6h", step = "hour", stepmode = "backward"),
+          list(step  = "all", label = "All")
+        )
+      ),
+      rangeslider = list(visible = TRUE),
+      type        = 'date',
+      range       = c(min_ts, max_ts)
+    ),
+    yaxis  = list(title = "Value"),
+    margin = list(l = 80, r = 20, t = 50, b = 50)
+  )
+
+  # inject custom CSS for slider styling
+  htmlwidgets::prependContent(fig, tags$style(HTML(custom_css)))
+})
+
+# ------------------------------------------------------------------------------
+# 4) Embed all widgets in the HTML output
+# ------------------------------------------------------------------------------
+tagList(plots)
+```
+```{r plot_individual, echo=FALSE, results='asis'}
+
+# ------------------------------------------------------------------------------
+# Custom CSS for the range slider
+# ------------------------------------------------------------------------------
+custom_css <- "
+.rangeslider-mask-min, .rangeslider-mask-max {
+  fill: steelblue !important;
+  fill-opacity: 0.3 !important;
+}
+.rangeslider-slidebox {
+  fill: lightyellow !important;
+  fill-opacity: 0.2 !important;
+}
+.rangeslider-handle-min, .rangeslider-handle-max {
+  fill: orange !important;
+  stroke: orange !important;
+}
+"
+
+# ------------------------------------------------------------------------------
+# 1) Identify the “high CPU” window (top 25% of % Processor Time)
+# ------------------------------------------------------------------------------
+cpu_df     <- perf %>% filter(Metric == "% Processor Time")
+cpu_thresh <- quantile(cpu_df$Value, 0.75, na.rm = TRUE)
+high_cpu   <- cpu_df %>% filter(Value >= cpu_thresh)
+min_ts     <- min(high_cpu$Timestamp)
+max_ts     <- max(high_cpu$Timestamp)
+
+# ------------------------------------------------------------------------------
+# 2) Define metric priority order
+# ------------------------------------------------------------------------------
+priority <- c(
+  # CPU
+  "% Processor Time",
+
+  # Memory
+  "% Committed Bytes In Use",
+  "Available MBytes")
+
+
+metrics <- c(
+  priority[priority %in% unique(perf$Metric)],
+  setdiff(unique(perf$Metric), priority)
+)
+
+# ------------------------------------------------------------------------------
+# 3) Build one plot per metric: top‐10 in red, + 1/5th of the rest in gray
+# ------------------------------------------------------------------------------
+plots <- lapply(metrics, function(m) {
+  df <- perf %>% filter(Metric == m)
+
+  # compute absolute deltas at each model event
+  deltas <- sapply(model_events$Timestamp, function(ts) {
+    i    <- which.min(abs(df$Timestamp - ts))
+    prev <- if (i > 1) df$Value[i - 1] else NA
+    nxt  <- if (i < nrow(df)) df$Value[i + 1] else NA
+    abs(nxt - prev)
+  })
+
+  # attach deltas to events
+  events_df <- model_events %>% mutate(delta = deltas)
+
+  # top 10 biggest jumps → red, thick lines
+  top_events <- events_df %>%
+    slice_max(order_by = delta, n = 10, with_ties = FALSE) %>%
+    mutate(Message = str_trunc(Message, 20, side = "right"))
+
+  # the remaining events → sample 1 out of 5 → gray, dashed thin lines
+  other_events <- anti_join(events_df, top_events, by = "Timestamp")
+  sampled_others <- other_events %>%
+    arrange(Timestamp) %>%
+    slice(seq(1, n(), by = 20)) %>%
     mutate(Message = str_trunc(Message, 20, side = "right"))
 
   # base time‐series trace
