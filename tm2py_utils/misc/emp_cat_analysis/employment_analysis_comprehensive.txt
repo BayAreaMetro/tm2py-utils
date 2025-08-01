@@ -1,0 +1,303 @@
+COMPREHENSIVE EMPLOYMENT VARIABLE ANALYSIS
+==================================================
+Generated on: 2025-08-01 15:02:34
+Model directory analyzed: C:\GitHub\travel-model-two\model-files\model
+TM2 root directory: C:\GitHub\travel-model-two
+Output directory: .
+
+HOW TO READ THIS REPORT:
+-------------------------
+OCCURRENCES: Total number of times a variable was found across all Excel cells.
+            This includes: cell values, formula references, column headers,
+            coefficient tables, and any other text mentioning the variable.
+
+MODELS:     Number of different Excel model files containing the variable.
+            Each Excel file represents a different travel model component
+            (e.g., TourModeChoice.xls, AutoOwnership.xls, etc.).
+
+VARIABLE TYPES:
+  - Official:      The 27 employment variables from TM2 documentation
+  - Aggregated:    Combinations of official variables (e.g., 'retail' = ret_loc + ret_reg)
+  - Undocumented:  Legacy or alternative names that map to official variables
+  - Unknown:       Variables not in any of the above categories
+
+EXAMPLE: 'ag    183 occurrences in 14 models (official)' means:
+         The agriculture employment variable 'ag' was found 183 times
+         across 14 different Excel model files, and it's an official TM2 variable.
+
+======================================================================
+
+OFFICIAL EMPLOYMENT VARIABLES (27):
+-----------------------------------
+ 1. ag
+ 2. art_rec
+ 3. constr
+ 4. eat
+ 5. ed_high
+ 6. ed_k12
+ 7. ed_oth
+ 8. fire
+ 9. gov
+10. health
+11. hotel
+12. info
+13. lease
+14. logis
+15. man_bio
+16. man_hvy
+17. man_lgt
+18. man_tech
+19. natres
+20. prof
+21. ret_loc
+22. ret_reg
+23. serv_bus
+24. serv_pers
+25. serv_soc
+26. transp
+27. util
+
+AGGREGATED VARIABLES:
+--------------------
+  - emp_total
+  - empTotal
+  - totemp
+  - education
+  - retail
+  - manufacturing
+  - services
+  - empEduHealth
+
+VARIABLE USAGE SUMMARY:
+-------------------------
+NOTE: 'Occurrences' = total times variable found across all Excel cells
+      'Models' = number of different Excel files containing the variable
+      Each occurrence could be: cell values, formula references, headers, etc.
+
+retail                112 occurrences in  5 models (aggregated)
+education              36 occurrences in  6 models (aggregated)
+services               26 occurrences in  3 models (aggregated)
+manufacturing          24 occurrences in  2 models (aggregated)
+health                 18 occurrences in  3 models (official)
+utilities              18 occurrences in  3 models (undocumented)
+empTotal               16 occurrences in  1 models (aggregated)
+hotel                  12 occurrences in  2 models (official)
+eat                    10 occurrences in  3 models (official)
+ed_oth                 10 occurrences in  3 models (official)
+ed_high                 9 occurrences in  3 models (official)
+serv_pers               9 occurrences in  3 models (official)
+man_bio                 8 occurrences in  3 models (official)
+professional            8 occurrences in  2 models (undocumented)
+serv_soc                8 occurrences in  2 models (official)
+emp_total               8 occurrences in  3 models (aggregated)
+ag                      7 occurrences in  3 models (official)
+constr                  7 occurrences in  3 models (official)
+ed_k12                  7 occurrences in  3 models (official)
+man_hvy                 7 occurrences in  3 models (official)
+man_lgt                 7 occurrences in  3 models (official)
+man_tech                7 occurrences in  3 models (official)
+serv_bus                7 occurrences in  3 models (official)
+transp                  7 occurrences in  3 models (official)
+util                    7 occurrences in  3 models (official)
+agriculture             6 occurrences in  2 models (undocumented)
+arts                    6 occurrences in  2 models (undocumented)
+art_rec                 6 occurrences in  2 models (official)
+construction            6 occurrences in  2 models (undocumented)
+fire                    6 occurrences in  2 models (official)
+gov                     6 occurrences in  2 models (official)
+information             6 occurrences in  2 models (undocumented)
+info                    6 occurrences in  2 models (official)
+lease                   6 occurrences in  2 models (official)
+logis                   6 occurrences in  2 models (official)
+natres                  6 occurrences in  2 models (official)
+prof                    6 occurrences in  2 models (official)
+ret_loc                 6 occurrences in  2 models (official)
+ret_reg                 6 occurrences in  2 models (official)
+empEduHealth            6 occurrences in  1 models (aggregated)
+management              2 occurrences in  1 models (undocumented)
+military                2 occurrences in  1 models (undocumented)
+emp_pvt_ed_post_k12_oth    2 occurrences in  1 models (undocumented)
+emp_personal_svcs_office    1 occurrences in  1 models (undocumented)
+
+UNDOCUMENTED → OFFICIAL VARIABLE MAPPINGS:
+---------------------------------------------
+accommodation             → hotel
+administrative            → serv_bus
+agriculture               → ag
+arts                      → art_rec
+construction              → constr
+education                 → ed_k12 + ed_high + ed_oth
+empEduHealth              → ed_k12 + ed_high + ed_oth + health
+empTotal                  → Total of all employment categories
+emp_ag                    → ag
+emp_amusement             → art_rec
+emp_const_bldg_office     → constr
+emp_const_bldg_prod       → constr
+emp_const_non_bldg_office → constr
+emp_const_non_bldg_prod   → constr
+emp_fed_mil               → gov
+emp_fed_non_mil           → gov
+emp_health                → health
+emp_hotel                 → hotel
+emp_mfg_office            → man_lgt + man_hvy + man_tech + man_bio
+emp_mfg_prod              → man_lgt + man_hvy + man_tech + man_bio
+emp_othr_svcs             → serv_bus + serv_pers + serv_soc
+emp_personal_svcs_office  → serv_pers
+emp_personal_svcs_retail  → serv_pers
+emp_prof_bus_svcs         → prof + serv_bus
+emp_prof_bus_svcs_bldg_maint → prof + serv_bus
+emp_public_ed             → ed_k12 + ed_high + ed_oth
+emp_pvt_ed_k12            → ed_k12
+emp_pvt_ed_post_k12_oth   → ed_high + ed_oth
+emp_restaurant_bar        → eat
+emp_retail_loc            → ret_loc
+emp_retail_reg            → ret_reg
+emp_state_local_gov_blue  → gov
+emp_state_local_gov_white → gov
+emp_total                 → Total of all employment categories
+emp_whsle_whs             → logis
+finance                   → fire
+food_service              → eat
+industrial                → man_lgt + man_hvy + man_tech + man_bio + util
+information               → info
+management                → prof
+manufacturing_food        → man_bio
+manufacturing_nonfood     → man_lgt + man_hvy + man_tech
+military                  → gov
+office                    → prof + serv_bus + fire + info
+other_services            → serv_bus + serv_pers + serv_soc
+professional              → prof
+real_estate               → fire
+retail                    → ret_loc + ret_reg
+totemp                    → Total of all employment categories
+transport                 → transp
+utilities                 → util
+wholesale                 → logis
+
+MODEL DETAILS:
+---------------
+
+Accessibilities (40 variables):
+  - ag (7 occurrences, official)
+  - agriculture (6 occurrences, undocumented)
+  - art_rec (6 occurrences, official)
+  - arts (6 occurrences, undocumented)
+  - constr (7 occurrences, official)
+  - construction (6 occurrences, undocumented)
+  - eat (10 occurrences, official)
+  - ed_high (9 occurrences, official)
+  - ed_k12 (7 occurrences, official)
+  - ed_oth (10 occurrences, official)
+  - education (36 occurrences, aggregated)
+  - emp_total (8 occurrences, aggregated)
+  - fire (6 occurrences, official)
+  - gov (6 occurrences, official)
+  - health (18 occurrences, official)
+  - hotel (12 occurrences, official)
+  - info (6 occurrences, official)
+  - information (6 occurrences, undocumented)
+  - lease (6 occurrences, official)
+  - logis (6 occurrences, official)
+  - man_bio (8 occurrences, official)
+  - man_hvy (7 occurrences, official)
+  - man_lgt (7 occurrences, official)
+  - man_tech (7 occurrences, official)
+  - management (2 occurrences, undocumented)
+  - manufacturing (24 occurrences, aggregated)
+  - military (2 occurrences, undocumented)
+  - natres (6 occurrences, official)
+  - prof (6 occurrences, official)
+  - professional (8 occurrences, undocumented)
+  - ret_loc (6 occurrences, official)
+  - ret_reg (6 occurrences, official)
+  - retail (112 occurrences, aggregated)
+  - serv_bus (7 occurrences, official)
+  - serv_pers (9 occurrences, official)
+  - serv_soc (8 occurrences, official)
+  - services (26 occurrences, aggregated)
+  - transp (7 occurrences, official)
+  - util (7 occurrences, official)
+  - utilities (18 occurrences, undocumented)
+
+AtWorkSubtourFrequency (1 variables):
+  - eat (10 occurrences, official)
+
+AutoOwnership (2 variables):
+  - education (36 occurrences, aggregated)
+  - retail (112 occurrences, aggregated)
+
+CoordinatedDailyActivityPattern (2 variables):
+  - retail (112 occurrences, aggregated)
+  - utilities (18 occurrences, undocumented)
+
+NonMandatoryIndividualTourFrequency (1 variables):
+  - retail (112 occurrences, aggregated)
+
+ParkingProvision (21 variables):
+  - ag (7 occurrences, official)
+  - constr (7 occurrences, official)
+  - ed_high (9 occurrences, official)
+  - ed_k12 (7 occurrences, official)
+  - ed_oth (10 occurrences, official)
+  - education (36 occurrences, aggregated)
+  - empEduHealth (6 occurrences, aggregated)
+  - empTotal (16 occurrences, aggregated)
+  - emp_personal_svcs_office (1 occurrences, undocumented)
+  - emp_pvt_ed_post_k12_oth (2 occurrences, undocumented)
+  - emp_total (8 occurrences, aggregated)
+  - health (18 occurrences, official)
+  - man_bio (8 occurrences, official)
+  - man_hvy (7 occurrences, official)
+  - man_lgt (7 occurrences, official)
+  - man_tech (7 occurrences, official)
+  - serv_bus (7 occurrences, official)
+  - serv_pers (9 occurrences, official)
+  - services (26 occurrences, aggregated)
+  - transp (7 occurrences, official)
+  - util (7 occurrences, official)
+
+SlcSoaSize (38 variables):
+  - ag (7 occurrences, official)
+  - agriculture (6 occurrences, undocumented)
+  - art_rec (6 occurrences, official)
+  - arts (6 occurrences, undocumented)
+  - constr (7 occurrences, official)
+  - construction (6 occurrences, undocumented)
+  - eat (10 occurrences, official)
+  - ed_high (9 occurrences, official)
+  - ed_k12 (7 occurrences, official)
+  - ed_oth (10 occurrences, official)
+  - education (36 occurrences, aggregated)
+  - emp_total (8 occurrences, aggregated)
+  - fire (6 occurrences, official)
+  - gov (6 occurrences, official)
+  - health (18 occurrences, official)
+  - hotel (12 occurrences, official)
+  - info (6 occurrences, official)
+  - information (6 occurrences, undocumented)
+  - lease (6 occurrences, official)
+  - logis (6 occurrences, official)
+  - man_bio (8 occurrences, official)
+  - man_hvy (7 occurrences, official)
+  - man_lgt (7 occurrences, official)
+  - man_tech (7 occurrences, official)
+  - manufacturing (24 occurrences, aggregated)
+  - natres (6 occurrences, official)
+  - prof (6 occurrences, official)
+  - professional (8 occurrences, undocumented)
+  - ret_loc (6 occurrences, official)
+  - ret_reg (6 occurrences, official)
+  - retail (112 occurrences, aggregated)
+  - serv_bus (7 occurrences, official)
+  - serv_pers (9 occurrences, official)
+  - serv_soc (8 occurrences, official)
+  - services (26 occurrences, aggregated)
+  - transp (7 occurrences, official)
+  - util (7 occurrences, official)
+  - utilities (18 occurrences, undocumented)
+
+TourDestinationChoice (1 variables):
+  - education (36 occurrences, aggregated)
+
+TourDestinationChoice2 (1 variables):
+  - education (36 occurrences, aggregated)

@@ -1,0 +1,3910 @@
+{
+  "metadata": {
+    "generated_on": "2025-08-01 15:02:34",
+    "model_directory_analyzed": "C:\\GitHub\\travel-model-two\\model-files\\model",
+    "tm2_directory": "C:\\GitHub\\travel-model-two",
+    "output_directory": ".",
+    "total_files_analyzed": 9,
+    "total_variables_found": 44
+  },
+  "variable_definitions": {
+    "official_employment_variables": [
+      "ag",
+      "art_rec",
+      "constr",
+      "eat",
+      "ed_high",
+      "ed_k12",
+      "ed_oth",
+      "fire",
+      "gov",
+      "health",
+      "hotel",
+      "info",
+      "lease",
+      "logis",
+      "man_bio",
+      "man_hvy",
+      "man_lgt",
+      "man_tech",
+      "natres",
+      "prof",
+      "ret_loc",
+      "ret_reg",
+      "serv_bus",
+      "serv_pers",
+      "serv_soc",
+      "transp",
+      "util"
+    ],
+    "aggregated_variables": [
+      "emp_total",
+      "empTotal",
+      "totemp",
+      "education",
+      "retail",
+      "manufacturing",
+      "services",
+      "empEduHealth"
+    ],
+    "undocumented_variables": [
+      "emp_ag",
+      "emp_const_non_bldg_prod",
+      "emp_const_non_bldg_office",
+      "emp_const_bldg_prod",
+      "emp_const_bldg_office",
+      "emp_mfg_prod",
+      "emp_mfg_office",
+      "emp_whsle_whs",
+      "emp_retail_loc",
+      "emp_retail_reg",
+      "emp_prof_bus_svcs",
+      "emp_prof_bus_svcs_bldg_maint",
+      "emp_pvt_ed_k12",
+      "emp_pvt_ed_post_k12_oth",
+      "emp_public_ed",
+      "emp_health",
+      "emp_hotel",
+      "emp_restaurant_bar",
+      "emp_personal_svcs_office",
+      "emp_personal_svcs_retail",
+      "emp_amusement",
+      "emp_othr_svcs",
+      "emp_fed_non_mil",
+      "emp_fed_mil",
+      "emp_state_local_gov_blue",
+      "emp_state_local_gov_white",
+      "agriculture",
+      "construction",
+      "manufacturing_food",
+      "manufacturing_nonfood",
+      "wholesale",
+      "transport",
+      "information",
+      "finance",
+      "real_estate",
+      "professional",
+      "management",
+      "administrative",
+      "arts",
+      "accommodation",
+      "food_service",
+      "other_services",
+      "military",
+      "utilities",
+      "office",
+      "industrial"
+    ]
+  },
+  "variable_mappings": {
+    "emp_const_non_bldg_prod": "constr",
+    "emp_const_non_bldg_office": "constr",
+    "emp_const_bldg_prod": "constr",
+    "emp_const_bldg_office": "constr",
+    "construction": "constr",
+    "emp_mfg_prod": [
+      "man_lgt",
+      "man_hvy",
+      "man_tech",
+      "man_bio"
+    ],
+    "emp_mfg_office": [
+      "man_lgt",
+      "man_hvy",
+      "man_tech",
+      "man_bio"
+    ],
+    "manufacturing_food": "man_bio",
+    "manufacturing_nonfood": [
+      "man_lgt",
+      "man_hvy",
+      "man_tech"
+    ],
+    "emp_whsle_whs": "logis",
+    "emp_retail_loc": "ret_loc",
+    "emp_retail_reg": "ret_reg",
+    "wholesale": "logis",
+    "retail": [
+      "ret_loc",
+      "ret_reg"
+    ],
+    "emp_prof_bus_svcs": [
+      "prof",
+      "serv_bus"
+    ],
+    "emp_prof_bus_svcs_bldg_maint": [
+      "prof",
+      "serv_bus"
+    ],
+    "professional": "prof",
+    "management": "prof",
+    "administrative": "serv_bus",
+    "emp_pvt_ed_k12": "ed_k12",
+    "emp_pvt_ed_post_k12_oth": [
+      "ed_high",
+      "ed_oth"
+    ],
+    "emp_public_ed": [
+      "ed_k12",
+      "ed_high",
+      "ed_oth"
+    ],
+    "education": [
+      "ed_k12",
+      "ed_high",
+      "ed_oth"
+    ],
+    "empEduHealth": [
+      "ed_k12",
+      "ed_high",
+      "ed_oth",
+      "health"
+    ],
+    "emp_health": "health",
+    "emp_hotel": "hotel",
+    "accommodation": "hotel",
+    "emp_restaurant_bar": "eat",
+    "food_service": "eat",
+    "emp_personal_svcs_office": "serv_pers",
+    "emp_personal_svcs_retail": "serv_pers",
+    "emp_amusement": "art_rec",
+    "arts": "art_rec",
+    "emp_othr_svcs": [
+      "serv_bus",
+      "serv_pers",
+      "serv_soc"
+    ],
+    "other_services": [
+      "serv_bus",
+      "serv_pers",
+      "serv_soc"
+    ],
+    "emp_fed_non_mil": "gov",
+    "emp_fed_mil": "gov",
+    "emp_state_local_gov_blue": "gov",
+    "emp_state_local_gov_white": "gov",
+    "military": "gov",
+    "emp_ag": "ag",
+    "agriculture": "ag",
+    "empTotal": "Total of all employment categories",
+    "emp_total": "Total of all employment categories",
+    "totemp": "Total of all employment categories",
+    "transport": "transp",
+    "information": "info",
+    "finance": "fire",
+    "real_estate": "fire",
+    "utilities": "util",
+    "office": [
+      "prof",
+      "serv_bus",
+      "fire",
+      "info"
+    ],
+    "industrial": [
+      "man_lgt",
+      "man_hvy",
+      "man_tech",
+      "man_bio",
+      "util"
+    ]
+  },
+  "analysis_results": {
+    "variable_counts": {
+      "eat": 10,
+      "agriculture": 6,
+      "ag": 7,
+      "arts": 6,
+      "art_rec": 6,
+      "construction": 6,
+      "constr": 7,
+      "education": 36,
+      "ed_high": 9,
+      "ed_k12": 7,
+      "ed_oth": 10,
+      "fire": 6,
+      "gov": 6,
+      "health": 18,
+      "hotel": 12,
+      "information": 6,
+      "info": 6,
+      "lease": 6,
+      "logis": 6,
+      "manufacturing": 24,
+      "man_bio": 8,
+      "man_hvy": 7,
+      "man_lgt": 7,
+      "man_tech": 7,
+      "natres": 6,
+      "professional": 8,
+      "prof": 6,
+      "retail": 112,
+      "ret_loc": 6,
+      "ret_reg": 6,
+      "services": 26,
+      "serv_bus": 7,
+      "serv_pers": 9,
+      "serv_soc": 8,
+      "transp": 7,
+      "utilities": 18,
+      "util": 7,
+      "emp_total": 8,
+      "management": 2,
+      "military": 2,
+      "empEduHealth": 6,
+      "empTotal": 16,
+      "emp_pvt_ed_post_k12_oth": 2,
+      "emp_personal_svcs_office": 1
+    },
+    "model_usage": {
+      "Accessibilities": [
+        "retail",
+        "art_rec",
+        "education",
+        "ag",
+        "military",
+        "information",
+        "eat",
+        "ed_oth",
+        "ret_loc",
+        "ed_k12",
+        "health",
+        "man_hvy",
+        "utilities",
+        "management",
+        "professional",
+        "logis",
+        "fire",
+        "ed_high",
+        "serv_pers",
+        "info",
+        "manufacturing",
+        "prof",
+        "serv_soc",
+        "services",
+        "gov",
+        "util",
+        "emp_total",
+        "constr",
+        "transp",
+        "natres",
+        "ret_reg",
+        "hotel",
+        "construction",
+        "lease",
+        "man_tech",
+        "agriculture",
+        "arts",
+        "serv_bus",
+        "man_lgt",
+        "man_bio"
+      ],
+      "AtWorkSubtourFrequency": [
+        "eat"
+      ],
+      "AutoOwnership": [
+        "retail",
+        "education"
+      ],
+      "CoordinatedDailyActivityPattern": [
+        "retail",
+        "utilities"
+      ],
+      "NonMandatoryIndividualTourFrequency": [
+        "retail"
+      ],
+      "ParkingProvision": [
+        "education",
+        "ag",
+        "ed_oth",
+        "empTotal",
+        "ed_k12",
+        "man_hvy",
+        "health",
+        "emp_personal_svcs_office",
+        "ed_high",
+        "serv_pers",
+        "services",
+        "util",
+        "emp_total",
+        "constr",
+        "transp",
+        "man_tech",
+        "emp_pvt_ed_post_k12_oth",
+        "empEduHealth",
+        "serv_bus",
+        "man_lgt",
+        "man_bio"
+      ],
+      "SlcSoaSize": [
+        "retail",
+        "art_rec",
+        "education",
+        "ag",
+        "information",
+        "eat",
+        "ed_oth",
+        "ret_loc",
+        "ed_k12",
+        "health",
+        "man_hvy",
+        "utilities",
+        "professional",
+        "logis",
+        "fire",
+        "ed_high",
+        "serv_pers",
+        "info",
+        "manufacturing",
+        "prof",
+        "serv_soc",
+        "services",
+        "gov",
+        "util",
+        "emp_total",
+        "constr",
+        "transp",
+        "natres",
+        "ret_reg",
+        "hotel",
+        "construction",
+        "lease",
+        "man_tech",
+        "agriculture",
+        "arts",
+        "serv_bus",
+        "man_lgt",
+        "man_bio"
+      ],
+      "TourDestinationChoice": [
+        "education"
+      ],
+      "TourDestinationChoice2": [
+        "education"
+      ]
+    },
+    "detailed_findings": {
+      "Accessibilities.xls": {
+        "size terms - non-mandatory": [
+          {
+            "location": "Row 4, Col 10",
+            "content": "Eat",
+            "variable": "eat",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 4, Col 10",
+            "content": "Eat",
+            "variable": "eat",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 8, Col 3",
+            "content": "Agriculture employment",
+            "variable": "agriculture",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 8, Col 3",
+            "content": "Agriculture employment",
+            "variable": "agriculture",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 8, Col 5",
+            "content": "ag",
+            "variable": "ag",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 8, Col 5",
+            "content": "ag",
+            "variable": "ag",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 9, Col 3",
+            "content": "Arts & recreational employment",
+            "variable": "arts",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 9, Col 3",
+            "content": "Arts & recreational employment",
+            "variable": "arts",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 9, Col 5",
+            "content": "art_rec",
+            "variable": "art_rec",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 9, Col 5",
+            "content": "art_rec",
+            "variable": "art_rec",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 10, Col 3",
+            "content": "Construction employment",
+            "variable": "construction",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 10, Col 3",
+            "content": "Construction employment",
+            "variable": "construction",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 10, Col 5",
+            "content": "constr",
+            "variable": "constr",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 10, Col 5",
+            "content": "constr",
+            "variable": "constr",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 11, Col 5",
+            "content": "eat",
+            "variable": "eat",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 11, Col 5",
+            "content": "eat",
+            "variable": "eat",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 12, Col 3",
+            "content": "Higher education employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 12, Col 3",
+            "content": "Higher education employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 12, Col 5",
+            "content": "ed_high",
+            "variable": "ed_high",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 12, Col 5",
+            "content": "ed_high",
+            "variable": "ed_high",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 13, Col 3",
+            "content": "K-12 education employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 13, Col 3",
+            "content": "K-12 education employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 13, Col 5",
+            "content": "ed_k12",
+            "variable": "ed_k12",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 13, Col 5",
+            "content": "ed_k12",
+            "variable": "ed_k12",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 14, Col 3",
+            "content": "Other education employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 14, Col 3",
+            "content": "Other education employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 14, Col 5",
+            "content": "ed_oth",
+            "variable": "ed_oth",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 14, Col 5",
+            "content": "ed_oth",
+            "variable": "ed_oth",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 15, Col 5",
+            "content": "fire",
+            "variable": "fire",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 15, Col 5",
+            "content": "fire",
+            "variable": "fire",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 16, Col 5",
+            "content": "gov",
+            "variable": "gov",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 16, Col 5",
+            "content": "gov",
+            "variable": "gov",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 17, Col 3",
+            "content": "Health employment",
+            "variable": "health",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 17, Col 3",
+            "content": "Health employment",
+            "variable": "health",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 17, Col 5",
+            "content": "health",
+            "variable": "health",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 17, Col 5",
+            "content": "health",
+            "variable": "health",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 18, Col 3",
+            "content": "Hotel employment",
+            "variable": "hotel",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 18, Col 3",
+            "content": "Hotel employment",
+            "variable": "hotel",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 18, Col 5",
+            "content": "hotel",
+            "variable": "hotel",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 18, Col 5",
+            "content": "hotel",
+            "variable": "hotel",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 19, Col 3",
+            "content": "Information employment",
+            "variable": "information",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 19, Col 3",
+            "content": "Information employment",
+            "variable": "information",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 19, Col 5",
+            "content": "info",
+            "variable": "info",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 19, Col 5",
+            "content": "info",
+            "variable": "info",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 20, Col 5",
+            "content": "lease",
+            "variable": "lease",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 20, Col 5",
+            "content": "lease",
+            "variable": "lease",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 21, Col 5",
+            "content": "logis",
+            "variable": "logis",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 21, Col 5",
+            "content": "logis",
+            "variable": "logis",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 22, Col 3",
+            "content": "Biological manufacturing employment",
+            "variable": "manufacturing",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 22, Col 3",
+            "content": "Biological manufacturing employment",
+            "variable": "manufacturing",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 22, Col 5",
+            "content": "man_bio",
+            "variable": "man_bio",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 22, Col 5",
+            "content": "man_bio",
+            "variable": "man_bio",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 23, Col 3",
+            "content": "Heavy manufacturing employment",
+            "variable": "manufacturing",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 23, Col 3",
+            "content": "Heavy manufacturing employment",
+            "variable": "manufacturing",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 23, Col 5",
+            "content": "man_hvy",
+            "variable": "man_hvy",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 23, Col 5",
+            "content": "man_hvy",
+            "variable": "man_hvy",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 24, Col 3",
+            "content": "Light manufacturing employment",
+            "variable": "manufacturing",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 24, Col 3",
+            "content": "Light manufacturing employment",
+            "variable": "manufacturing",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 24, Col 5",
+            "content": "man_lgt",
+            "variable": "man_lgt",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 24, Col 5",
+            "content": "man_lgt",
+            "variable": "man_lgt",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 25, Col 3",
+            "content": "Technology manufacturing employment",
+            "variable": "manufacturing",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 25, Col 3",
+            "content": "Technology manufacturing employment",
+            "variable": "manufacturing",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 25, Col 5",
+            "content": "man_tech",
+            "variable": "man_tech",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 25, Col 5",
+            "content": "man_tech",
+            "variable": "man_tech",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 26, Col 5",
+            "content": "natres",
+            "variable": "natres",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 26, Col 5",
+            "content": "natres",
+            "variable": "natres",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 27, Col 3",
+            "content": "Professional employment",
+            "variable": "professional",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 27, Col 3",
+            "content": "Professional employment",
+            "variable": "professional",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 27, Col 5",
+            "content": "prof",
+            "variable": "prof",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 27, Col 5",
+            "content": "prof",
+            "variable": "prof",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 28, Col 3",
+            "content": "Local retail employment",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 28, Col 3",
+            "content": "Local retail employment",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 28, Col 5",
+            "content": "ret_loc",
+            "variable": "ret_loc",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 28, Col 5",
+            "content": "ret_loc",
+            "variable": "ret_loc",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 29, Col 3",
+            "content": "Regional retail employment",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 29, Col 3",
+            "content": "Regional retail employment",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 29, Col 5",
+            "content": "ret_reg",
+            "variable": "ret_reg",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 29, Col 5",
+            "content": "ret_reg",
+            "variable": "ret_reg",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 30, Col 3",
+            "content": "Business services employment",
+            "variable": "services",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 30, Col 3",
+            "content": "Business services employment",
+            "variable": "services",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 30, Col 5",
+            "content": "serv_bus",
+            "variable": "serv_bus",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 30, Col 5",
+            "content": "serv_bus",
+            "variable": "serv_bus",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 31, Col 3",
+            "content": "Personal services employment",
+            "variable": "services",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 31, Col 3",
+            "content": "Personal services employment",
+            "variable": "services",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 31, Col 5",
+            "content": "serv_pers",
+            "variable": "serv_pers",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 31, Col 5",
+            "content": "serv_pers",
+            "variable": "serv_pers",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 32, Col 3",
+            "content": "Social services employment",
+            "variable": "services",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 32, Col 3",
+            "content": "Social services employment",
+            "variable": "services",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 32, Col 5",
+            "content": "serv_soc",
+            "variable": "serv_soc",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 32, Col 5",
+            "content": "serv_soc",
+            "variable": "serv_soc",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 33, Col 5",
+            "content": "transp",
+            "variable": "transp",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 33, Col 5",
+            "content": "transp",
+            "variable": "transp",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 34, Col 3",
+            "content": "Utilities employment",
+            "variable": "utilities",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 34, Col 3",
+            "content": "Utilities employment",
+            "variable": "utilities",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 34, Col 5",
+            "content": "util",
+            "variable": "util",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 34, Col 5",
+            "content": "util",
+            "variable": "util",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 35, Col 5",
+            "content": "emp_total",
+            "variable": "emp_total",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 35, Col 5",
+            "content": "emp_total",
+            "variable": "emp_total",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          }
+        ],
+        "size terms - school": [
+          {
+            "location": "Row 7, Col 3",
+            "content": "Social services employment",
+            "variable": "services",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 7, Col 3",
+            "content": "Social services employment",
+            "variable": "services",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 7, Col 5",
+            "content": "serv_soc",
+            "variable": "serv_soc",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 7, Col 5",
+            "content": "serv_soc",
+            "variable": "serv_soc",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 8, Col 3",
+            "content": "Personal services employment",
+            "variable": "services",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 8, Col 3",
+            "content": "Personal services employment",
+            "variable": "services",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 8, Col 5",
+            "content": "serv_pers",
+            "variable": "serv_pers",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 8, Col 5",
+            "content": "serv_pers",
+            "variable": "serv_pers",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 9, Col 3",
+            "content": "Higher education employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 9, Col 3",
+            "content": "Higher education employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 9, Col 5",
+            "content": "ed_high",
+            "variable": "ed_high",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 9, Col 5",
+            "content": "ed_high",
+            "variable": "ed_high",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 10, Col 3",
+            "content": "Other education employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 10, Col 3",
+            "content": "Other education employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 10, Col 5",
+            "content": "ed_oth",
+            "variable": "ed_oth",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 10, Col 5",
+            "content": "ed_oth",
+            "variable": "ed_oth",
+            "variable_type": "official",
+            "type": "formula_variable"
+          }
+        ],
+        "size terms - work": [
+          {
+            "location": "Row 4, Col 7",
+            "content": "Management",
+            "variable": "management",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 4, Col 7",
+            "content": "Management",
+            "variable": "management",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 4, Col 8",
+            "content": "Professional",
+            "variable": "professional",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 4, Col 8",
+            "content": "Professional",
+            "variable": "professional",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 4, Col 9",
+            "content": "Services",
+            "variable": "services",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 4, Col 9",
+            "content": "Services",
+            "variable": "services",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 4, Col 10",
+            "content": "Retail",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 4, Col 10",
+            "content": "Retail",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 4, Col 12",
+            "content": "Military",
+            "variable": "military",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 4, Col 12",
+            "content": "Military",
+            "variable": "military",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 6, Col 3",
+            "content": "Agriculture employment",
+            "variable": "agriculture",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 6, Col 3",
+            "content": "Agriculture employment",
+            "variable": "agriculture",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 6, Col 5",
+            "content": "ag",
+            "variable": "ag",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 6, Col 5",
+            "content": "ag",
+            "variable": "ag",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 7, Col 3",
+            "content": "Arts & recreational employment",
+            "variable": "arts",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 7, Col 3",
+            "content": "Arts & recreational employment",
+            "variable": "arts",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 7, Col 5",
+            "content": "art_rec",
+            "variable": "art_rec",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 7, Col 5",
+            "content": "art_rec",
+            "variable": "art_rec",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 8, Col 3",
+            "content": "Construction employment",
+            "variable": "construction",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 8, Col 3",
+            "content": "Construction employment",
+            "variable": "construction",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 8, Col 5",
+            "content": "constr",
+            "variable": "constr",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 8, Col 5",
+            "content": "constr",
+            "variable": "constr",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 9, Col 5",
+            "content": "eat",
+            "variable": "eat",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 9, Col 5",
+            "content": "eat",
+            "variable": "eat",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 10, Col 3",
+            "content": "Higher education employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 10, Col 3",
+            "content": "Higher education employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 10, Col 5",
+            "content": "ed_high",
+            "variable": "ed_high",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 10, Col 5",
+            "content": "ed_high",
+            "variable": "ed_high",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 11, Col 3",
+            "content": "K-12 education employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 11, Col 3",
+            "content": "K-12 education employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 11, Col 5",
+            "content": "ed_k12",
+            "variable": "ed_k12",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 11, Col 5",
+            "content": "ed_k12",
+            "variable": "ed_k12",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 12, Col 3",
+            "content": "Other education employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 12, Col 3",
+            "content": "Other education employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 12, Col 5",
+            "content": "ed_oth",
+            "variable": "ed_oth",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 12, Col 5",
+            "content": "ed_oth",
+            "variable": "ed_oth",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 13, Col 5",
+            "content": "fire",
+            "variable": "fire",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 13, Col 5",
+            "content": "fire",
+            "variable": "fire",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 14, Col 5",
+            "content": "gov",
+            "variable": "gov",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 14, Col 5",
+            "content": "gov",
+            "variable": "gov",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 15, Col 3",
+            "content": "Health employment",
+            "variable": "health",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 15, Col 3",
+            "content": "Health employment",
+            "variable": "health",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 15, Col 5",
+            "content": "health",
+            "variable": "health",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 15, Col 5",
+            "content": "health",
+            "variable": "health",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 16, Col 3",
+            "content": "Hotel employment",
+            "variable": "hotel",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 16, Col 3",
+            "content": "Hotel employment",
+            "variable": "hotel",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 16, Col 5",
+            "content": "hotel",
+            "variable": "hotel",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 16, Col 5",
+            "content": "hotel",
+            "variable": "hotel",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 17, Col 3",
+            "content": "Information employment",
+            "variable": "information",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 17, Col 3",
+            "content": "Information employment",
+            "variable": "information",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 17, Col 5",
+            "content": "info",
+            "variable": "info",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 17, Col 5",
+            "content": "info",
+            "variable": "info",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 18, Col 5",
+            "content": "lease",
+            "variable": "lease",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 18, Col 5",
+            "content": "lease",
+            "variable": "lease",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 19, Col 5",
+            "content": "logis",
+            "variable": "logis",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 19, Col 5",
+            "content": "logis",
+            "variable": "logis",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 20, Col 3",
+            "content": "Biological manufacturing employment",
+            "variable": "manufacturing",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 20, Col 3",
+            "content": "Biological manufacturing employment",
+            "variable": "manufacturing",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 20, Col 5",
+            "content": "man_bio",
+            "variable": "man_bio",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 20, Col 5",
+            "content": "man_bio",
+            "variable": "man_bio",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 21, Col 3",
+            "content": "Heavy manufacturing employment",
+            "variable": "manufacturing",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 21, Col 3",
+            "content": "Heavy manufacturing employment",
+            "variable": "manufacturing",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 21, Col 5",
+            "content": "man_hvy",
+            "variable": "man_hvy",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 21, Col 5",
+            "content": "man_hvy",
+            "variable": "man_hvy",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 22, Col 3",
+            "content": "Light manufacturing employment",
+            "variable": "manufacturing",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 22, Col 3",
+            "content": "Light manufacturing employment",
+            "variable": "manufacturing",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 22, Col 5",
+            "content": "man_lgt",
+            "variable": "man_lgt",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 22, Col 5",
+            "content": "man_lgt",
+            "variable": "man_lgt",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 23, Col 3",
+            "content": "Technology manufacturing employment",
+            "variable": "manufacturing",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 23, Col 3",
+            "content": "Technology manufacturing employment",
+            "variable": "manufacturing",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 23, Col 5",
+            "content": "man_tech",
+            "variable": "man_tech",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 23, Col 5",
+            "content": "man_tech",
+            "variable": "man_tech",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 24, Col 5",
+            "content": "natres",
+            "variable": "natres",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 24, Col 5",
+            "content": "natres",
+            "variable": "natres",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 25, Col 3",
+            "content": "Professional employment",
+            "variable": "professional",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 25, Col 3",
+            "content": "Professional employment",
+            "variable": "professional",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 25, Col 5",
+            "content": "prof",
+            "variable": "prof",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 25, Col 5",
+            "content": "prof",
+            "variable": "prof",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 26, Col 3",
+            "content": "Local retail employment",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 26, Col 3",
+            "content": "Local retail employment",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 26, Col 5",
+            "content": "ret_loc",
+            "variable": "ret_loc",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 26, Col 5",
+            "content": "ret_loc",
+            "variable": "ret_loc",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 27, Col 3",
+            "content": "Regional retail employment",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 27, Col 3",
+            "content": "Regional retail employment",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 27, Col 5",
+            "content": "ret_reg",
+            "variable": "ret_reg",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 27, Col 5",
+            "content": "ret_reg",
+            "variable": "ret_reg",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 28, Col 3",
+            "content": "Business services employment",
+            "variable": "services",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 28, Col 3",
+            "content": "Business services employment",
+            "variable": "services",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 28, Col 5",
+            "content": "serv_bus",
+            "variable": "serv_bus",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 28, Col 5",
+            "content": "serv_bus",
+            "variable": "serv_bus",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 29, Col 3",
+            "content": "Personal services employment",
+            "variable": "services",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 29, Col 3",
+            "content": "Personal services employment",
+            "variable": "services",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 29, Col 5",
+            "content": "serv_pers",
+            "variable": "serv_pers",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 29, Col 5",
+            "content": "serv_pers",
+            "variable": "serv_pers",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 30, Col 3",
+            "content": "Social services employment",
+            "variable": "services",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 30, Col 3",
+            "content": "Social services employment",
+            "variable": "services",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 30, Col 5",
+            "content": "serv_soc",
+            "variable": "serv_soc",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 30, Col 5",
+            "content": "serv_soc",
+            "variable": "serv_soc",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 31, Col 5",
+            "content": "transp",
+            "variable": "transp",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 31, Col 5",
+            "content": "transp",
+            "variable": "transp",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 32, Col 3",
+            "content": "Utilities employment",
+            "variable": "utilities",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 32, Col 3",
+            "content": "Utilities employment",
+            "variable": "utilities",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 32, Col 5",
+            "content": "util",
+            "variable": "util",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 32, Col 5",
+            "content": "util",
+            "variable": "util",
+            "variable_type": "official",
+            "type": "formula_variable"
+          }
+        ]
+      },
+      "AtWorkSubtourFrequency.xls": {
+        "atWork Tour Frequency": [
+          {
+            "location": "Row 12, Col 3",
+            "content": "Non-motorized eat-out destination choice accessibility (alt43?)",
+            "variable": "eat",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 25, Col 3",
+            "content": "Total eat tours",
+            "variable": "eat",
+            "variable_type": "official",
+            "type": "formula_variable"
+          }
+        ]
+      },
+      "AutoOwnership.xls": {
+        "Auto Ownership": [
+          {
+            "location": "Row 23, Col 2",
+            "content": "retailDensity",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 23, Col 2",
+            "content": "retailDensity",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 23, Col 3",
+            "content": "Retail Employment Density in 1/2 mile radius of household MGRA from 4D file",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 23, Col 3",
+            "content": "Retail Employment Density in 1/2 mile radius of household MGRA from 4D file",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          }
+        ],
+        "Alogit Report": [
+          {
+            "location": "Row 32, Col 3",
+            "content": "Education Non high school gradts",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 32, Col 3",
+            "content": "Education Non high school gradts",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 40, Col 4",
+            "content": "Retail density",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 40, Col 4",
+            "content": "Retail density",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          }
+        ],
+        "pre-wlc": [
+          {
+            "location": "Row 12, Col 2",
+            "content": "retailDensity",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 12, Col 2",
+            "content": "retailDensity",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 12, Col 3",
+            "content": "Retail Employment Density in 1/2 mile radius of household MGRA from 4D file",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 12, Col 3",
+            "content": "Retail Employment Density in 1/2 mile radius of household MGRA from 4D file",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          }
+        ],
+        "post-wlc": [
+          {
+            "location": "Row 12, Col 2",
+            "content": "retailDensity",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 12, Col 2",
+            "content": "retailDensity",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 12, Col 3",
+            "content": "Retail Employment Density in 1/2 mile radius of household MGRA from 4D file",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 12, Col 3",
+            "content": "Retail Employment Density in 1/2 mile radius of household MGRA from 4D file",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          }
+        ],
+        "original sandag model": [
+          {
+            "location": "Row 21, Col 2",
+            "content": "retailDensity",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 21, Col 2",
+            "content": "retailDensity",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 21, Col 3",
+            "content": "Retail Employment Density in 1/2 mile radius of household MGRA from 4D file",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 21, Col 3",
+            "content": "Retail Employment Density in 1/2 mile radius of household MGRA from 4D file",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          }
+        ]
+      },
+      "CoordinatedDailyActivityPattern.xls": {
+        "OnePerson": [
+          {
+            "location": "Row 31, Col 3",
+            "content": "Accessibility to retail employment/Non-Mandatory Attractions",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 31, Col 3",
+            "content": "Accessibility to retail employment/Non-Mandatory Attractions",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 31, Col 5",
+            "content": "@retailAccessibility",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 31, Col 5",
+            "content": "@retailAccessibility",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          }
+        ],
+        "JointTour": [
+          {
+            "location": "Row 5, Col 3",
+            "content": "Accessibility to retail employment/Non-Mandatory Attractions",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 5, Col 3",
+            "content": "Accessibility to retail employment/Non-Mandatory Attractions",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 5, Col 5",
+            "content": "@retailAccessibility",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 5, Col 5",
+            "content": "@retailAccessibility",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 21, Col 3",
+            "content": "Accessibility to retail employment/Non-Mandatory Attractions for Joint Tour",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 21, Col 3",
+            "content": "Accessibility to retail employment/Non-Mandatory Attractions for Joint Tour",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          }
+        ],
+        "Debug.OnePerson.A": [
+          {
+            "location": "Row 8, Col 10",
+            "content": "Utilities",
+            "variable": "utilities",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 8, Col 10",
+            "content": "Utilities",
+            "variable": "utilities",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 33, Col 3",
+            "content": "Off-peak accessibility to retail employment",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 33, Col 3",
+            "content": "Off-peak accessibility to retail employment",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          }
+        ],
+        "Debug.OnePerson.B": [
+          {
+            "location": "Row 8, Col 10",
+            "content": "Utilities",
+            "variable": "utilities",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 8, Col 10",
+            "content": "Utilities",
+            "variable": "utilities",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 33, Col 3",
+            "content": "Off-peak accessibility to retail employment",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 33, Col 3",
+            "content": "Off-peak accessibility to retail employment",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          }
+        ],
+        "Debug.TwoPeople.A": [
+          {
+            "location": "Row 9, Col 10",
+            "content": "Utilities",
+            "variable": "utilities",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 9, Col 10",
+            "content": "Utilities",
+            "variable": "utilities",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          }
+        ],
+        "Debug.TwoPeople.B": [
+          {
+            "location": "Row 9, Col 10",
+            "content": "Utilities",
+            "variable": "utilities",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 9, Col 10",
+            "content": "Utilities",
+            "variable": "utilities",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          }
+        ],
+        "Debug.ThreePeople.A": [
+          {
+            "location": "Row 11, Col 10",
+            "content": "Utilities",
+            "variable": "utilities",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 11, Col 10",
+            "content": "Utilities",
+            "variable": "utilities",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          }
+        ],
+        "Debug.ThreePeople.B": [
+          {
+            "location": "Row 11, Col 10",
+            "content": "Utilities",
+            "variable": "utilities",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 11, Col 10",
+            "content": "Utilities",
+            "variable": "utilities",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          }
+        ]
+      },
+      "NonMandatoryIndividualTourFrequency.xls": {
+        "1_FullTimeWorker": [
+          {
+            "location": "Row 16, Col 3",
+            "content": "Retail Accessibility for Escorting",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 16, Col 3",
+            "content": "Retail Accessibility for Escorting",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 17, Col 3",
+            "content": "Retail Accessibility for Shopping",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 17, Col 3",
+            "content": "Retail Accessibility for Shopping",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 18, Col 3",
+            "content": "Retail Accessibility for Maintenance",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 18, Col 3",
+            "content": "Retail Accessibility for Maintenance",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 19, Col 3",
+            "content": "Retail Accessibility for Eating Out",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 19, Col 3",
+            "content": "Retail Accessibility for Eating Out",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          }
+        ],
+        "2_PartTimeWorker": [
+          {
+            "location": "Row 15, Col 3",
+            "content": "Retail Accessibility for Escorting",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 15, Col 3",
+            "content": "Retail Accessibility for Escorting",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 16, Col 3",
+            "content": "Retail Accessibility for Shopping",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 16, Col 3",
+            "content": "Retail Accessibility for Shopping",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 17, Col 3",
+            "content": "Retail Accessibility for Maintenance",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 17, Col 3",
+            "content": "Retail Accessibility for Maintenance",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 18, Col 3",
+            "content": "Retail Accessibility for Eating Out",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 18, Col 3",
+            "content": "Retail Accessibility for Eating Out",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 19, Col 3",
+            "content": "Retail Accessibility for Visiting/visit",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 19, Col 3",
+            "content": "Retail Accessibility for Visiting/visit",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 20, Col 3",
+            "content": "Retail Accessibility for Discretionary",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 20, Col 3",
+            "content": "Retail Accessibility for Discretionary",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          }
+        ],
+        "3_UnivStudent": [
+          {
+            "location": "Row 15, Col 3",
+            "content": "Retail Accessibility for Discretionary",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 15, Col 3",
+            "content": "Retail Accessibility for Discretionary",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          }
+        ],
+        "4_NonWorker": [
+          {
+            "location": "Row 14, Col 3",
+            "content": "Retail Accessibility for Escorting",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 14, Col 3",
+            "content": "Retail Accessibility for Escorting",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 15, Col 3",
+            "content": "Retail Accessibility for Shopping",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 15, Col 3",
+            "content": "Retail Accessibility for Shopping",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 16, Col 3",
+            "content": "Retail Accessibility for Maintenance",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 16, Col 3",
+            "content": "Retail Accessibility for Maintenance",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 17, Col 3",
+            "content": "Retail Accessibility for Eating Out",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 17, Col 3",
+            "content": "Retail Accessibility for Eating Out",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 18, Col 3",
+            "content": "Retail Accessibility for Visiting/visit",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 18, Col 3",
+            "content": "Retail Accessibility for Visiting/visit",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 19, Col 3",
+            "content": "Retail Accessibility for Discretionary",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 19, Col 3",
+            "content": "Retail Accessibility for Discretionary",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          }
+        ],
+        "5_Retiree": [
+          {
+            "location": "Row 14, Col 3",
+            "content": "Retail Accessibility for Escorting",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 14, Col 3",
+            "content": "Retail Accessibility for Escorting",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 15, Col 3",
+            "content": "Retail Accessibility for Shopping",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 15, Col 3",
+            "content": "Retail Accessibility for Shopping",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 16, Col 3",
+            "content": "Retail Accessibility for Maintenance",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 16, Col 3",
+            "content": "Retail Accessibility for Maintenance",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 17, Col 3",
+            "content": "Retail Accessibility for Eating Out",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 17, Col 3",
+            "content": "Retail Accessibility for Eating Out",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 18, Col 3",
+            "content": "Retail Accessibility for Visiting/visit",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 18, Col 3",
+            "content": "Retail Accessibility for Visiting/visit",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 19, Col 3",
+            "content": "Retail Accessibility for Discretionary",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 19, Col 3",
+            "content": "Retail Accessibility for Discretionary",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          }
+        ],
+        "6_DrivingSchoolChild": [
+          {
+            "location": "Row 15, Col 3",
+            "content": "Retail Accessibility for Shopping",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 15, Col 3",
+            "content": "Retail Accessibility for Shopping",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 16, Col 3",
+            "content": "Retail Accessibility for Eating Out",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 16, Col 3",
+            "content": "Retail Accessibility for Eating Out",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          }
+        ],
+        "7_PreDrivingSchoolChild": [
+          {
+            "location": "Row 15, Col 3",
+            "content": "Retail Accessibility for Escorting",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 15, Col 3",
+            "content": "Retail Accessibility for Escorting",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 16, Col 3",
+            "content": "Retail Accessibility for Shopping",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 16, Col 3",
+            "content": "Retail Accessibility for Shopping",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 17, Col 3",
+            "content": "Retail Accessibility for Maintenance",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 17, Col 3",
+            "content": "Retail Accessibility for Maintenance",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 18, Col 3",
+            "content": "Retail Accessibility for Eating Out",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 18, Col 3",
+            "content": "Retail Accessibility for Eating Out",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 19, Col 3",
+            "content": "Retail Accessibility for Discretionary",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 19, Col 3",
+            "content": "Retail Accessibility for Discretionary",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          }
+        ],
+        "8_PreSchoolChild": [
+          {
+            "location": "Row 13, Col 3",
+            "content": "Retail Accessibility for Escorting",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 13, Col 3",
+            "content": "Retail Accessibility for Escorting",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 14, Col 3",
+            "content": "Retail Accessibility for Shopping",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 14, Col 3",
+            "content": "Retail Accessibility for Shopping",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 50, Col 3",
+            "content": "Retail Accessibility for Escorting",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 50, Col 3",
+            "content": "Retail Accessibility for Escorting",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          }
+        ]
+      },
+      "ParkingProvision.xls": {
+        "ParkingProvision": [
+          {
+            "location": "Row 22, Col 5",
+            "content": "ag+constr+util+man_bio+man_hvy+man_lgt+man_tech+transp+serv_bus",
+            "variable": "man_bio",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 22, Col 5",
+            "content": "ag+constr+util+man_bio+man_hvy+man_lgt+man_tech+transp+serv_bus",
+            "variable": "util",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 22, Col 5",
+            "content": "ag+constr+util+man_bio+man_hvy+man_lgt+man_tech+transp+serv_bus",
+            "variable": "ag",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 22, Col 5",
+            "content": "ag+constr+util+man_bio+man_hvy+man_lgt+man_tech+transp+serv_bus",
+            "variable": "man_hvy",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 22, Col 5",
+            "content": "ag+constr+util+man_bio+man_hvy+man_lgt+man_tech+transp+serv_bus",
+            "variable": "man_tech",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 22, Col 5",
+            "content": "ag+constr+util+man_bio+man_hvy+man_lgt+man_tech+transp+serv_bus",
+            "variable": "constr",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 22, Col 5",
+            "content": "ag+constr+util+man_bio+man_hvy+man_lgt+man_tech+transp+serv_bus",
+            "variable": "transp",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 22, Col 5",
+            "content": "ag+constr+util+man_bio+man_hvy+man_lgt+man_tech+transp+serv_bus",
+            "variable": "serv_bus",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 22, Col 5",
+            "content": "ag+constr+util+man_bio+man_hvy+man_lgt+man_tech+transp+serv_bus",
+            "variable": "man_lgt",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 22, Col 5",
+            "content": "ag+constr+util+man_bio+man_hvy+man_lgt+man_tech+transp+serv_bus",
+            "variable": "man_bio",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 23, Col 2",
+            "content": "empEduHealth",
+            "variable": "empEduHealth",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 23, Col 2",
+            "content": "empEduHealth",
+            "variable": "empEduHealth",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 23, Col 3",
+            "content": "Education, health, and personal services employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 23, Col 3",
+            "content": "Education, health, and personal services employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 23, Col 3",
+            "content": "Education, health, and personal services employment",
+            "variable": "services",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 23, Col 3",
+            "content": "Education, health, and personal services employment",
+            "variable": "health",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 23, Col 5",
+            "content": "ed_k12+ed_oth+ed_high+health+serv_pers",
+            "variable": "ed_oth",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 23, Col 5",
+            "content": "ed_k12+ed_oth+ed_high+health+serv_pers",
+            "variable": "ed_k12",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 23, Col 5",
+            "content": "ed_k12+ed_oth+ed_high+health+serv_pers",
+            "variable": "health",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 23, Col 5",
+            "content": "ed_k12+ed_oth+ed_high+health+serv_pers",
+            "variable": "ed_high",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 23, Col 5",
+            "content": "ed_k12+ed_oth+ed_high+health+serv_pers",
+            "variable": "serv_pers",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 23, Col 5",
+            "content": "ed_k12+ed_oth+ed_high+health+serv_pers",
+            "variable": "ed_oth",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 24, Col 2",
+            "content": "empTotal",
+            "variable": "empTotal",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 24, Col 2",
+            "content": "empTotal",
+            "variable": "empTotal",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 24, Col 5",
+            "content": "emp_total",
+            "variable": "emp_total",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 24, Col 5",
+            "content": "emp_total",
+            "variable": "emp_total",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 28, Col 5",
+            "content": "empBlue/empTotal",
+            "variable": "empTotal",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 28, Col 5",
+            "content": "empBlue/empTotal",
+            "variable": "empTotal",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 29, Col 3",
+            "content": "Percent education and health employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 29, Col 3",
+            "content": "Percent education and health employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 29, Col 3",
+            "content": "Percent education and health employment",
+            "variable": "health",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 29, Col 5",
+            "content": "empEduHealth/empTotal",
+            "variable": "empTotal",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 29, Col 5",
+            "content": "empEduHealth/empTotal",
+            "variable": "empTotal",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 29, Col 5",
+            "content": "empEduHealth/empTotal",
+            "variable": "empEduHealth",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          }
+        ],
+        "FreeParkingEligibility - Jeff": [
+          {
+            "location": "Row 9, Col 2",
+            "content": "empEduHealth",
+            "variable": "empEduHealth",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 9, Col 2",
+            "content": "empEduHealth",
+            "variable": "empEduHealth",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 9, Col 3",
+            "content": "Education, health, and personal services employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 9, Col 3",
+            "content": "Education, health, and personal services employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 9, Col 3",
+            "content": "Education, health, and personal services employment",
+            "variable": "services",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 9, Col 3",
+            "content": "Education, health, and personal services employment",
+            "variable": "health",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 9, Col 5",
+            "content": "emp_pvt_k12+emp_pvt_ed_post_k12_oth+emp_health+emp_personal_svcs_office+emp_pub_ed",
+            "variable": "emp_pvt_ed_post_k12_oth",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 9, Col 5",
+            "content": "emp_pvt_k12+emp_pvt_ed_post_k12_oth+emp_health+emp_personal_svcs_office+emp_pub_ed",
+            "variable": "emp_personal_svcs_office",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 9, Col 5",
+            "content": "emp_pvt_k12+emp_pvt_ed_post_k12_oth+emp_health+emp_personal_svcs_office+emp_pub_ed",
+            "variable": "emp_pvt_ed_post_k12_oth",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 9, Col 5",
+            "content": "emp_pvt_k12+emp_pvt_ed_post_k12_oth+emp_health+emp_personal_svcs_office+emp_pub_ed",
+            "variable": "health",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 10, Col 2",
+            "content": "empTotal",
+            "variable": "empTotal",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 10, Col 2",
+            "content": "empTotal",
+            "variable": "empTotal",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 10, Col 5",
+            "content": "emp_total",
+            "variable": "emp_total",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 10, Col 5",
+            "content": "emp_total",
+            "variable": "emp_total",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 16, Col 4",
+            "content": "empTotal > 0",
+            "variable": "empTotal",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 16, Col 4",
+            "content": "empTotal > 0",
+            "variable": "empTotal",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 16, Col 5",
+            "content": "empBlue/empTotal",
+            "variable": "empTotal",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 16, Col 5",
+            "content": "empBlue/empTotal",
+            "variable": "empTotal",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 17, Col 3",
+            "content": "Percent education and health employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 17, Col 3",
+            "content": "Percent education and health employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 17, Col 3",
+            "content": "Percent education and health employment",
+            "variable": "health",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 17, Col 4",
+            "content": "empTotal > 0",
+            "variable": "empTotal",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 17, Col 4",
+            "content": "empTotal > 0",
+            "variable": "empTotal",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 17, Col 5",
+            "content": "empEduHealth/empTotal",
+            "variable": "empTotal",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 17, Col 5",
+            "content": "empEduHealth/empTotal",
+            "variable": "empTotal",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 17, Col 5",
+            "content": "empEduHealth/empTotal",
+            "variable": "empEduHealth",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          }
+        ]
+      },
+      "SlcSoaSize.xls": {
+        "slc size terms": [
+          {
+            "location": "Row 8, Col 3",
+            "content": "Agriculture employment",
+            "variable": "agriculture",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 8, Col 3",
+            "content": "Agriculture employment",
+            "variable": "agriculture",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 8, Col 5",
+            "content": "ag",
+            "variable": "ag",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 8, Col 5",
+            "content": "ag",
+            "variable": "ag",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 9, Col 3",
+            "content": "Arts & recreational employment",
+            "variable": "arts",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 9, Col 3",
+            "content": "Arts & recreational employment",
+            "variable": "arts",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 9, Col 5",
+            "content": "art_rec",
+            "variable": "art_rec",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 9, Col 5",
+            "content": "art_rec",
+            "variable": "art_rec",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 10, Col 3",
+            "content": "Construction employment",
+            "variable": "construction",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 10, Col 3",
+            "content": "Construction employment",
+            "variable": "construction",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 10, Col 5",
+            "content": "constr",
+            "variable": "constr",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 10, Col 5",
+            "content": "constr",
+            "variable": "constr",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 11, Col 5",
+            "content": "eat",
+            "variable": "eat",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 11, Col 5",
+            "content": "eat",
+            "variable": "eat",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 12, Col 3",
+            "content": "Higher education employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 12, Col 3",
+            "content": "Higher education employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 12, Col 5",
+            "content": "ed_high",
+            "variable": "ed_high",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 12, Col 5",
+            "content": "ed_high",
+            "variable": "ed_high",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 13, Col 3",
+            "content": "K-12 education employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 13, Col 3",
+            "content": "K-12 education employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 13, Col 5",
+            "content": "ed_k12",
+            "variable": "ed_k12",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 13, Col 5",
+            "content": "ed_k12",
+            "variable": "ed_k12",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 14, Col 3",
+            "content": "Other education employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 14, Col 3",
+            "content": "Other education employment",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 14, Col 5",
+            "content": "ed_oth",
+            "variable": "ed_oth",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 14, Col 5",
+            "content": "ed_oth",
+            "variable": "ed_oth",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 15, Col 5",
+            "content": "fire",
+            "variable": "fire",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 15, Col 5",
+            "content": "fire",
+            "variable": "fire",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 16, Col 5",
+            "content": "gov",
+            "variable": "gov",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 16, Col 5",
+            "content": "gov",
+            "variable": "gov",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 17, Col 3",
+            "content": "Health employment",
+            "variable": "health",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 17, Col 3",
+            "content": "Health employment",
+            "variable": "health",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 17, Col 5",
+            "content": "health",
+            "variable": "health",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 17, Col 5",
+            "content": "health",
+            "variable": "health",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 18, Col 3",
+            "content": "Hotel employment",
+            "variable": "hotel",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 18, Col 3",
+            "content": "Hotel employment",
+            "variable": "hotel",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 18, Col 5",
+            "content": "hotel",
+            "variable": "hotel",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 18, Col 5",
+            "content": "hotel",
+            "variable": "hotel",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 19, Col 3",
+            "content": "Information employment",
+            "variable": "information",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 19, Col 3",
+            "content": "Information employment",
+            "variable": "information",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 19, Col 5",
+            "content": "info",
+            "variable": "info",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 19, Col 5",
+            "content": "info",
+            "variable": "info",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 20, Col 5",
+            "content": "lease",
+            "variable": "lease",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 20, Col 5",
+            "content": "lease",
+            "variable": "lease",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 21, Col 5",
+            "content": "logis",
+            "variable": "logis",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 21, Col 5",
+            "content": "logis",
+            "variable": "logis",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 22, Col 3",
+            "content": "Biological manufacturing employment",
+            "variable": "manufacturing",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 22, Col 3",
+            "content": "Biological manufacturing employment",
+            "variable": "manufacturing",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 22, Col 5",
+            "content": "man_bio",
+            "variable": "man_bio",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 22, Col 5",
+            "content": "man_bio",
+            "variable": "man_bio",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 23, Col 3",
+            "content": "Heavy manufacturing employment",
+            "variable": "manufacturing",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 23, Col 3",
+            "content": "Heavy manufacturing employment",
+            "variable": "manufacturing",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 23, Col 5",
+            "content": "man_hvy",
+            "variable": "man_hvy",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 23, Col 5",
+            "content": "man_hvy",
+            "variable": "man_hvy",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 24, Col 3",
+            "content": "Light manufacturing employment",
+            "variable": "manufacturing",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 24, Col 3",
+            "content": "Light manufacturing employment",
+            "variable": "manufacturing",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 24, Col 5",
+            "content": "man_lgt",
+            "variable": "man_lgt",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 24, Col 5",
+            "content": "man_lgt",
+            "variable": "man_lgt",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 25, Col 3",
+            "content": "Technology manufacturing employment",
+            "variable": "manufacturing",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 25, Col 3",
+            "content": "Technology manufacturing employment",
+            "variable": "manufacturing",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 25, Col 5",
+            "content": "man_tech",
+            "variable": "man_tech",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 25, Col 5",
+            "content": "man_tech",
+            "variable": "man_tech",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 26, Col 5",
+            "content": "natres",
+            "variable": "natres",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 26, Col 5",
+            "content": "natres",
+            "variable": "natres",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 27, Col 3",
+            "content": "Professional employment",
+            "variable": "professional",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 27, Col 3",
+            "content": "Professional employment",
+            "variable": "professional",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 27, Col 5",
+            "content": "prof",
+            "variable": "prof",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 27, Col 5",
+            "content": "prof",
+            "variable": "prof",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 28, Col 3",
+            "content": "Local retail employment",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 28, Col 3",
+            "content": "Local retail employment",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 28, Col 5",
+            "content": "ret_loc",
+            "variable": "ret_loc",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 28, Col 5",
+            "content": "ret_loc",
+            "variable": "ret_loc",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 29, Col 3",
+            "content": "Regional retail employment",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 29, Col 3",
+            "content": "Regional retail employment",
+            "variable": "retail",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 29, Col 5",
+            "content": "ret_reg",
+            "variable": "ret_reg",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 29, Col 5",
+            "content": "ret_reg",
+            "variable": "ret_reg",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 30, Col 3",
+            "content": "Business services employment",
+            "variable": "services",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 30, Col 3",
+            "content": "Business services employment",
+            "variable": "services",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 30, Col 5",
+            "content": "serv_bus",
+            "variable": "serv_bus",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 30, Col 5",
+            "content": "serv_bus",
+            "variable": "serv_bus",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 31, Col 3",
+            "content": "Personal services employment",
+            "variable": "services",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 31, Col 3",
+            "content": "Personal services employment",
+            "variable": "services",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 31, Col 5",
+            "content": "serv_pers",
+            "variable": "serv_pers",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 31, Col 5",
+            "content": "serv_pers",
+            "variable": "serv_pers",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 32, Col 3",
+            "content": "Social services employment",
+            "variable": "services",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 32, Col 3",
+            "content": "Social services employment",
+            "variable": "services",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 32, Col 5",
+            "content": "serv_soc",
+            "variable": "serv_soc",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 32, Col 5",
+            "content": "serv_soc",
+            "variable": "serv_soc",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 33, Col 5",
+            "content": "transp",
+            "variable": "transp",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 33, Col 5",
+            "content": "transp",
+            "variable": "transp",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 34, Col 3",
+            "content": "Utilities employment",
+            "variable": "utilities",
+            "variable_type": "undocumented",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 34, Col 3",
+            "content": "Utilities employment",
+            "variable": "utilities",
+            "variable_type": "undocumented",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 34, Col 5",
+            "content": "util",
+            "variable": "util",
+            "variable_type": "official",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 34, Col 5",
+            "content": "util",
+            "variable": "util",
+            "variable_type": "official",
+            "type": "formula_variable"
+          },
+          {
+            "location": "Row 35, Col 5",
+            "content": "emp_total",
+            "variable": "emp_total",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 35, Col 5",
+            "content": "emp_total",
+            "variable": "emp_total",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          }
+        ]
+      },
+      "TourDestinationChoice.xls": {
+        "workfromhome": [
+          {
+            "location": "Row 20, Col 3",
+            "content": "Education Level- Bachelors or higher degree",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 20, Col 3",
+            "content": "Education Level- Bachelors or higher degree",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          }
+        ]
+      },
+      "TourDestinationChoice2.xls": {
+        "workfromhome": [
+          {
+            "location": "Row 20, Col 3",
+            "content": "Education Level- Bachelors or higher degree",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "direct_variable"
+          },
+          {
+            "location": "Row 20, Col 3",
+            "content": "Education Level- Bachelors or higher degree",
+            "variable": "education",
+            "variable_type": "aggregated",
+            "type": "formula_variable"
+          }
+        ]
+      }
+    }
+  }
+}
