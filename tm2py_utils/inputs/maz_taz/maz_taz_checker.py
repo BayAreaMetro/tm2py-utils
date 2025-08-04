@@ -57,37 +57,37 @@ EXEMPT_TAZ = [287,                800095, 800203]
 
 EXEMPT_NOLAND_BLOCK = ["060133010003000"]
 
+# These blocks were exempted because they were blocks with primarily water
+EXEMPT_LAND_BLOCK = ['060014273002003','060014301021079','060014415031031','060133010003003','060133010003023','060133010003025','060133010003026',
+                     '060133010003050','060133010003064','060133010003071','060133010003074','060133010003078','060133010003085','060133010003130',
+                     '060133010003139','060133010003175','060133010003178','060133020061000','060133020061005','060133020062000','060133020081009',
+                     '060133020081015','060133020081017','060133040021008','060133040021114','060133040021138','060133040042000','060133040052005',
+                     '060133050003058','060133551071007','060133551071018','060133800001025','060133800001029','060133800002068','060411250001013',
+                     '060411262002014','060411262002020','060411322003000','060411330002014','060750601001000','060750607001016','060816061001000',
+                     '060816080043002','060816103034021','060816135012045','060855119111005','060952521021065','060952527026251','060952531083023',
+                     '060952535001147','060952535001211','060971501003015','060971517002024','060971538011005']
+
 
 import argparse, csv, logging, os, pathlib, sys, numpy, shutil
 import pandas
 import geopandas
 
-# Set path to your workspace - defaults to where this script is run
+# The script should be run from the tm2py-utils directory
 WORKSPACE          = pathlib.Path(".")
 CROSSWALK_ROOT     = "blocks_mazs_tazs"
-CROSSWALK_CSV      = WORKSPACE / f"{CROSSWALK_ROOT}.csv"
-VERSION            = "2.3"
 
+# Set directory to the Census Block Version
 CENSUS_BLOCK_DIR   = pathlib.Path("M:\\Data\\Census\\Geography\\tl_2010_06_tabblock10")
 CENSUS_BLOCK_ROOT  = "tl_2010_06_tabblock10_9CountyBayArea"
-CENSUS_BLOCK_SHP   = CENSUS_BLOCK_DIR /  f"{CENSUS_BLOCK_ROOT}.shp"
+#CENSUS_BLOCK_SHP   = CENSUS_BLOCK_DIR /  f"{CENSUS_BLOCK_ROOT}.shp"
+CENSUS_BLOCK_SHP   = "E:\\Box\\Documents\\Data\\Census Data\\tl_2020_06_tabblock10\\tl_2020_06_tabblock10_9CBA.shp"
 CENSUS_BLOCK_COLS  = ["STATEFP10", "COUNTYFP10", "TRACTCE10", "BLOCKCE10", "GEOID10", "ALAND10", "AWATER10"]
 
-CENSUS_BLOCK_NEIGHBOR_CSV = CENSUS_BLOCK_DIR / "tl_2010_06_tabblock10_9CBA_neighbors.csv"
+CENSUS_BLOCK_NEIGHBOR_CSV = "E:\\GitHub\\tm2\\tm2py-utils\\tm2py_utils\\inputs\\maz_taz\\tl_2020_06_tabblock10_9CBA_neighbors.csv"
 CENSUS_TRACT_PUMA  = pathlib.Path("M:\\Data\\Census\\Geography\\tl_2010_06_puma10\\2010_Census_Tract_to_2010_PUMA.txt")
 
-# Set path to the TM2 GitHub repo where the MAZ and TAZ files are stored
-MAZ_TAZ_DIR = pathlib.Path("E:\\Github\\tm2\\tm2py-utils\\tm2py_utils\\inputs\\maz_taz")
-MAZ_TAZ_README = MAZ_TAZ_DIR / "README.md"
-MAZ_TAZ_CSV = MAZ_TAZ_DIR / "blocks_mazs_tazs_v2.1.1.csv"
-
-# output files
-LOG_FILE           = WORKSPACE / "maz_taz_checker.log"
-CROSSWALK_OUT      = WORKSPACE / "blocks_mazs_tazs_updated"
-MAZS_SHP           = "mazs_TM2_v2_2"
-TAZS_SHP           = "tazs_TM2_v2_2"
-
-MAZ_TAZ_COUNTY_PUMA_FILE = WORKSPACE / "mazs_tazs_county_tract_PUMA.csv"
+MAZS_SHP           = "mazs_TM2"
+TAZS_SHP           = "tazs_TM2"
 
 # Default CRS for analysis
 ANALYSIS_CRS = "EPSG:26910"
@@ -147,9 +147,9 @@ def move_small_block_to_neighbor(blocks_maz_df, blocks_neighbor_df,
                 this_block_id = block_row["GEOID10"]
                 this_block_maz = block_row["maz"]
                 # look at neighbors for candidates
-                this_block_neighbors = blocks_neighbor_df.loc[blocks_neighbor_df.src_GEOID1 == this_block_id].copy()
+                this_block_neighbors = blocks_neighbor_df.loc[blocks_neighbor_df.src_GEOID10 == this_block_id].copy()
                 # only neighbors in the same block group with maz/taz set and maz differs
-                this_block_neighbors = this_block_neighbors.loc[ (this_block_neighbors.nbr_GEIOID10_BG == block_row["GEOID10_BG"]) &
+                this_block_neighbors = this_block_neighbors.loc[ (this_block_neighbors.nbr_GEOID10_BG == block_row["GEOID10_BG"]) &
                                                                  (this_block_neighbors.maz != 0) &
                                                                  (this_block_neighbors.maz != this_block_maz)]
 
@@ -160,7 +160,7 @@ def move_small_block_to_neighbor(blocks_maz_df, blocks_neighbor_df,
                 # pick the neighboring block with the most length adjacent
                 this_block_neighbors.sort_values(by="LENGTH", ascending=False, inplace=True)
                 # print(this_block_neighbors)
-                this_neighbor_id = this_block_neighbors.nbr_GEOID1.iloc[0]
+                this_neighbor_id = this_block_neighbors.nbr_GEOID10.iloc[0]
                 logging.info(f"  => block {this_block_id} picking up maz/taz from neighboring block {this_neighbor_id}")
 
                 # look up the neighbor's maz and taz to inherit
@@ -285,12 +285,11 @@ def dissolve_into_shapefile(blocks_maz_layer, maz_or_taz):
 
         # Save the dissolved shapefile to workspace
         shapefile_name = MAZS_SHP if maz_or_taz=="maz" else TAZS_SHP
-        shapefile.to_file(f"{WORKSPACE}\{shapefile_name}.shp")
-        logging.info(f"Saving final {maz_or_taz}s into {shapefile_name}.shp")
-
-        # Create geojson
-        shapefile.to_file(f"{WORKSPACE}\{shapefile_name}.json", driver='GeoJSON')
-        logging.info("Created {0}.json".format(shapefile))
+        if not os.path.exists(f"{WORKSPACE}\shapefiles"):
+            os.makedirs(f"{WORKSPACE}\shapefiles")
+        version_shp = VERSION.replace(".", "_")
+        shapefile.to_file(f"{WORKSPACE}\shapefiles\{shapefile_name}_{version_shp}.shp")
+        logging.info(f"Saving final {maz_or_taz}s into {shapefile_name}_{version_shp}.shp")
 
     except Exception as err:
         logging.error(err.args)
@@ -298,9 +297,13 @@ def dissolve_into_shapefile(blocks_maz_layer, maz_or_taz):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description=USAGE, formatter_class=argparse.RawDescriptionHelpFormatter,)
-    parser.add_argument("--dissolve", dest="dissolve", action="store_true", help="Creates a dissolved maz shapefile and a dissolved taz shapefile.")
+    parser.add_argument("crosswalk_csv", help = 'Block/MAZ/TAZ Crosswalk file to build the latest crosswalk from', metavar= 'block_maz_taz.csv' )
+    parser.add_argument("version",help = 'Set the version of the MAZ/TAZs')
     args = parser.parse_args()
 
+    VERSION = args.version
+    CROSSWALK_CSV = args.crosswalk_csv
+    
     pandas.options.display.width = 300
     pandas.options.display.float_format = '{:.2f}'.format
 
@@ -313,36 +316,32 @@ if __name__ == '__main__':
     ch.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p'))
     logger.addHandler(ch)
     # file handler
-    fh = logging.FileHandler(LOG_FILE, mode='w')
+    fh = logging.FileHandler(f"maz_taz_checker_{VERSION}.log", mode='w')
     fh.setLevel(logging.DEBUG)
     fh.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p'))
     logger.addHandler(fh)
 
     
-    ## Copy initial files from GitHub Repo (Latest MAZ/TAZ file defined above) to workspace
-    crosswalk_csv = CROSSWALK_CSV
-    logging.info(f"Copying existing crosswalk file from GitHub to Workspace")
-    shutil.copy(MAZ_TAZ_README, WORKSPACE / "README.md")
-    shutil.copy(MAZ_TAZ_CSV, CROSSWALK_CSV)
+     #######################################################
+    # Create a GeoDataFrame from the 2010 block shapefile
+    # and converting dataframe to the default analysis CRS
+    blocks_maz_shp = geopandas.read_file(CENSUS_BLOCK_SHP)
+    blocks_maz_shp.to_crs(ANALYSIS_CRS,  inplace=True)
+    block_count = len(blocks_maz_shp)
+    print(blocks_maz_shp.head())
+    logging.info(f"Reading in the 2010 block shapefile with {block_count} rows")
+
+    logging.info(f"Reading in crosswalk file: {CROSSWALK_CSV}")
+    crosswalk_df = pandas.read_csv(CROSSWALK_CSV)
 
     for x in range(1,NUM_ITER + 1,1):
         logging.info(f"Starting iteration {x} of {NUM_ITER}")
-        try:
-            #######################################################
-            # Create a GeoDataFrame from the 2010 block shapefile
-            # and converting dataframe to the default analysis CRS
-            blocks_maz_layer = geopandas.read_file(CENSUS_BLOCK_SHP)
-            blocks_maz_layer.to_crs(ANALYSIS_CRS,  inplace=True)
-            block_count = len(blocks_maz_layer)
-            print(blocks_maz_layer.head())
-            logging.info(f"Reading in the 2010 block shapefile with {block_count} rows")
+        try:        
 
             ########################################################
             # Join the census blocks to the maz/taz crosswalk - this needs to be included in the looping
-            logging.info(f"Reading in crosswalk file: {crosswalk_csv}")
-            crosswalk_df = pandas.read_csv(crosswalk_csv)
             crosswalk_df['GEOID10'] = crosswalk_df['GEOID10'].astype(str).str.zfill(15)  # Ensure GEOID10 is string with leading zeros
-            blocks_maz_layer = blocks_maz_layer.merge(crosswalk_df, on = 'GEOID10')
+            blocks_maz_layer = blocks_maz_shp.merge(crosswalk_df, on = 'GEOID10')
             block_join_count = len(blocks_maz_layer)
             logging.info(f"Join block shapefile to crosswalk csv resulting in {block_join_count} rows")
 
@@ -373,13 +372,13 @@ if __name__ == '__main__':
             #####################################################
             # Create a table from the 2010 block neighbor mapping
             # For use in move_small_block_to_neighbor()
-            blocks_neighbor_df = pandas.read_csv(CENSUS_BLOCK_NEIGHBOR_CSV, dtype= {"src_GEOID1":str, "nbr_GEOID1":str, "LENGTH":float, "NODE_COUNT":int})
-            blocks_neighbor_df["nbr_GEIOID10_BG"] = blocks_neighbor_df["nbr_GEOID1"].str[:12]
+            blocks_neighbor_df = pandas.read_csv(CENSUS_BLOCK_NEIGHBOR_CSV, dtype= {"src_GEOID10":str, "nbr_GEOID10":str, "LENGTH":float, "NODE_COUNT":int})
+            blocks_neighbor_df["nbr_GEOID10_BG"] = blocks_neighbor_df["nbr_GEOID10"].str[:12]
             # get the maz/taz for these neighbors
             blocks_neighbor_df = pandas.merge(left   =blocks_neighbor_df,
                                             right   =blocks_maz_df[["GEOID10","maz","taz"]],
                                             how     ="left",
-                                            left_on ="nbr_GEOID1",
+                                            left_on ="nbr_GEOID10",
                                             right_on="GEOID10")
             logging.info(f"blocks_neighbor_df has length {len(blocks_neighbor_df)}")
             logging.info(f"\n{blocks_neighbor_df.head()}")
@@ -464,9 +463,8 @@ if __name__ == '__main__':
         if (blocks_moved > 0) or (tazs_split > 0):
             crosswalk_out_df = crosswalk_out_df[["GEOID10","maz","taz"]]
             crosswalk_out_df.sort_values(by="GEOID10", ascending=True, inplace=True)
-            crosswalk_out_df.to_csv(f"{CROSSWALK_OUT}_{VERSION}.{x}.csv", index=False, quoting=csv.QUOTE_NONNUMERIC)
-            logging.info(f"Wrote updated draft crosswalk to {CROSSWALK_OUT}_{VERSION}.{x}")
-            crosswalk_csv = f"{CROSSWALK_OUT}_{VERSION}.{x}.csv"
+            crosswalk_df = crosswalk_out_df
+            
         # Once loops end or no blocks moved or tazs split, save the final crosswalk 
         else:
             logging.info("No blocks moved or tazs split -- exiting iterations")
@@ -496,7 +494,7 @@ if __name__ == '__main__':
     logging.info(f"Number of blocks without maz/taz: {blocks_nomaz_df.GEOID10.nunique()}")
 
     # blocks with land should have mazs/tazs - Error if blocks with land does not have mazs/tazs
-    block_nomaz_land_df = blocks_nomaz_df.loc[ blocks_nomaz_df.ALAND10 > 0 ]
+    block_nomaz_land_df = blocks_nomaz_df.loc[ (blocks_nomaz_df.ALAND10 > 0) & (blocks_nomaz_df.GEOID10.isin(EXEMPT_LAND_BLOCK) == False) ]
     logging.info(f"Number of blocks without maz/taz with land area: {len(block_nomaz_land_df)}")
     if len(block_nomaz_land_df) > 0:
         logging.fatal(f"\n{block_nomaz_land_df}")
@@ -517,15 +515,8 @@ if __name__ == '__main__':
                                                                         'taz':['min','max']})
     logging.info(f"maz_taz_county_check=\n{maz_taz_county_check}")
 
-    # if we're not instructed to dissolve blocks into MAZs and TAZs, the process ends and system stops running the script
-    
-    if args.dissolve == False: sys.exit(0)
-
     logging.info("Dissolving blocks into MAZs and TAZs")
-
-    
     dissolve_into_shapefile(blocks_maz_layer, "maz")
-
     dissolve_into_shapefile(blocks_maz_layer, "taz")
 
     # create MAZ_TAZ_COUNTY_PUMA_FILE with columns,MAZ,TAZ,COUNTY,county_name,PUMA
@@ -577,7 +568,7 @@ if __name__ == '__main__':
     blocks_maz_df = blocks_maz_df[['MAZ','TAZ','COUNTY','county_name','COUNTYFP10','TRACTCE10','PUMA10']]
     blocks_maz_df.sort_values(by='MAZ', inplace=True)
     blocks_maz_df.drop_duplicates(inplace=True)
-    blocks_maz_df.to_csv(MAZ_TAZ_COUNTY_PUMA_FILE, index=False)
+    blocks_maz_df.to_csv(f'mazs_tazs_county_tract_PUMA_{VERSION}.csv', index=False)
 
-    blocks_maz_df[['MAZ','TAZ','COUNTY','county_name']].to_csv("mazs_tazs_county.csv", index=False)
+    blocks_maz_df[['MAZ','TAZ','COUNTY','county_name']].to_csv(f"mazs_tazs_county_{VERSION}.csv", index=False)
     sys.exit(0)
