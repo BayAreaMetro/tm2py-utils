@@ -53,7 +53,7 @@ The resulting shapefiles (produced by the correspondence csv via the python scri
 
 ### Version 2.4
 * Updated [maz_taz_checker.py](maz_taz_checker.py) to run with GeoPandas, move iteration within the python script, and passed the crosswalk file and version number as arguments
-* Using 2020 vintage of Census 2020 blocks
+* Using 2020 vintage of Census 2010 blocks
 * Manual fixes incorporated into [blocks_mazs_tazs_2.3.csv](blocks_mazs_tazs_2.3.csv). Fixes were to addressed blocks with very small percent land that was previously coded as zero land area
 
 ### Version 2.2
