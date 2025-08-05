@@ -6,11 +6,11 @@ travel analysis zones (TAZs) for Travel Model Two (TM2).
 See [web map](https://arcg.is/1n9XfL) with Version 2.2 and 1.0 of TM2 MAZs and TAZs, along with Census 2010 places, tracts, block groups.
 
 ## Axioms
-* MAZs and TAZs are *defined* as a union of [2010 vintage Census 2010 Blocks](https://www.census.gov/cgi-bin/geo/shapefiles/index.php?year=2010&layergroup=Blocks).  The shapefiles are dissolved from this definition.
-* There is one 2010 vintage Census 2010 Block Group (and therefore Tract and County) per MAZ
-* There is one 2010 vintage Census 2010 Tract (and therefore County) per TAZ
-* 2010 vintage Census 2010 Blocks with zero land area (ALAND10) are not assigned a MAZ or TAZ
-* 2010 vintage Census 2010 Blocks with nonzero land area (ALAND10) are assigned a MAZ and TAZ
+* MAZs and TAZs are *defined* as a union of [2020 vintage Census 2010 Blocks](https://www.census.gov/cgi-bin/geo/shapefiles/index.php?year=2020&layergroup=Blocks+%282020%29).  The shapefiles are dissolved from this definition.
+* There is one 2020 vintage Census 2010 Block Group (and therefore Tract and County) per MAZ
+* There is one 2020 vintage Census 2010 Tract (and therefore County) per TAZ
+* 2020 vintage Census 2010 Blocks with zero land area (ALAND10) are not assigned a MAZ or TAZ
+* 2020 vintage Census 2010 Blocks with nonzero land area (ALAND10) are assigned a MAZ and TAZ
 
 ### Axiom Exceptions
 
@@ -28,13 +28,13 @@ There are a handful of exceptions to the above axioms.
   as is so as not to create a donut hole maz
 * Block "06 013 301000 3000" (maz 410304, taz 400507) is a block that Census 2010 claims has no land area ("Webb Tract")
   but appears to be a delta island so it's an exception to the zero-land/non-zero water blocks having a maz/taz
+* Blocks with very small percent of land were not assigned a MAZ and TAZ
 
 ### Notes
 * Block "06 075 017902 1009" (maz 10186, taz 592) is the little piece of Alameda island that the Census 2010
   calls San Francisco.  Left in SF as its own maz.
 
-The [R script](csv_to_dbf.R) converts the csv to dbf (and forces the GEOID10 to be text) and the
-python script [maz_taz_checker.py](maz_taz_checker.py) does a number of checks on the MAZs and TAZs and fixes,
+The python script [maz_taz_checker.py](maz_taz_checker.py) does a number of checks on the MAZs and TAZs and fixes,
 and creates the shapefiles and geoJSON files.
 
 ## GeoJSON and Shapefiles
@@ -50,6 +50,11 @@ The resulting shapefiles (produced by the correspondence csv via the python scri
 * *mazcount* - for TAZs only, this is the count of MAZs in the TAZ
 
 ## Revision History
+
+### Version 2.4
+* Updated [maz_taz_checker.py](maz_taz_checker.py) to run with GeoPandas, move iteration within the python script, and passed the crosswalk file and version number as arguments
+* Using 2020 vintage of Census 2020 blocks
+* Manual fixes incorporated into [blocks_mazs_tazs_2.3.csv](blocks_mazs_tazs_2.3.csv). Fixes were to addressed blocks with very small percent land that was previously coded as zero land area
 
 ### Version 2.2
 
