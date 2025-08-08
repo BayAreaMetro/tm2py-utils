@@ -196,6 +196,16 @@ def create_naics_xwalk():
     naics_xwalk = naics.copy()
     naics_xwalk["steelhead"] = naics_xwalk["naicssix"].apply(map_steelhead)
 
+    # Firms with NAICS 999990 have been previously categorized as "mis" - appending here
+    naics_xwalk = pd.concat([
+        naics_xwalk,
+        pd.DataFrame([{
+            "naicssix": "999990",
+            "description": "Firm with unclassified NAICS",
+            "steelhead": "mis"
+        }])
+    ], ignore_index=True)
+
     return naics_xwalk
 
 # Some simple unit tests
@@ -205,10 +215,10 @@ class TestNAICSXwalk(unittest.TestCase):
 
     def test_length_unique_steelhead(self):
         """
-        Ensure we are getting 27 unique categories
+        Ensure we are getting 28 unique categories, including the "mis" category 
         """
         unique_count = len(self.naics_xwalk["steelhead"].unique())
-        expected_count = 27
+        expected_count = 28
         self.assertEqual(
             unique_count, 
             expected_count, 
