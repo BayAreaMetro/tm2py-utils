@@ -118,9 +118,9 @@ def summarize_jobs_by_maz(firms_maz, maz):
     maz_no_firms = maz[~maz["maz"].isin(firms_maz["maz"])].drop(columns="geometry")
     jobs_maz = pd.concat([jobs_maz, maz_no_firms]).reset_index(drop=True)
 
-    # Final formatting
-    jobs_maz["maz"] = jobs_maz["maz"].astype(str)
-    jobs_maz["taz"] = jobs_maz["taz"].astype(str)
+    # Remove trailing decimal and zero from ID cols
+    jobs_maz["maz"] = jobs_maz["maz"].astype(str).str.replace(r"\.0$", "", regex=True)
+    jobs_maz["taz"] = jobs_maz["taz"].astype(str).str.replace(r"\.0$", "", regex=True)
     jobs_maz = jobs_maz.fillna(0)
 
     # Create total jobs column
