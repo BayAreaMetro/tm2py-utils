@@ -51,6 +51,9 @@ The resulting shapefiles (produced by the correspondence csv via the python scri
 
 ## Revision History
 
+### Version 2.5
+* Manual fixes incorporated into [blocks_mazs_tazs_2.5](blocks_mazs_tazs_2.3.csv). Fixes were to addresses MAZs that were nested within another MAZ. See [excel](https://mtcdrive.box.com/s/rg8k2rcs39y45l3do82gmdsyk8jrslm2) for more details about the changes made.
+
 ### Version 2.4
 * Updated [maz_taz_checker.py](maz_taz_checker.py) to run with GeoPandas, move iteration within the python script, and passed the crosswalk file and version number as arguments
 * Using 2020 vintage of Census 2010 blocks
