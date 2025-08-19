@@ -3,7 +3,7 @@
 The files in this directory were used to develop micro-analysis zones (MAZs) and
 travel analysis zones (TAZs) for Travel Model Two (TM2).
 
-See [web map](https://arcg.is/1n9XfL) with Version 2.2 and 1.0 of TM2 MAZs and TAZs, along with Census 2010 places, tracts, block groups.
+See [web map](https://public.tableau.com/app/profile/bayareametro/viz/TravelModel2-MAZsandTAZs/TAZandMAZDetailedView) with Version 2.5 of TM2 MAZs and TAZs. 
 
 ## Axioms
 * MAZs and TAZs are *defined* as a union of [2020 vintage Census 2010 Blocks](https://www.census.gov/cgi-bin/geo/shapefiles/index.php?year=2020&layergroup=Blocks+%282020%29).  The shapefiles are dissolved from this definition.
@@ -68,6 +68,7 @@ The resulting shapefiles (produced by the correspondence csv via the python scri
 * The final v2.1.X file is the v2.2 file
 * [(Internal) Asana Task](https://app.asana.com/0/610230255351992/626340099942965/f)
 * Work performed in M:\Data\GIS layers\TM2_maz_taz_v2.2
+* See [web map](https://arcg.is/1n9XfL) with Version 2.2 and 1.0 of TM2 MAZs and TAZs, along with Census 2010 places, tracts, block groups.
 
 ### Version 2.1
 * Started development of [maz_taz_checker.py](maz_taz_checker.py) to automatically generate shapefiles
