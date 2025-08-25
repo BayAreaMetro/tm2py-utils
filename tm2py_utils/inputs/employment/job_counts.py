@@ -132,9 +132,11 @@ def summarize_jobs_by_maz(firms_maz, maz):
     return jobs_maz
 
 
-def get_jobs_maz():
+def get_jobs_maz(write=False):
     """
     Loads data, performs spatial joins, and summarizes jobs.
+    Parameters:
+        write (bool, optional): If True, writes the resulting jobs_maz DataFrame to a CSV file.
     Returns:
         DataFrame: jobs_maz with job counts by MAZ and steelhead categories.
     """
@@ -143,6 +145,9 @@ def get_jobs_maz():
     maz = load_maz_shp()
     firms_maz = spatil_join_firms_to_maz(firms, maz)
     jobs_maz = summarize_jobs_by_maz(firms_maz, maz)
+    if write==True:
+        OUT_FILE = r"E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-test\landuse\jobs_maz_2023_v1.csv"
+        jobs_maz.to_csv(OUT_FILE)        
     return jobs_maz
 
 def main():
