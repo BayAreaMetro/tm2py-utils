@@ -51,6 +51,7 @@ def load_csv(path):
         return None
 
 def merge_and_update():
+    # ...existing code...
     # Print column summary
     
     # Load data
@@ -94,10 +95,23 @@ def merge_and_update():
     maz_data_merged.to_csv(OUTPUT_MAZ_DATA, index=False)
 
     # --- Update maz_data_withDensity.csv ---
+    print("\nmaz_density columns before merge:", list(maz_density.columns))
+    print("jobs columns before merge:", list(jobs.columns))
+    # Ensure the join column exists and is named 'MAZ' in maz_density
+    join_col = None
+    for candidate in ['MAZ', 'MAZ_x', 'maz']:
+        if candidate in maz_density.columns:
+            join_col = candidate
+            break
+    if join_col and join_col != 'MAZ':
+        maz_density = maz_density.rename(columns={join_col: 'MAZ'})
+        join_col = 'MAZ'
+    if not join_col:
+        raise KeyError("No MAZ column found in maz_density for merging.")
     maz_density_merged = pd.merge(
         maz_density,
         jobs,
-        left_on=MAZ_DENSITY_MAZ_COL,
+        left_on='MAZ',
         right_on=JOBS_MAZ_COL,
         how="right"  # include all jobs MAZs
     )
@@ -106,16 +120,69 @@ def merge_and_update():
             maz_density_merged[col] = maz_density_merged[col].fillna(0)
 
 
-    # Keep jobs columns in case of conflict: drop _x, rename _y to original
-    cols_to_drop = [col for col in maz_density_merged.columns if col.endswith('_x') and col[:-2] + '_y' in maz_density_merged.columns]
+
+    # --- Ensure only a single MAZ column is carried forward ---
+    # Acceptable variants: 'MAZ', 'MAZ_x', 'MAZ_y', 'maz'
+    maz_variants = [col for col in maz_density_merged.columns if col.lower() == 'maz' or col.lower().startswith('maz_')]
+    # Prefer 'MAZ', then 'MAZ_x', then 'maz', then 'MAZ_y'
+    keep_maz = None
+    for candidate in ['MAZ', 'MAZ_x', 'maz', 'MAZ_y']:
+        if candidate in maz_density_merged.columns:
+            keep_maz = candidate
+            break
+    if keep_maz:
+        maz_density_merged = maz_density_merged.rename(columns={keep_maz: 'MAZ'})
+    # Drop all other MAZ variants
+    drop_maz = [col for col in maz_variants if col != keep_maz and col != 'MAZ']
+    if drop_maz:
+        maz_density_merged = maz_density_merged.drop(columns=drop_maz)
+
+    # Keep jobs columns in case of conflict: drop _x, rename _y to original (except for MAZ)
+    cols_to_drop = [col for col in maz_density_merged.columns if col.endswith('_x') and col[:-2] + '_y' in maz_density_merged.columns and col[:-2] != 'MAZ']
     maz_density_merged = maz_density_merged.drop(columns=cols_to_drop)
-    maz_density_merged.columns = [col[:-2] if col.endswith('_y') else col for col in maz_density_merged.columns]
+    maz_density_merged.columns = [col[:-2] if col.endswith('_y') and col[:-2] != 'MAZ' else col for col in maz_density_merged.columns]
+
+
+
+    # --- Overwrite EmpDen, RetEmpDen, PopDen columns with new calculations ---
+    sq_mi_acre = 1 / 640  # 1 acre = 1/640 square miles
+    if "emp_total" in maz_density_merged.columns and "ACRES" in maz_density_merged.columns:
+        maz_density_merged["EmpDen"] = maz_density_merged["emp_total"] / maz_density_merged["ACRES"].replace(0, pd.NA)
+    if "ret_loc" in maz_density_merged.columns and "ret_reg" in maz_density_merged.columns and "ACRES" in maz_density_merged.columns:
+        maz_density_merged["RetEmpDen"] = (maz_density_merged["ret_loc"] + maz_density_merged["ret_reg"]) / maz_density_merged["ACRES"].replace(0, pd.NA)
+    if "POP" in maz_density_merged.columns and "ACRES" in maz_density_merged.columns:
+        maz_density_merged["PopDen"] = maz_density_merged["POP"] / maz_density_merged["ACRES"].replace(0, pd.NA)
+    # Calculate PopEmpDenPerMi = (POP+emp_total)/(10*ACRES*sq_mi_acre)
+    if all(col in maz_density_merged.columns for col in ["POP", "emp_total", "ACRES"]):
+        maz_density_merged["PopEmpDenPerMi"] = (maz_density_merged["POP"] + maz_density_merged["emp_total"]) / (10 * maz_density_merged["ACRES"] * sq_mi_acre)
+
+    # Define empdenbin: [0-10)=1, [10-30)=2, 30+=3
+    if "EmpDen" in maz_density_merged.columns:
+        bins = [0, 10, 30, float('inf')]
+        labels = [1, 2, 3]
+        empden_numeric = pd.to_numeric(maz_density_merged["EmpDen"], errors="coerce")
+    maz_density_merged["EmpDenBin"] = pd.cut(empden_numeric, bins=bins, labels=labels, right=False)
+    maz_density_merged["EmpDenBin"] = maz_density_merged["EmpDenBin"].fillna(1)
+
+
+
+    # Calculate DUDen as HH / ACRES
+    if "HH" in maz_density_merged.columns and "ACRES" in maz_density_merged.columns:
+        maz_density_merged["DUDen"] = maz_density_merged["HH"] / maz_density_merged["ACRES"].replace(0, pd.NA)
+
+    # Define DUDenBin: [0-5)=1, [5-10)=2, 10+=3
+    if "DUDen" in maz_density_merged.columns:
+        du_bins = [0, 5, 10, float('inf')]
+        du_labels = [1, 2, 3]
+        duden_numeric = pd.to_numeric(maz_density_merged["DUDen"], errors="coerce")
+    maz_density_merged["DUDenBin"] = pd.cut(duden_numeric, bins=du_bins, labels=du_labels, right=False)
+    maz_density_merged["DUDenBin"] = maz_density_merged["DUDenBin"].fillna(1)
 
     # Save updated file
     maz_density_merged.to_csv(OUTPUT_MAZ_DENSITY, index=False)
+    print('TO DO: Figure out what EmpDenBin, DuDEnBin, IntDenBin are, and update them.')
 
-    # --- Reminder for density columns ---
-    print("\nTODO: Implement logic to recalculate density columns: EmpDen, RetEmpDen, EmpDenBin, DuDenBin, PopEmpDen, etc.")
+
 
 if __name__ == "__main__":
     merge_and_update()
