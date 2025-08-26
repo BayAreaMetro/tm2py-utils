@@ -2,7 +2,7 @@ USAGE = """
 
 MAZ and TAZ checker.
 
-Reads the definition of MAZs and TAZs in blocks_mazs_tazs.dbf (converted from csv using csv_to_dbf.R)
+Reads the definition of MAZs and TAZs in blocks_mazs_tazs.csv
 
 The following verifications are performed
   - Verifies that there are not multiple tazs or counties per maz
@@ -11,6 +11,7 @@ The following verifications are performed
   - Verifies that all blocks with zero land area are not assigned a maz/taz
   - Verifies that maz and taz numbers are numbered according to county ranges:
    https://bayareametro.github.io/tm2py/inputs/#county-node-numbering-system
+  - Verifies that mazs are not nested within other mazs
 
 Also, given the following issue:
   - If there are mazs with multiple block groups, tracts
@@ -85,6 +86,8 @@ CENSUS_BLOCK_COLS  = ["STATEFP10", "COUNTYFP10", "TRACTCE10", "BLOCKCE10", "GEOI
 
 CENSUS_BLOCK_NEIGHBOR_CSV = "E:\\GitHub\\tm2\\tm2py-utils\\tm2py_utils\\inputs\\maz_taz\\tl_2020_06_tabblock10_9CBA_neighbors.csv"
 CENSUS_TRACT_PUMA  = pathlib.Path("M:\\Data\\Census\\Geography\\tl_2010_06_puma10\\2010_Census_Tract_to_2010_PUMA.txt")
+
+SUPERDISTRICT_FILE = "E:\\GitHub\\tm2\\tm2py-utils\\tm2py_utils\\inputs\\maz_taz\\shapefiles\\travel_model_super_districts.shp"
 
 MAZS_SHP           = "mazs_TM2"
 TAZS_SHP           = "tazs_TM2"
@@ -290,14 +293,15 @@ def dissolve_into_shapefile(blocks_maz_layer, maz_or_taz):
         version_shp = VERSION.replace(".", "_")
         shapefile.to_file(f"{WORKSPACE}\shapefiles\{shapefile_name}_{version_shp}.shp")
         logging.info(f"Saving final {maz_or_taz}s into {shapefile_name}_{version_shp}.shp")
+        return shapefile
 
     except Exception as err:
         logging.error(err.args)
-
+      
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description=USAGE, formatter_class=argparse.RawDescriptionHelpFormatter,)
-    parser.add_argument("crosswalk_csv", help = 'Block/MAZ/TAZ Crosswalk file to build the latest crosswalk from', metavar= 'block_maz_taz.csv' )
+    parser.add_argument("crosswalk_csv", help = 'Block/MAZ/TAZ Crosswalk file to build the latest crosswalk from', metavar= 'blocks_mazs_tazs.csv' )
     parser.add_argument("version",help = 'Set the version of the MAZ/TAZs')
     args = parser.parse_args()
 
@@ -516,8 +520,66 @@ if __name__ == '__main__':
     logging.info(f"maz_taz_county_check=\n{maz_taz_county_check}")
 
     logging.info("Dissolving blocks into MAZs and TAZs")
-    dissolve_into_shapefile(blocks_maz_layer, "maz")
-    dissolve_into_shapefile(blocks_maz_layer, "taz")
+    maz_shapefile = dissolve_into_shapefile(blocks_maz_layer, "maz")
+    taz_shapefile = dissolve_into_shapefile(blocks_maz_layer, "taz")
+
+    # Create centroids for mazs and tazs
+    logging.info("Creating centroids for mazs and tazs")
+    maz_shapefile['MAZ_X'] = maz_shapefile.geometry.centroid.x
+    maz_shapefile['MAZ_Y'] = maz_shapefile.geometry.centroid.y
+    taz_shapefile['TAZ_X'] = taz_shapefile.geometry.centroid.x
+    taz_shapefile['TAZ_Y'] = taz_shapefile.geometry.centroid.y
+
+
+    ## Join MAZs/TAZs to superdistricts
+    logging.info("Joining mazs/tazs to superdistricts")
+    superdistricts = geopandas.read_file(SUPERDISTRICT_FILE)
+    superdistricts.to_crs(ANALYSIS_CRS, inplace=True)
+
+    ## Naming Superdistricts based on the descriptors: https://opendata.mtc.ca.gov/datasets/MTC::travel-model-super-districts/about
+    superdistricts['DistName'] = superdistricts.suprdistid.map({
+        1:'Downtown SF',
+        2:'Richmond District',
+        3:'Mission District',
+        4:'Sunset District',
+        5: 'Daly City & San Bruno',
+        6: 'San Mateo & Burlingame',
+        7: "Redwood City & Menlo Park",
+        8: 'Palo Alto & Los Altos',
+        9: 'Mountain View & Sunnyvale',
+        10:'Cupertino & Saratoga',
+        11: 'Central San Jose',
+        12: 'Milipitas & East San Jose',
+        13: 'South San Jose',
+        14: 'Gilroy & Morgan Hill',
+        15: 'Livermore & Pleasanton',
+        16: 'Fremont & Union City',
+        17: "Hayward & San Leandro",
+        18: 'Oakland & Alameda',
+        19: 'Berkeley & Albany',
+        20: 'Richmond & El Cerrito',
+        21: 'Concord & Martinez',
+        22: 'Walnut Creek',
+        23: 'Danville & San Ramon',
+        24: 'Antioch & Pittsburg',
+        25: 'Vallejo & Benicia',
+        26: 'Fairfield & Vacaville',
+        27: 'Napa',
+        28: 'Saint Helena',
+        29: 'Petaluma & Rohnert Park',
+        30: 'Santa Rosa & Sebastopol',
+        31: 'Healdsburg & Cloverdale',
+        32: 'Novato',
+        33: 'San Rafael',
+        34: 'Mill Valley & Sausalito',
+    })
+
+    taz_shapefile = geopandas.overlay(taz_shapefile, superdistricts, how='intersection')
+    taz_shapefile['area'] = taz_shapefile.geometry.area
+    taz_shapefile.sort_values(by = ['area'], inplace = True)
+    taz_shapefile.drop_duplicates(subset = ['taz'], keep = 'last', inplace = True)
+    maz_shapefile = maz_shapefile.merge(taz_shapefile[['taz','suprdistid', 'DistName']], on='taz', how='left')
+  
 
     # create MAZ_TAZ_COUNTY_PUMA_FILE with columns,MAZ,TAZ,COUNTY,county_name,PUMA
     census_tract_puma_df = pandas.read_csv(CENSUS_TRACT_PUMA, dtype=str)
@@ -529,6 +591,14 @@ if __name__ == '__main__':
     }, inplace=True)
     logging.info(f"Read {CENSUS_TRACT_PUMA}; head=\n{census_tract_puma_df.head()}")
     logging.info(f"blocks_maz_df len={len(blocks_maz_df):,}.head():\n{blocks_maz_df.head()}")
+
+    # merge blocks to get MAZ centroid
+    blocks_maz_df = pandas.merge(
+        left=blocks_maz_df,
+        right=maz_shapefile[['maz', 'suprdistid','DistName','MAZ_X','MAZ_Y']],
+        how='left',
+        on='maz',
+    )
 
     blocks_maz_df = pandas.merge(
         left=blocks_maz_df,
@@ -564,8 +634,8 @@ if __name__ == '__main__':
         "Marin": 9,
     })
     # keep only these columns
-    blocks_maz_df.rename(columns={'maz':'MAZ','taz':'TAZ'}, inplace=True)
-    blocks_maz_df = blocks_maz_df[['MAZ','TAZ','COUNTY','county_name','COUNTYFP10','TRACTCE10','PUMA10']]
+    blocks_maz_df.rename(columns={'maz':'MAZ','taz':'TAZ', 'suprdistid':'DistID'}, inplace=True)
+    blocks_maz_df = blocks_maz_df[['MAZ','TAZ','COUNTY','county_name','COUNTYFP10','TRACTCE10','PUMA10', 'DistID', 'DistName','MAZ_X','MAZ_Y']]
     blocks_maz_df.sort_values(by='MAZ', inplace=True)
     blocks_maz_df.drop_duplicates(inplace=True)
     blocks_maz_df.to_csv(f'mazs_tazs_county_tract_PUMA_{VERSION}.csv', index=False)
