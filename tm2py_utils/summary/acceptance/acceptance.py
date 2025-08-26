@@ -12,6 +12,50 @@ import pandas as pd
 
 
 class Acceptance:
+    """Orchestrates acceptance criteria comparisons between simulated and observed data.
+    
+    This class coordinates the comparison of simulated model outputs against observed data
+    and generates acceptance criteria summaries for validation. It produces GeoJSON outputs
+    suitable for visualization in Tableau or other GIS platforms.
+    
+    Attributes:
+        s (Simulated): Simulated data handler instance
+        o (Observed): Observed data handler instance
+        c (Canonical): Canonical naming and crosswalk handler instance
+        acceptance_output_folder_root (str): Root directory for output files
+        road_network_gdf (gpd.GeoDataFrame): Road network comparison results with columns:
+            - model_link_id: Unique link identifier
+            - emme_a_node_id, emme_b_node_id: Link node IDs
+            - station_id: PeMS station ID if applicable
+            - observed_flow: Observed traffic volume
+            - simulated_flow: Total simulated volume
+            - simulated_flow_[da/s2/s3/lrgt/trk]: Volume by vehicle class
+            - simulated_capacity: Link capacity
+            - odot_flow_category: ODOT volume category for error thresholds
+            - geometry: Link geometry
+        transit_network_gdf (gpd.GeoDataFrame): Transit network comparison results with columns:
+            - model_line_id: Transit line identifier
+            - operator: Transit agency name
+            - technology: Transit mode (Bus, Rail, Ferry, etc.)
+            - route_observed_boardings: Observed boardings from surveys
+            - route_simulated_boardings: Simulated boardings
+            - am_segment_volume: AM peak segment passenger volume
+            - am_segment_vc_ratio_total: Volume/capacity ratio
+            - geometry: Route geometry
+        compare_gdf (gpd.GeoDataFrame): Other comparison results with columns:
+            - criteria_number: Acceptance criteria ID
+            - criteria_name: Description of criteria
+            - dimension_01/02/03_name: Dimension labels (e.g., 'Origin County')
+            - dimension_01/02/03_value: Dimension values
+            - observed_outcome: Observed metric value
+            - simulated_outcome: Simulated metric value
+            - acceptance_threshold: Pass/fail threshold
+            - geometry: Point geometry for spatial comparisons
+    
+    Example:
+        >>> acceptance = Acceptance(canonical, simulated, observed, "output/acceptance")
+        >>> acceptance.make_acceptance(make_transit=True, make_roadway=True)
+    """
     s: Simulated
     o: Observed
     c: Canonical
@@ -122,6 +166,25 @@ class Acceptance:
         self.acceptance_output_folder_root = output_file_root
 
     def make_acceptance(self, make_transit=True, make_roadway=True, make_other=False):
+        """Generate acceptance criteria comparisons.
+        
+        Main entry point for generating all acceptance criteria comparisons. Controls
+        which types of comparisons are performed and writes results to GeoJSON files.
+        
+        Args:
+            make_transit (bool): Generate transit network comparisons. Defaults to True.
+                Creates 'acceptance-transit-network.geojson' with route-level and
+                segment-level boarding comparisons.
+            make_roadway (bool): Generate roadway network comparisons. Defaults to True.
+                Creates 'acceptance-roadway-network.geojson' with link-level volume
+                comparisons for multiple time periods.
+            make_other (bool): Generate other comparisons. Defaults to False.
+                Creates 'acceptance-other.geojson' with aggregate comparisons like
+                county flows and household characteristics.
+        
+        Returns:
+            None
+        """
         if make_roadway:
             self._make_roadway_network_comparisons()
         if make_transit:
@@ -132,6 +195,14 @@ class Acceptance:
         return
 
     def _write_roadway_network(self):
+        """Write roadway network comparison results to GeoJSON file.
+        
+        Outputs the road_network_gdf to a GeoJSON file for visualization.
+        File is written to: {acceptance_output_folder_root}/acceptance-roadway-network.geojson
+        
+        Returns:
+            None
+        """
         file_root = self.acceptance_output_folder_root
         out_file = os.path.join(file_root, self.output_roadway_filename)
         self.road_network_gdf.to_file(out_file, driver="GeoJSON")
@@ -139,6 +210,14 @@ class Acceptance:
         return
 
     def _write_transit_network(self):
+        """Write transit network comparison results to GeoJSON file.
+        
+        Outputs the transit_network_gdf to a GeoJSON file for visualization.
+        File is written to: {acceptance_output_folder_root}/acceptance-transit-network.geojson
+        
+        Returns:
+            None
+        """
         file_root = self.acceptance_output_folder_root
         out_file = os.path.join(file_root, self.output_transit_filename)
         self.transit_network_gdf.to_file(out_file, driver="GeoJSON")
@@ -146,6 +225,14 @@ class Acceptance:
         return
 
     def _write_other_comparisons(self):
+        """Write other comparison results to GeoJSON file.
+        
+        Outputs the compare_gdf containing various non-network comparisons to a GeoJSON file.
+        File is written to: {acceptance_output_folder_root}/acceptance-other.geojson
+        
+        Returns:
+            None
+        """
         file_root = self.acceptance_output_folder_root
         out_file = os.path.join(file_root, self.output_other_filename)
         self.compare_gdf.to_file(out_file, driver="GeoJSON")
@@ -153,6 +240,39 @@ class Acceptance:
         return
 
     def _make_roadway_network_comparisons(self):
+        """Create roadway network comparisons between observed and simulated data.
+        
+        Merges observed traffic counts (PeMS, Caltrans) and bridge transactions with
+        simulated roadway assignment results. Applies ODOT error categories and
+        prepares data for visualization.
+        
+        Produces road_network_gdf with columns:
+            - model_link_id: Unique link identifier
+            - emme_a_node_id, emme_b_node_id: Network node IDs
+            - station_id: PeMS/Caltrans station ID
+            - pems_station_type: Station type (mainline, ramp, etc.)
+            - distance_in_miles: Link length
+            - key_location_name: Key arterial or bridge name if applicable
+            - bridge_plaza_name: Bridge toll plaza name if applicable
+            - time_period: Time period (am, pm, md, ev, ea, daily)
+            - observed_source: Data source (PeMS, Caltrans)
+            - observed_flow: Observed volume
+            - observed_vehicle_class: Vehicle type (All Vehicles, Large Trucks)
+            - observed_toll_transactions: Bridge toll transactions
+            - simulated_flow: Total simulated volume
+            - simulated_flow_[da/s2/s3/lrgt/trk]: Volume by mode
+            - simulated_flow_managed: Managed lane total volume
+            - simulated_capacity: Link capacity
+            - simulated_facility_type: Facility type code
+            - simulated_lanes: Number of lanes
+            - simulated_speed_mph: Simulated speed
+            - odot_flow_category: Volume category for error standards
+            - odot_maximum_error: Maximum acceptable percent error
+            - geometry: Link geometry
+        
+        Returns:
+            None
+        """
         o_df = self.o.reduced_traffic_counts_df.copy()
         o_trans_df = self.o.observed_bridge_transactions_df.copy()
         s_df = self.s.simulated_roadway_assignment_results_df.copy()
@@ -280,6 +400,24 @@ class Acceptance:
         return
 
     def compare_transit_boardings(self) -> pd.DataFrame:
+        """Compare transit boardings between simulated and observed data.
+        
+        Method created to compare simulated transit boardings generated
+        by assigning demand from the on-board survey. Handles rail operators
+        (matched by operator/technology) and non-rail operators (matched by route).
+        
+        Returns:
+            pd.DataFrame: Observed and simulated transit boardings with columns:
+                - operator: Transit agency name (canonical)
+                - technology: Mode type (Local Bus, Express Bus, Light Rail, etc.)
+                - time_period: Time period (am, daily, etc.)
+                - survey_boardings: Observed boardings from surveys
+                - total_boarding: Simulated boardings from model
+                - florida_threshold: Maximum acceptable error percentage
+                - line_name: Transit line identifier (non-rail only)
+                - survey_route: Survey route name
+                - standard_route_id: Standardized route identifier
+        """
         """Compare transit boardings
 
         Method created to compare simulated transit boardings generated
@@ -386,6 +524,35 @@ class Acceptance:
         return boards_df
 
     def _make_transit_network_comparisons(self):
+        """Create transit network comparisons between observed and simulated data.
+        
+        Compares observed transit boardings from on-board surveys with simulated
+        boardings. Handles rail operators (aggregate by operator) and non-rail
+        operators (match by route). Includes segment-level volume/capacity metrics.
+        
+        Produces transit_network_gdf with columns:
+            - model_link_id: Transit link identifier
+            - model_line_id: Transit line name
+            - operator: Transit agency (canonical name)
+            - technology: Mode (Local Bus, Express Bus, Light Rail, etc.)
+            - route_short_name: Route short name from GTFS
+            - route_long_name: Route long name from GTFS
+            - time_period: Time period (am, daily)
+            - route_observed_boardings: Survey boardings (route total)
+            - route_simulated_boardings: Model boardings (route total)
+            - florida_threshold: Maximum error threshold percentage
+            - am_segment_simulated_boardings: AM boardings on segment
+            - am_segment_volume: AM passenger volume on segment
+            - am_segment_capacity_total: Total capacity
+            - am_segment_vc_ratio_total: Volume/capacity ratio (total)
+            - am_segment_capacity_seated: Seated capacity
+            - am_segment_vc_ratio_seated: Volume/capacity ratio (seated)
+            - mean_am_segment_vc_ratio_total: Route mean V/C ratio
+            - geometry: Route/segment geometry
+        
+        Returns:
+            None
+        """
         # step 1: outer merge for rail operators (ignore route)
         # step 2: left merge for non-rail operators
         boards_df = self.compare_transit_boardings()
@@ -492,6 +659,18 @@ class Acceptance:
         return
 
     def _make_other_comparisons(self):
+        """Create other non-network comparisons.
+        
+        Aggregates multiple comparison types into a single GeoDataFrame:
+        - Home-work county flows (CTPP)
+        - Zero-vehicle households by census tract
+        - BART station-to-station flows
+        - Rail station access mode shares
+        - Transit district-to-district flows by technology
+        
+        Returns:
+            None
+        """
         a_df = self._make_home_work_flow_comparisons()
         b_gdf = self._make_zero_vehicle_household_comparisons()
         c_gdf = self._make_bart_station_to_station_comparisons()
@@ -509,6 +688,26 @@ class Acceptance:
     def _fix_technology_labels(
         self, input_df: pd.DataFrame, column_name: str
     ) -> pd.DataFrame:
+        """Standardize transit technology labels.
+        
+        Converts various technology label formats to standardized names:
+        - "local"/"local bus" -> "Local Bus"
+        - "express"/"express bus" -> "Express Bus"
+        - "light"/"light rail" -> "Light Rail"
+        - "ferry" -> "Ferry"
+        - "heavy" -> "Heavy Rail"
+        - "commuter" -> "Commuter Rail"
+        
+        Args:
+            input_df (pd.DataFrame): DataFrame with technology labels to fix
+            column_name (str): Name of column containing technology labels
+        
+        Returns:
+            pd.DataFrame: DataFrame with standardized technology labels
+        
+        Raises:
+            AssertionError: If column_name is not in input_df
+        """
         assert column_name in input_df.columns
 
         r_df = input_df.copy()
@@ -535,6 +734,23 @@ class Acceptance:
         return r_df
 
     def _make_home_work_flow_comparisons(self):
+        """Create county-to-county home-work flow comparisons.
+        
+        Compares simulated home-work flows against CTPP 2012-2016 observed flows.
+        Adjusts observed flows to match total simulated workers.
+        
+        Returns:
+            pd.DataFrame: Comparison data for acceptance criteria #23 with columns:
+                - criteria_number: 23
+                - criteria_name: "Percent root mean square error in CTPP county-to-county worker flows"
+                - acceptance_threshold: "Less than 15 percent RMSE"
+                - dimension_01_name: "residence_county"
+                - dimension_01_value: Residence county name
+                - dimension_02_name: "work_county"
+                - dimension_02_value: Work county name
+                - observed_outcome: Observed worker flow (adjusted)
+                - simulated_outcome: Simulated worker flow
+        """
         adjust_observed = (
             self.s.simulated_home_work_flows_df.simulated_flow.sum()
             / self.o.ctpp_2012_2016_df.observed_flow.sum()
@@ -568,6 +784,24 @@ class Acceptance:
         return df
 
     def _make_zero_vehicle_household_comparisons(self):
+        """Create zero-vehicle household share comparisons by census tract.
+        
+        Compares simulated zero-vehicle household shares against Census 2017 ACS data
+        at the census tract level.
+        
+        Returns:
+            gpd.GeoDataFrame: Comparison data for acceptance criteria #24 with columns:
+                - criteria_number: 24
+                - criteria_name: "Spatial patterns of observed and estimated zero vehicle households"
+                - acceptance_threshold: "MTC's Assessment of Reasonableness"
+                - dimension_01_name: "residence_tract"
+                - dimension_01_value: Census tract ID
+                - dimension_02_name: "observed_total_households"
+                - dimension_02_value: Total households in tract
+                - observed_outcome: Observed zero-vehicle household share (0-1)
+                - simulated_outcome: Simulated zero-vehicle household share (0-1)
+                - geometry: Tract centroid point geometry
+        """
         c_df = self.s.reduced_simulated_zero_vehicle_hhs_df
 
         # prepare the observed data
@@ -607,6 +841,23 @@ class Acceptance:
         return gdf
 
     def _make_bart_station_to_station_comparisons(self):
+        """Create BART station-to-station flow comparisons.
+        
+        Compares simulated BART boarding-alighting flows against observed data.
+        
+        Returns:
+            gpd.GeoDataFrame: Comparison data for acceptance criteria #16 with columns:
+                - criteria_number: 16
+                - criteria_name: "Percent root mean square error across boarding-alighting BART flows"
+                - acceptance_threshold: "Less than 40 percent"
+                - dimension_01_name: "Boarding Station"
+                - dimension_01_value: Boarding station name (canonical)
+                - dimension_02_name: "Alighting Station"
+                - dimension_02_value: Alighting station name (canonical)
+                - observed_outcome: Observed station-to-station flow
+                - simulated_outcome: Simulated station-to-station flow
+                - geometry: Boarding station point geometry
+        """
         s_df = self.s.simulated_station_to_station_df.copy()
 
         df = pd.merge(
@@ -640,6 +891,37 @@ class Acceptance:
         return r_gdf
 
     def _make_rail_access_comparisons(self):
+        """Create rail station access mode comparisons.
+        
+        Compares access mode shares (walk, park-and-ride, kiss-and-ride) at rail
+        stations between simulated and observed data. Focuses on stations with
+        significant park-and-ride usage (>500 daily vehicles).
+        
+        Returns:
+            gpd.GeoDataFrame: Comparison data for acceptance criteria #17 and #19:
+                
+                Criteria #19 columns:
+                - criteria_number: 19
+                - criteria_name: "Percent error in share of transit boardings that access via walk, bus, park and ride, and kiss and ride at rail stations"
+                - acceptance_threshold: "MTC's assessment of reasonableness"
+                - dimension_01_name: "Boarding Station"
+                - dimension_01_value: Station name with operator prefix
+                - dimension_02_name: "Access Mode"
+                - dimension_02_value: Access mode (Walk, Park and Ride, Kiss and Ride)
+                - observed_outcome: Observed boardings by access mode
+                - simulated_outcome: Simulated boardings by access mode
+                - geometry: Station point geometry
+                
+                Criteria #17 columns (BART park-and-ride only):
+                - criteria_number: 17
+                - criteria_name: "Percent root mean square error in park and ride lot demand at each BART station with parking access"
+                - acceptance_threshold: "Less than 20 percent for lots with more than 500 daily vehicles"
+                - dimension_01_name: "Boarding Station"
+                - dimension_01_value: BART station name
+                - observed_outcome: Observed park-and-ride boardings
+                - simulated_outcome: Simulated park-and-ride boardings
+                - geometry: Station point geometry
+        """
         PARK_AND_RIDE_OBSERVED_THRESHOLD = 500
 
         s_df = self.s.simulated_transit_access_df.copy()
@@ -742,6 +1024,26 @@ class Acceptance:
         return r_gdf
 
     def _make_transit_district_flow_comparisons(self):
+        """Create district-to-district transit flow comparisons by technology.
+        
+        Compares simulated district-level transit flows by technology (ferry,
+        commuter rail, heavy rail, light rail, express bus) against observed flows
+        for the AM peak period.
+        
+        Returns:
+            pd.DataFrame: Comparison data for acceptance criteria #6 with columns:
+                - criteria_number: 6
+                - criteria_name: "Reasonableness of morning commute district level transit flows by technology (Ferry, CR, HR, LRT, Express bus)"
+                - acceptance_threshold: "MTC's assessment of reasonableness"
+                - dimension_01_name: "Origin District"
+                - dimension_01_value: Origin district ID (1-34)
+                - dimension_02_name: "Destination District"
+                - dimension_02_value: Destination district ID (1-34)
+                - dimension_03_name: "Technology"
+                - dimension_03_value: Technology name (Local Bus, Express Bus, Light Rail, Ferry, Heavy Rail, Commuter Rail)
+                - observed_outcome: Observed district-to-district flow
+                - simulated_outcome: Simulated district-to-district flow
+        """
         s_df = self.s.simulated_transit_district_to_district_by_tech_df.copy()
         o_df = self.o.reduced_transit_district_flows_by_technology_df.copy()
 

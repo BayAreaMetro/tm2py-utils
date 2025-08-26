@@ -1,4 +1,9 @@
-"""Methods to handle canonical names for the Acceptance Criteria summaries from a tm2py model run."""
+"""Methods to handle canonical names for the Acceptance Criteria summaries from a tm2py model run.
+
+This module provides canonical naming conventions and crosswalk mappings between different
+data sources used in acceptance criteria validation. It ensures consistent naming across
+PeMS, GTFS, census, and model network data.
+"""
 
 import os
 import pandas as pd
@@ -6,6 +11,44 @@ import toml
 
 
 class Canonical:
+    """Manages canonical naming conventions and crosswalk mappings.
+    
+    This class handles standardization of names and IDs across different data sources,
+    including transit agencies, station names, network nodes, and geographic units.
+    It loads configuration from TOML files and provides crosswalk mappings.
+    
+    Attributes:
+        canonical_dict (dict): Configuration loaded from canonical TOML file
+        scenario_dict (dict): Scenario configuration from TOML file
+        census_2010_to_maz_crosswalk_df (pd.DataFrame): Census block group to MAZ mapping
+            Columns: [maz, blockgroup, maz_share]
+        canonical_agency_names_dict (dict): Maps agency name variations to canonical names
+        canonical_station_names_dict (dict): Maps station name variations to canonical names by operator
+        gtfs_to_tm2_mode_codes_df (pd.DataFrame): GTFS to TM2 mode code mapping
+            Columns: [tm2_mode, tm2_operator, operator, technology]
+        standard_transit_to_survey_df (pd.DataFrame): Transit survey crosswalk
+            Columns: [survey_route, survey_agency, survey_tech, standard_route_id,
+                     standard_line_name, standard_operator, canonical_operator]
+        standard_to_emme_node_crosswalk_df (pd.DataFrame): Standard to EMME node mapping
+            Columns: [model_node_id, emme_node_id]
+        pems_to_link_crosswalk_df (pd.DataFrame): PeMS stations to network links
+            Columns: [station_id, A, B]
+        taz_to_district_df (pd.DataFrame): TAZ to planning district mapping
+            Columns: [taz, district]
+        
+    Constants:
+        ALL_DAY_WORD: "daily" - keyword for daily summaries
+        WALK_ACCESS_WORD: "Walk" - standard walk access label
+        PARK_AND_RIDE_ACCESS_WORD: "Park and Ride" - standard PNR label
+        KISS_AND_RIDE_ACCESS_WORD: "Kiss and Ride" - standard KNR label
+        BIKE_ACCESS_WORD: "Bike" - standard bike access label
+        ALL_VEHICLE_TYPE_WORD: "All Vehicles" - all vehicle types label
+        LARGE_TRUCK_VEHICLE_TYPE_WORD: "Large Trucks" - truck category label
+        MANAGED_LANE_OFFSET: 10000000 - offset for managed lane link IDs
+        transit_technology_abbreviation_dict: Maps codes to technology names
+        rail_operators_vector: List of rail operator names
+        county_names_list: Nine Bay Area county names
+    """
     canonical_dict: dict
     canonical_file: str
     scenario_dict: dict
@@ -64,6 +107,13 @@ class Canonical:
     ]
 
     def _load_configs(self):
+        """Load configuration from TOML files.
+        
+        Reads canonical and scenario configuration files specified during initialization.
+        
+        Returns:
+            None
+        """
         with open(self.canonical_file, "r", encoding="utf-8") as toml_file:
             self.canonical_dict = toml.load(toml_file)
 
@@ -77,6 +127,19 @@ class Canonical:
     def __init__(
         self, canonical_file: str, scenario_file: str = None, on_board_assign_summary: bool = False
     ) -> None:
+        """Initialize the Canonical class with configuration files.
+        
+        Args:
+            canonical_file (str): Path to canonical configuration TOML file containing
+                crosswalk file paths and canonical naming conventions
+            scenario_file (str, optional): Path to scenario TOML file with model inputs.
+                Defaults to None.
+            on_board_assign_summary (bool, optional): If True, only loads transit-related
+                crosswalks for on-board assignment summaries. Defaults to False.
+        
+        Returns:
+            None
+        """
         self.canonical_file = canonical_file
         self.scenario_file = scenario_file
         self._load_configs()
@@ -95,6 +158,14 @@ class Canonical:
         return
 
     def _make_simulated_maz_data(self):
+        """Load simulated MAZ land use data.
+        
+        Reads MAZ-level land use file and joins with zone sequencing to create
+        simulated_maz_data_df with MAZ attributes including county and district IDs.
+        
+        Returns:
+            None
+        """
         in_file = self.scenario_dict["scenario"]["maz_landuse_file"]
 
         df = pd.read_csv(in_file)
@@ -118,6 +189,14 @@ class Canonical:
         return
         
     def _make_taz_district_crosswalk(self):
+        """Create TAZ to planning district crosswalk.
+        
+        Extracts unique TAZ to district mappings from MAZ data for use in
+        district-level summaries. Districts are numbered 1-34 in the MTC region.
+        
+        Returns:
+            None
+        """
 
         df = self.simulated_maz_data_df[["TAZ_ORIGINAL", "DistID"]].copy()
         df = df.rename(columns={"TAZ_ORIGINAL": "taz", "DistID": "district"})
@@ -126,6 +205,14 @@ class Canonical:
         return
         
     def _make_canonical_agency_names_dict(self):
+        """Create dictionary mapping agency name variations to canonical names.
+        
+        Reads agency names CSV file and builds a dictionary that maps all variations
+        (canonical_name, alternate_01 through alternate_05) to the canonical name.
+        
+        Returns:
+            None
+        """
         file_root = self.canonical_dict["remote_io"]["crosswalk_folder_root"]
         in_file = self.canonical_dict["crosswalks"]["canonical_agency_names_file"]
 
@@ -173,6 +260,15 @@ class Canonical:
         return
 
     def _make_canonical_station_names_dict(self):
+        """Create nested dictionary mapping station name variations to canonical names.
+        
+        Reads station names CSV file and builds a nested dictionary where the outer key
+        is the operator name and inner dictionary maps all station name variations to
+        canonical station names.
+        
+        Returns:
+            None
+        """
         file_root = self.canonical_dict["remote_io"]["crosswalk_folder_root"]
         in_file = self.canonical_dict["crosswalks"]["canonical_station_names_file"]
 
@@ -210,12 +306,26 @@ class Canonical:
         return
 
     def _make_census_maz_crosswalk(self):
+        """Load census block group to MAZ crosswalk.
+        
+        Downloads/reads CSV mapping census block groups to model MAZs with share allocations.
+        
+        Returns:
+            None
+        """
         url_string = self.canonical_dict["crosswalks"]["block_group_to_maz_url"]
         self.census_2010_to_maz_crosswalk_df = pd.read_csv(url_string)
 
         return
 
     def _read_standard_to_emme_transit(self):
+        """Read standard to EMME transit node crosswalk.
+        
+        Loads mapping between standard network node IDs and EMME node IDs for transit stops.
+        
+        Returns:
+            None
+        """
         root_dir = self.canonical_dict["remote_io"]["crosswalk_folder_root"]
         in_file = self.canonical_dict["crosswalks"]["standard_to_emme_transit_file"]
 
@@ -226,6 +336,14 @@ class Canonical:
         return
 
     def _make_tm2_to_gtfs_mode_crosswalk(self):
+        """Create TM2 mode to GTFS agency/technology crosswalk.
+        
+        Reads mode mapping file to link TM2 mode codes with GTFS agencies and technologies.
+        Creates gtfs_to_tm2_mode_codes_df with columns: [tm2_mode, tm2_operator, operator, technology]
+        
+        Returns:
+            None
+        """
         file_root = self.canonical_dict["remote_io"]["crosswalk_folder_root"]
         in_file = self.canonical_dict["crosswalks"]["standard_to_tm2_modes_file"]
 
@@ -246,6 +364,14 @@ class Canonical:
         return
 
     def _read_standard_transit_to_survey_crosswalk(self):
+        """Read crosswalk between standard transit network and survey data.
+        
+        Loads mapping that links transit survey routes to standard network routes,
+        including operator names, route IDs, and technology types.
+        
+        Returns:
+            None
+        """
         file_root = self.canonical_dict["remote_io"]["crosswalk_folder_root"]
         in_file = self.canonical_dict["crosswalks"]["crosswalk_standard_survey_file"]
 
@@ -273,6 +399,18 @@ class Canonical:
     def aggregate_line_names_across_time_of_day(
         self, input_df: pd.DataFrame, input_column_name: str
     ) -> pd.DataFrame:
+        """Extract daily line name from time-specific line names.
+        
+        Parses line names like "Mode_Operator_Route_TimePeriod" to extract
+        "Mode_Operator_Route" as the daily line name.
+        
+        Args:
+            input_df (pd.DataFrame): DataFrame containing line names
+            input_column_name (str): Column with time-specific line names
+        
+        Returns:
+            pd.DataFrame: Input DataFrame with added 'daily_line_name' column
+        """
         df = input_df[input_column_name].str.split(pat="_", expand=True).copy()
         df["daily_line_name"] = df[0] + "_" + df[1] + "_" + df[2]
         return_df = pd.concat([input_df, df["daily_line_name"]], axis="columns")
@@ -280,6 +418,14 @@ class Canonical:
         return return_df
 
     def _read_pems_to_link_crosswalk(self) -> pd.DataFrame:
+        """Read PeMS station to network link crosswalk.
+        
+        Loads mapping of PeMS traffic count stations to model network links.
+        Creates station_id as combination of station number and direction.
+        
+        Returns:
+            pd.DataFrame: Not used (sets instance attribute instead)
+        """
         file_root = self.canonical_dict["remote_io"]["crosswalk_folder_root"]
         in_file = self.canonical_dict["crosswalks"]["pems_station_to_tm2_links_file"]
 
@@ -292,6 +438,13 @@ class Canonical:
         return
 
     def _read_standard_to_emme_node_crosswalk(self) -> pd.DataFrame:
+        """Read standard to EMME roadway node crosswalk.
+        
+        Loads mapping between standard network node IDs and EMME node IDs for roadway network.
+        
+        Returns:
+            pd.DataFrame: Not used (sets instance attribute instead)
+        """
         file_root = self.canonical_dict["remote_io"]["crosswalk_folder_root"]
         in_file = self.canonical_dict["crosswalks"]["standard_to_emme_nodes_file"]
 

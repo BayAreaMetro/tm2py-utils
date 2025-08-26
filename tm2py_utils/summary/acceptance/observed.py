@@ -1,4 +1,9 @@
-"""Methods to handle observed data for the Acceptance Criteria summaries from a tm2py model run."""
+"""Methods to handle observed data for the Acceptance Criteria summaries from a tm2py model run.
+
+This module manages observed data from various sources including PeMS traffic counts,
+transit on-board surveys, census data, and bridge toll transactions. It processes and
+standardizes these data sources for comparison with simulated model outputs.
+"""
 
 from tm2py_utils.summary.acceptance.canonical import Canonical
 
@@ -10,6 +15,80 @@ import toml
 
 
 class Observed:
+    """Manages observed data for acceptance criteria validation.
+    
+    This class handles loading, processing, and standardizing observed data from multiple
+    sources for comparison with simulated model outputs. It applies data reduction and
+    aggregation methods to prepare observed data for acceptance criteria evaluation.
+    
+    Attributes:
+        c (Canonical): Canonical naming and crosswalk handler
+        observed_dict (dict): Configuration from observed TOML file
+        observed_file (str): Path to observed configuration file
+        
+        Traffic/Roadway Data:
+        reduced_traffic_counts_df (pd.DataFrame): Processed traffic counts with columns:
+            - model_link_id: Network link ID
+            - source: Data source (PeMS, Caltrans)
+            - station_id: Count station identifier
+            - vehicle_class: Vehicle type (All Vehicles, Large Trucks)
+            - time_period: Time period (am, pm, md, ev, ea, daily)
+            - observed_flow: Traffic volume
+            - odot_flow_category_daily/hourly: Volume category for error standards
+            - odot_maximum_error: Maximum acceptable percent error
+            - key_location: Key arterial or bridge name if applicable
+            
+        observed_bridge_transactions_df (pd.DataFrame): Bridge toll transactions:
+            - plaza_name: Bridge toll plaza name
+            - time_period: Time period
+            - transactions: Number of toll transactions
+            
+        Transit Data:
+        reduced_transit_on_board_df (pd.DataFrame): Transit survey boardings:
+            - survey_tech: Technology type from survey
+            - survey_operator: Agency name from survey
+            - survey_route: Route identifier from survey
+            - survey_boardings: Observed boardings
+            - florida_threshold: Maximum error threshold percentage
+            - standard_route_id: Standardized route ID
+            - time_period: Time period (am, daily)
+            
+        reduced_transit_on_board_access_df (pd.DataFrame): Rail access mode data:
+            - operator: Rail operator name
+            - boarding_station: Station name
+            - access_mode: Access mode (Walk, Park and Ride, etc.)
+            - survey_trips: Number of trips by access mode
+            - time_period: Time period
+            
+        observed_bart_boardings_df (pd.DataFrame): BART station-to-station flows:
+            - boarding: Origin station name
+            - alighting: Destination station name
+            - observed: Average daily trips
+            
+        Census Data:
+        ctpp_2012_2016_df (pd.DataFrame): County-to-county work flows:
+            - residence_county: Home county
+            - work_county: Work county
+            - observed_flow: Number of workers
+            
+        census_2017_zero_vehicle_hhs_df (pd.DataFrame): Zero-vehicle households:
+            - geoid: Census geography ID
+            - total_households: Total households
+            - observed_zero_vehicle_households: Households with no vehicles
+            - observed_zero_vehicle_household_share: Share with no vehicles
+            
+        census_tract_centroids_gdf (gpd.GeoDataFrame): Census tract centroids:
+            - tract: Census tract ID
+            - geometry: Centroid point geometry
+    
+    Constants:
+        RELEVANT_PEMS_OBSERVED_YEARS_LIST: [2014, 2015, 2016]
+        RELEVANT_BRIDGE_TRANSACTIONS_YEARS_LIST: [2014, 2015, 2016]
+        RELEVANT_BART_OBSERVED_YEARS_LIST: [2014, 2015, 2016]
+        RELEVANT_PEMS_VEHICLE_CLASSES_FOR_LARGE_TRUCK: [6, 7, 8, 9, 10, 11, 12]
+        ohio_rmse_standards_df: ODOT volume-based RMSE thresholds
+        florida_transit_guidelines_df: Florida DOT boarding-based error thresholds
+    """
     c: Canonical
 
     observed_dict: dict
@@ -153,6 +232,18 @@ class Observed:
         observed_file: str,
         on_board_assign_summary: bool = False,
     ) -> None:
+        """Initialize Observed data handler.
+        
+        Args:
+            canonical (Canonical): Canonical naming and crosswalk handler instance
+            observed_file (str): Path to observed configuration TOML file containing
+                data source file paths and processing parameters
+            on_board_assign_summary (bool, optional): If True, only loads transit
+                access summaries for on-board assignment validation. Defaults to False.
+        
+        Returns:
+            None
+        """
         self.c = canonical
         self.observed_file = observed_file
         self._load_configs()
@@ -190,6 +281,19 @@ class Observed:
         return
 
     def _join_florida_thresholds(self, input_df: pd.DataFrame) -> pd.DataFrame:
+        """Apply Florida DOT error thresholds based on boarding volumes.
+        
+        Joins Florida DOT guidelines that specify maximum acceptable error percentages
+        based on observed boarding ranges (e.g., 150% for 0-1000 boardings, 35% for
+        5000-10000 boardings).
+        
+        Args:
+            input_df (pd.DataFrame): Transit boardings data with 'survey_boardings' column
+        
+        Returns:
+            pd.DataFrame: Input data with added 'florida_threshold' column containing
+                maximum acceptable error percentage for each route's boarding level
+        """
         df = self.florida_transit_guidelines_df.copy()
         df["high"] = df["boardings"].shift(-1)
         df["low"] = df["boardings"]
@@ -316,6 +420,31 @@ class Observed:
         return pd.concat([all_df, time_of_day_df], axis="rows", ignore_index=True)
 
     def reduce_on_board_survey(self, read_file_from_disk=True):
+        """Reduce on-board survey data to route-level boardings.
+        
+        Processes raw on-board survey data, applies canonical naming, adds Florida DOT
+        thresholds, and joins with standard route IDs. For non-rail routes, boardings
+        are divided by 2 to account for direction.
+        
+        Args:
+            read_file_from_disk (bool, optional): If True, reads previously processed
+                data from disk if available. If False, reprocesses from raw data.
+                Defaults to True.
+        
+        Results stored in reduced_transit_on_board_df with columns:
+            - survey_tech: Technology type
+            - survey_operator: Canonical operator name
+            - survey_route: Route identifier
+            - survey_boardings: Total boardings (adjusted for direction)
+            - time_period: Time period (am, daily)
+            - florida_threshold: Error threshold percentage
+            - standard_route_id: Standard network route ID
+            - standard_line_name: Standard line name
+            - daily_line_name: Daily aggregated line name
+        
+        Returns:
+            None
+        """
         """Reduces the on-board survey, summarizing boardings by technology, operator, route, and time of day.
         Result is stored in the reduced_transit_on_board_df DataFrame and written to disk in the `reduced_summaries_file`
         in the observed configuration.
@@ -347,6 +476,20 @@ class Observed:
         return
 
     def _reduce_census_zero_car_households(self):
+        """Process Census ACS zero-vehicle household data.
+        
+        Reads 2017 American Community Survey data on vehicle availability by block group
+        and calculates zero-vehicle household shares.
+        
+        Results stored in census_2017_zero_vehicle_hhs_df with columns:
+            - geoid: Census block group identifier
+            - total_households: Total households in block group
+            - observed_zero_vehicle_households: Count of zero-vehicle households
+            - observed_zero_vehicle_household_share: Share of households with no vehicles
+        
+        Returns:
+            None
+        """
         file_root = self.observed_dict["remote_io"]["obs_folder_root"]
         in_file = self.observed_dict["census"]["vehicles_by_block_group_file"]
 
@@ -372,6 +515,19 @@ class Observed:
         return
 
     def _reduce_observed_bart_boardings(self):
+        """Process observed BART station-to-station flows.
+        
+        Reads BART origin-destination data and applies canonical station names.
+        Takes average of years 2014-2016.
+        
+        Results stored in observed_bart_boardings_df with columns:
+            - boarding: Origin station canonical name
+            - alighting: Destination station canonical name
+            - observed: Average daily trips between stations
+        
+        Returns:
+            None
+        """
         file_root = self.observed_dict["remote_io"]["obs_folder_root"]
         in_file = self.observed_dict["transit"]["bart_boardings_file"]
 
@@ -462,6 +618,19 @@ class Observed:
         return
 
     def _reduce_ctpp_2012_2016(self):
+        """Process CTPP county-to-county commute flows.
+        
+        Reads Census Transportation Planning Products (CTPP) 2012-2016 data for
+        county-to-county worker flows in the nine Bay Area counties.
+        
+        Results stored in ctpp_2012_2016_df with columns:
+            - residence_county: Home county name
+            - work_county: Work county name
+            - observed_flow: Number of workers making this commute
+        
+        Returns:
+            None
+        """
         file_root = self.observed_dict["remote_io"]["obs_folder_root"]
         in_file = self.observed_dict["census"]["ctpp_2012_2016_file"]
 
@@ -578,6 +747,20 @@ class Observed:
         return df
 
     def _join_ohio_standards(self, input_df: pd.DataFrame) -> pd.DataFrame:
+        """Apply Ohio DOT RMSE standards based on traffic volumes.
+        
+        Joins ODOT guidelines that specify maximum acceptable RMSE percentages based
+        on observed traffic volume ranges. Higher volumes have stricter error tolerances.
+        
+        Args:
+            input_df (pd.DataFrame): Traffic count data with 'observed_flow' column
+        
+        Returns:
+            pd.DataFrame: Input data with added columns:
+                - odot_flow_category_daily: Daily volume range (e.g., "1000-2000")
+                - odot_flow_category_hourly: Hourly volume range
+                - odot_maximum_error: Maximum acceptable percent RMSE
+        """
         df = self.ohio_rmse_standards_df.copy()
 
         df["upper"] = (
@@ -682,6 +865,24 @@ class Observed:
         return return_df
 
     def reduce_bridge_transactions(self, read_file_from_disk=True):
+        """Prepare observed bridge toll transaction data.
+        
+        Processes bridge toll transaction data, aggregates to time periods and daily
+        totals. Takes median across years 2014-2016.
+        
+        Args:
+            read_file_from_disk (bool, optional): If True, reads previously processed
+                data from disk if available. If False, reprocesses from raw data.
+                Defaults to True.
+        
+        Results stored in observed_bridge_transactions_df with columns:
+            - plaza_name: Bridge toll plaza name
+            - time_period: Time period (am, pm, md, ev, ea, daily)
+            - transactions: Number of toll transactions (median across years)
+        
+        Returns:
+            None
+        """
         """
         Prepares observed bridge transaction data for Acceptance Comparisons.
 
@@ -762,6 +963,31 @@ class Observed:
         return
 
     def reduce_traffic_counts(self, read_file_from_disk=True):
+        """Prepare observed traffic count data for acceptance comparisons.
+        
+        Processes PeMS and Caltrans traffic counts, computes daily totals, joins with
+        network link crosswalk, and applies ODOT error standards based on volume ranges.
+        
+        Args:
+            read_file_from_disk (bool, optional): If True, reads previously processed
+                data from disk if available. If False, reprocesses from raw data.
+                Defaults to True.
+        
+        Results stored in reduced_traffic_counts_df with columns:
+            - emme_a_node_id, emme_b_node_id: Network node IDs
+            - station_id: Count station identifier
+            - type: Station type (mainline, ramp, etc.)
+            - time_period: Time period (hourly or daily)
+            - observed_flow: Traffic volume
+            - vehicle_class: Vehicle type (All Vehicles, Large Trucks)
+            - source: Data source (PeMS, Caltrans)
+            - odot_flow_category_daily/hourly: Volume range category
+            - odot_maximum_error: Maximum acceptable percent error
+            - key_location_name/direction: Key location if applicable
+        
+        Returns:
+            None
+        """
         """
         Prepares observed traffic count data for Acceptance Comparisons by computing daily counts,
         joining with the TM2 link cross walk, and joining the Ohio Standards database.

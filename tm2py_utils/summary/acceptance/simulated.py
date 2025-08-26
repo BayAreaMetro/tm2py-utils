@@ -1,4 +1,10 @@
-"""Methods to handle simulation results for the Acceptance Criteria summaries from a tm2py model run."""
+"""Methods to handle simulation results for the Acceptance Criteria summaries from a tm2py model run.
+
+This module processes simulated model outputs from tm2py runs including roadway assignments,
+transit boardings, home-work flows, and accessibility metrics. It reads model outputs from
+various sources (OMX matrices, shapefiles, CSV files) and prepares them for comparison with
+observed data.
+"""
 
 from tm2py_utils.summary.acceptance.canonical import Canonical
 
@@ -13,6 +19,99 @@ import toml
 
 
 class Simulated:
+    """Manages simulated model outputs for acceptance criteria validation.
+    
+    This class processes tm2py model outputs including roadway volumes, transit boardings,
+    travel patterns, and demographic distributions. It reads outputs from various model
+    components and standardizes them for comparison with observed data.
+    
+    Attributes:
+        c (Canonical): Canonical naming and crosswalk handler
+        scenario_dict (dict): Scenario configuration from TOML
+        model_dict (dict): Model configuration from TOML
+        scenario_file (str): Path to scenario configuration file
+        model_file (str): Path to model configuration file
+        model_time_periods (list): Time periods in model (e.g., ['ea', 'am', 'md', 'pm', 'ev'])
+        model_morning_capacity_factor (float): AM peak capacity adjustment factor
+        
+        Roadway Data:
+        simulated_roadway_am_shape_gdf (gpd.GeoDataFrame): AM roadway network geometry:
+            - emme_a_node_id, emme_b_node_id: Network nodes
+            - standard_link_id: Link identifier
+            - geometry: Link shape
+            
+        simulated_roadway_assignment_results_df (pd.DataFrame): Link volumes by time:
+            - emme_a_node_id, emme_b_node_id: Network nodes
+            - standard_link_id: Link identifier
+            - time_period: Time period
+            - flow_da, flow_s2, flow_s3: Auto volumes by occupancy
+            - flow_lrgt, flow_trk: Truck volumes by class
+            - flow_total: Total volume
+            - m_flow_*: Managed lane volumes
+            - capacity, lanes: Link attributes
+            - speed_mph: Congested speed
+            - ft: Facility type
+            
+        Transit Data:
+        simulated_boardings_df (pd.DataFrame): Route-level boardings:
+            - line_name: Transit line identifier
+            - daily_line_name: Daily aggregated line
+            - operator: Transit agency
+            - technology: Mode type
+            - time_period: Time period
+            - total_boarding: Total boardings
+            - total_hour_cap: Hourly capacity
+            
+        simulated_transit_segments_gdf (gpd.GeoDataFrame): Segment-level transit:
+            - LINE_ID: Line identifier
+            - INODE, JNODE: Segment nodes
+            - board: Segment boardings
+            - am_segment_volume: Passenger volume
+            - am_segment_capacity_total/seated: Capacity
+            - am_segment_vc_ratio_total/seated: V/C ratios
+            - geometry: Segment shape
+            
+        simulated_transit_access_df (pd.DataFrame): Rail station access:
+            - operator: Rail operator
+            - boarding: Station node
+            - boarding_name: Station name
+            - access_mode: Access mode (Walk, Park and Ride, etc.)
+            - simulated_boardings: Boardings by access mode
+            - time_period: Time period
+            
+        simulated_station_to_station_df (pd.DataFrame): Station OD flows:
+            - operator: Transit operator
+            - boarding_name, alighting_name: Station names
+            - simulated: Passenger flow
+            
+        Home-Work & Demographics:
+        simulated_home_work_flows_df (pd.DataFrame): County commute flows:
+            - residence_county: Home county
+            - work_county: Work county
+            - simulated_flow: Number of workers
+            
+        simulated_zero_vehicle_hhs_df (pd.DataFrame): Zero-vehicle households by MAZ:
+            - maz: Model zone ID
+            - simulated_zero_vehicle_share: Share with no vehicles
+            - simulated_households: Total households
+            
+        reduced_simulated_zero_vehicle_hhs_df (pd.DataFrame): By census tract:
+            - tract: Census tract ID
+            - simulated_zero_vehicle_share: Tract-level share
+            - simulated_households: Total households
+            
+        Bridge Data:
+        simulated_bridge_details_df (pd.DataFrame): Bridge toll links:
+            - plaza_name: Bridge name
+            - direction: Travel direction
+            - standard_link_id: Link ID
+            - pay_toll: Boolean for toll collection direction
+    
+    Constants:
+        network_shapefile_names_dict: Maps time periods to EMME scenario names
+        transit_access_mode_dict: Maps mode codes to access mode names
+        transit_mode_dict: Maps mode IDs to mode descriptions
+    """
     c: Canonical
 
     scenario_dict: dict
@@ -117,6 +216,22 @@ class Simulated:
         on_board_assign_summary: bool = False,
         iteration: int = 3,
     ) -> None:
+        """Initialize Simulated data handler.
+        
+        Args:
+            canonical (Canonical): Canonical naming and crosswalk handler instance
+            scenario_file (str, optional): Path to scenario TOML configuration.
+                Defaults to None.
+            model_file (str, optional): Path to model TOML configuration.
+                Defaults to None.
+            on_board_assign_summary (bool, optional): If True, only loads transit
+                boardings for on-board assignment validation. Defaults to False.
+            iteration (int, optional): Model iteration number to read (for iterative
+                assignment outputs). Defaults to 3.
+        
+        Returns:
+            None
+        """
         self.c = canonical
         self.scenario_file = scenario_file
         self.iter = iteration
@@ -130,6 +245,18 @@ class Simulated:
             self._validate()
 
     def reduce_on_board_assignment_boardings(self, time_period_list: list = ["am"]):
+        """Process transit boardings for on-board assignment validation.
+        
+        Simplified method that only processes transit boarding data when validating
+        on-board survey assignments.
+        
+        Args:
+            time_period_list (list, optional): Time periods to process.
+                Defaults to ["am"].
+        
+        Returns:
+            None
+        """
         self.model_time_periods = time_period_list
         self._reduce_simulated_transit_boardings()
 
@@ -346,6 +473,19 @@ class Simulated:
         return
 
     def _reduce_simulated_home_work_flows(self):
+        """Process simulated home-to-work county flows.
+        
+        Reads workplace location results from CTRAMP, aggregates to county-to-county
+        flows for comparison with CTPP data.
+        
+        Results stored in simulated_home_work_flows_df with columns:
+            - residence_county: Home county name
+            - work_county: Work county name
+            - simulated_flow: Number of workers making this commute
+        
+        Returns:
+            None
+        """
         # if self.simulated_maz_data_df.empty:
         #    self._make_simulated_maz_data()
 
@@ -420,6 +560,24 @@ class Simulated:
         return
 
     def _reduce_simulated_rail_access_summaries(self):
+        """Process rail station access mode summaries.
+        
+        Reads transit segment files to extract boardings by access mode at rail stations.
+        Focuses on heavy rail and commuter rail stations. Aggregates walk access from
+        multiple sub-modes (walk-to-transit, walk-transfer-walk, etc.).
+        
+        Results stored in simulated_transit_access_df with columns:
+            - operator: Rail operator canonical name
+            - boarding: Station node ID
+            - boarding_name: Station canonical name
+            - boarding_standard_node_id: Standard network node
+            - access_mode: Access mode (Walk, Park and Ride, Kiss and Ride)
+            - simulated_boardings: Number of boardings by access mode
+            - time_period: Time period
+        
+        Returns:
+            None
+        """
         if not self.transit_mode_dict:
             self._make_transit_mode_dict()
 
@@ -554,6 +712,22 @@ class Simulated:
         return
 
     def _reduce_simulated_station_to_station(self):
+        """Process simulated rail station-to-station flows.
+        
+        Reads station-to-station matrices for BART and Caltrain across all access
+        modes (walk, drive, park-and-ride) and time periods. Applies canonical
+        station names and sums across all paths.
+        
+        Results stored in simulated_station_to_station_df with columns:
+            - operator: Rail operator (BART, Caltrain)
+            - boarding_name: Origin station canonical name
+            - alighting_name: Destination station canonical name
+            - simulated: Total trips between stations
+            - boarding_lat, boarding_lon: Station coordinates
+        
+        Returns:
+            None
+        """
         # if self.model_time_periods is None:
         #     self._get_model_time_periods()
 
@@ -647,6 +821,25 @@ class Simulated:
         return return_df
 
     def _reduce_simulated_transit_boardings(self):
+        """Process simulated transit boardings by route and time period.
+        
+        Reads boardings_by_line CSV files for each time period, joins with mode/operator
+        crosswalk, applies canonical naming, and aggregates to daily totals.
+        
+        Results stored in simulated_boardings_df with columns:
+            - line_name: Time-specific line identifier
+            - daily_line_name: Daily aggregated line name
+            - tm2_mode: TM2 mode code
+            - line_mode: Line mode description
+            - operator: Canonical operator name
+            - technology: Mode technology (Bus, Rail, etc.)
+            - time_period: Time period (am, pm, daily, etc.)
+            - total_boarding: Total boardings on route
+            - total_hour_cap: Total hourly capacity
+        
+        Returns:
+            None
+        """
         file_prefix = "boardings_by_line_"
 
         c_df = pd.DataFrame()
@@ -702,6 +895,20 @@ class Simulated:
         return
 
     def _reduce_simulated_zero_vehicle_households(self):
+        """Process simulated zero-vehicle household shares.
+        
+        Reads household vehicle ownership from CTRAMP outputs, calculates zero-vehicle
+        shares by MAZ, then aggregates to census tract level using MAZ-to-blockgroup
+        crosswalk.
+        
+        Results stored in:
+        - simulated_zero_vehicle_hhs_df: MAZ-level data
+        - reduced_simulated_zero_vehicle_hhs_df: Census tract-level aggregation
+            with columns: tract, simulated_zero_vehicle_share, simulated_households
+        
+        Returns:
+            None
+        """
         in_file = os.path.join("ctramp_output", "householdData_1.csv")
 
         df = pd.read_csv(in_file)
@@ -774,16 +981,27 @@ class Simulated:
         input_df: pd.DataFrame,
         operator_list: list = None,
     ) -> pd.DataFrame:
-        """_summary_
-
-        Takes a dataframe with columns "boarding" (and, optionally, "alighting") that contains the node numbers of BART and Caltrain stations from the simulation. It then uses
-        the standard network stops file (`stops.txt`) to get the station names and lat/lon coordinates for each subject station. The canonical station name is returned.
-
+        """Get canonical station names and coordinates from node IDs.
+        
+        Takes a dataframe with station node IDs and adds canonical station names
+        and coordinates by joining with standard network stops data.
+        
         Args:
-            input_df (pd.DataFrame): A pandas datting" columns are present, then name and coordinate columns are added for both the boarding and alighting station.aframe with columns "boarding" and/or "alighting" that contain the node numbers of rail stations from the simulation.
-
+            input_df (pd.DataFrame): DataFrame with columns:
+                - boarding (int, optional): Boarding station node ID
+                - alighting (int, optional): Alighting station node ID
+                - operator (str): Transit operator name
+            operator_list (list, optional): List of operators to process.
+                Defaults to all operators in canonical_station_names_dict.
+        
         Returns:
-            pd.DataFrame: The input_df with the canonical station name and lat/lon coordinates added as columns. If "boarding" and "aligh
+            pd.DataFrame: Input DataFrame with added columns:
+                - boarding_name: Canonical boarding station name
+                - boarding_lat, boarding_lon: Boarding station coordinates
+                - boarding_standard_node_id: Standard network node ID
+                - alighting_name: Canonical alighting station name (if applicable)
+                - alighting_lat, alighting_lon: Alighting station coordinates
+                - alighting_standard_node_id: Standard network node ID
         """
 
         x_df = self.c.standard_to_emme_transit_nodes_df.copy()
@@ -936,6 +1154,24 @@ class Simulated:
         return
 
     def _make_transit_technology_in_vehicle_table_from_skims(self):
+        """Create in-vehicle time by technology from transit skims.
+        
+        Reads transit skim matrices to extract in-vehicle times by technology
+        (local bus, express bus, light rail, ferry, heavy rail, commuter rail)
+        for each OD pair. Used to allocate trips to technologies based on
+        in-vehicle time shares.
+        
+        Results stored in simulated_transit_tech_in_vehicle_times_df with columns:
+            - origin, destination: TAZ pair
+            - path: Access mode path (WLK_TRN_WLK, PNR_TRN_WLK, etc.)
+            - time_period: Time period
+            - ivt: Total in-vehicle time
+            - boards: Number of boardings
+            - loc, exp, ltr, fry, hvy, com: IVT by technology
+        
+        Returns:
+            None
+        """
         path_list = [
             "WLK_TRN_WLK",
             "PNR_TRN_WLK",
@@ -1054,6 +1290,21 @@ class Simulated:
         return
 
     def _make_dataframe_from_omx(self, input_mtx: omx, core_name: str):
+        """Convert OMX matrix to long-format DataFrame.
+        
+        Helper function to read OpenMatrix files and convert to pandas DataFrame
+        with origin-destination pairs.
+        
+        Args:
+            input_mtx (omx): OpenMatrix matrix object
+            core_name (str): Name of matrix core to extract
+        
+        Returns:
+            pd.DataFrame: Long-format DataFrame with columns:
+                - origin: Origin TAZ (1-indexed)
+                - destination: Destination TAZ (1-indexed)
+                - {core_name}: Matrix value
+        """
         """_summary_
 
         Args:
@@ -1076,6 +1327,21 @@ class Simulated:
         return df
 
     def _make_district_to_district_transit_summaries(self):
+        """Create district-to-district transit flows by technology.
+        
+        Combines transit demand and in-vehicle times to allocate trips to technologies.
+        Aggregates TAZ-level flows to planning districts. Calculates trips using each
+        technology based on in-vehicle time proportions.
+        
+        Results stored in simulated_transit_district_to_district_by_tech_df with columns:
+            - orig_district: Origin district ID (1-34)
+            - dest_district: Destination district ID (1-34)
+            - tech: Technology code (loc, exp, ltr, fry, hvy, com, total)
+            - simulated: Number of trips using this technology
+        
+        Returns:
+            None
+        """
         taz_district_dict = self.c.taz_to_district_df.set_index("taz")[
             "district"
         ].to_dict()
@@ -1203,6 +1469,31 @@ class Simulated:
         return
 
     def _reduce_simulated_roadway_assignment_outcomes(self):
+        """Process simulated roadway volumes and speeds.
+        
+        Reads EMME link shapefiles for each time period, extracts volumes by vehicle
+        class, speeds, and capacities. Combines general purpose and managed lane
+        volumes. Aggregates to daily totals.
+        
+        Results stored in simulated_roadway_assignment_results_df with columns:
+            - emme_a_node_id, emme_b_node_id: Link nodes
+            - standard_link_id: Link identifier
+            - time_period: Time period (am, pm, daily, etc.)
+            - flow_da, flow_s2, flow_s3: Auto volumes by occupancy
+            - flow_lrgt, flow_trk: Large truck and truck volumes
+            - flow_total: Total volume all vehicles
+            - m_flow_*: Managed lane volumes by class
+            - capacity: Link capacity
+            - lanes: Number of lanes
+            - speed_mph: Congested speed
+            - ft: Facility type code
+            - distance_in_miles: Link length
+        
+        Also creates simulated_roadway_am_shape_gdf with AM period geometry.
+        
+        Returns:
+            None
+        """
         # step 1: get the shape
         shape_period = "am"
         emme_scenario = self.network_shapefile_names_dict[shape_period]
