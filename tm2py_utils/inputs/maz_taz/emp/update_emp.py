@@ -170,17 +170,17 @@ def merge_and_update():
     if "HH" in maz_density_merged.columns and "ACRES" in maz_density_merged.columns:
         maz_density_merged["DUDen"] = maz_density_merged["HH"] / maz_density_merged["ACRES"].replace(0, pd.NA)
 
-    # Define DUDenBin: [0-5)=1, [5-10)=2, 10+=3
+    # Define DuDenBin: [0-5)=1, [5-10)=2, 10+=3
     if "DUDen" in maz_density_merged.columns:
         du_bins = [0, 5, 10, float('inf')]
         du_labels = [1, 2, 3]
         duden_numeric = pd.to_numeric(maz_density_merged["DUDen"], errors="coerce")
-    maz_density_merged["DUDenBin"] = pd.cut(duden_numeric, bins=du_bins, labels=du_labels, right=False)
-    maz_density_merged["DUDenBin"] = maz_density_merged["DUDenBin"].fillna(1)
+        maz_density_merged["DuDenBin"] = pd.cut(duden_numeric, bins=du_bins, labels=du_labels, right=False)
+        maz_density_merged["DuDenBin"] = maz_density_merged["DuDenBin"].fillna(1)
 
     # Save updated file
     maz_density_merged.to_csv(OUTPUT_MAZ_DENSITY, index=False)
-    print('TO DO: Figure out what EmpDenBin, DuDEnBin, IntDenBin are, and update them.')
+    print('TO DO: Figure out what IntDenBin is, and update.')
 
 
 
