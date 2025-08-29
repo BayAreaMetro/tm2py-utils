@@ -30,7 +30,7 @@ import os
 import pandas as pd
 
 # Paths to files
-TARGET_DIR = r"E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-test\landuse"
+TARGET_DIR = r"C:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-test\landuse"
 JOBS_FILE = os.path.join(TARGET_DIR, "jobs_maz_2023_v1.csv")
 MAZ_DATA_FILE = os.path.join(TARGET_DIR, "maz_data.csv")
 MAZ_DENSITY_FILE = os.path.join(TARGET_DIR, "maz_data_withDensity.csv")
@@ -97,26 +97,18 @@ def merge_and_update():
     # --- Update maz_data_withDensity.csv ---
     print("\nmaz_density columns before merge:", list(maz_density.columns))
     print("jobs columns before merge:", list(jobs.columns))
-    # Ensure the join column exists and is named 'MAZ' in maz_density
-    join_col = None
-    for candidate in ['MAZ', 'MAZ_x', 'maz']:
-        if candidate in maz_density.columns:
-            join_col = candidate
-            break
-    if join_col and join_col != 'MAZ':
-        maz_density = maz_density.rename(columns={join_col: 'MAZ'})
-        join_col = 'MAZ'
-    if not join_col:
-        raise KeyError("No MAZ column found in maz_density for merging.")
+        # Use MAZ_ORIGINAL as the join column for maz_data_withDensity and maz for jobs
+    if 'MAZ_ORIGINAL' not in maz_density.columns:
+        raise KeyError("No MAZ_ORIGINAL column found in maz_data_withDensity for merging.")
     maz_density_merged = pd.merge(
         maz_density,
         jobs,
-        left_on='MAZ',
+        left_on='MAZ_ORIGINAL',
         right_on=JOBS_MAZ_COL,
         how="right"  # include all jobs MAZs
     )
     for col in maz_density.columns:
-        if col != MAZ_DENSITY_MAZ_COL and col in maz_density_merged.columns:
+        if col != 'MAZ_ORIGINAL' and col in maz_density_merged.columns:
             maz_density_merged[col] = maz_density_merged[col].fillna(0)
 
 
