@@ -26,6 +26,8 @@ def print_column_summary(jobs, maz_data, maz_density):
     print(f"Columns UNIQUE to maz_data.csv: {sorted(maz_data_cols - jobs_cols - maz_density_cols)}")
     print(f"Columns UNIQUE to maz_data_withDensity.csv: {sorted(maz_density_cols - jobs_cols - maz_data_cols)}")
 
+# This is how we are supposed to do this: https://github.com/BayAreaMetro/travel-model-two/blob/master/model-files/scripts/preprocess/createMazDensityFile.py
+
 import os
 import pandas as pd
 
@@ -146,7 +148,7 @@ def merge_and_update():
         maz_density_merged["PopDen"] = maz_density_merged["POP"] / maz_density_merged["ACRES"].replace(0, pd.NA)
     # Calculate PopEmpDenPerMi = (POP+emp_total)/(10*ACRES*sq_mi_acre)
     if all(col in maz_density_merged.columns for col in ["POP", "emp_total", "ACRES"]):
-        maz_density_merged["PopEmpDenPerMi"] = (maz_density_merged["POP"] + maz_density_merged["emp_total"]) / (10 * maz_density_merged["ACRES"] * sq_mi_acre)
+        maz_density_merged["PopEmpDenPerMi"] = (maz_density_merged["POP"] + maz_density_merged["emp_total"]) / maz_density_merged["ACRES"].replace(0, pd.NA)
 
     # Define empdenbin: [0-10)=1, [10-30)=2, 30+=3
     if "EmpDen" in maz_density_merged.columns:
