@@ -1,254 +1,178 @@
-08/15/2025 02:43:24 PM - INFO - Reading in the 2010 block shapefile with 109228 rows
-08/15/2025 02:43:24 PM - INFO - Reading in crosswalk file: blocks_mazs_tazs_2.5.csv
-08/15/2025 02:43:24 PM - INFO - Starting iteration 1 of 5
-08/15/2025 02:43:24 PM - INFO - Join block shapefile to crosswalk csv resulting in 109228 rows
-08/15/2025 02:43:24 PM - INFO - The Dataframe has the following columns:
-08/15/2025 02:43:24 PM - INFO - None
-08/15/2025 02:43:24 PM - INFO - blocks_maz_df has length 109228
-08/15/2025 02:43:24 PM - INFO - 
-  STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10  ...     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
-0        06        055    201700      4004  060552017004004  ...  610054  600102  060552017004   06055201700          06055
-1        06        055    201700      1013  060552017001013  ...  611025  600006  060552017001   06055201700          06055
-2        06        055    201700      4007  060552017004007  ...  610857  600102  060552017004   06055201700          06055
-3        06        055    201700      4023  060552017004023  ...  611028  600102  060552017004   06055201700          06055
-4        06        055    201403      1023  060552014031023  ...  610051  600097  060552014031   06055201403          06055
+09/04/2025 03:08:46 PM - INFO - Reading in the 2010 block shapefile with 109228 rows
+09/04/2025 03:08:46 PM - INFO - Reading in crosswalk file: blocks_mazs_tazs_2.5.csv
+09/04/2025 03:08:46 PM - INFO - Starting iteration 1 of 5
+09/04/2025 03:08:46 PM - INFO - Join block shapefile to crosswalk csv resulting in 109228 rows
+09/04/2025 03:08:46 PM - INFO - The Dataframe has the following columns:
+09/04/2025 03:08:46 PM - INFO - None
+09/04/2025 03:08:46 PM - INFO - blocks_maz_df has length 109228
+09/04/2025 03:08:46 PM - INFO - 
+  STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10  ...                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT  GEOID10_COUNTY
+0        06        055    201700      4004  060552017004004  Block 4004  ...  POLYGON ((-122.46065 38.61807, -122.46062 38.6...  610054  600102  060552017004   06055201700           06055
+1        06        055    201700      1013  060552017001013  Block 1013  ...  POLYGON ((-122.35414 38.50767, -122.35408 38.5...  611025  600006  060552017001   06055201700           06055
+2        06        055    201700      4007  060552017004007  Block 4007  ...  POLYGON ((-122.4883 38.59902, -122.48826 38.60...  610857  600102  060552017004   06055201700           06055
+3        06        055    201700      4023  060552017004023  Block 4023  ...  POLYGON ((-122.47466 38.59312, -122.47346 38.5...  611028  600102  060552017004   06055201700           06055
+4        06        055    201403      1023  060552014031023  Block 1023  ...  POLYGON ((-122.1789 38.38562, -122.17748 38.38...  610051  600097  060552014031   06055201403           06055
 
 [5 rows x 21 columns]
-08/15/2025 02:43:25 PM - INFO - blocks_neighbor_df has length 725774
-08/15/2025 02:43:25 PM - INFO - 
+09/04/2025 03:08:47 PM - INFO - blocks_neighbor_df has length 725774
+09/04/2025 03:08:47 PM - INFO - 
        src_GEOID10      nbr_GEOID10  LENGTH  NODE_COUNT nbr_GEOID10_BG          GEOID10     maz     taz
 0  060014001001000  060014001001001 1838.32           0   060014001001  060014001001001  333453  301054
 1  060014001001000  060014001001002 1291.63           0   060014001001  060014001001002  333453  301054
 2  060014001001000  060014001001003  148.32           0   060014001001  060014001001003  333453  301054
 3  060014001001000  060014001001004  560.54           0   060014001001  060014001001004  333453  301054
 4  060014001001000  060014001001005  180.17           0   060014001001  060014001001005  333453  301054
-08/15/2025 02:43:25 PM - INFO - Number of unique GEOID10: 109228
-08/15/2025 02:43:25 PM - INFO -   Min: 060014001001000
-08/15/2025 02:43:25 PM - INFO -   Max: 060979901000010
-08/15/2025 02:43:25 PM - INFO - 
-08/15/2025 02:43:25 PM - INFO - Number of unique maz: 39586
-08/15/2025 02:43:25 PM - INFO -    Min: 10001
-08/15/2025 02:43:25 PM - INFO -    Max: 814506
-08/15/2025 02:43:25 PM - INFO - 
-08/15/2025 02:43:25 PM - INFO - Number of unique taz: 4734
-08/15/2025 02:43:25 PM - INFO -    Min: 1
-08/15/2025 02:43:25 PM - INFO -    Max: 800210
-08/15/2025 02:43:25 PM - INFO - 
-08/15/2025 02:43:25 PM - INFO - Verified one taz per maz
-08/15/2025 02:43:25 PM - INFO - Verified one GEOID10_COUNTY per maz
-08/15/2025 02:43:25 PM - WARNING - Multiple GEOID10_TRACT for a single maz: 1
-08/15/2025 02:43:25 PM - WARNING - 
+09/04/2025 03:08:47 PM - INFO - Number of unique GEOID10: 109228
+09/04/2025 03:08:47 PM - INFO -   Min: 060014001001000
+09/04/2025 03:08:47 PM - INFO -   Max: 060979901000010
+09/04/2025 03:08:47 PM - INFO - 
+09/04/2025 03:08:47 PM - INFO - Number of unique maz: 39587
+09/04/2025 03:08:48 PM - INFO -    Min: 10001
+09/04/2025 03:08:48 PM - INFO -    Max: 814506
+09/04/2025 03:08:48 PM - INFO - 
+09/04/2025 03:08:48 PM - INFO - Number of unique taz: 4734
+09/04/2025 03:08:48 PM - INFO -    Min: 1
+09/04/2025 03:08:48 PM - INFO -    Max: 800210
+09/04/2025 03:08:48 PM - INFO - 
+09/04/2025 03:08:48 PM - INFO - Verified one taz per maz
+09/04/2025 03:08:48 PM - INFO - Verified one GEOID10_COUNTY per maz
+09/04/2025 03:08:48 PM - WARNING - Multiple GEOID10_TRACT for a single maz: 1
+09/04/2025 03:08:48 PM - WARNING - 
         GEOID10_TRACT
 maz                  
 718685              2
-08/15/2025 02:43:25 PM - INFO - move_small_block_to_neighbor for GEOID10_TRACT
-08/15/2025 02:43:25 PM - INFO - Attempting to fix maz 718685
-08/15/2025 02:43:25 PM - DEBUG - 
-      STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10  ...     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
-6812         06        097    151700      2027  ...  700241  060971517002   06097151700          06097
-21394        06        097    151503      3011  ...  700241  060971515033   06097151503          06097
-22360        06        097    151700      2025  ...  700241  060971517002   06097151700          06097
-28172        06        097    151503      3000  ...  700241  060971515033   06097151503          06097
-92991        06        097    151700      2029  ...  700241  060971517002   06097151700          06097
+09/04/2025 03:08:48 PM - INFO - move_small_block_to_neighbor for GEOID10_TRACT
+09/04/2025 03:08:48 PM - INFO - Attempting to fix maz 718685
+09/04/2025 03:08:48 PM - DEBUG - 
+      STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10  ...     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
+6812         06        097    151700      2027  060971517002027  ...  718685  700241  060971517002   06097151700          06097
+21394        06        097    151503      3011  060971515033011  ...  718685  700241  060971515033   06097151503          06097
+22360        06        097    151700      2025  060971517002025  ...  718685  700241  060971517002   06097151700          06097
+28172        06        097    151503      3000  060971515033000  ...  718685  700241  060971515033   06097151503          06097
+92991        06        097    151700      2029  060971517002029  ...  718685  700241  060971517002   06097151700          06097
 
 [5 rows x 21 columns]
-08/15/2025 02:43:25 PM - DEBUG - group 06097151503 has 2 rows and 83.8 percent of land
-08/15/2025 02:43:25 PM - DEBUG - 
-      STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10  ...     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
-21394        06        097    151503      3011  ...  700241  060971515033   06097151503          06097
-28172        06        097    151503      3000  ...  700241  060971515033   06097151503          06097
+09/04/2025 03:08:48 PM - DEBUG - group 06097151503 has 2 rows and 83.8 percent of land
+09/04/2025 03:08:48 PM - DEBUG - 
+      STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10  ...     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
+21394        06        097    151503      3011  060971515033011  ...  718685  700241  060971515033   06097151503          06097
+28172        06        097    151503      3000  060971515033000  ...  718685  700241  060971515033   06097151503          06097
 
 [2 rows x 21 columns]
-08/15/2025 02:43:25 PM - DEBUG - group 06097151700 has 3 rows and 16.2 percent of land
-08/15/2025 02:43:25 PM - DEBUG - 
-      STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10  ...     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
-6812         06        097    151700      2027  ...  700241  060971517002   06097151700          06097
-22360        06        097    151700      2025  ...  700241  060971517002   06097151700          06097
-92991        06        097    151700      2029  ...  700241  060971517002   06097151700          06097
+09/04/2025 03:08:48 PM - DEBUG - group 06097151700 has 3 rows and 16.2 percent of land
+09/04/2025 03:08:48 PM - DEBUG - 
+      STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10  ...     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
+6812         06        097    151700      2027  060971517002027  ...  718685  700241  060971517002   06097151700          06097
+22360        06        097    151700      2025  060971517002025  ...  718685  700241  060971517002   06097151700          06097
+92991        06        097    151700      2029  060971517002029  ...  718685  700241  060971517002   06097151700          06097
 
 [3 rows x 21 columns]
-08/15/2025 02:43:26 PM - DEBUG -   No neighbors in same block group with maz/taz
-08/15/2025 02:43:26 PM - DEBUG -   No neighbors in same block group with maz/taz
-08/15/2025 02:43:26 PM - DEBUG -   No neighbors in same block group with maz/taz
-08/15/2025 02:43:26 PM - INFO - ====> moved 0 blocks to neighbor
-08/15/2025 02:43:26 PM - WARNING - Multiple GEOID10_BG for a single maz: 3
-08/15/2025 02:43:26 PM - WARNING - 
+09/04/2025 03:08:48 PM - DEBUG -   No neighbors in same block group with maz/taz
+09/04/2025 03:08:48 PM - DEBUG -   No neighbors in same block group with maz/taz
+09/04/2025 03:08:48 PM - DEBUG -   No neighbors in same block group with maz/taz
+09/04/2025 03:08:48 PM - INFO - ====> moved 0 blocks to neighbor
+09/04/2025 03:08:48 PM - WARNING - Multiple GEOID10_BG for a single maz: 2
+09/04/2025 03:08:48 PM - WARNING - 
         GEOID10_BG
 maz               
-223032           2
 411035           2
 718685           2
-08/15/2025 02:43:26 PM - INFO - move_small_block_to_neighbor for GEOID10_BG
-08/15/2025 02:43:26 PM - INFO - Attempting to fix maz 223032
-08/15/2025 02:43:26 PM - DEBUG - 
-       STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10  ...     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
-11907         06        085    512001      2007  ...  200152  060855120012   06085512001          06085
-12045         06        085    512001      2002  ...  200152  060855120012   06085512001          06085
-14339         06        085    512001      2003  ...  200152  060855120012   06085512001          06085
-21510         06        085    512001      1050  ...  200152  060855120011   06085512001          06085
-23925         06        085    512001      1056  ...  200152  060855120011   06085512001          06085
-27183         06        085    512001      1049  ...  200152  060855120011   06085512001          06085
-31459         06        085    512001      1051  ...  200152  060855120011   06085512001          06085
-33382         06        085    512001      1046  ...  200152  060855120011   06085512001          06085
-34123         06        085    512001      1053  ...  200152  060855120011   06085512001          06085
-40953         06        085    512001      2004  ...  200152  060855120012   06085512001          06085
-42707         06        085    512001      2000  ...  200152  060855120012   06085512001          06085
-43398         06        085    512001      1045  ...  200152  060855120011   06085512001          06085
-43620         06        085    512001      2008  ...  200152  060855120012   06085512001          06085
-44313         06        085    512001      2005  ...  200152  060855120012   06085512001          06085
-58445         06        085    512001      2011  ...  200152  060855120012   06085512001          06085
-65792         06        085    512001      1054  ...  200152  060855120011   06085512001          06085
-71607         06        085    512001      2006  ...  200152  060855120012   06085512001          06085
-78671         06        085    512001      1060  ...  200152  060855120011   06085512001          06085
-79101         06        085    512001      2009  ...  200152  060855120012   06085512001          06085
-82102         06        085    512001      2010  ...  200152  060855120012   06085512001          06085
-96650         06        085    512001      1048  ...  200152  060855120011   06085512001          06085
-98761         06        085    512001      1047  ...  200152  060855120011   06085512001          06085
-99182         06        085    512001      1052  ...  200152  060855120011   06085512001          06085
-103467        06        085    512001      2001  ...  200152  060855120012   06085512001          06085
-
-[24 rows x 21 columns]
-08/15/2025 02:43:26 PM - DEBUG - group 060855120011 has 12 rows and 97.9 percent of land
-08/15/2025 02:43:26 PM - DEBUG - 
-      STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10  ...     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
-21510        06        085    512001      1050  ...  200152  060855120011   06085512001          06085
-23925        06        085    512001      1056  ...  200152  060855120011   06085512001          06085
-27183        06        085    512001      1049  ...  200152  060855120011   06085512001          06085
-31459        06        085    512001      1051  ...  200152  060855120011   06085512001          06085
-33382        06        085    512001      1046  ...  200152  060855120011   06085512001          06085
-34123        06        085    512001      1053  ...  200152  060855120011   06085512001          06085
-43398        06        085    512001      1045  ...  200152  060855120011   06085512001          06085
-65792        06        085    512001      1054  ...  200152  060855120011   06085512001          06085
-78671        06        085    512001      1060  ...  200152  060855120011   06085512001          06085
-96650        06        085    512001      1048  ...  200152  060855120011   06085512001          06085
-98761        06        085    512001      1047  ...  200152  060855120011   06085512001          06085
-99182        06        085    512001      1052  ...  200152  060855120011   06085512001          06085
-
-[12 rows x 21 columns]
-08/15/2025 02:43:26 PM - DEBUG - group 060855120012 has 12 rows and 2.1 percent of land
-08/15/2025 02:43:26 PM - DEBUG - 
-       STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10  ...     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
-11907         06        085    512001      2007  ...  200152  060855120012   06085512001          06085
-12045         06        085    512001      2002  ...  200152  060855120012   06085512001          06085
-14339         06        085    512001      2003  ...  200152  060855120012   06085512001          06085
-40953         06        085    512001      2004  ...  200152  060855120012   06085512001          06085
-42707         06        085    512001      2000  ...  200152  060855120012   06085512001          06085
-43620         06        085    512001      2008  ...  200152  060855120012   06085512001          06085
-44313         06        085    512001      2005  ...  200152  060855120012   06085512001          06085
-58445         06        085    512001      2011  ...  200152  060855120012   06085512001          06085
-71607         06        085    512001      2006  ...  200152  060855120012   06085512001          06085
-79101         06        085    512001      2009  ...  200152  060855120012   06085512001          06085
-82102         06        085    512001      2010  ...  200152  060855120012   06085512001          06085
-103467        06        085    512001      2001  ...  200152  060855120012   06085512001          06085
-
-[12 rows x 21 columns]
-08/15/2025 02:43:26 PM - DEBUG -   No neighbors in same block group with maz/taz
-08/15/2025 02:43:26 PM - DEBUG -   No neighbors in same block group with maz/taz
-08/15/2025 02:43:26 PM - DEBUG -   No neighbors in same block group with maz/taz
-08/15/2025 02:43:26 PM - DEBUG -   No neighbors in same block group with maz/taz
-08/15/2025 02:43:26 PM - DEBUG -   No neighbors in same block group with maz/taz
-08/15/2025 02:43:26 PM - DEBUG -   No neighbors in same block group with maz/taz
-08/15/2025 02:43:26 PM - DEBUG -   No neighbors in same block group with maz/taz
-08/15/2025 02:43:26 PM - DEBUG -   No neighbors in same block group with maz/taz
-08/15/2025 02:43:26 PM - DEBUG -   No neighbors in same block group with maz/taz
-08/15/2025 02:43:26 PM - DEBUG -   No neighbors in same block group with maz/taz
-08/15/2025 02:43:26 PM - DEBUG -   No neighbors in same block group with maz/taz
-08/15/2025 02:43:26 PM - DEBUG -   No neighbors in same block group with maz/taz
-08/15/2025 02:43:26 PM - INFO - Attempting to fix maz 411035
-08/15/2025 02:43:26 PM - DEBUG - 
-       STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10  ...     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
-25347         06        013    380000      3022  ...  400461  060133800003   06013380000          06013
-27226         06        013    380000      3025  ...  400461  060133800003   06013380000          06013
-45112         06        013    380000      1030  ...  400461  060133800001   06013380000          06013
-81307         06        013    380000      3021  ...  400461  060133800003   06013380000          06013
-98945         06        013    380000      3024  ...  400461  060133800003   06013380000          06013
-106972        06        013    380000      3023  ...  400461  060133800003   06013380000          06013
+09/04/2025 03:08:48 PM - INFO - move_small_block_to_neighbor for GEOID10_BG
+09/04/2025 03:08:48 PM - INFO - Attempting to fix maz 411035
+09/04/2025 03:08:48 PM - DEBUG - 
+       STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10  ...     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
+25347         06        013    380000      3022  060133800003022  ...  411035  400461  060133800003   06013380000          06013
+27226         06        013    380000      3025  060133800003025  ...  411035  400461  060133800003   06013380000          06013
+45112         06        013    380000      1030  060133800001030  ...  411035  400461  060133800001   06013380000          06013
+81307         06        013    380000      3021  060133800003021  ...  411035  400461  060133800003   06013380000          06013
+98945         06        013    380000      3024  060133800003024  ...  411035  400461  060133800003   06013380000          06013
+106972        06        013    380000      3023  060133800003023  ...  411035  400461  060133800003   06013380000          06013
 
 [6 rows x 21 columns]
-08/15/2025 02:43:26 PM - DEBUG - group 060133800001 has 1 rows and 0.3 percent of land
-08/15/2025 02:43:26 PM - DEBUG - 
-      STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10  ...     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
-45112        06        013    380000      1030  ...  400461  060133800001   06013380000          06013
+09/04/2025 03:08:48 PM - DEBUG - group 060133800001 has 1 rows and 0.3 percent of land
+09/04/2025 03:08:48 PM - DEBUG - 
+      STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10  ...     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
+45112        06        013    380000      1030  060133800001030  ...  411035  400461  060133800001   06013380000          06013
 
 [1 rows x 21 columns]
-08/15/2025 02:43:26 PM - DEBUG -   No neighbors in same block group with maz/taz
-08/15/2025 02:43:26 PM - DEBUG - group 060133800003 has 5 rows and 99.7 percent of land
-08/15/2025 02:43:26 PM - DEBUG - 
-       STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10  ...     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
-25347         06        013    380000      3022  ...  400461  060133800003   06013380000          06013
-27226         06        013    380000      3025  ...  400461  060133800003   06013380000          06013
-81307         06        013    380000      3021  ...  400461  060133800003   06013380000          06013
-98945         06        013    380000      3024  ...  400461  060133800003   06013380000          06013
-106972        06        013    380000      3023  ...  400461  060133800003   06013380000          06013
+09/04/2025 03:08:48 PM - DEBUG -   No neighbors in same block group with maz/taz
+09/04/2025 03:08:48 PM - DEBUG - group 060133800003 has 5 rows and 99.7 percent of land
+09/04/2025 03:08:48 PM - DEBUG - 
+       STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10  ...     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
+25347         06        013    380000      3022  060133800003022  ...  411035  400461  060133800003   06013380000          06013
+27226         06        013    380000      3025  060133800003025  ...  411035  400461  060133800003   06013380000          06013
+81307         06        013    380000      3021  060133800003021  ...  411035  400461  060133800003   06013380000          06013
+98945         06        013    380000      3024  060133800003024  ...  411035  400461  060133800003   06013380000          06013
+106972        06        013    380000      3023  060133800003023  ...  411035  400461  060133800003   06013380000          06013
 
 [5 rows x 21 columns]
-08/15/2025 02:43:26 PM - INFO - Attempting to fix maz 718685
-08/15/2025 02:43:26 PM - DEBUG - 
-      STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10  ...     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
-6812         06        097    151700      2027  ...  700241  060971517002   06097151700          06097
-21394        06        097    151503      3011  ...  700241  060971515033   06097151503          06097
-22360        06        097    151700      2025  ...  700241  060971517002   06097151700          06097
-28172        06        097    151503      3000  ...  700241  060971515033   06097151503          06097
-92991        06        097    151700      2029  ...  700241  060971517002   06097151700          06097
+09/04/2025 03:08:48 PM - INFO - Attempting to fix maz 718685
+09/04/2025 03:08:48 PM - DEBUG - 
+      STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10  ...     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
+6812         06        097    151700      2027  060971517002027  ...  718685  700241  060971517002   06097151700          06097
+21394        06        097    151503      3011  060971515033011  ...  718685  700241  060971515033   06097151503          06097
+22360        06        097    151700      2025  060971517002025  ...  718685  700241  060971517002   06097151700          06097
+28172        06        097    151503      3000  060971515033000  ...  718685  700241  060971515033   06097151503          06097
+92991        06        097    151700      2029  060971517002029  ...  718685  700241  060971517002   06097151700          06097
 
 [5 rows x 21 columns]
-08/15/2025 02:43:26 PM - DEBUG - group 060971515033 has 2 rows and 83.8 percent of land
-08/15/2025 02:43:26 PM - DEBUG - 
-      STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10  ...     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
-21394        06        097    151503      3011  ...  700241  060971515033   06097151503          06097
-28172        06        097    151503      3000  ...  700241  060971515033   06097151503          06097
+09/04/2025 03:08:48 PM - DEBUG - group 060971515033 has 2 rows and 83.8 percent of land
+09/04/2025 03:08:48 PM - DEBUG - 
+      STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10  ...     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
+21394        06        097    151503      3011  060971515033011  ...  718685  700241  060971515033   06097151503          06097
+28172        06        097    151503      3000  060971515033000  ...  718685  700241  060971515033   06097151503          06097
 
 [2 rows x 21 columns]
-08/15/2025 02:43:26 PM - DEBUG - group 060971517002 has 3 rows and 16.2 percent of land
-08/15/2025 02:43:26 PM - DEBUG - 
-      STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10  ...     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
-6812         06        097    151700      2027  ...  700241  060971517002   06097151700          06097
-22360        06        097    151700      2025  ...  700241  060971517002   06097151700          06097
-92991        06        097    151700      2029  ...  700241  060971517002   06097151700          06097
+09/04/2025 03:08:48 PM - DEBUG - group 060971517002 has 3 rows and 16.2 percent of land
+09/04/2025 03:08:48 PM - DEBUG - 
+      STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10  ...     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
+6812         06        097    151700      2027  060971517002027  ...  718685  700241  060971517002   06097151700          06097
+22360        06        097    151700      2025  060971517002025  ...  718685  700241  060971517002   06097151700          06097
+92991        06        097    151700      2029  060971517002029  ...  718685  700241  060971517002   06097151700          06097
 
 [3 rows x 21 columns]
-08/15/2025 02:43:27 PM - DEBUG -   No neighbors in same block group with maz/taz
-08/15/2025 02:43:27 PM - DEBUG -   No neighbors in same block group with maz/taz
-08/15/2025 02:43:27 PM - DEBUG -   No neighbors in same block group with maz/taz
-08/15/2025 02:43:27 PM - INFO - ====> moved 0 blocks to neighbor
-08/15/2025 02:43:27 PM - WARNING - Multiple GEOID10_TRACT for a single taz: 2
-08/15/2025 02:43:27 PM - WARNING - 
+09/04/2025 03:08:48 PM - DEBUG -   No neighbors in same block group with maz/taz
+09/04/2025 03:08:48 PM - DEBUG -   No neighbors in same block group with maz/taz
+09/04/2025 03:08:48 PM - DEBUG -   No neighbors in same block group with maz/taz
+09/04/2025 03:08:48 PM - INFO - ====> moved 0 blocks to neighbor
+09/04/2025 03:08:48 PM - WARNING - Multiple GEOID10_TRACT for a single taz: 2
+09/04/2025 03:08:48 PM - WARNING - 
         GEOID10_TRACT
 taz                  
 327                 2
 700241              2
-08/15/2025 02:43:27 PM - INFO - splitting taz for tract
-08/15/2025 02:43:27 PM - INFO - Attempting to fix taz    327
-08/15/2025 02:43:27 PM - DEBUG - 
+09/04/2025 03:08:48 PM - INFO - splitting taz for tract
+09/04/2025 03:08:48 PM - INFO - Attempting to fix taz    327
+09/04/2025 03:08:48 PM - DEBUG - 
                ALAND10  ALAND10_pct
 GEOID10_TRACT                      
 06075017902       4650         0.01
 06075023103     748028         0.99
-08/15/2025 02:43:27 PM - INFO - Tract/taz portion too small -- skipping
-08/15/2025 02:43:27 PM - INFO - Attempting to fix taz 700241
-08/15/2025 02:43:27 PM - DEBUG - 
+09/04/2025 03:08:48 PM - INFO - Tract/taz portion too small -- skipping
+09/04/2025 03:08:48 PM - INFO - Attempting to fix taz 700241
+09/04/2025 03:08:48 PM - DEBUG - 
                ALAND10  ALAND10_pct
 GEOID10_TRACT                      
 06097151503     977478         1.00
 06097151700       4177         0.00
-08/15/2025 02:43:27 PM - INFO - Tract/taz portion too small -- skipping
-08/15/2025 02:43:27 PM - INFO - Verified one GEOID10_COUNTY per taz
-08/15/2025 02:43:27 PM - INFO - No blocks moved or tazs split -- exiting iterations
-08/15/2025 02:43:27 PM - INFO - Saving crosswalk as final crosswalk: blocks_mazs_tazs_2.5.csv
-08/15/2025 02:43:27 PM - INFO - Number of blocks per maz: 
-08/15/2025 02:43:27 PM - INFO -    Min: 1
-08/15/2025 02:43:27 PM - INFO -    Max: 89
-08/15/2025 02:43:27 PM - INFO -   Mean: 2.7092911635426664
-08/15/2025 02:43:27 PM - INFO - 
-08/15/2025 02:43:27 PM - INFO - Number of maz per taz: 
-08/15/2025 02:43:27 PM - INFO -    Min: 1
-08/15/2025 02:43:27 PM - INFO -    Max: 118
-08/15/2025 02:43:27 PM - INFO -   Mean: 8.362061681453316
-08/15/2025 02:43:27 PM - INFO - 
-08/15/2025 02:43:27 PM - INFO - Number of blocks without maz/taz: 1978
-08/15/2025 02:43:27 PM - INFO - Number of blocks without maz/taz with land area: 0
-08/15/2025 02:43:27 PM - INFO - Number of blocks with maz/taz without land area: 0
-08/15/2025 02:43:27 PM - INFO - maz_taz_county_check=
+09/04/2025 03:08:48 PM - INFO - Tract/taz portion too small -- skipping
+09/04/2025 03:08:48 PM - INFO - Verified one GEOID10_COUNTY per taz
+09/04/2025 03:08:48 PM - INFO - No blocks moved or tazs split -- exiting iterations
+09/04/2025 03:08:48 PM - INFO - Saving crosswalk as final crosswalk: blocks_mazs_tazs_2.5.csv
+09/04/2025 03:08:49 PM - INFO - Number of blocks per maz: 
+09/04/2025 03:08:49 PM - INFO -    Min: 1
+09/04/2025 03:08:49 PM - INFO -    Max: 89
+09/04/2025 03:08:49 PM - INFO -   Mean: 2.7092227246318235
+09/04/2025 03:08:49 PM - INFO - 
+09/04/2025 03:08:49 PM - INFO - Number of maz per taz: 
+09/04/2025 03:08:49 PM - INFO -    Min: 1
+09/04/2025 03:08:49 PM - INFO -    Max: 118
+09/04/2025 03:08:49 PM - INFO -   Mean: 8.36227291930714
+09/04/2025 03:08:49 PM - INFO - 
+09/04/2025 03:08:49 PM - INFO - Number of blocks without maz/taz: 1978
+09/04/2025 03:08:49 PM - INFO - Number of blocks without maz/taz with land area: 0
+09/04/2025 03:08:49 PM - INFO - Number of blocks with maz/taz without land area: 0
+09/04/2025 03:08:49 PM - INFO - maz_taz_county_check=
                    maz             taz        
                    min     max     min     max
 GEOID10_COUNTY                                
@@ -261,41 +185,44 @@ GEOID10_COUNTY
 06085           210002  232367  200002  201093
 06095           510002  520521  500001  500287
 06097           710009  720388  700001  700387
-08/15/2025 02:43:27 PM - INFO - Dissolving blocks into MAZs and TAZs
-08/15/2025 02:43:48 PM - INFO - Calculated part count for mazs
-08/15/2025 02:43:48 PM - INFO - Calculated perimeter length for mazs
-08/15/2025 02:43:48 PM - INFO - Calculated perim*perim/area for mazs
-08/15/2025 02:43:48 PM - INFO - Calculated acres for mazs
-08/15/2025 02:43:51 PM - INFO - Created 39,586 records
-08/15/2025 02:43:51 PM - INFO - Saving final mazs into mazs_TM2_2_5.shp
-08/15/2025 02:44:21 PM - INFO - Calculated part count for tazs
-08/15/2025 02:44:21 PM - INFO - Calculated perimeter length for tazs
-08/15/2025 02:44:21 PM - INFO - Calculated perim*perim/area for tazs
-08/15/2025 02:44:21 PM - INFO - Calculated acres for tazs
-08/15/2025 02:44:22 PM - INFO - Created 4,734 records
-08/15/2025 02:44:22 PM - INFO - Saving final tazs into tazs_TM2_2_5.shp
-08/15/2025 02:44:22 PM - INFO - Read M:\Data\Census\Geography\tl_2010_06_puma10\2010_Census_Tract_to_2010_PUMA.txt; head=
+09/04/2025 03:08:49 PM - INFO - Dissolving blocks into MAZs and TAZs
+09/04/2025 03:09:08 PM - INFO - Calculated part count for mazs
+09/04/2025 03:09:08 PM - INFO - Calculated perimeter length for mazs
+09/04/2025 03:09:08 PM - INFO - Calculated perim*perim/area for mazs
+09/04/2025 03:09:08 PM - INFO - Calculated acres for mazs
+09/04/2025 03:09:08 PM - INFO - Creating centroids for maz
+09/04/2025 03:09:11 PM - INFO - Created 39,587 records
+09/04/2025 03:09:11 PM - INFO - Saving final mazs into mazs_TM2_2_5.shp
+09/04/2025 03:09:40 PM - INFO - Calculated part count for tazs
+09/04/2025 03:09:40 PM - INFO - Calculated perimeter length for tazs
+09/04/2025 03:09:40 PM - INFO - Calculated perim*perim/area for tazs
+09/04/2025 03:09:40 PM - INFO - Calculated acres for tazs
+09/04/2025 03:09:40 PM - INFO - Creating centroids for taz
+09/04/2025 03:09:40 PM - INFO - Created 4,734 records
+09/04/2025 03:09:40 PM - INFO - Saving final tazs into tazs_TM2_2_5.shp
+09/04/2025 03:09:40 PM - INFO - Joining mazs/tazs to superdistricts
+09/04/2025 03:09:45 PM - INFO - Read M:\Data\Census\Geography\tl_2010_06_puma10\2010_Census_Tract_to_2010_PUMA.txt; head=
   STATEFP10 COUNTYFP10 TRACTCE10 PUMA10
 0        01        001    020100  02100
 1        01        001    020200  02100
 2        01        001    020300  02100
 3        01        001    020400  02100
 4        01        001    020500  02100
-08/15/2025 02:44:22 PM - INFO - blocks_maz_df len=107,250.head():
-  STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10  ...     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
-0        06        055    201700      4004  060552017004004  ...  610054  600102  060552017004   06055201700          06055
-1        06        055    201700      1013  060552017001013  ...  611025  600006  060552017001   06055201700          06055
-2        06        055    201700      4007  060552017004007  ...  610857  600102  060552017004   06055201700          06055
-3        06        055    201700      4023  060552017004023  ...  611028  600102  060552017004   06055201700          06055
-4        06        055    201403      1023  060552014031023  ...  610051  600097  060552014031   06055201403          06055
+09/04/2025 03:09:45 PM - INFO - blocks_maz_df len=107,250.head():
+  STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10  ...                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT  GEOID10_COUNTY
+0        06        055    201700      4004  060552017004004  Block 4004  ...  POLYGON ((-122.46065 38.61807, -122.46062 38.6...  610054  600102  060552017004   06055201700           06055
+1        06        055    201700      1013  060552017001013  Block 1013  ...  POLYGON ((-122.35414 38.50767, -122.35408 38.5...  611025  600006  060552017001   06055201700           06055
+2        06        055    201700      4007  060552017004007  Block 4007  ...  POLYGON ((-122.4883 38.59902, -122.48826 38.60...  610857  600102  060552017004   06055201700           06055
+3        06        055    201700      4023  060552017004023  Block 4023  ...  POLYGON ((-122.47466 38.59312, -122.47346 38.5...  611028  600102  060552017004   06055201700           06055
+4        06        055    201403      1023  060552014031023  Block 1023  ...  POLYGON ((-122.1789 38.38562, -122.17748 38.38...  610051  600097  060552014031   06055201403           06055
 
 [5 rows x 21 columns]
-08/15/2025 02:44:23 PM - INFO - blocks_maz_df len=107,250.head():
-  STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10  ...     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY PUMA10
-0        06        055    201700      4004  060552017004004  ...  600102  060552017004   06055201700          06055  05500
-1        06        055    201700      1013  060552017001013  ...  600006  060552017001   06055201700          06055  05500
-2        06        055    201700      4007  060552017004007  ...  600102  060552017004   06055201700          06055  05500
-3        06        055    201700      4023  060552017004023  ...  600102  060552017004   06055201700          06055  05500
-4        06        055    201403      1023  060552014031023  ...  600097  060552014031   06055201403          06055  05500
+09/04/2025 03:09:45 PM - INFO - blocks_maz_df len=107,250.head():
+  STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10  ...    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY  suprdistid      DistName   MAZ_X MAZ_Y PUMA10
+0        06        055    201700      4004  060552017004004  Block 4004   G5040    R  ...  060552017004   06055201700          06055          28  Saint Helena -122.45 38.62  05500
+1        06        055    201700      1013  060552017001013  Block 1013   G5040    R  ...  060552017001   06055201700          06055          28  Saint Helena -122.33 38.51  05500
+2        06        055    201700      4007  060552017004007  Block 4007   G5040    R  ...  060552017004   06055201700          06055          28  Saint Helena -122.48 38.60  05500
+3        06        055    201700      4023  060552017004023  Block 4023   G5040    R  ...  060552017004   06055201700          06055          28  Saint Helena -122.46 38.59  05500
+4        06        055    201403      1023  060552014031023  Block 1023   G5040    R  ...  060552014031   06055201403          06055          28  Saint Helena -122.15 38.37  05500
 
-[5 rows x 22 columns]
+[5 rows x 26 columns]

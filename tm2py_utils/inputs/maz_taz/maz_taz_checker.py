@@ -93,7 +93,7 @@ MAZS_SHP           = "mazs_TM2"
 TAZS_SHP           = "tazs_TM2"
 
 # Default CRS for analysis
-ANALYSIS_CRS = "EPSG:26910"
+ANALYSIS_CRS = "EPSG:4326"
 
 #Number of Iteration for moving mazs/tazs
 NUM_ITER = 5
@@ -284,6 +284,11 @@ def dissolve_into_shapefile(blocks_maz_layer, maz_or_taz):
         # Rename fields for clarity
         shapefile.rename(columns = {'GEOID10': 'blockcount'},inplace = True)
         if maz_or_taz == 'taz': shapefile.rename(columns = {'maz': 'mazcount'}, inplace = True)
+
+        # Create centroids for mazs and tazs
+        logging.info(f"Creating centroids for {maz_or_taz}")
+        shapefile[f'{maz_or_taz.upper()}_X'] = shapefile.geometry.centroid.x
+        shapefile[f'{maz_or_taz.upper()}_Y'] = shapefile.geometry.centroid.y
         print(shapefile.head())
 
         # Save the dissolved shapefile to workspace
@@ -523,14 +528,7 @@ if __name__ == '__main__':
     maz_shapefile = dissolve_into_shapefile(blocks_maz_layer, "maz")
     taz_shapefile = dissolve_into_shapefile(blocks_maz_layer, "taz")
 
-    # Create centroids for mazs and tazs
-    logging.info("Creating centroids for mazs and tazs")
-    maz_shapefile['MAZ_X'] = maz_shapefile.geometry.centroid.x
-    maz_shapefile['MAZ_Y'] = maz_shapefile.geometry.centroid.y
-    taz_shapefile['TAZ_X'] = taz_shapefile.geometry.centroid.x
-    taz_shapefile['TAZ_Y'] = taz_shapefile.geometry.centroid.y
-
-
+    
     ## Join MAZs/TAZs to superdistricts
     logging.info("Joining mazs/tazs to superdistricts")
     superdistricts = geopandas.read_file(SUPERDISTRICT_FILE)
@@ -641,4 +639,5 @@ if __name__ == '__main__':
     blocks_maz_df.to_csv(f'mazs_tazs_county_tract_PUMA_{VERSION}.csv', index=False)
 
     blocks_maz_df[['MAZ','TAZ','COUNTY','county_name']].to_csv(f"mazs_tazs_county_{VERSION}.csv", index=False)
+    taz_shapefile[['taz', 'TAZ_X', 'TAZ_Y']].to_csv(f"tazs_{VERSION}.csv", index=False)
     sys.exit(0)
