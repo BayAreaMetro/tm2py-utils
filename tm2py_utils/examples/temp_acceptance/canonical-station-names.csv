@@ -1,0 +1,129 @@
+﻿operator,canonical,alternate_01,alternate_02,alternate_03,alternate_04,alternate_05
+ACE,Fremont,FMT FREMONT STATION,FREMONT STATION,,,
+ACE,Great America,GAC GREAT AMERICA STATION,GREAT AMERICA STATION,,,
+ACE,Livermore,LVA LIVERMORE STATION,LIVERMORE STATION,,,
+ACE,Plesanton,PLD PLEASANTON STATION,PLEASANTON STATION,,,
+ACE,San Jose Diridon,SJD SAN JOSE STATION,SAN JOSE STATION,,,
+ACE,Santa Clara,SCC SANTA CLARA STATION,SANTA CLARA STATION,,,
+ACE,Vasco Road,VAR VASCO ROAD STATION,VASCO STATION,,,
+ACE,Lathrop-Manteca,LMT LATHROP-MANTECA STATION,LATHROP-MANTECA STATION,,,
+ACE,Stockton,STK STOCKTON STATION,STOCKTON STATION,,,
+ACE,Tracy,TCY TRACY STATION,TRACY STATION,,,
+BART,12th St Oakland City Center,12th St. Oakland City Center,12th St/Oakland City Center,12th Street Oakland,12,12TH
+BART,16th St Mission,16th St. Mission,16th Street & Mission,16th Street Mission,16,16TH
+BART,19th St Oakland,19th St. Oakland,19th St/Oakland,19th Street Oakland,19,19TH
+BART,24th St Mission,24th St. Mission,24th Street & Mission,24th Street Mission,24,24TH
+BART,Antioch,,,,AN,
+BART,Ashby,,,,AS,ASHB
+BART,Balboa Park,,,,BP,BALB
+BART,BayFair,Bay Fair ,Bay Fair,,BF,BAYF
+BART,Downtown Berkeley,Berkeley,,,BK,DBRK
+BART,Berryessa / North San Jose,Berryessa/North San Jose,,,BE,
+BART,Castro Valley,,,,CV,CAST
+BART,Civic Center/UN Plaza,Civic Center UN Plaza,Civic Center / UN Plaza,Civic Center,CC,CIVC
+BART,Coliseum,Oakland Coliseum,,,CL,COLS
+BART,Colma,,,,CM,COLM
+BART,Concord,,,,CN,CONC
+BART,Daly City,,,,DC,DALY
+BART,Dublin/Pleasanton,Dublin Pleasanton,,,ED,DUBL
+BART,El Cerrito del Norte,,,,EN,DELN
+BART,El Cerrito Plaza,,,,EP,PLZA
+BART,Embarcadero,,,,EM,EMBR
+BART,Fremont,,,,FM,FRMT
+BART,Fruitvale,,,,FV,FTVL
+BART,Glen Park,,,,GP,GLEN
+BART,Hayward,Hayward (BART),,,HY,HAYW
+BART,Lafayette,,,,LF,LAFY
+BART,Lake Merritt,,,,LM,LAKE
+BART,MacArthur,,,,MA,MCAR
+BART,Millbrae,,,,MB,MLBR
+BART,Milpitas,,,,ML,
+BART,Montgomery St,Montgomery St.,Montgomery,Montgomery Street,MT,MONT
+BART,North Berkeley,,,,NB,NBRK
+BART,North Concord/Martinez,North Concord Martinez,North Concord,,NC,NCON
+BART,Oakland Airport,OAK Airport,Oakland International Airport,Oakland Airport Connector,OA,OAKL
+BART,Orinda,,,,OR,ORIN
+BART,Pittsburg Center,,,,PC,
+BART,Pittsburg/Bay Point,Pittsburg Bay Point,,,WP,PITT
+BART,Pleasant Hill,Pleasant Hill Contra Costa Centre,Pleasant Hill/Contra Costa Centre,Plesant Hill/Contra Costa Centre,PH,PHIL
+BART,Powell St,Powell St.,Powell,Powell Street,PL,POWL
+BART,Richmond,,,,RM,RICH
+BART,Rockridge,,,,RR,ROCK
+BART,San Bruno,,,,SB,SBRN
+BART,San Leandro,,,,SL,SANL
+BART,San Francisco International Airport,SFO,San Francisco Intl Airport,SF Airport,SO,SFIA
+BART,South Hayward,,,,SH,SHAY
+BART,South San Francisco,South City,,,SS,SSAN
+BART,Union City,Union City (BART),,,UC,UCTY
+BART,Walnut Creek,,,,WC,WCRK
+BART,Warm Springs,,,,WS,
+BART,West Dublin/Pleasanton,West Dublin Pleasanton,West Dublin/Plesanton,West Dublin,WD,WDUB
+BART,West Oakland,,,,OW,WOAK
+Caltrain,Bayshore,Bayshore Caltrain,,,,
+Caltrain,Belmont,Belmont Caltrain,,,,
+Caltrain,Blossom Hill,Blossom Hill Caltrain,,,,
+Caltrain,Burlingame,Burlingame Caltrain,,,,
+Caltrain,California Ave,California Ave Caltrain,,,,
+Caltrain,College Park,College Park Caltrain,College<a0>Park,,,
+Caltrain,Capitol,Capitol Caltrain,,,,
+Caltrain,Gilroy,Gilroy Caltrain,,,,
+Caltrain,Hayward Park,Hayward Park Caltrain,,,,
+Caltrain,Hillsdale,Hillsdale Caltrain,,,,
+Caltrain,Lawrence,Lawrence Caltrain,,,,
+Caltrain,Menlo Park,Menlo Park Caltrain,,,,
+Caltrain,Millbrae,Millbrae Caltrain,,,,
+Caltrain,Morgan Hill,Morgan Hill Caltrain,,,,
+Caltrain,Mountain View,Mountain View Caltrain,Mountain<a0>View,,,
+Caltrain,Palo Alto,Palo Alto Caltrain,,,,
+Caltrain,Redwood City,Redwood City Caltrain,,,,
+Caltrain,San Antonio,San Antonio Caltrain,San<a0>Antonio,,,
+Caltrain,San Bruno,San Bruno Caltrain,,,,
+Caltrain,San Carlos,San Carlos Caltrain,,,,
+Caltrain,San Jose Diridon,San Jose Diridon Caltrain,San Jose,,,
+Caltrain,San Martin,San Martin Caltrain,,,,
+Caltrain,San Mateo,San Mateo Caltrain,,,,
+Caltrain,San Francisco,San Francisco Caltrain,4th and King,,,
+Caltrain,Santa Clara,Santa Clara Caltrain,Santa<a0>Clara,,,
+Caltrain,South San Francisco,South San Francisco Caltrain,So. San Francisco,,,
+Caltrain,Sunnyvale,Sunnyvale Caltrain,,,,
+Caltrain,Tamien,Tamien Caltrain,,,,
+Capitol Corridor,Berkeley,,,,,
+Capitol Corridor,Coliseum,Oakland Coliseum,,,,
+Capitol Corridor,Emeryville,,,,,
+Capitol Corridor,Fremont,,,,,
+Capitol Corridor,Great America,Great America-Santa Clara,,,,
+Capitol Corridor,Hayward,,,,,
+Capitol Corridor,Jack London Square,Oakland Jack London,,,,
+Capitol Corridor,Martinez,,,,,
+Capitol Corridor,Richmond,,,,,
+Capitol Corridor,San Jose Diridon,,,,,
+Capitol Corridor,Santa Clara Uni,University-Santa Clara,,,,
+Capitol Corridor,Suisun-Fairfield,,,,,
+Golden Gate Transit,Sausilito,,,,,
+SF Ferry,Alameda Main,,,,,
+SF Ferry,Harbor Bay,,,,,
+SF Ferry,Oakland Terminal,,,,,
+SF Ferry,South San Francisco,,,,,
+SF Ferry,Vallejo Terminal,,,,,
+Sonoma-Marin Area Rail Transit,Larkspur,,,,,
+VTA,Alder,,,,,
+VTA,Alum Rock,,,,,
+VTA,Bascom,,,,,
+VTA,Blossom Hill,,,,,
+VTA,Branham,,,,,
+VTA,Capitol,,,,,
+VTA,Cottle,,,,,
+VTA,Curtner,,,,,
+VTA,Great Mall,,,,,
+VTA,Hostetter,,,,,
+VTA,Milpitas,,,,,
+VTA,Moffett Park,,,,,
+VTA,Mountain View,,,,,
+VTA,Ohlone/Chynoweth,,,,,
+VTA,Penitencia Creek,,,,,
+VTA,San Jose Diridon,,,,,
+VTA,Santa Teresa,,,,,
+VTA,Snell,,,,,
+VTA,Tamien,,,,,
+VTA,Whiseman,,,,,
+VTA,Winchester,,,,,
