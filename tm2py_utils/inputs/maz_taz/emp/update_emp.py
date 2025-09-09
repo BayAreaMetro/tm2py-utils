@@ -127,6 +127,21 @@ def merge_and_update():
         else:
             print(f"✅ Added coordinates to maz_data ({missing_coords} MAZs marked with -1 for missing coords)")
 
+    # Recalculate emp_total to match sum of employment subcategories
+    emp_subcategories = ['ag', 'art_rec', 'constr', 'eat', 'ed_high', 'ed_k12', 'ed_oth', 'fire', 'gov', 'health',
+                        'hotel', 'info', 'lease', 'logis', 'man_bio', 'man_hvy', 'man_lgt', 'man_tech', 'natres', 
+                        'prof', 'ret_loc', 'ret_reg', 'serv_bus', 'serv_soc', 'transp', 'util']
+    
+    # Check which employment columns are actually present
+    available_emp_cols = [col for col in emp_subcategories if col in maz_data_merged.columns]
+    if available_emp_cols:
+        old_total = maz_data_merged['emp_total'].sum()
+        maz_data_merged['emp_total'] = maz_data_merged[available_emp_cols].sum(axis=1)
+        new_total = maz_data_merged['emp_total'].sum()
+        print(f"✅ Recalculated emp_total for maz_data: {old_total:,.0f} -> {new_total:,.0f} ({len(available_emp_cols)} categories)")
+    else:
+        print("⚠️ No employment subcategories found for emp_total recalculation in maz_data")
+
     # Save updated file
     maz_data_merged.to_csv(OUTPUT_MAZ_DATA, index=False)
 
@@ -205,6 +220,21 @@ def merge_and_update():
         print(f"Renamed jobs columns: {list(rename_cols.values())}")
     
     print(f"After employment column cleanup: {len(maz_density_merged.columns)} columns")
+
+    # Recalculate emp_total to match sum of employment subcategories
+    emp_subcategories = ['ag', 'art_rec', 'constr', 'eat', 'ed_high', 'ed_k12', 'ed_oth', 'fire', 'gov', 'health',
+                        'hotel', 'info', 'lease', 'logis', 'man_bio', 'man_hvy', 'man_lgt', 'man_tech', 'natres', 
+                        'prof', 'ret_loc', 'ret_reg', 'serv_bus', 'serv_soc', 'transp', 'util']
+    
+    # Check which employment columns are actually present
+    available_emp_cols = [col for col in emp_subcategories if col in maz_density_merged.columns]
+    if available_emp_cols:
+        old_total = maz_density_merged['emp_total'].sum()
+        maz_density_merged['emp_total'] = maz_density_merged[available_emp_cols].sum(axis=1)
+        new_total = maz_density_merged['emp_total'].sum()
+        print(f"✅ Recalculated emp_total for maz_density: {old_total:,.0f} -> {new_total:,.0f} ({len(available_emp_cols)} categories)")
+    else:
+        print("⚠️ No employment subcategories found for emp_total recalculation in maz_density")
 
 
 
@@ -390,6 +420,43 @@ def rename_final_files():
     print("- maz_data_withDensity.csv (current version)")
     print("- maz_data_old.csv (previous version)")
     print("- maz_data_withDensity_old.csv (previous version)")
+
+def copy_files_to_box():
+    """Copy final files to Box destination for TM2 model"""
+    import shutil
+    from pathlib import Path
+    
+    print("\n--- COPYING FILES TO BOX ---")
+    
+    # Source: where our script saves the files
+    source_dir = Path(TARGET_DIR)
+    
+    # Destination: Box location for TM2 model (same as source in this case, but keeping for clarity)
+    dest_dir = Path(r'C:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-test\landuse')
+    
+    # Files to copy
+    files_to_copy = [
+        'maz_data.csv',
+        'maz_data_withDensity.csv'
+    ]
+    
+    # Ensure destination directory exists
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    
+    for fname in files_to_copy:
+        src = source_dir / fname
+        dst = dest_dir / fname
+        
+        if src.exists():
+            try:
+                shutil.copy2(src, dst)
+                print(f"✅ Copied: {fname} -> {dest_dir}")
+            except Exception as e:
+                print(f"❌ Error copying {fname}: {e}")
+        else:
+            print(f"⚠️ Source file not found: {src}")
+    
+    print("Box sync complete!")
 
 if __name__ == "__main__":
     merge_and_update()
