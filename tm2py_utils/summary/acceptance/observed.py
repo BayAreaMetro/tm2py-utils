@@ -496,11 +496,11 @@ class Observed:
         df = pd.read_csv(os.path.join(file_root, in_file), skiprows=1)
 
         df = df[
-            ["Geography", "Estimate!!Total", "Estimate!!Total!!No vehicle available"]
+            ["id", "Estimate!!Total", "Estimate!!Total!!No vehicle available"]
         ]
         df = df.rename(
             columns={
-                "Geography": "geoid",
+                "id": "geoid",
                 "Estimate!!Total": "total_households",
                 "Estimate!!Total!!No vehicle available": "observed_zero_vehicle_households",
             }
@@ -634,14 +634,14 @@ class Observed:
         file_root = self.observed_dict["remote_io"]["obs_folder_root"]
         in_file = self.observed_dict["census"]["ctpp_2012_2016_file"]
 
-        df = pd.read_csv(os.path.join(file_root, in_file), skiprows=2)
-
-        a_df = df[(df["Output"] == "Estimate")].copy()
+        df = pd.read_csv(os.path.join(file_root, in_file), skiprows=1)
+        #a_df = df[(df["Output"] == "Estimate")].copy()
+        a_df = df.copy()
         a_df = a_df.rename(
             columns={
-                "RESIDENCE": "residence_county",
-                "WORKPLACE": "work_county",
-                "Workers 16 and Over": "observed_flow",
+                "origin_name": "residence_county",
+                "destination_name": "work_county",
+                "a302100_e1": "observed_flow",
             }
         )
         a_df = a_df[["residence_county", "work_county", "observed_flow"]]
@@ -927,7 +927,7 @@ class Observed:
             )
         else:
             in_df = pd.read_csv(
-                os.path.join(file_root, in_file), sep="\t", encoding="utf-16"
+                os.path.join(file_root, in_file)
             )
             df = in_df[
                 in_df["Year"].isin(self.RELEVANT_BRIDGE_TRANSACTIONS_YEARS_LIST)

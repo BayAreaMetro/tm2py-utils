@@ -24,7 +24,6 @@ class Acceptance:
         c (Canonical): Canonical naming and crosswalk handler instance
         acceptance_output_folder_root (str): Root directory for output files
         road_network_gdf (gpd.GeoDataFrame): Road network comparison results with columns:
-            - model_link_id: Unique link identifier
             - emme_a_node_id, emme_b_node_id: Link node IDs
             - station_id: PeMS station ID if applicable
             - observed_flow: Observed traffic volume
@@ -73,7 +72,6 @@ class Acceptance:
     # Output data specs
     road_network_gdf = gpd.GeoDataFrame(
         {
-            "model_link_id": pd.Series(dtype="int"),
             "emme_a_node_id": pd.Series(dtype="int"),
             "emme_b_node_id": pd.Series(dtype="int"),
             "station_id": pd.Series(dtype="str"),
@@ -114,13 +112,12 @@ class Acceptance:
 
     transit_network_gdf = gpd.GeoDataFrame(
         {
-            "model_link_id": pd.Series(dtype="int"),
             "model_line_id": pd.Series(dtype="str"),
             "operator": pd.Series(dtype="str"),
             "technology": pd.Series(dtype="str"),
             "route_short_name": pd.Series(dtype="str"),
             "route_long_name": pd.Series(dtype="str"),
-            # "trip_headsign": pd.Series(dtype="str"),
+            #"trip_headsign": pd.Series(dtype="str"),
             "time_period": pd.Series(dtype="str"),
             "route_observed_boardings": pd.Series(dtype="float"),
             "route_simulated_boardings": pd.Series(dtype="float"),
@@ -247,7 +244,6 @@ class Acceptance:
         prepares data for visualization.
         
         Produces road_network_gdf with columns:
-            - model_link_id: Unique link identifier
             - emme_a_node_id, emme_b_node_id: Network node IDs
             - station_id: PeMS/Caltrans station ID
             - pems_station_type: Station type (mainline, ramp, etc.)
@@ -389,7 +385,7 @@ class Acceptance:
             s_am_shape_gdf,
             how="left",
             on=["emme_a_node_id", "emme_b_node_id", "standard_link_id", "time_period"],
-        ).rename(columns={"standard_link_id": "model_link_id"})
+        )
 
         return_gdf = gpd.GeoDataFrame(return_df, geometry="geometry")
         return_gdf = return_gdf.to_crs(crs="EPSG:" + self.tableau_projection)
@@ -531,7 +527,6 @@ class Acceptance:
         operators (match by route). Includes segment-level volume/capacity metrics.
         
         Produces transit_network_gdf with columns:
-            - model_link_id: Transit link identifier
             - model_line_id: Transit line name
             - operator: Transit agency (canonical name)
             - technology: Mode (Local Bus, Express Bus, Light Rail, etc.)
@@ -622,7 +617,6 @@ class Acceptance:
 
         return_df = return_df.rename(
             columns={
-                "#link_id": "model_link_id",
                 "standard_route_short_name": "route_short_name",
                 "standard_route_long_name": "route_long_name",
                 "standard_headsign": "trip_headsign",

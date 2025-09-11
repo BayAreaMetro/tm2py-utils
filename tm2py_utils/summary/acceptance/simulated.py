@@ -289,19 +289,6 @@ class Simulated:
 
         return
 
-    def _add_model_link_id(self):
-        df = pd.read_csv(
-            os.path.join("acceptance", "crosswalks", "transit_link_id_mapping_am.csv")
-        )
-
-        df = df.rename(
-            columns={
-                "LINK_ID": "#link_id",
-            }
-        )
-
-        return df
-
     def _reduce_simulated_transit_by_segment(self):
         file_prefix = "transit_segment_"
 
@@ -382,18 +369,12 @@ class Simulated:
             on="LINE_ID",
             how="left",
         )
+        print(a_gdf.head())
+        print(a_gdf.columns)
 
-        crosswalk_df = self._add_model_link_id()
-
-        b_gdf = pd.merge(
-            a_gdf,
-            crosswalk_df,
-            on=["INODE", "JNODE", "LINE_ID"],
-            how="left",
-        )
 
         self.simulated_transit_segments_gdf = pd.merge(
-            b_gdf,
+            a_gdf,
             a_df[
                 [
                     "LINE_ID",
@@ -1153,7 +1134,7 @@ class Simulated:
 
         return
 
-    def _make_transit_technology_in_vehicle_table_from_skims(self):
+    def _make_transit_technology_in_vehicle_table_from_skims(self, time_period_list: list = ["am"]):
         """Create in-vehicle time by technology from transit skims.
         
         Reads transit skim matrices to extract in-vehicle times by technology
@@ -1180,6 +1161,8 @@ class Simulated:
             "WLK_TRN_KNR",
         ]
 
+        self.model_time_periods =  time_period_list
+
         tech_list = self.c.transit_technology_abbreviation_dict.keys()
 
         skim_dir = os.path.join("skim_matrices", "transit")
@@ -1191,7 +1174,7 @@ class Simulated:
             )
             if os.path.exists(filename):
                 omx_handle = omx.open_file(filename)
-
+                print(f"Extracting in vehicle time for {path} during {time_period} period")
                 # IVT
                 TIME_PERIOD = time_period.upper()
                 matrix_name = TIME_PERIOD + "_" + path + "_IVT"
@@ -1219,6 +1202,7 @@ class Simulated:
                 )
                 path_time_df["path"] = path
                 path_time_df["time_period"] = time_period
+                
 
                 for tech in tech_list:
                     matrix_name = TIME_PERIOD + "_" + path + "_IVT" + tech
