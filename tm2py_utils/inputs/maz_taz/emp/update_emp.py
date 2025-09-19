@@ -26,13 +26,157 @@ def print_column_summary(jobs, maz_data, maz_density):
     print(f"Columns UNIQUE to maz_data.csv: {sorted(maz_data_cols - jobs_cols - maz_density_cols)}")
     print(f"Columns UNIQUE to maz_data_withDensity.csv: {sorted(maz_density_cols - jobs_cols - maz_data_cols)}")
 
+def check_employment_consistency(df, filename, emp_subcategories):
+    """Check and log employment data consistency issues that cause ExplicitTelecommute crashes"""
+    print(f"\n--- EMPLOYMENT CONSISTENCY CHECK: {filename} ---")
+    
+    # Check which employment columns are actually present
+    available_emp_cols = [col for col in emp_subcategories if col in df.columns]
+    missing_emp_cols = [col for col in emp_subcategories if col not in df.columns]
+    
+    print(f"Available employment subcategories ({len(available_emp_cols)}): {available_emp_cols}")
+    if missing_emp_cols:
+        print(f"⚠️ Missing employment subcategories ({len(missing_emp_cols)}): {missing_emp_cols}")
+    
+    if not available_emp_cols:
+        print("❌ ERROR: No employment subcategories found for consistency check")
+        return df, 0, 0
+    
+    if 'emp_total' not in df.columns:
+        print("❌ ERROR: emp_total column not found")
+        return df, 0, 0
+    
+    # Calculate sum of subcategories
+    df['emp_sum_calculated'] = df[available_emp_cols].sum(axis=1)
+    
+    # Find mismatches
+    tolerance = 0.01  # Allow small floating point differences
+    mismatches = abs(df['emp_total'] - df['emp_sum_calculated']) > tolerance
+    n_mismatches = mismatches.sum()
+    
+    print(f"Employment total mismatches: {n_mismatches:,} / {len(df):,} ({100*n_mismatches/len(df):.2f}%)")
+    
+    if n_mismatches > 0:
+        print("⚠️ CRITICAL: Employment mismatches found - this causes ExplicitTelecommute crashes!")
+        
+        # Find problematic cases
+        mismatch_df = df[mismatches].copy()
+        mismatch_df['emp_diff'] = mismatch_df['emp_total'] - mismatch_df['emp_sum_calculated']
+        
+        # Cases where emp_total = 0 but subcategories > 0 (division by zero in telecommute model)
+        zero_total_nonzero_subs = mismatch_df[(mismatch_df['emp_total'] == 0) & (mismatch_df['emp_sum_calculated'] > 0)]
+        if len(zero_total_nonzero_subs) > 0:
+            print(f"❌ CRITICAL: {len(zero_total_nonzero_subs)} MAZs have emp_total=0 but subcategories>0")
+            print("   This causes division by zero in ExplicitTelecommute model!")
+            maz_col = 'MAZ' if 'MAZ' in zero_total_nonzero_subs.columns else 'maz'
+            if maz_col in zero_total_nonzero_subs.columns:
+                sample_mazs = zero_total_nonzero_subs[maz_col].head(10).tolist()
+                print(f"   Sample problematic MAZs: {sample_mazs}")
+        
+        # Show worst mismatches
+        print("Top 5 largest positive differences (emp_total > emp_sum):")
+        maz_col = 'MAZ' if 'MAZ' in mismatch_df.columns else 'maz'
+        cols_to_show = [maz_col, 'emp_total', 'emp_sum_calculated', 'emp_diff'] if maz_col in mismatch_df.columns else ['emp_total', 'emp_sum_calculated', 'emp_diff']
+        print(mismatch_df.nlargest(5, 'emp_diff')[cols_to_show])
+        
+        print("Top 5 largest negative differences (emp_total < emp_sum):")
+        print(mismatch_df.nsmallest(5, 'emp_diff')[cols_to_show])
+    
+    # Fix employment totals
+    old_total = df['emp_total'].sum()
+    df['emp_total'] = df['emp_sum_calculated']
+    new_total = df['emp_total'].sum()
+    
+    print(f"✅ Fixed emp_total: {old_total:,.0f} -> {new_total:,.0f}")
+    print(f"   Using {len(available_emp_cols)} employment subcategories")
+    
+    # Clean up temporary column
+    df = df.drop('emp_sum_calculated', axis=1)
+    
+    return df, n_mismatches, len(zero_total_nonzero_subs) if 'zero_total_nonzero_subs' in locals() else 0
+
+def validate_telecommute_safety(df, filename):
+    """Validate that the data won't cause ExplicitTelecommute crashes"""
+    print(f"\n--- TELECOMMUTE CRASH VALIDATION: {filename} ---")
+    
+    emp_subcategories = ['ag', 'art_rec', 'constr', 'eat', 'ed_high', 'ed_k12', 'ed_oth', 'fire', 'gov', 'health',
+                        'hotel', 'info', 'lease', 'logis', 'man_bio', 'man_hvy', 'man_lgt', 'man_tech', 'natres', 
+                        'prof', 'ret_loc', 'ret_reg', 'serv_bus', 'serv_soc', 'transp', 'util']
+    
+    available_emp_cols = [col for col in emp_subcategories if col in df.columns]
+    
+    if not available_emp_cols or 'emp_total' not in df.columns:
+        print("❌ Cannot validate - missing employment columns")
+        return False
+    
+    # Calculate what empTotal would be in the UEC expressions
+    df_temp = df.copy()
+    df_temp['emp_sum_for_validation'] = df_temp[available_emp_cols].sum(axis=1)
+    
+    # Find cases where sum of subcategories > 0 but would cause division by zero
+    # (This is what the UEC expressions calculate as empTotal)
+    problematic = df_temp[df_temp['emp_sum_for_validation'] == 0]
+    has_employment_but_zero_total = df_temp[
+        (df_temp[available_emp_cols] > 0).any(axis=1) & 
+        (df_temp['emp_sum_for_validation'] == 0)
+    ]
+    
+    print(f"MAZs with zero calculated empTotal: {len(problematic):,}")
+    print(f"MAZs with employment but zero total (would crash): {len(has_employment_but_zero_total):,}")
+    
+    # Verify emp_total matches sum of subcategories
+    total_mismatch = abs(df_temp['emp_total'] - df_temp['emp_sum_for_validation']) > 0.01
+    
+    if total_mismatch.sum() == 0:
+        print("✅ PASS: emp_total matches sum of subcategories")
+    else:
+        print(f"❌ FAIL: {total_mismatch.sum():,} MAZs still have emp_total mismatches")
+        return False
+    
+    if len(has_employment_but_zero_total) == 0:
+        print("✅ PASS: No MAZs would cause ExplicitTelecommute division by zero crashes")
+        return True
+    else:
+        print(f"❌ FAIL: {len(has_employment_but_zero_total):,} MAZs would still cause crashes")
+        return False
+
+def check_density_consistency(df, filename):
+    """Check density field consistency"""
+    print(f"\n--- DENSITY CONSISTENCY CHECK: {filename} ---")
+    
+    density_issues = 0
+    
+    # Check EmpDen >= RetEmpDen
+    if 'EmpDen' in df.columns and 'RetEmpDen' in df.columns:
+        invalid_density = df['EmpDen'] < df['RetEmpDen']
+        n_invalid = invalid_density.sum()
+        
+        print(f"EmpDen < RetEmpDen violations: {n_invalid:,} / {len(df):,} ({100*n_invalid/len(df):.2f}%)")
+        
+        if n_invalid > 0:
+            print("⚠️ WARNING: Employment density less than retail employment density found")
+            invalid_df = df[invalid_density].copy()
+            invalid_df['density_diff'] = invalid_df['EmpDen'] - invalid_df['RetEmpDen']
+            
+            maz_col = 'MAZ' if 'MAZ' in invalid_df.columns else 'maz'
+            cols_to_show = [maz_col, 'EmpDen', 'RetEmpDen', 'density_diff'] if maz_col in invalid_df.columns else ['EmpDen', 'RetEmpDen', 'density_diff']
+            
+            print("Top 5 worst violations (most negative EmpDen - RetEmpDen):")
+            print(invalid_df.nsmallest(5, 'density_diff')[cols_to_show])
+            
+            density_issues += n_invalid
+    else:
+        print("EmpDen and/or RetEmpDen columns not found - skipping density consistency check")
+    
+    return density_issues
+
 # This is how we are supposed to do this: https://github.com/BayAreaMetro/travel-model-two/blob/master/model-files/scripts/preprocess/createMazDensityFile.py
 
 import os
 import pandas as pd
 
 # Paths to files
-TARGET_DIR = r"C:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-test\landuse"
+TARGET_DIR = r"E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-test\landuse"
 JOBS_FILE = os.path.join(TARGET_DIR, "jobs_maz_2023_v1.csv")
 MAZ_DATA_FILE = os.path.join(TARGET_DIR, "maz_data.csv")
 MAZ_DENSITY_FILE = os.path.join(TARGET_DIR, "maz_data_withDensity.csv")
@@ -132,18 +276,16 @@ def merge_and_update():
                         'hotel', 'info', 'lease', 'logis', 'man_bio', 'man_hvy', 'man_lgt', 'man_tech', 'natres', 
                         'prof', 'ret_loc', 'ret_reg', 'serv_bus', 'serv_soc', 'transp', 'util']
     
-    # Check which employment columns are actually present
-    available_emp_cols = [col for col in emp_subcategories if col in maz_data_merged.columns]
-    if available_emp_cols:
-        old_total = maz_data_merged['emp_total'].sum()
-        maz_data_merged['emp_total'] = maz_data_merged[available_emp_cols].sum(axis=1)
-        new_total = maz_data_merged['emp_total'].sum()
-        print(f"✅ Recalculated emp_total for maz_data: {old_total:,.0f} -> {new_total:,.0f} ({len(available_emp_cols)} categories)")
-    else:
-        print("⚠️ No employment subcategories found for emp_total recalculation in maz_data")
+    # Check and fix employment consistency for maz_data
+    maz_data_merged, mismatch_count, critical_count = check_employment_consistency(
+        maz_data_merged, "maz_data.csv", emp_subcategories
+    )
 
     # Save updated file
     maz_data_merged.to_csv(OUTPUT_MAZ_DATA, index=False)
+    
+    # Validate the fix worked for maz_data
+    maz_data_validation = validate_telecommute_safety(maz_data_merged, "maz_data.csv")
 
     # --- Update maz_data_withDensity.csv ---
     print("\nmaz_density columns before merge:", list(maz_density.columns))
@@ -226,15 +368,10 @@ def merge_and_update():
                         'hotel', 'info', 'lease', 'logis', 'man_bio', 'man_hvy', 'man_lgt', 'man_tech', 'natres', 
                         'prof', 'ret_loc', 'ret_reg', 'serv_bus', 'serv_soc', 'transp', 'util']
     
-    # Check which employment columns are actually present
-    available_emp_cols = [col for col in emp_subcategories if col in maz_density_merged.columns]
-    if available_emp_cols:
-        old_total = maz_density_merged['emp_total'].sum()
-        maz_density_merged['emp_total'] = maz_density_merged[available_emp_cols].sum(axis=1)
-        new_total = maz_density_merged['emp_total'].sum()
-        print(f"✅ Recalculated emp_total for maz_density: {old_total:,.0f} -> {new_total:,.0f} ({len(available_emp_cols)} categories)")
-    else:
-        print("⚠️ No employment subcategories found for emp_total recalculation in maz_density")
+    # Check and fix employment consistency for maz_data_withDensity
+    maz_density_merged, density_mismatch_count, density_critical_count = check_employment_consistency(
+        maz_density_merged, "maz_data_withDensity.csv", emp_subcategories
+    )
 
 
 
@@ -249,6 +386,9 @@ def merge_and_update():
     # Calculate PopEmpDenPerMi = (POP+emp_total)/(10*ACRES*sq_mi_acre)
     if all(col in maz_density_merged.columns for col in ["POP", "emp_total", "ACRES"]):
         maz_density_merged["PopEmpDenPerMi"] = (maz_density_merged["POP"] + maz_density_merged["emp_total"]) / maz_density_merged["ACRES"].replace(0, pd.NA)
+
+    # Check density consistency BEFORE calculating bins
+    density_issues = check_density_consistency(maz_density_merged, "maz_data_withDensity.csv")
 
     # Define empdenbin: [0-10)=1, [10-30)=2, 30+=3
     if "EmpDen" in maz_density_merged.columns:
@@ -379,6 +519,38 @@ def merge_and_update():
 
     # Save updated file
     maz_density_merged.to_csv(OUTPUT_MAZ_DENSITY, index=False)
+    
+    # Validate the fix worked for maz_data_withDensity
+    density_validation = validate_telecommute_safety(maz_density_merged, "maz_data_withDensity.csv")
+    
+    # Final summary of all fixes and issues
+    print(f"\n{'='*60}")
+    print("FINAL SUMMARY - DATA QUALITY FIXES")
+    print(f"{'='*60}")
+    print(f"maz_data.csv:")
+    print(f"  - Employment mismatches fixed: {mismatch_count:,}")
+    print(f"  - Critical zero-total cases fixed: {critical_count:,}")
+    print(f"  - Validation passed: {'✅ YES' if maz_data_validation else '❌ NO'}")
+    print(f"maz_data_withDensity.csv:")  
+    print(f"  - Employment mismatches fixed: {density_mismatch_count:,}")
+    print(f"  - Critical zero-total cases fixed: {density_critical_count:,}")
+    print(f"  - Density consistency issues: {density_issues:,}")
+    print(f"  - Validation passed: {'✅ YES' if density_validation else '❌ NO'}")
+    
+    total_critical_fixes = critical_count + density_critical_count
+    if total_critical_fixes > 0:
+        print(f"\n🎯 CRITICAL: Fixed {total_critical_fixes:,} MAZs that would have caused ExplicitTelecommute crashes")
+        print("   (emp_total=0 but employment subcategories>0 causing division by zero)")
+    else:
+        print(f"\n✅ No critical ExplicitTelecommute crash-causing issues found")
+    
+    overall_success = maz_data_validation and density_validation
+    if overall_success:
+        print(f"\n🎉 SUCCESS: All employment data consistency issues resolved!")
+        print("   ExplicitTelecommute model should no longer crash on these households.")
+    else:
+        print(f"\n⚠️ WARNING: Some validation checks failed - review output above")
+    
     print('TO DO: Figure out what IntDenBin is, and update.')
 
 def rename_final_files():
@@ -432,7 +604,7 @@ def copy_files_to_box():
     source_dir = Path(TARGET_DIR)
     
     # Destination: Box location for TM2 model (same as source in this case, but keeping for clarity)
-    dest_dir = Path(r'C:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-test\landuse')
+    dest_dir = Path(r'E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-test\landuse')
     
     # Files to copy
     files_to_copy = [
