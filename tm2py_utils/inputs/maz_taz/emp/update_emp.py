@@ -99,9 +99,10 @@ def validate_telecommute_safety(df, filename):
     """Validate that the data won't cause ExplicitTelecommute crashes"""
     print(f"\n--- TELECOMMUTE CRASH VALIDATION: {filename} ---")
     
+    # CRITICAL FIX: Include serv_pers instead of serv_per to match UEC expressions
     emp_subcategories = ['ag', 'art_rec', 'constr', 'eat', 'ed_high', 'ed_k12', 'ed_oth', 'fire', 'gov', 'health',
                         'hotel', 'info', 'lease', 'logis', 'man_bio', 'man_hvy', 'man_lgt', 'man_tech', 'natres', 
-                        'prof', 'ret_loc', 'ret_reg', 'serv_bus', 'serv_soc', 'transp', 'util']
+                        'prof', 'ret_loc', 'ret_reg', 'serv_bus', 'serv_pers', 'serv_soc', 'transp', 'util']
     
     available_emp_cols = [col for col in emp_subcategories if col in df.columns]
     
@@ -272,9 +273,10 @@ def merge_and_update():
             print(f"✅ Added coordinates to maz_data ({missing_coords} MAZs marked with -1 for missing coords)")
 
     # Recalculate emp_total to match sum of employment subcategories
+    # CRITICAL FIX: Include serv_pers instead of serv_per to match UEC expressions and prevent crashes
     emp_subcategories = ['ag', 'art_rec', 'constr', 'eat', 'ed_high', 'ed_k12', 'ed_oth', 'fire', 'gov', 'health',
                         'hotel', 'info', 'lease', 'logis', 'man_bio', 'man_hvy', 'man_lgt', 'man_tech', 'natres', 
-                        'prof', 'ret_loc', 'ret_reg', 'serv_bus', 'serv_soc', 'transp', 'util']
+                        'prof', 'ret_loc', 'ret_reg', 'serv_bus', 'serv_pers', 'serv_soc', 'transp', 'util']
     
     # Check and fix employment consistency for maz_data
     maz_data_merged, mismatch_count, critical_count = check_employment_consistency(
@@ -364,9 +366,10 @@ def merge_and_update():
     print(f"After employment column cleanup: {len(maz_density_merged.columns)} columns")
 
     # Recalculate emp_total to match sum of employment subcategories
+    # CRITICAL FIX: Include serv_pers instead of serv_per to match UEC expressions and prevent crashes
     emp_subcategories = ['ag', 'art_rec', 'constr', 'eat', 'ed_high', 'ed_k12', 'ed_oth', 'fire', 'gov', 'health',
                         'hotel', 'info', 'lease', 'logis', 'man_bio', 'man_hvy', 'man_lgt', 'man_tech', 'natres', 
-                        'prof', 'ret_loc', 'ret_reg', 'serv_bus', 'serv_soc', 'transp', 'util']
+                        'prof', 'ret_loc', 'ret_reg', 'serv_bus', 'serv_pers', 'serv_soc', 'transp', 'util']
     
     # Check and fix employment consistency for maz_data_withDensity
     maz_density_merged, density_mismatch_count, density_critical_count = check_employment_consistency(

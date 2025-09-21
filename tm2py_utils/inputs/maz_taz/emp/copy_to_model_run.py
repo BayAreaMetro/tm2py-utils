@@ -110,10 +110,11 @@ def verify_employment_fixes():
         if maz_data_path.exists():
             df = pd.read_csv(maz_data_path)
             
-            # Check for employment consistency
+            # Check for employment consistency using the CORRECT employment subcategories
+            # CRITICAL: Include serv_pers instead of serv_per to match UEC expressions
             emp_cols = ['ag', 'art_rec', 'constr', 'eat', 'ed_high', 'ed_k12', 'ed_oth', 'fire', 'gov', 'health',
                        'hotel', 'info', 'lease', 'logis', 'man_bio', 'man_hvy', 'man_lgt', 'man_tech', 'natres', 
-                       'prof', 'ret_loc', 'ret_reg', 'serv_bus', 'serv_soc', 'transp', 'util']
+                       'prof', 'ret_loc', 'ret_reg', 'serv_bus', 'serv_pers', 'serv_soc', 'transp', 'util']
             
             available_emp_cols = [col for col in emp_cols if col in df.columns]
             
