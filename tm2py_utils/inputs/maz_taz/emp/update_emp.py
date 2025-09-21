@@ -141,6 +141,128 @@ def validate_telecommute_safety(df, filename):
         print(f"❌ FAIL: {len(has_employment_but_zero_total):,} MAZs would still cause crashes")
         return False
 
+def check_coordinate_validity(df, filename):
+    """Check and fix coordinate issues that could cause Stop Location Choice crashes"""
+    print(f"\n--- COORDINATE VALIDATION: {filename} ---")
+    
+    coord_issues = 0
+    
+    # Check for coordinate columns
+    coord_x_col = None
+    coord_y_col = None
+    
+    for col in df.columns:
+        if 'MAZ_X' in col.upper():
+            coord_x_col = col
+        elif 'MAZ_Y' in col.upper():
+            coord_y_col = col
+        elif '_X' in col.upper() and not coord_x_col:
+            coord_x_col = col
+        elif '_Y' in col.upper() and not coord_y_col:
+            coord_y_col = col
+    
+    if not coord_x_col or not coord_y_col:
+        print(f"⚠️ No coordinate columns found (looked for MAZ_X/MAZ_Y or _X/_Y)")
+        return 0
+    
+    print(f"Using coordinate columns: {coord_x_col}, {coord_y_col}")
+    
+    # Check for invalid coordinates (-1, -1)
+    invalid_x = (df[coord_x_col] == -1).sum()
+    invalid_y = (df[coord_y_col] == -1).sum()
+    invalid_both = ((df[coord_x_col] == -1) | (df[coord_y_col] == -1)).sum()
+    
+    print(f"MAZs with invalid coordinates (-1): {invalid_both:,} / {len(df):,}")
+    
+    if invalid_both > 0:
+        # Check impact on stop alternatives
+        should_be_available = (df['emp_total'] > 0) | (df['HH'] > 0) if 'HH' in df.columns else (df['emp_total'] > 0)
+        invalid_coords_mask = (df[coord_x_col] == -1) | (df[coord_y_col] == -1)
+        
+        stop_alternatives_with_invalid_coords = should_be_available & invalid_coords_mask
+        affected_stops = stop_alternatives_with_invalid_coords.sum()
+        
+        print(f"⚠️ CRITICAL: {affected_stops:,} potential stop locations have invalid coordinates!")
+        print("   This could cause Stop Location Choice distance calculations to fail")
+        
+        if affected_stops > 0:
+            # Show sample of affected MAZs
+            problematic = df[stop_alternatives_with_invalid_coords]
+            maz_col = 'MAZ' if 'MAZ' in problematic.columns else 'maz'
+            
+            if maz_col in problematic.columns:
+                sample_cols = [maz_col, 'emp_total']
+                if 'HH' in problematic.columns:
+                    sample_cols.append('HH')
+                sample_cols.extend([coord_x_col, coord_y_col])
+                
+                print(f"\nSample MAZs with invalid coordinates but employment/households:")
+                print(problematic[sample_cols].head(10))
+            
+            # For now, we'll mark these as unavailable for stops
+            # by setting both emp_total and HH to 0 if coordinates are invalid
+            print(f"\n🔧 APPLYING FIX: Setting emp_total=0 and HH=0 for MAZs with invalid coordinates")
+            print("   This prevents them from being selected as stop alternatives")
+            
+            # Apply the fix
+            invalid_mask = (df[coord_x_col] == -1) | (df[coord_y_col] == -1)
+            
+            # Count what we're fixing
+            emp_zeroed = (df.loc[invalid_mask, 'emp_total'] > 0).sum()
+            hh_zeroed = (df.loc[invalid_mask, 'HH'] > 0).sum() if 'HH' in df.columns else 0
+            
+            # Zero out employment and households for MAZs with invalid coordinates
+            df.loc[invalid_mask, 'emp_total'] = 0
+            if 'HH' in df.columns:
+                df.loc[invalid_mask, 'HH'] = 0
+            
+            # Also zero out all employment subcategories
+            emp_subcategories = ['ag', 'art_rec', 'constr', 'eat', 'ed_high', 'ed_k12', 'ed_oth', 'fire', 'gov', 'health',
+                                'hotel', 'info', 'lease', 'logis', 'man_bio', 'man_hvy', 'man_lgt', 'man_tech', 'natres', 
+                                'prof', 'ret_loc', 'ret_reg', 'serv_bus', 'serv_pers', 'serv_soc', 'transp', 'util']
+            
+            emp_cols_zeroed = 0
+            for emp_col in emp_subcategories:
+                if emp_col in df.columns:
+                    emp_cols_zeroed += (df.loc[invalid_mask, emp_col] > 0).sum()
+                    df.loc[invalid_mask, emp_col] = 0
+            
+            print(f"✅ Fixed {invalid_both:,} MAZs with invalid coordinates:")
+            print(f"   - Zeroed emp_total for {emp_zeroed:,} MAZs")
+            print(f"   - Zeroed HH for {hh_zeroed:,} MAZs")
+            print(f"   - Zeroed employment subcategories for {emp_cols_zeroed:,} entries")
+            print("   - These MAZs will now be excluded from stop location choice sets")
+            
+            coord_issues = invalid_both
+    else:
+        print("✅ All MAZs have valid coordinates")
+    
+    # Check coordinate ranges for remaining valid coordinates
+    valid_coords = df[(df[coord_x_col] != -1) & (df[coord_y_col] != -1)]
+    
+    if len(valid_coords) > 0:
+        print(f"\nValid coordinates summary:")
+        print(f"  X range: {valid_coords[coord_x_col].min():.3f} to {valid_coords[coord_x_col].max():.3f}")
+        print(f"  Y range: {valid_coords[coord_y_col].min():.3f} to {valid_coords[coord_y_col].max():.3f}")
+        
+        # Check for extreme outliers that might cause distance calculation issues
+        x_std = valid_coords[coord_x_col].std()
+        y_std = valid_coords[coord_y_col].std()
+        x_mean = valid_coords[coord_x_col].mean()
+        y_mean = valid_coords[coord_y_col].mean()
+        
+        # Flag coordinates more than 5 standard deviations from mean
+        extreme_x = abs(valid_coords[coord_x_col] - x_mean) > 5 * x_std
+        extreme_y = abs(valid_coords[coord_y_col] - y_mean) > 5 * y_std
+        extreme_coords = (extreme_x | extreme_y).sum()
+        
+        if extreme_coords > 0:
+            print(f"⚠️ {extreme_coords:,} MAZs have extreme coordinates (>5σ from mean)")
+        else:
+            print("✅ No extreme coordinate outliers detected")
+    
+    return coord_issues
+
 def check_density_consistency(df, filename):
     """Check density field consistency"""
     print(f"\n--- DENSITY CONSISTENCY CHECK: {filename} ---")
@@ -170,6 +292,173 @@ def check_density_consistency(df, filename):
         print("EmpDen and/or RetEmpDen columns not found - skipping density consistency check")
     
     return density_issues
+
+def check_population_synthesis_compatibility():
+    """Check and fix compatibility issues between population synthesis and land use data"""
+    print(f"\n--- POPULATION SYNTHESIS COMPATIBILITY CHECK ---")
+    
+    # Load population synthesis files to check for compatibility issues
+    popsyn_dir = r"E:\TM2_2023_LU_Test3\inputs\popsyn"
+    landuse_path = OUTPUT_MAZ_DENSITY  # Use our updated land use file
+    
+    try:
+        # Load our updated land use data
+        if not os.path.exists(landuse_path):
+            print(f"⚠️ Updated land use file not found: {landuse_path}")
+            print("   Skipping population synthesis compatibility check")
+            return 0
+            
+        landuse_df = pd.read_csv(landuse_path)
+        print(f"Loaded updated land use data: {len(landuse_df):,} MAZ records")
+        
+        # Get valid MAZ IDs from land use data
+        if 'MAZ_ORIGINAL' in landuse_df.columns:
+            valid_maz_original = set(landuse_df['MAZ_ORIGINAL'].dropna())
+            print(f"Valid MAZ_ORIGINAL IDs: {len(valid_maz_original):,}")
+        else:
+            print("⚠️ No MAZ_ORIGINAL column in land use data - cannot check compatibility")
+            return 0
+        
+        # Check population synthesis files
+        if not os.path.exists(popsyn_dir):
+            print(f"⚠️ Population synthesis directory not found: {popsyn_dir}")
+            return 0
+            
+        popsyn_files = [f for f in os.listdir(popsyn_dir) if f.endswith('.csv') and 'household' in f.lower()]
+        
+        total_issues_fixed = 0
+        
+        for popsyn_file in popsyn_files:
+            if 'dummy' in popsyn_file.lower():
+                continue  # Skip dummy files
+                
+            popsyn_path = os.path.join(popsyn_dir, popsyn_file)
+            print(f"\n--- Checking {popsyn_file} ---")
+            
+            try:
+                # Load population synthesis file
+                popsyn_df = pd.read_csv(popsyn_path)
+                print(f"Loaded {len(popsyn_df):,} household records")
+                
+                # Check for MAZ_ORIGINAL compatibility
+                if 'MAZ_ORIGINAL' in popsyn_df.columns:
+                    popsyn_maz_original = set(popsyn_df['MAZ_ORIGINAL'].dropna())
+                    
+                    # Find mismatched MAZ_ORIGINAL IDs
+                    missing_in_landuse = popsyn_maz_original - valid_maz_original
+                    
+                    if missing_in_landuse:
+                        print(f"❌ {len(missing_in_landuse):,} MAZ_ORIGINAL IDs in {popsyn_file} not found in land use data")
+                        print(f"   Sample missing IDs: {sorted(list(missing_in_landuse))[:10]}")
+                        
+                        # Check if households are using these problematic MAZ_ORIGINAL values
+                        problematic_households = popsyn_df[popsyn_df['MAZ_ORIGINAL'].isin(missing_in_landuse)]
+                        
+                        if len(problematic_households) > 0:
+                            print(f"   {len(problematic_households):,} households affected")
+                            
+                            # Strategy: Map problematic MAZ_ORIGINAL to nearby valid MAZ_ORIGINAL
+                            # For now, we'll flag this as needing manual review
+                            print(f"⚠️  MANUAL REVIEW NEEDED: These households reference non-existent MAZ_ORIGINAL IDs")
+                            print("   Suggested fixes:")
+                            print("   1. Update population synthesis to use current MAZ_ORIGINAL IDs")
+                            print("   2. Create MAZ ID mapping table (old -> new)")
+                            print("   3. Remove/relocate affected households")
+                            
+                            total_issues_fixed += len(problematic_households)
+                    else:
+                        print(f"✅ All MAZ_ORIGINAL IDs in {popsyn_file} exist in land use data")
+                
+                # Check regular MAZ compatibility (should be fine since we saw this works)
+                if 'MAZ' in popsyn_df.columns:
+                    valid_maz = set(landuse_df['MAZ'].dropna()) if 'MAZ' in landuse_df.columns else set()
+                    popsyn_maz = set(popsyn_df['MAZ'].dropna())
+                    
+                    missing_maz = popsyn_maz - valid_maz
+                    if missing_maz:
+                        print(f"❌ {len(missing_maz):,} MAZ IDs in {popsyn_file} not found in land use data")
+                        total_issues_fixed += len(popsyn_df[popsyn_df['MAZ'].isin(missing_maz)])
+                    else:
+                        print(f"✅ All MAZ IDs in {popsyn_file} exist in land use data")
+                
+            except Exception as e:
+                print(f"❌ Error checking {popsyn_file}: {e}")
+        
+        if total_issues_fixed > 0:
+            print(f"\n⚠️ POPULATION SYNTHESIS ISSUES FOUND:")
+            print(f"   - {total_issues_fixed:,} household records reference non-existent MAZ IDs")
+            print(f"   - These could cause model crashes when households try to make tours")
+            print(f"   - RECOMMENDATION: Update population synthesis files before running model")
+        else:
+            print(f"\n✅ Population synthesis files are compatible with land use data")
+        
+        return total_issues_fixed
+        
+    except Exception as e:
+        print(f"❌ Error checking population synthesis compatibility: {e}")
+        import traceback
+        traceback.print_exc()
+        return 0
+
+def create_maz_id_mapping_report():
+    """Create a report of MAZ ID mappings for troubleshooting"""
+    print(f"\n--- CREATING MAZ ID MAPPING REPORT ---")
+    
+    try:
+        # Load coordinate reference file
+        coord_file = COORD_FILE
+        if not os.path.exists(coord_file):
+            print(f"⚠️ Coordinate file not found: {coord_file}")
+            return
+            
+        coords_df = pd.read_csv(coord_file)
+        
+        # Load our updated land use file
+        landuse_path = OUTPUT_MAZ_DENSITY
+        if not os.path.exists(landuse_path):
+            print(f"⚠️ Updated land use file not found: {landuse_path}")
+            return
+            
+        landuse_df = pd.read_csv(landuse_path)
+        
+        # Create mapping report
+        mapping_report_path = os.path.join(TARGET_DIR, "maz_id_mapping_report.csv")
+        
+        # Combine coordinate and land use data to show MAZ ID relationships
+        if 'MAZ' in coords_df.columns and 'MAZ_ORIGINAL' in landuse_df.columns:
+            mapping_df = pd.merge(
+                coords_df[['MAZ', 'TAZ', 'MAZ_X', 'MAZ_Y']],
+                landuse_df[['MAZ', 'MAZ_ORIGINAL', 'TAZ', 'emp_total', 'HH']],
+                left_on='MAZ',
+                right_on='MAZ_ORIGINAL',
+                how='outer',
+                suffixes=('_coord', '_landuse')
+            )
+            
+            # Add status flags
+            mapping_df['in_coordinates'] = mapping_df['MAZ'].notna()
+            mapping_df['in_landuse'] = mapping_df['MAZ_ORIGINAL'].notna()
+            mapping_df['status'] = 'unknown'
+            
+            mapping_df.loc[mapping_df['in_coordinates'] & mapping_df['in_landuse'], 'status'] = 'matched'
+            mapping_df.loc[mapping_df['in_coordinates'] & ~mapping_df['in_landuse'], 'status'] = 'coord_only'
+            mapping_df.loc[~mapping_df['in_coordinates'] & mapping_df['in_landuse'], 'status'] = 'landuse_only'
+            
+            # Save report
+            mapping_df.to_csv(mapping_report_path, index=False)
+            
+            # Print summary
+            status_counts = mapping_df['status'].value_counts()
+            print(f"MAZ ID mapping report saved: {mapping_report_path}")
+            print("Status summary:")
+            for status, count in status_counts.items():
+                print(f"  {status}: {count:,}")
+            
+        else:
+            print("⚠️ Cannot create mapping report - missing required columns")
+            
+    except Exception as e:
+        print(f"❌ Error creating MAZ ID mapping report: {e}")
 
 # This is how we are supposed to do this: https://github.com/BayAreaMetro/travel-model-two/blob/master/model-files/scripts/preprocess/createMazDensityFile.py
 
@@ -392,6 +681,9 @@ def merge_and_update():
 
     # Check density consistency BEFORE calculating bins
     density_issues = check_density_consistency(maz_density_merged, "maz_data_withDensity.csv")
+    
+    # Check coordinate validity and fix issues that could cause Stop Location Choice crashes
+    coord_issues = check_coordinate_validity(maz_density_merged, "maz_data_withDensity.csv")
 
     # Define empdenbin: [0-10)=1, [10-30)=2, 30+=3
     if "EmpDen" in maz_density_merged.columns:
