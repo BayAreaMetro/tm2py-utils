@@ -9,8 +9,17 @@ def print_column_summary(jobs, maz_data, maz_density):
     print(f"maz_data_withDensity.csv columns: {sorted(maz_density_cols)}")
 
     # Columns in all three
-    all_three = jobs_cols & maz_data_cols & maz_density_cols
-    print(f"\nColumns in ALL THREE files: {sorted(all_three)}")
+    all_three = jobs_cols & maz_data_cols & maz_density_cols    # Fix serv_per -> serv_pers column naming issue
+    print("\n=== FIXING EMPLOYMENT COLUMN NAMING ===")
+    if 'serv_per' in jobs.columns:
+        print("✅ Found serv_per column - copying to serv_pers and dropping serv_per")
+        jobs['serv_pers'] = jobs['serv_per']
+        jobs = jobs.drop(columns=['serv_per'])
+        print("✅ serv_pers now contains serv_per data, serv_per column dropped")
+    elif 'serv_pers' in jobs.columns:
+        print("✅ serv_pers column already exists (no serv_per found)")
+    else:
+        print("⚠️ Neither serv_per nor serv_pers found in jobs data")(f"\nColumns in ALL THREE files: {sorted(all_three)}")
 
     # Pairwise intersections
     jobs_maz_data = jobs_cols & maz_data_cols
@@ -508,6 +517,23 @@ def merge_and_update():
     else:
         print(f"\nLoaded coordinate data: {len(coords)} rows")
         print(f"Coordinate file columns: {sorted(coords.columns)}")
+
+    # Fix serv_per -> serv_pers column naming issue
+    print("\n=== FIXING EMPLOYMENT COLUMN NAMING ===")
+    if 'serv_per' in jobs.columns and 'serv_pers' not in jobs.columns:
+        print("✅ Copying serv_per data to serv_pers column")
+        jobs['serv_pers'] = jobs['serv_per']
+        jobs = jobs.drop(columns=['serv_per'])
+        print("✅ Dropped serv_per column")
+    elif 'serv_per' in jobs.columns and 'serv_pers' in jobs.columns:
+        print("⚠️  Both serv_per and serv_pers exist - merging data")
+        jobs['serv_pers'] = jobs['serv_pers'] + jobs['serv_per']
+        jobs = jobs.drop(columns=['serv_per'])
+        print("✅ Merged serv_per into serv_pers and dropped serv_per")
+    elif 'serv_pers' in jobs.columns:
+        print("✅ serv_pers column already exists correctly")
+    else:
+        print("⚠️  Neither serv_per nor serv_pers found in jobs data")
 
     # Identify job columns to merge (all except maz)
     job_cols = [col for col in jobs.columns if col != JOBS_MAZ_COL]
