@@ -3,7 +3,7 @@
 ####################################
 
 [scenario]
-    name = "2023-tm22-dev-test"
+    name = "2023-tm22-dev-version-05"
     year = 2023
     verify = false
     maz_landuse_file = "inputs/landuse/maz_data.csv"

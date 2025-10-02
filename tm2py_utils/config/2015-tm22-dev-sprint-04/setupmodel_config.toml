@@ -12,7 +12,7 @@
 # location of the networks support files
 # this includes file such as tolls, transit fares etc.
 # Box: https://mtcdrive.box.com/s/6jf6duborg00d5uqftu35iiynpuzpkbj
-INPUT_NETWORK_DIR = "E:/Box/Modeling and Surveys/Development/Travel Model Two Conversion/Model Inputs/2023-tm22-dev-test"
+INPUT_NETWORK_DIR = "E:/Box/Modeling and Surveys/Development/Travel Model Two Conversion/Model Inputs/2015-tm22-dev-sprint-03"
 
 # this is the location/folder for Emme Netorks (built from Lasso) 
 # Box: https://mtcdrive.box.com/s/rs84fqlzkpidn1cdxruucy70500seye5
@@ -20,7 +20,7 @@ INPUT_EMME_NETWORK_DIR = "E:/Box/Modeling and Surveys/Development/Travel Model T
 
 # location of the populationsim and land use inputs
 # Box: https://mtcdrive.box.com/s/6jf6duborg00d5uqftu35iiynpuzpkbj
-INPUT_POPLU_DIR = "E:/Box/Modeling and Surveys/Development/Travel Model Two Conversion/Model Inputs/2023-tm22-dev-test"
+INPUT_POPLU_DIR = "E:/Box/Modeling and Surveys/Development/Travel Model Two Conversion/Model Inputs/2015-tm22-dev-sprint-03"
 
 # location of nonres inputs
 # Box: https://mtcdrive.box.com/s/6jf6duborg00d5uqftu35iiynpuzpkbj
@@ -35,7 +35,7 @@ WARMSTART_FILES_DIR = "E:/Box/Modeling and Surveys/Development/Travel Model Two 
 EMME_TEMPLATE_PROJECT_DIR = "E:/Box/Modeling and Surveys/Development/Travel Model Two Conversion/Model Inputs/2015-tm22-dev-sprint-03/emme_23_project_template"
 
 # github raw link for toml config files
-CONFIGS_GITHUB_PATH = "https://raw.githubusercontent.com/BayAreaMetro/tm2py-utils/refs/heads/main/tm2py_utils/config/2023-tm22-dev-test"
+CONFIGS_GITHUB_PATH = "https://raw.githubusercontent.com/BayAreaMetro/tm2py-utils/refs/heads/main/tm2py_utils/config/develop"
 
 # travel model two release tag to fetch
 TRAVEL_MODEL_TWO_RELEASE_TAG = "TM2.2.4"
