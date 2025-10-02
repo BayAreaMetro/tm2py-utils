@@ -1,3 +1,9 @@
+# Version history log
+
+2015-tm22-dev-sprint-04, corresponds to v2.2.1.4 tm2py
+* This release contains runtime improvements for transit skimming and assignment, and usability improvements.
+
+2023-tm2-dev-version-05, no release yet - 2023 test version
 
 
 ## Relevant Repositories
