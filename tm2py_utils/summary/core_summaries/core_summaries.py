@@ -1106,7 +1106,7 @@ class SummaryGenerator:
         summary['freq'] = summary['freq']/self.config.sampleshare
 
         # Save results
-        output_file = self.config.results_dir/'TripSummaryByMode.csv'
+        output_file = self.config.results_dir/'TripSummaryByModePurpose.csv'
         summary.to_csv(output_file, index = False)
     
       
