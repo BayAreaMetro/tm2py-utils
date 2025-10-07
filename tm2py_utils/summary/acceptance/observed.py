@@ -612,7 +612,9 @@ class Observed:
         # project to coordinate system appropriate for Northern California and create centroids
         tract_gdf['centroid_geometry'] = tract_gdf.to_crs(EPSG_NAD83_UTM_ZONE_10M).centroid
         # drop original geometry and keep centroid geometry instead
-        tract_gdf.set_geometry(col="centroid_geometry", drop=True, inplace=True)
+        tract_gdf.set_geometry(col="centroid_geometry", inplace=True)
+        tract_gdf.drop(columns="geometry", inplace=True)
+
         # back to lat/long
         tract_gdf = tract_gdf.to_crs(EPSG_WGS84)
         self.census_tract_centroids_gdf = tract_gdf.rename(columns={"centroid_geometry":"geometry"})
