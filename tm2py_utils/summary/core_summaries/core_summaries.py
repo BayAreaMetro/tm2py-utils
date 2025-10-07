@@ -7,19 +7,21 @@ import pickle
 from typing import Dict, List, Tuple, Optional
 import openmatrix as omx
 import itertools
+from pydantic import BaseModel, Field
 
 ## TODO: Add logging
 ## TODO: Potentially move this to .toml configuration? Or reference .toml file
 
 # TM2 Test Directory
-TARGET_DIR = 'E:/TM2/2015_TM2_20250619'
+#TARGET_DIR = "E:/TM2/2015_TM2_20250619"
+TARGET_DIR = "E:/Box/Modeling and Surveys/Development/Travel Model Two Conversion/Model Outputs/2015-tm22-dev-sprint-04"
 #TARGET_DIR = 'V:/Projects/2050_TM161_FBP_Plan_16'
 ITER = 3
 #SAMPLESHARE = 0.1
 
 class Config:
     """Configuration class for model parameters and paths."""
-
+    ## TODO: These will most likely change for TM2
 
     def __init__(self):
         # Environment variables
@@ -147,13 +149,22 @@ class LookupTables:
             'autoSuff_label': ['Zero automobiles', 'Automobiles < workers', 'Automobiles >= workers']
         })
 
+        # Trip and Tour Modes
+        self.tripMode = pd.DataFrame(
+            {'code': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+             'mode': ['DRIVEALONEFREE' , 'DRIVEALONEPAY', 'SHARED2GP' , 'SHARED2HOV' , 'SHARED2PAY' , 'SHARED3GP' , 
+                      'SHARED3HOV' , 'SHARED3PAY' , 'WALK' , 'BIKE' , 'WALK_SET' , 'PNR_SET' , 'KNR_PERS' , 
+                      'KNR_TNC' , 'TAXI' , 'TNC', 'SCHBUS'] 
+             }
+        )
+
         #Transit Modes
         self.transitMode = pd.DataFrame({
             'mode': ['LOC', 'EXP', 'LTR', 'FRY', 'HVY', 'COM'],
             'mode_label': ['Local Bus', 'Express Bus', 'Light Rail', 'Ferry', 'Heavy Rail', 'Commuter Rail']
         })
 
-## This seems mostly for landuse/household/person data reading
+
 class DataReader:
     """Class for reading and processing input data files.
     
@@ -182,8 +193,8 @@ class DataReader:
         # taz_data.rename(columns={'ZONE': 'taz'}, inplace=True)
 
         ## TM2
-        maz_file = Path(self.config.target_dir) / "inputs" / "landuse" / "maz_data.csv"
-        maz_data = pd.read_csv(maz_file, usecols = ['MAZ_ORIGINAL', 'TAZ_ORIGINAL', 'CountyID', 'DistID', 'hparkcost'])
+        maz_file = Path(self.config.target_dir) / "inputs" / "landuse" / "maz_data_withDensity.csv"
+        maz_data = pd.read_csv(maz_file, usecols = ['MAZ', 'TAZ','MAZ_ORIGINAL', 'TAZ_ORIGINAL', 'CountyID', 'DistID', 'hparkcost'])
 
         ## TODO: What parking data do we want to include
         #maz_data = maz_data[['MAZ_ORIGINAL', 'TAZ_ORIGINAL', 'CountyID', 'DistID', 'hparkcost']]
@@ -317,21 +328,25 @@ class DataReader:
         return households          
     
     ## TODO: Update for TM2
-    def combine_tours(self, households: pd.DataFrame) -> pd.DataFrame:
+    def combine_tours(self, households: pd.DataFrame, landuse: pd.DataFrame) -> pd.DataFrame:
         """Combine joint and individual tours into a single DataFrame."""
         jointTours = self._read_tours('Joint')
         indivTours = self._read_tours('Indiv')
         jointTours = jointTours.drop(columns = ['tour_composition'])
         indivTours = indivTours.drop(columns = ['person_type', 'atWork_freq'])
         tours = pd.concat([jointTours, indivTours], ignore_index=True)
-
+        print(tours.columns)
         # Add Residence Landuse Info
         tours = tours.merge(households[['hh_id', 'ORIG_MAZ', 'ORIG_TAZ', 'CountyID', 'DistID', 'incQ', 'incQ_label']], on='hh_id', how='left')
+        print(tours.columns)
 
         ## TODO: Add CountyID for Destination MAZ
+        tours = tours.merge(landuse[['MAZ', 'TAZ', 'ORIG_MAZ', 'ORIG_TAZ','CountyID', 'DistID']], left_on='dest_mgra', right_on='MAZ', how='left', suffixes= (None, "_dest"))
+
 
         print(f"Combined tours; have {len(tours):,} rows")
         print(tours.columns)
+        tours['tour_mode_label'] = tours['tour_mode'].map(self.lookups.tripMode.set_index('code')['mode'])
         print(tours.head())
         #tours = tours._add_tours_attrs()
         return tours
@@ -394,6 +409,8 @@ class DataReader:
         joint_person_trips = self._get_joint_persons_trips(joint_trip, persons)
 
         combined = pd.concat([joint_person_trips, indiv_trip], ignore_index=True)
+        combined['trip_mode_label'] = combined['trip_mode'].map(self.lookups.tripMode.set_index('code')['mode'])
+
         print(f"Combined individual trips with joint person trips to make {len(combined):,} rows")
         print(combined.head())
         return combined
@@ -410,6 +427,7 @@ class DataReader:
 
         if IndivJoint == 'Indiv':
             trip['num_participants'] = 1
+            trip['tour_participants'] = trip['person_num']
 
         print(f"Read {len(trip):,} rows from {trip_file}")
         print(trip.head())
@@ -956,6 +974,7 @@ class SummaryGenerator:
         self.config = config
         self.lookups = lookups
     
+    # TODO: Update
     def generate_active_transport_summary(self, trips_by_person: pd.DataFrame) -> None:
         """Generate active transportation summary."""
         # Calculate summary statistics
@@ -984,9 +1003,14 @@ class SummaryGenerator:
         print(f"Wrote {len(summary):,} rows of active_summary")
 
     def generate_activity_pattern_summary(self, persons: pd.DataFrame) -> None:
-        """Generate activity pattern summary."""
-        summary = persons.groupby(['ptype', 'ptype_label', 'activity_pattern', 'imf_choice', 
-                                   'inmf_choice', 'incQ_label']).agg({'person_id':'count'}).reset_index
+        """
+        Generate activity pattern summary.
+
+        Universe: Persons
+        
+        """
+        summary = persons.groupby(['type', 'cdap', 'imf_choice', 
+                                   'inmf_choice', 'incQ', 'incQ_label']).agg({'person_id':'count'}).reset_index()
         
         summary.rename(columns={'person_id': 'freq'}, inplace=True)
         summary['freq'] = summary['freq'] / self.config.sampleshare
@@ -1000,6 +1024,7 @@ class SummaryGenerator:
         
         print(f"Wrote {len(summary):,} rows of activity_pattern_summary")     
     
+    # TODO: Update
     def generate_auto_ownership_summary(self, households: pd.DataFrame) -> None:
         """Generate auto ownership summary."""
         summary = households.groupby([
@@ -1018,6 +1043,7 @@ class SummaryGenerator:
         
         print(f"Wrote {len(summary):,} rows of autoown_summary")
     
+    # TODO: update
     def generate_vmt_summary(self, persons: pd.DataFrame) -> None:
         """Generate vehicle miles traveled summary."""
         summary = persons.groupby([
@@ -1045,70 +1071,34 @@ class SummaryGenerator:
             pickle.dump(summary, f)
         
         print(f"Wrote {len(summary):,} rows of vmt_summary")
-
-    def generate_trips_summary_by_modes(self, trips: pd.DataFrame):
+    
+    def generate_trips_tours_summary(
+            self,
+            df: pd.DataFrame,
+            trip_or_tour: str,
+            group_by: List[str],
+            output_suffix: str,
+    ):
         """
-        Generate trip summaries 
+        Generate trip or tour summaries with flexible groupin
 
         Args:
-        Groupby: Set summarization level (modes, purpose, time of day; defaults to mode)
+            df: Dataframe to summarize (trips or tours)
+            trip_or_tour: String to indicate which universe ('trip' or 'tour')
+            group_by: List of column names to groupby
+            output_suffix: Suffix for output filename (e.g., 'ByMode', 'ByPurpose')
+        
+        Returns:
+            Summary CSV
 
-        Universe: Trips
         """
-        ## Trips Summary (w/o adding skims )
-        ## TODO: ADD SKIMS
-        # Summary by autoSuff, inc, timeCode, trip mode, tour purpose
-
-        summary = trips.groupby(['trip_mode']).agg({'hh_id':'count'}).reset_index()
-        summary.rename(columns = {'hh_id': 'freq'}, inplace = True)
+        summary = df.groupby(group_by).size().reset_index(name = 'freq')
         summary['freq'] = summary['freq']/self.config.sampleshare
+        summary['share'] = (summary['freq'] / summary['freq'].sum())*100
 
         # Save results
-        output_file = self.config.results_dir/'TripSummaryByMode.csv'
-        summary.to_csv(output_file, index = False)
-    
-    def generate_trips_summary_by_purpose(self, trips: pd.DataFrame):
-        """
-        Generate trip summaries 
-
-        Args:
-        Groupby: Set summarization level (modes, purpose, time of day; defaults to mode)
-
-        Universe: Trips
-        """
-        ## Trips Summary (w/o adding skims )
-        ## TODO: ADD SKIMS
-        # Summary by autoSuff, inc, timeCode, trip mode, tour purpose
-
-        summary = trips.groupby(['tour_purpose']).agg({'hh_id':'count'}).reset_index()
-        summary.rename(columns = {'hh_id': 'freq'}, inplace = True)
-        summary['freq'] = summary['freq']/self.config.sampleshare
-
-        # Save results
-        output_file = self.config.results_dir/'TripSummaryByPurpose.csv'
-        summary.to_csv(output_file, index = False)
-    
-    def generate_trips_summary_by_modepurpose(self, trips: pd.DataFrame):
-        """
-        Generate trip summaries 
-
-        Args:
-        Groupby: Set summarization level (modes, purpose, time of day; defaults to mode)
-
-        Universe: Trips
-        """
-        ## Trips Summary (w/o adding skims )
-        ## TODO: ADD SKIMS
-        # Summary by autoSuff, inc, timeCode, trip mode, tour purpose
-
-        summary = trips.groupby(['trip_mode','tour_purpose']).agg({'hh_id':'count'}).reset_index()
-        summary.rename(columns = {'hh_id': 'freq'}, inplace = True)
-        summary['freq'] = summary['freq']/self.config.sampleshare
-
-        # Save results
-        output_file = self.config.results_dir/'TripSummaryByModePurpose.csv'
-        summary.to_csv(output_file, index = False)
-    
+        output_file = self.config.results_dir/f'{trip_or_tour.capitalize()}Summary{output_suffix}.csv'
+        summary.to_csv(output_file, index = False)        
       
 
 class CoreSummaries:
@@ -1147,7 +1137,7 @@ class CoreSummaries:
         print("Reading tour data...")
         # This would involve reading tour and trip files and processing them
         
-        tours = self.data_reader.combine_tours(households)
+        tours = self.data_reader.combine_tours(households, landuse)
 
         print("Reading trip data ...")
         trips = self.data_reader.combine_trips(persons)
@@ -1157,22 +1147,26 @@ class CoreSummaries:
         # Generate summaries
         print("Generating summaries...")
 
-        print("Generate trips by mode summary")
-        self.summary_generator.generate_trips_summary_by_modes(trips)
+        print("Gerenate Activity Pattern summary")
+        self.summary_generator.generate_activity_pattern_summary(persons)
 
-        print("Generate trips by purpose summary")
-        self.summary_generator.generate_trips_summary_by_purpose(trips)
+        print("Generate trips summary")
+        self.summary_generator.generate_trips_tours_summary(trips, 'trip', ['trip_mode', 'trip_mode_label'], 'ByMode')
+        self.summary_generator.generate_trips_tours_summary(trips, 'trip', ['trip_mode', 'trip_mode_label', 'tour_purpose'], 'ByModePurpose')
+        self.summary_generator.generate_trips_tours_summary(trips, 'trip', ['tour_purpose'], 'ByPurpose')
+        
+        print("Generate tours summaries")
+        self.summary_generator.generate_trips_tours_summary(tours, 'tour', ['tour_mode', 'tour_mode_label'], 'ByMode')
+        self.summary_generator.generate_trips_tours_summary(tours, 'tour', ['tour_mode', 'tour_mode_label', 'tour_purpose'], 'ByModePurpose')
+        self.summary_generator.generate_trips_tours_summary(tours, 'tour', ['tour_purpose'], 'ByPurpose')
 
-        print("Generate trips by mode and purpose summary")
-        self.summary_generator.generate_trips_summary_by_modepurpose(trips)
-        
-        
-        # # Save processed data
-        # print("Saving processed data...")
-        # households.to_pickle(self.config.updated_dir / "households.pickle")
-        # persons.to_pickle(self.config.updated_dir / "persons.pickle")
-        # trips.to_pickle(self.config.updated_dir / "trips.pickle")
-        # tours.to_pickle(self.config.updated_dir / "tours.pickle")
+
+        # Save processed data
+        print("Saving processed data...")
+        households.to_pickle(self.config.updated_dir / "households.pickle")
+        persons.to_pickle(self.config.updated_dir / "persons.pickle")
+        trips.to_pickle(self.config.updated_dir / "trips.pickle")
+        tours.to_pickle(self.config.updated_dir / "tours.pickle")
         
 
         
