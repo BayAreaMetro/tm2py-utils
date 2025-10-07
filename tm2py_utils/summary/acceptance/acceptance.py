@@ -1,15 +1,19 @@
 """Methods to create Acceptance Criteria summaries from a tm2py model run."""
+USAGE = __doc__
 
 from tm2py_utils.summary.acceptance.simulated import Simulated
 from tm2py_utils.summary.acceptance.observed import Observed
 from tm2py_utils.summary.acceptance.canonical import Canonical
 
-import numpy as np
+import argparse
+import logging
 import os
-import geopandas as gpd
-import itertools
-import pandas as pd
+import pathlib
 
+import numpy as np
+import geopandas as gpd
+import pandas as pd
+import tm2py_utils
 
 class Acceptance:
     """Orchestrates acceptance criteria comparisons between simulated and observed data.
@@ -1071,3 +1075,66 @@ class Acceptance:
         )
 
         return df
+
+
+
+
+if __name__ == "__main__":
+    # printing options
+    pd.set_option('display.max_columns',None)
+    pd.set_option('display.width', None)
+
+    parser = argparse.ArgumentParser(description=USAGE, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("model_run_dir", type=pathlib.Path)
+    parser.add_argument("output_dir", type=pathlib.Path)
+    args = parser.parse_args()
+
+    # make output_dir if needed
+    args.output_dir.mkdir(exist_ok=True)
+    print(f"Writing debug log to {args.output_dir / 'acceptance.log'}")
+
+    # setup logging to file
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        datefmt='%m/%d/%Y %I:%M:%S %p',
+        filename=args.output_dir / 'acceptance.log',
+        filemode='w'
+    )
+    # setup logging to console -- keep at INFO level
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(
+        logging.Formatter("%(asctime)s - %(levelname)s - %(message)s", 
+                          datefmt="%m/%d/%Y %I:%M:%S %p"))
+    console_handler.setLevel(logging.INFO)
+    logging.getLogger().addHandler(console_handler)
+
+    logger.info("Processing Canonical Files")
+    my_canonical = Canonical(
+        canonical_file = args.model_run_dir / "canonical_crosswalk.toml", 
+        scenario_file = args.model_run_dir / "scenario_config.toml"
+    )
+
+    logger.info("Processing Observed Data")
+    my_observed = Observed(
+        canonical = my_canonical,
+        observed_file = args.model_run_dir / "observed_data.toml"
+    )
+
+    logger.info("Processing Simulated Data")
+    my_simulated = Simulated(
+        canonical = my_canonical,
+        scenario_file = args.model_run_dir / "scenario_config.toml",
+        model_file = args.model_run_dir / "model_config.toml"
+    )
+
+    logger.info("Processing Acceptance")
+    my_acceptance = Acceptance(
+        canonical = my_canonical,
+        simulated = my_simulated,
+        observed = my_observed, 
+        output_file_root = args.output_dir
+    )
+
+    my_acceptance.make_acceptance(make_roadway=True, make_other=True)

@@ -5,10 +5,11 @@ data sources used in acceptance criteria validation. It ensures consistent namin
 PeMS, GTFS, census, and model network data.
 """
 
-import os
+import logging
 import pandas as pd
+import pathlib
+import pprint
 import toml
-
 
 class Canonical:
     """Manages canonical naming conventions and crosswalk mappings.
@@ -114,25 +115,25 @@ class Canonical:
         Returns:
             None
         """
+        logging.debug(f"Loading canonical_dict from {self.canonical_file}")
         with open(self.canonical_file, "r", encoding="utf-8") as toml_file:
             self.canonical_dict = toml.load(toml_file)
 
+        logging.debug(f"Loading scenario_dict from {self.scenario_file}")
         with open(self.scenario_file, "r", encoding="utf-8") as toml_file:
             self.scenario_dict = toml.load(toml_file)
-        
-
 
         return
 
     def __init__(
-        self, canonical_file: str, scenario_file: str = None, on_board_assign_summary: bool = False
+        self, canonical_file: pathlib.Path, scenario_file: pathlib.Path = None, on_board_assign_summary: bool = False
     ) -> None:
         """Initialize the Canonical class with configuration files.
         
         Args:
-            canonical_file (str): Path to canonical configuration TOML file containing
+            canonical_file (pathlib.Path): Path to canonical configuration TOML file containing
                 crosswalk file paths and canonical naming conventions
-            scenario_file (str, optional): Path to scenario TOML file with model inputs.
+            scenario_file (pathlib.Path, optional): Path to scenario TOML file with model inputs.
                 Defaults to None.
             on_board_assign_summary (bool, optional): If True, only loads transit-related
                 crosswalks for on-board assignment summaries. Defaults to False.
@@ -142,6 +143,8 @@ class Canonical:
         """
         self.canonical_file = canonical_file
         self.scenario_file = scenario_file
+        self.scenario_dir = scenario_file.parent
+        logging.info(f"Initialzing Canonical instance with {self.scenario_dir=}")
         self._load_configs()
         self._make_canonical_agency_names_dict()
         self._make_canonical_station_names_dict()
@@ -168,21 +171,26 @@ class Canonical:
         """
         in_file = self.scenario_dict["scenario"]["maz_landuse_file"]
 
-        df = pd.read_csv(in_file)
+        logging.info(f"Reading {self.scenario_dir / in_file}")
+        self.simulated_maz_data_df = pd.read_csv(self.scenario_dir / in_file)
+        logging.debug(f"self.simulated_maz_data_df.head()\n{self.simulated_maz_data_df.head()}")
 
-        index_file = os.path.join("inputs", "landuse", "mtc_final_network_zone_seq.csv")
+        # TODO Note this is here -- this should be updated for 2023 & MAZ/TAZ updates
+        maz_map_file = self.scenario_dir / "inputs/landuse/mtc_final_network_zone_seq.csv"
+        logging.info(f"Reading {maz_map_file}")
+        maz_map_df = pd.read_csv(maz_map_file, usecols=["N","MAZSEQ"])
+        logging.debug(f"maz_map_df.head()\n{maz_map_df.head()}")
 
-        index_df = pd.read_csv(index_file)
-        join_df = index_df.rename(columns={"N": "MAZ_ORIGINAL"})[
-            ["MAZ_ORIGINAL", "MAZSEQ"]
-        ].copy()
+        # map MAZ_ORIGINAL -> MAZSEQ and add that column to self.simulated_maz_data_df
+        maz_map_df.rename(columns={"N": "MAZ_ORIGINAL"}, inplace=True)
+        maz_map_df = maz_map_df.loc[maz_map_df.MAZSEQ > 0]
+        maz_map_df.set_index("MAZ_ORIGINAL", inplace=True)
+        logging.debug(f"maz_map_df.head()\n{maz_map_df.head()}")
+        maz_map = maz_map_df["MAZSEQ"].to_dict()
+        logging.debug(f"maz_map: {maz_map}")
 
-        self.simulated_maz_data_df = pd.merge(
-            df,
-            join_df,
-            how="left",
-            on="MAZ_ORIGINAL",
-        )
+        self.simulated_maz_data_df["MAZSEQ"] = self.simulated_maz_data_df["MAZ_ORIGINAL"].map(maz_map)
+        logging.debug(f"self.simulated_maz_data_df:\n{self.simulated_maz_data_df}")
 
         self._make_taz_district_crosswalk()
 
@@ -201,6 +209,7 @@ class Canonical:
         df = self.simulated_maz_data_df[["TAZ_ORIGINAL", "DistID"]].copy()
         df = df.rename(columns={"TAZ_ORIGINAL": "taz", "DistID": "district"})
         self.taz_to_district_df = df.drop_duplicates().reset_index(drop=True)
+        logging.debug(f"self.taz_to_district_df:\n{self.taz_to_district_df}")
 
         return
         
@@ -213,49 +222,30 @@ class Canonical:
         Returns:
             None
         """
-        file_root = self.canonical_dict["remote_io"]["crosswalk_folder_root"]
+        file_root = pathlib.Path(self.canonical_dict["remote_io"]["crosswalk_folder_root"])
         in_file = self.canonical_dict["crosswalks"]["canonical_agency_names_file"]
 
-        df = pd.read_csv(os.path.join(file_root, in_file))
+        # if not absolute, assume file_root is relative to self.scenario_dir
+        if not file_root.is_absolute():
+            file_root = self.scenario_dir / file_root
 
-        a_df = df[["canonical_name"]].copy()
-        a_df["temp"] = df["canonical_name"]
-        a_dict = a_df.set_index("temp").to_dict()["canonical_name"]
+        logging.info(f"Reading {file_root / in_file}")
+        df = pd.read_csv(file_root / in_file)
+        # columns: canonical_name, alternative_01, alternative_02, etc.
+        # transform to dictionary with { alternative -> canonical_name }
+        logging.debug(f"Read:\n{df}")
 
-        b_dict = (
-            df[(df["alternate_01"].notna())][["canonical_name", "alternate_01"]]
-            .set_index("alternate_01")
-            .to_dict()["canonical_name"]
-        )
-        c_dict = (
-            df[(df["alternate_02"].notna())][["canonical_name", "alternate_02"]]
-            .set_index("alternate_02")
-            .to_dict()["canonical_name"]
-        )
-        d_dict = (
-            df[(df["alternate_03"].notna())][["canonical_name", "alternate_03"]]
-            .set_index("alternate_03")
-            .to_dict()["canonical_name"]
-        )
-        e_dict = (
-            df[(df["alternate_04"].notna())][["canonical_name", "alternate_04"]]
-            .set_index("alternate_04")
-            .to_dict()["canonical_name"]
-        )
-        f_dict = (
-            df[(df["alternate_05"].notna())][["canonical_name", "alternate_05"]]
-            .set_index("alternate_05")
-            .to_dict()["canonical_name"]
-        )
+        self.canonical_agency_names_dict = {}
+        for colname in df.columns:
+            if not colname.startswith("alternate_"): continue
 
-        self.canonical_agency_names_dict = {
-            **a_dict,
-            **b_dict,
-            **c_dict,
-            **d_dict,
-            **e_dict,
-            **f_dict,
-        }
+            alt_names_df = df[["canonical_name",colname]]
+            alt_names_df = alt_names_df.loc[ alt_names_df[colname].notna() ]
+            alt_names_df.set_index(colname, inplace=True)
+
+            # update the dictionary with alternative -> canonical_name
+            self.canonical_agency_names_dict.update(alt_names_df["canonical_name"].to_dict())
+        logging.debug(f"self.canonical_agency_names_dict:\n{pprint.pformat(self.canonical_agency_names_dict)}")
 
         return
 
@@ -269,39 +259,35 @@ class Canonical:
         Returns:
             None
         """
-        file_root = self.canonical_dict["remote_io"]["crosswalk_folder_root"]
+        file_root = pathlib.Path(self.canonical_dict["remote_io"]["crosswalk_folder_root"])
         in_file = self.canonical_dict["crosswalks"]["canonical_station_names_file"]
 
-        df = pd.read_csv(os.path.join(file_root, in_file))
+        # if not absolute, assume file_root is relative to self.scenario_dir
+        if not file_root.is_absolute():
+            file_root = self.scenario_dir / file_root
 
-        alt_list = list(df.columns)
-        alt_list.remove("canonical")
-        alt_list.remove("operator")
+        logging.info(f"Reading {file_root / in_file}")
+        df = pd.read_csv(file_root / in_file)
+        # columns: operator, canonical, alternative_01, alternative_02, etc.
+        # transform to dictionary with { operator -> { alternative -> canonical }}
+        logging.debug(f"Read:\n{df}")
 
-        running_operator_dict = {}
+        self.canonical_station_names_dict = {}
         for operator in df["operator"].unique():
-            o_df = df[df["operator"] == operator].copy()
+            operator_df = df[df["operator"] == operator]
+            self.canonical_station_names_dict[operator] = {}
 
-            a_df = o_df[["canonical"]].copy()
-            a_df["temp"] = o_df["canonical"]
-            a_dict = a_df.set_index("temp").to_dict()["canonical"]
+            for colname in operator_df.columns:
+                if not colname.startswith("alternate_"): continue
 
-            running_alt_dict = {**a_dict}
+                alt_names_df = operator_df[["canonical",colname]]
+                alt_names_df = alt_names_df.loc[ alt_names_df[colname].notna() ]
+                alt_names_df.set_index(colname, inplace=True)
 
-            for alt in alt_list:
-                alt_dict = (
-                    o_df[(o_df[alt].notna())][["canonical", alt]]
-                    .set_index(alt)
-                    .to_dict()["canonical"]
-                )
-
-                running_alt_dict = {**running_alt_dict, **alt_dict}
-
-            operator_dict = {operator: running_alt_dict}
-
-            running_operator_dict = {**running_operator_dict, **operator_dict}
-
-        self.canonical_station_names_dict = running_operator_dict
+                # update the dictionary with alternative -> canonical_name
+                self.canonical_station_names_dict[operator].update(alt_names_df["canonical"].to_dict())
+           
+        logging.debug(f"self.canonical_station_names_dict:\n{pprint.pformat(self.canonical_station_names_dict)}")
 
         return
 
@@ -314,6 +300,9 @@ class Canonical:
             None
         """
         url_string = self.canonical_dict["crosswalks"]["block_group_to_maz_url"]
+        logging.info(f"Reading {url_string}")
+
+        # TODO: This is out of date with updated MAZ/TAZ and will need to be fixed
         self.census_2010_to_maz_crosswalk_df = pd.read_csv(url_string)
 
         return
@@ -326,13 +315,17 @@ class Canonical:
         Returns:
             None
         """
-        root_dir = self.canonical_dict["remote_io"]["crosswalk_folder_root"]
+        # file_root = pathlib.Path(self.canonical_dict["remote_io"]["crosswalk_folder_root"])
+        # TODO: handle this better; this doesn't belong in acceptance/crosswalk
+        file_root = self.scenario_dir / "emme_project" / "Database_transit"
         in_file = self.canonical_dict["crosswalks"]["standard_to_emme_transit_file"]
 
-        x_df = pd.read_csv(os.path.join(root_dir, in_file))
+        # if not absolute, assume file_root is relative to self.scenario_dir
+        if not file_root.is_absolute():
+            file_root = self.scenario_dir / file_root
 
-        self.standard_to_emme_transit_nodes_df = x_df
-
+        logging.info(f"Reading {file_root / in_file}")
+        self.standard_to_emme_transit_nodes_df = pd.read_csv(file_root / in_file)
         return
 
     def _make_tm2_to_gtfs_mode_crosswalk(self):
@@ -344,22 +337,31 @@ class Canonical:
         Returns:
             None
         """
-        file_root = self.canonical_dict["remote_io"]["crosswalk_folder_root"]
+        file_root = pathlib.Path(self.canonical_dict["remote_io"]["crosswalk_folder_root"])
         in_file = self.canonical_dict["crosswalks"]["standard_to_tm2_modes_file"]
 
-        df = pd.read_csv(os.path.join(file_root, in_file))
+        # if not absolute, assume file_root is relative to self.scenario_dir
+        if not file_root.is_absolute():
+            file_root = self.scenario_dir / file_root
 
-        df = df[["TM2_mode", "TM2_operator", "agency_name", "TM2_line_haul_name"]]
-        df = df.rename(
+        logging.info(f"Reading {file_root / in_file}")
+        self.gtfs_to_tm2_mode_codes_df = pd.read_csv(file_root / in_file)
+        logging.debug(f"Read:\n{self.gtfs_to_tm2_mode_codes_df}")
+        # columns are
+        #   agency_raw_name, agency_name, agency_id, TM2_operator, route_type, TM2_mode, TM2_line_haul_name, TM2_faresystem, 
+        #   is_express_bus, VEHTYPE
+
+        self.gtfs_to_tm2_mode_codes_df = self.gtfs_to_tm2_mode_codes_df[["TM2_mode", "TM2_operator", "agency_name", "TM2_line_haul_name"]]
+        self.gtfs_to_tm2_mode_codes_df.rename(
             columns={
                 "TM2_mode": "tm2_mode",
                 "TM2_operator": "tm2_operator",
                 "agency_name": "operator",
                 "TM2_line_haul_name": "technology",
-            }
+            },
+            inplace=True
         )
-
-        self.gtfs_to_tm2_mode_codes_df = df
+        logging.debug(f"self.gtfs_to_tm2_mode_codes_df:\n{self.gtfs_to_tm2_mode_codes_df}")
 
         return
 
@@ -372,27 +374,30 @@ class Canonical:
         Returns:
             None
         """
-        file_root = self.canonical_dict["remote_io"]["crosswalk_folder_root"]
+        file_root = pathlib.Path(self.canonical_dict["remote_io"]["crosswalk_folder_root"])
         in_file = self.canonical_dict["crosswalks"]["crosswalk_standard_survey_file"]
 
-        df = pd.read_csv(os.path.join(file_root, in_file))
-        df = df[
-            [
-                "survey_route",
-                "survey_agency",
-                "survey_tech",
-                "standard_route_id",
-                "standard_line_name",
-                "standard_operator",
-                "standard_headsign",
-                "standard_agency",
-                "standard_route_short_name",
-                "standard_route_long_name",
-                "canonical_operator",
-            ]
-        ].drop_duplicates()
+        # if not absolute, assume file_root is relative to self.scenario_dir
+        if not file_root.is_absolute():
+            file_root = self.scenario_dir / file_root
 
-        self.standard_transit_to_survey_df = df
+        logging.info(f"Reading {file_root / in_file}")
+        self.standard_transit_to_survey_df = pd.read_csv(file_root / in_file)
+        self.standard_transit_to_survey_df = self.standard_transit_to_survey_df[[
+            "survey_route",
+            "survey_agency",
+            "survey_tech",
+            "standard_route_id",
+            "standard_line_name",
+            "standard_operator",
+            "standard_headsign",
+            "standard_agency",
+            "standard_route_short_name",
+            "standard_route_long_name",
+            "canonical_operator",
+        ]].drop_duplicates()
+
+        logging.debug(f"self.standard_transit_to_survey_df:\n{self.standard_transit_to_survey_df}")
 
         return
 
@@ -426,14 +431,20 @@ class Canonical:
         Returns:
             pd.DataFrame: Not used (sets instance attribute instead)
         """
-        file_root = self.canonical_dict["remote_io"]["crosswalk_folder_root"]
+        file_root = pathlib.Path(self.canonical_dict["remote_io"]["crosswalk_folder_root"])
         in_file = self.canonical_dict["crosswalks"]["pems_station_to_tm2_links_file"]
 
-        df = pd.read_csv(os.path.join(file_root, in_file))
-        df["station_id"] = df["station"].astype(str) + "_" + df["direction"]
-        df = df[["station_id", "A", "B"]]
+        # if not absolute, assume file_root is relative to self.scenario_dir
+        if not file_root.is_absolute():
+            file_root = self.scenario_dir / file_root
+    
+        logging.info(f"Reading {file_root / in_file}")
+        self.pems_to_link_crosswalk_df = pd.read_csv(file_root / in_file)
+        self.pems_to_link_crosswalk_df["station_id"] = self.pems_to_link_crosswalk_df["station"].astype(str) + \
+            "_" + self.pems_to_link_crosswalk_df["direction"]
+        self.pems_to_link_crosswalk_df = self.pems_to_link_crosswalk_df[["station_id", "A", "B"]]
 
-        self.pems_to_link_crosswalk_df = df
+        logging.debug(f"self.pems_to_link_crosswalk_df:\n{self.pems_to_link_crosswalk_df}")
 
         return
 
@@ -445,11 +456,14 @@ class Canonical:
         Returns:
             pd.DataFrame: Not used (sets instance attribute instead)
         """
-        file_root = self.canonical_dict["remote_io"]["crosswalk_folder_root"]
+        # file_root = self.canonical_dict["remote_io"]["crosswalk_folder_root"]
+        # TODO: handle this better; this doesn't belong in acceptance/crosswalk
+        file_root = self.scenario_dir / "emme_project" / "Database_highway"
         in_file = self.canonical_dict["crosswalks"]["standard_to_emme_nodes_file"]
 
-        df = pd.read_csv(os.path.join(file_root, in_file))
+        logging.info(f"Reading {file_root / in_file}")
+        self.standard_to_emme_node_crosswalk_df = pd.read_csv(file_root / in_file)
 
-        self.standard_to_emme_node_crosswalk_df = df
+        logging.debug(f"self.standard_to_emme_node_crosswalk_df:\n{self.standard_to_emme_node_crosswalk_df}")
 
         return

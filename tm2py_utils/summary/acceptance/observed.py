@@ -7,13 +7,15 @@ standardizes these data sources for comparison with simulated model outputs.
 
 from tm2py_utils.summary.acceptance.canonical import Canonical
 
+import logging
 import numpy as np
-import os
 import geopandas as gpd
 import pandas as pd
+import pathlib
+import pyproj
 import toml
 
-
+# TODO: This is not generic observed, but specific to 2015 Observed.
 class Observed:
     """Manages observed data for acceptance criteria validation.
     
@@ -246,6 +248,7 @@ class Observed:
         """
         self.c = canonical
         self.observed_file = observed_file
+        logging.info(f"Initializing Observed instance with {self.observed_file=}")
         self._load_configs()
 
         if not on_board_assign_summary:
@@ -254,6 +257,8 @@ class Observed:
             self._reduce_observed_rail_access_summaries()
 
     def _validate(self):
+        """ TODO: Add docstring 
+        """
         if self.reduced_transit_on_board_df.empty:
             self.reduce_on_board_survey()
 
@@ -419,17 +424,12 @@ class Observed:
 
         return pd.concat([all_df, time_of_day_df], axis="rows", ignore_index=True)
 
-    def reduce_on_board_survey(self, read_file_from_disk=True):
+    def reduce_on_board_survey(self):
         """Reduce on-board survey data to route-level boardings.
         
         Processes raw on-board survey data, applies canonical naming, adds Florida DOT
         thresholds, and joins with standard route IDs. For non-rail routes, boardings
         are divided by 2 to account for direction.
-        
-        Args:
-            read_file_from_disk (bool, optional): If True, reads previously processed
-                data from disk if available. If False, reprocesses from raw data.
-                Defaults to True.
         
         Results stored in reduced_transit_on_board_df with columns:
             - survey_tech: Technology type
@@ -445,33 +445,27 @@ class Observed:
         Returns:
             None
         """
-        """Reduces the on-board survey, summarizing boardings by technology, operator, route, and time of day.
-        Result is stored in the reduced_transit_on_board_df DataFrame and written to disk in the `reduced_summaries_file`
-        in the observed configuration.
-        """
 
         if not self.c.canonical_agency_names_dict:
             self.c._make_canonical_agency_names_dict()
 
-        file_root = self.observed_dict["remote_io"]["obs_folder_root"]
-        in_file = self.observed_dict["transit"]["on_board_survey_file"]
-        out_file = self.observed_dict["transit"]["reduced_summaries_file"]
+        file_root = pathlib.Path(self.observed_dict["remote_io"]["obs_folder_root"])
+        in_file = pathlib.Path(self.observed_dict["transit"]["on_board_survey_file"])
 
-        if os.path.isfile(out_file) and read_file_from_disk:
-            self.reduced_transit_on_board_df = pd.read_csv(
-                os.path.join(file_root, out_file),
-                dtype=self.reduced_transit_on_board_df.dtypes.to_dict(),
-            )
-        else:
-            in_df = pd.read_csv(os.path.join(file_root, in_file))
-            out_df = in_df.copy()
-            out_df["survey_operator"] = out_df["survey_operator"].map(
-                self.c.canonical_agency_names_dict
-            )
-            out_df = self._join_florida_thresholds(out_df)
-            out_df = self._join_standard_route_id(out_df)
-            out_df.to_csv(os.path.join(file_root, out_file))
-            self.reduced_transit_on_board_df = out_df
+        # handle absolute or relative in_file
+        if not in_file.is_absolute():
+            in_file = file_root / self.observed_dict["transit"]["on_board_survey_file"]
+
+        logging.info(f"Reading {file_root / in_file}")
+        tps_df = pd.read_csv(file_root / in_file)
+        
+        tps_df["survey_operator"] = tps_df["survey_operator"].map(
+            self.c.canonical_agency_names_dict
+        )
+        tps_df = self._join_florida_thresholds(tps_df)
+        tps_df = self._join_standard_route_id(tps_df)
+        self.reduced_transit_on_board_df = tps_df
+        logging.debug(f"self.reduced_transit_on_board_df:\n{self.reduced_transit_on_board_df}")
 
         return
 
@@ -490,28 +484,31 @@ class Observed:
         Returns:
             None
         """
-        file_root = self.observed_dict["remote_io"]["obs_folder_root"]
-        in_file = self.observed_dict["census"]["vehicles_by_block_group_file"]
+        file_root = pathlib.Path(self.observed_dict["remote_io"]["obs_folder_root"])
+        in_file = pathlib.Path(self.observed_dict["census"]["vehicles_by_block_group_file"])
 
-        df = pd.read_csv(os.path.join(file_root, in_file), skiprows=1)
+        # handle absolute or relative in_file
+        if not in_file.is_absolute():
+            in_file = file_root / self.observed_dict["census"]["vehicles_by_block_group_file"]
 
-        df = df[
-            ["id", "Estimate!!Total", "Estimate!!Total!!No vehicle available"]
-        ]
-        df = df.rename(
-            columns={
-                "id": "geoid",
-                "Estimate!!Total": "total_households",
-                "Estimate!!Total!!No vehicle available": "observed_zero_vehicle_households",
-            }
+        logging.info(f"Reading {in_file}")
+        acs_vehs_df = pd.read_csv(in_file, skiprows=1, usecols=[
+            "id", "Estimate!!Total", "Estimate!!Total!!No vehicle available"
+        ])
+        logging.debug(f"acs_vehs_df:\n{acs_vehs_df}")
+
+        acs_vehs_df.rename(columns={
+            "id": "geoid",
+            "Estimate!!Total": "total_households",
+            "Estimate!!Total!!No vehicle available": "observed_zero_vehicle_households",
+        }, inplace=True)
+
+        acs_vehs_df["observed_zero_vehicle_household_share"] = (
+            acs_vehs_df["observed_zero_vehicle_households"] / acs_vehs_df["total_households"]
         )
 
-        df["observed_zero_vehicle_household_share"] = (
-            df["observed_zero_vehicle_households"] / df["total_households"]
-        )
-
-        self.census_2017_zero_vehicle_hhs_df = df.copy()
-
+        self.census_2017_zero_vehicle_hhs_df = acs_vehs_df
+        logging.debug(f"self.census_2017_zero_vehicle_hhs_df:\n{self.census_2017_zero_vehicle_hhs_df}")
         return
 
     def _reduce_observed_bart_boardings(self):
@@ -528,93 +525,100 @@ class Observed:
         Returns:
             None
         """
-        file_root = self.observed_dict["remote_io"]["obs_folder_root"]
-        in_file = self.observed_dict["transit"]["bart_boardings_file"]
+        file_root = pathlib.Path(self.observed_dict["remote_io"]["obs_folder_root"])
+        in_file = pathlib.Path(self.observed_dict["transit"]["bart_boardings_file"])
 
-        df = pd.read_csv(os.path.join(file_root, in_file))
+        # handle absolute or relative in_file
+        if not in_file.is_absolute():
+            in_file = file_root / self.observed_dict["transit"]["bart_boardings_file"]
+
+        logging.info(f"Reading {in_file}")
+        bart_df = pd.read_csv(in_file)
 
         assert "BART" in self.c.canonical_station_names_dict.keys()
 
-        df["boarding"] = df["orig_name"].map(
+        bart_df["boarding"] = bart_df["orig_name"].map(
             self.c.canonical_station_names_dict["BART"]
         )
-        df["alighting"] = df["dest_name"].map(
+        bart_df["alighting"] = bart_df["dest_name"].map(
             self.c.canonical_station_names_dict["BART"]
         )
+        logging.debug(f"bart_df:\n{bart_df}")
 
-        a_df = df[df.year.isin(self.RELEVANT_BART_OBSERVED_YEARS_LIST)].copy()
+        bart_df = bart_df[bart_df.year.isin(self.RELEVANT_BART_OBSERVED_YEARS_LIST)]
+        logging.debug(f"bart_df:\n{bart_df}")
 
-        sum_df = (
-            a_df.groupby(["boarding", "alighting"])
+        bart_df = (
+            bart_df.groupby(["boarding", "alighting"])
             .agg({"avg_trips": "mean"})
             .reset_index()
         )
-        sum_df = sum_df.rename(columns={"avg_trips": "observed"})
+        bart_df = bart_df.rename(columns={"avg_trips": "observed"})
+        logging.debug(f"bart_df:\n{bart_df}")
 
-        self.observed_bart_boardings_df = sum_df.copy()
+        self.observed_bart_boardings_df = bart_df
+        logging.debug(f"self.observed_bart_boardings_df:\n{self.observed_bart_boardings_df}")
 
         return
 
     def _make_census_geo_crosswalk(self):
-        file_root = self.observed_dict["remote_io"]["obs_folder_root"]
-        pickle_file = self.observed_dict["census"]["census_geographies_pickle"]
-        tract_geojson_file = self.observed_dict["census"][
-            "census_tract_centroids_geojson"
-        ]
+        file_root = pathlib.Path(self.observed_dict["remote_io"]["obs_folder_root"])
+        in_file = pathlib.Path(self.observed_dict["census"]["census_geographies_shapefile"])
 
-        if os.path.exists(os.path.join(file_root, pickle_file)) and os.path.exists(
-            os.path.join(file_root, tract_geojson_file)
-        ):
-            self.census_2010_geo_df = pd.read_pickle(
-                os.path.join(file_root, pickle_file)
-            )
+        # handle absolute or relative in_file
+        if not in_file.is_absolute():
+            in_file = file_root / self.observed_dict["census"]["census_geographies_shapefile"]
 
-            self.census_tract_centroids_gdf = gpd.read_file(
-                os.path.join(file_root, tract_geojson_file)
-            )
-            return
+        logging.info(f"Reading {in_file}")
+        self.census_2010_geo_df = gpd.read_file(in_file)
+        logging.debug(f"self.census_2010_geo_df:\n{self.census_2010_geo_df}")
+        logging.debug(f"self.census_2010_geo_df.crs:\n{self.census_2010_geo_df.crs}")
 
-        else:
-            file_root = self.observed_dict["remote_io"]["obs_folder_root"]
-            in_file = self.observed_dict["census"]["census_geographies_shapefile"]
-            gdf = gpd.read_file(os.path.join(file_root, in_file))
+        self._make_tract_centroids(self.census_2010_geo_df)
 
-            self._make_tract_centroids(gdf, os.path.join(file_root, tract_geojson_file))
+        self.census_2010_geo_df.rename(columns={
+            "TRACTCE10": "tract",
+            "COUNTYFP10": "county_fips",
+            "STATEFP10": "state_fips",
+            "GEOID10": "blockgroup",
+        }, inplace=True)
 
-            self.census_2010_geo_df = (
-                pd.DataFrame(gdf)
-                .rename(
-                    columns={
-                        "TRACTCE10": "tract",
-                        "COUNTYFP10": "county_fips",
-                        "STATEFP10": "state_fips",
-                        "GEOID10": "blockgroup",
-                    }
-                )[["state_fips", "county_fips", "tract", "blockgroup"]]
-                .copy()
-            )
-
-            self.census_2010_geo_df.to_pickle(os.path.join(file_root, pickle_file))
-
-            return
+        return
 
     def _make_tract_centroids(
-        self, input_gdf: gpd.GeoDataFrame, out_file: str
+        self, census_blockgroup_gdf: gpd.GeoDataFrame
     ) -> gpd.GeoDataFrame:
-        t_gdf = input_gdf.dissolve(by="TRACTCE10")
-        c_gdf = t_gdf.to_crs(3857).centroid.to_crs(4326).reset_index()
-        df = pd.DataFrame(t_gdf.reset_index())[["TRACTCE10", "COUNTYFP10", "STATEFP10"]]
-        df["tract"] = df["STATEFP10"] + df["COUNTYFP10"] + df["TRACTCE10"]
-        df["tract"] = df.tract.str.slice(start=1)  # remove leading zero
-        r_df = c_gdf.merge(df, left_on="TRACTCE10", right_on="TRACTCE10")
-        return_df = r_df[["tract", 0]].rename(columns={0: "geometry"}).copy()
+        """ TODO: Why do we need this?
+        """
+        # https://epsg.io/26910
+        EPSG_NAD83_UTM_ZONE_10M = 26910
+        # https://epsg.io/4326
+        EPSG_WGS84 = 4326
 
-        self.census_tract_centroids_gdf = gpd.GeoDataFrame(
-            return_df, geometry="geometry"
-        )
+        # This is to resolve errors like this:
+        #  PROJ_ERROR: hgridshift: could not find required grid(s).
+        #  PROJ_ERROR: pipeline: Pipeline: Bad step definition: proj=hgridshift (File not found or invalid)
+        # Enable PROJ network capabilities
+        pyproj.network.set_network_enabled(True)
 
-        self.census_tract_centroids_gdf.to_file(out_file)
+        tract_gdf = census_blockgroup_gdf.copy()
+        # consolidate ids into full geoid
+        # TODO: I removed code to remove leading zero from this field because this is wrong! :p
+        tract_gdf["tract"] = tract_gdf["STATEFP10"] + tract_gdf["COUNTYFP10"] + tract_gdf["TRACTCE10"]
+        tract_gdf = tract_gdf.dissolve(by="tract").reset_index(drop=False)
+        tract_gdf = tract_gdf[["tract","geometry"]]
+        logging.debug(f"Dissolved census geographies to tracts:\n{tract_gdf}")
 
+        # project to coordinate system appropriate for Northern California and create centroids
+        tract_gdf['centroid_geometry'] = tract_gdf.to_crs(EPSG_NAD83_UTM_ZONE_10M).centroid
+        # drop original geometry and keep centroid geometry instead
+        tract_gdf.set_geometry(col="centroid_geometry", drop=True, inplace=True)
+        # back to lat/long
+        tract_gdf = tract_gdf.to_crs(EPSG_WGS84)
+        self.census_tract_centroids_gdf = tract_gdf.rename(columns={"centroid_geometry":"geometry"})
+
+        logging.debug(f"Calculated centroids:\n{self.census_tract_centroids_gdf}")
+        logging.debug(f"{type(self.census_tract_centroids_gdf)=}")
         return
 
     def _reduce_ctpp_2012_2016(self):
@@ -631,35 +635,46 @@ class Observed:
         Returns:
             None
         """
-        file_root = self.observed_dict["remote_io"]["obs_folder_root"]
-        in_file = self.observed_dict["census"]["ctpp_2012_2016_file"]
+        file_root = pathlib.Path(self.observed_dict["remote_io"]["obs_folder_root"])
+        in_file = pathlib.Path(self.observed_dict["census"]["ctpp_2012_2016_file"])
 
-        df = pd.read_csv(os.path.join(file_root, in_file), skiprows=1)
-        #a_df = df[(df["Output"] == "Estimate")].copy()
-        a_df = df.copy()
-        a_df = a_df.rename(
-            columns={
-                "origin_name": "residence_county",
-                "destination_name": "work_county",
-                "a302100_e1": "observed_flow",
-            }
+        # handle absolute or relative in_file
+        if not in_file.is_absolute():
+            in_file = file_root / self.observed_dict["census"]["ctpp_2012_2016_file"]
+
+        logging.info(f"Reading {in_file}")
+        ctpp_df = pd.read_csv(in_file, skiprows=5, header=None, names=[
+            "residence_county","work_county","observed_flow","margin_of_error"]
         )
-        a_df = a_df[["residence_county", "work_county", "observed_flow"]]
-        a_df["residence_county"] = a_df["residence_county"].str.replace(
+        logging.debug(f"ctpp_df:\n{ctpp_df}")
+        ctpp_df.drop(columns="margin_of_error", inplace=True)
+        ctpp_df["residence_county"] = ctpp_df["residence_county"].str.replace(
             " County, California", ""
         )
-        a_df["work_county"] = a_df["work_county"].str.replace(" County, California", "")
-        a_df["observed_flow"] = a_df["observed_flow"].str.replace(",", "").astype(int)
+        # drop bottom rows with metadata
+        ctpp_df = ctpp_df.loc[ctpp_df.observed_flow.notna()]
 
-        self.ctpp_2012_2016_df = a_df
+        ctpp_df["work_county"] = ctpp_df["work_county"].str.replace(" County, California", "")
+        ctpp_df["observed_flow"] = ctpp_df["observed_flow"].str.replace(",", "").astype(int)
+
+        # filldown residence_county
+        ctpp_df["residence_county"] = ctpp_df["residence_county"].ffill()
+
+        self.ctpp_2012_2016_df = ctpp_df
+        logging.debug(f"self.ctpp_2012_2016_df:\n{self.ctpp_2012_2016_df}")
 
         return
 
     def _reduce_observed_rail_access_summaries(self):
-        root_dir = self.observed_dict["remote_io"]["obs_folder_root"]
-        in_file = self.observed_dict["transit"]["reduced_access_summary_file"]
+        file_root = pathlib.Path(self.observed_dict["remote_io"]["obs_folder_root"])
+        in_file = pathlib.Path(self.observed_dict["transit"]["reduced_access_summary_file"])
 
-        df = pd.read_csv(os.path.join(root_dir, in_file))
+        # handle absolute or relative in_file
+        if not in_file.is_absolute():
+            in_file = file_root / self.observed_dict["transit"]["reduced_access_summary_file"]
+
+        logging.info(f"Reading {in_file}")
+        df = pd.read_csv(in_file)
 
         assert "operator" in df.columns
         df["operator"] = df["operator"].map(self.c.canonical_agency_names_dict)
@@ -671,16 +686,20 @@ class Observed:
             ].map(self.c.canonical_station_names_dict[operator])
 
         self.reduced_transit_on_board_access_df = df.copy()
+        logging.debug(f"self.reduced_transit_on_board_access_df:\n{self.reduced_transit_on_board_access_df}")
 
         return
 
     def _reduce_observed_rail_flow_summaries(self):
-        root_dir = self.observed_dict["remote_io"]["obs_folder_root"]
-        in_file = self.observed_dict["transit"]["reduced_flow_summary_file"]
+        file_root = pathlib.Path(self.observed_dict["remote_io"]["obs_folder_root"])
+        in_file = pathlib.Path(self.observed_dict["transit"]["reduced_flow_summary_file"])
 
-        df = pd.read_csv(os.path.join(root_dir, in_file))
+        # handle absolute or relative in_file
+        if not in_file.is_absolute():
+            in_file = file_root / self.observed_dict["transit"]["reduced_flow_summary_file"]
 
-        self.reduced_transit_spatial_flow_df = df.copy()
+        self.reduced_transit_spatial_flow_df = pd.read_csv(in_file)
+        logging.debug(f"self.reduced_transit_spatial_flow_df:\n{self.reduced_transit_spatial_flow_df}")
 
         return
 
@@ -834,10 +853,15 @@ class Observed:
         return out_df
 
     def _reduce_truck_counts(self) -> pd.DataFrame:
-        file_root = self.observed_dict["remote_io"]["obs_folder_root"]
-        in_file = self.observed_dict["roadway"]["pems_truck_count_file"]
+        file_root = pathlib.Path(self.observed_dict["remote_io"]["obs_folder_root"])
+        in_file = pathlib.Path(self.observed_dict["roadway"]["pems_truck_count_file"])
 
-        in_df = pd.read_csv(os.path.join(file_root, in_file))
+        # handle absolute or relative in_file
+        if not in_file.is_absolute():
+            in_file = file_root / self.observed_dict["roadway"]["pems_truck_count_file"]
+
+        logging.info(f"Reading {in_file}")
+        in_df = pd.read_csv(in_file)
 
         df = in_df[in_df.year.isin(self.RELEVANT_PEMS_OBSERVED_YEARS_LIST)].copy()
         df = df[
@@ -864,16 +888,11 @@ class Observed:
 
         return return_df
 
-    def reduce_bridge_transactions(self, read_file_from_disk=True):
+    def reduce_bridge_transactions(self):
         """Prepare observed bridge toll transaction data.
         
         Processes bridge toll transaction data, aggregates to time periods and daily
         totals. Takes median across years 2014-2016.
-        
-        Args:
-            read_file_from_disk (bool, optional): If True, reads previously processed
-                data from disk if available. If False, reprocesses from raw data.
-                Defaults to True.
         
         Results stored in observed_bridge_transactions_df with columns:
             - plaza_name: Bridge toll plaza name
@@ -883,13 +902,6 @@ class Observed:
         Returns:
             None
         """
-        """
-        Prepares observed bridge transaction data for Acceptance Comparisons.
-
-        Args:
-            read_file_from_disk (bool, optional): If `False`, will do calculations from source data. Defaults to True.
-        """
-
         time_period_dict = {
             "3 am": "ea",
             "4 am": "ea",
@@ -917,61 +929,49 @@ class Observed:
             "2 am": "ev",
         }
 
-        file_root = self.observed_dict["remote_io"]["obs_folder_root"]
-        in_file = self.observed_dict["roadway"]["bridge_transactions_file"]
-        out_file = self.observed_dict["roadway"]["reduced_transactions_file"]
+        file_root = pathlib.Path(self.observed_dict["remote_io"]["obs_folder_root"])
+        in_file =pathlib.Path(self.observed_dict["roadway"]["bridge_transactions_file"])
 
-        if os.path.isfile(out_file) and read_file_from_disk:
-            return_df = pd.read_pickle(
-                os.path.join(file_root, out_file),
-            )
-        else:
-            in_df = pd.read_csv(
-                os.path.join(file_root, in_file)
-            )
-            df = in_df[
-                in_df["Year"].isin(self.RELEVANT_BRIDGE_TRANSACTIONS_YEARS_LIST)
-            ].copy()
-            df = df[df["Lane Designation"] == "all"].copy()
-            hourly_median_df = (
-                df.groupby(["Plaza Name", "Hour beginning"])["transactions"]
-                .agg("median")
-                .reset_index()
-            )
-            daily_df = (
-                hourly_median_df.groupby(["Plaza Name"])["transactions"]
-                .agg("sum")
-                .reset_index()
-                .rename(columns={"Plaza Name": "plaza_name"})
-            )
-            daily_df["time_period"] = self.c.ALL_DAY_WORD
+        # handle absolute or relative in_file
+        if not in_file.is_absolute():
+            in_file = file_root / self.observed_dict["roadway"]["bridge_transactions_file"]
 
-            df = hourly_median_df.copy()
-            df["time_period"] = hourly_median_df["Hour beginning"].map(time_period_dict)
-            time_period_df = (
-                df.groupby(["Plaza Name", "time_period"])["transactions"]
-                .agg("sum")
-                .reset_index()
-                .rename(columns={"Plaza Name": "plaza_name"})
-            )
-            return_df = pd.concat([time_period_df, daily_df]).reset_index(drop=True)
+        logging.info(f"Reading {in_file}")
+        in_df = pd.read_csv(in_file)
+        df = in_df[
+            in_df["Year"].isin(self.RELEVANT_BRIDGE_TRANSACTIONS_YEARS_LIST)
+        ].copy()
+        df = df[df["Lane Designation"] == "all"].copy()
+        hourly_median_df = (
+            df.groupby(["Plaza Name", "Hour beginning"])["transactions"]
+            .agg("median")
+            .reset_index()
+        )
+        daily_df = (
+            hourly_median_df.groupby(["Plaza Name"])["transactions"]
+            .agg("sum")
+            .reset_index()
+            .rename(columns={"Plaza Name": "plaza_name"})
+        )
+        daily_df["time_period"] = self.c.ALL_DAY_WORD
 
-            return_df.to_pickle(os.path.join(file_root, out_file))
-
-        self.observed_bridge_transactions_df = return_df
-
+        df = hourly_median_df.copy()
+        df["time_period"] = hourly_median_df["Hour beginning"].map(time_period_dict)
+        time_period_df = (
+            df.groupby(["Plaza Name", "time_period"])["transactions"]
+            .agg("sum")
+            .reset_index()
+            .rename(columns={"Plaza Name": "plaza_name"})
+        )
+        self.observed_bridge_transactions_df = pd.concat([time_period_df, daily_df]).reset_index(drop=True)
+        logging.debug(f"self.observed_bridge_transactions_df:\n{self.observed_bridge_transactions_df}")
         return
 
-    def reduce_traffic_counts(self, read_file_from_disk=True):
+    def reduce_traffic_counts(self):
         """Prepare observed traffic count data for acceptance comparisons.
         
         Processes PeMS and Caltrans traffic counts, computes daily totals, joins with
         network link crosswalk, and applies ODOT error standards based on volume ranges.
-        
-        Args:
-            read_file_from_disk (bool, optional): If True, reads previously processed
-                data from disk if available. If False, reprocesses from raw data.
-                Defaults to True.
         
         Results stored in reduced_traffic_counts_df with columns:
             - emme_a_node_id, emme_b_node_id: Network node IDs
@@ -988,170 +988,166 @@ class Observed:
         Returns:
             None
         """
-        """
-        Prepares observed traffic count data for Acceptance Comparisons by computing daily counts,
-        joining with the TM2 link cross walk, and joining the Ohio Standards database.
-
-        Args:
-            read_file_from_disk (bool, optional): If `False`, will do calculations from source data. Defaults to True.
-        """
-
-        pems_df = self._reduce_pems_counts(read_file_from_disk=read_file_from_disk)
+        pems_df = self._reduce_pems_counts()
         caltrans_df = self._reduce_caltrans_counts()
         self.reduced_traffic_counts_df = pd.concat([pems_df, caltrans_df])
 
         return
 
-    def _reduce_pems_counts(self, read_file_from_disk=True):
+    def _reduce_pems_counts(self):
         """
         Prepares observed traffic count data for Acceptance Comparisons by computing daily counts,
         joining with the TM2 link cross walk, and joining the Ohio Standards database.
-
-        Args:
-            read_file_from_disk (bool, optional): If `False`, will do calculations from source data. Defaults to True.
         """
 
-        file_root = self.observed_dict["remote_io"]["obs_folder_root"]
-        in_file = self.observed_dict["roadway"]["pems_traffic_count_file"]
-        out_file = self.observed_dict["roadway"]["reduced_pems_summaries_file"]
+        file_root = pathlib.Path(self.observed_dict["remote_io"]["obs_folder_root"])
+        in_file = pathlib.Path(self.observed_dict["roadway"]["pems_traffic_count_file"])
 
-        if os.path.isfile(out_file) and read_file_from_disk:
-            return_df = pd.read_pickle(
-                os.path.join(file_root, out_file),
-            )
-        else:
-            in_df = pd.read_csv(os.path.join(file_root, in_file))
-            df = in_df[in_df.year.isin(self.RELEVANT_PEMS_OBSERVED_YEARS_LIST)].copy()
-            df["station_id"] = df["station"].astype(str) + "_" + df["direction"]
-            df = df[["station_id", "type", "year", "time_period", "median_flow"]].copy()
-            median_across_years_all_vehs_df = (
-                df.groupby(["station_id", "type", "time_period"])["median_flow"]
-                .median()
-                .reset_index()
-            )
-            median_across_years_all_vehs_df = median_across_years_all_vehs_df.rename(
-                columns={"median_flow": "observed_flow"}
-            )
-            median_across_years_all_vehs_df[
-                "vehicle_class"
-            ] = self.c.ALL_VEHICLE_TYPE_WORD
-            median_across_years_trucks_df = self._reduce_truck_counts()
+        # handle absolute or relative in_file
+        if not in_file.is_absolute():
+            in_file = file_root / self.observed_dict["roadway"]["pems_traffic_count_file"]
 
-            median_across_years_df = pd.concat(
-                [median_across_years_all_vehs_df, median_across_years_trucks_df],
-                axis="rows",
-                ignore_index=True,
-            )
+        logging.info(f"Reading {in_file}")
+        pems_df = pd.read_csv(in_file)
+        pems_df = pems_df[pems_df.year.isin(self.RELEVANT_PEMS_OBSERVED_YEARS_LIST)]
+        pems_df["station_id"] = pems_df["station"].astype(str) + "_" + pems_df["direction"]
+        pems_df = pems_df[["station_id", "type", "year", "time_period", "median_flow"]]
+        logging.debug(f"pems_df:\n{pems_df}")
 
-            all_day_df = (
-                median_across_years_df.groupby(["station_id", "type", "vehicle_class"])[
-                    "observed_flow"
-                ]
-                .sum()
-                .reset_index()
-            )
-            all_day_df["time_period"] = self.c.ALL_DAY_WORD
+        median_across_years_all_vehs_df = (
+            pems_df.groupby(["station_id", "type", "time_period"])["median_flow"]
+            .median()
+            .reset_index()
+        )
+        median_across_years_all_vehs_df = median_across_years_all_vehs_df.rename(
+            columns={"median_flow": "observed_flow"}
+        )
+        median_across_years_all_vehs_df[
+            "vehicle_class"
+        ] = self.c.ALL_VEHICLE_TYPE_WORD
+        logging.debug(f"median_across_years_all_vehs_df:\n{median_across_years_all_vehs_df}")
+        logging.debug(f"vehicle_class:\n{median_across_years_all_vehs_df['vehicle_class'].value_counts()}")
 
-            out_df = pd.concat(
-                [all_day_df, median_across_years_df], axis="rows", ignore_index=True
-            )
+        median_across_years_trucks_df = self._reduce_truck_counts()
+        logging.debug(f"median_across_years_trucks_df:\n{median_across_years_trucks_df}")
+        logging.debug(f"vehicle_class:\n{median_across_years_trucks_df['vehicle_class'].value_counts()}")
 
-            out_df = pd.merge(
-                self.c.pems_to_link_crosswalk_df, out_df, how="left", on="station_id"
-            )
+        median_across_years_df = pd.concat(
+            [median_across_years_all_vehs_df, median_across_years_trucks_df],
+            axis="rows",
+            ignore_index=True,
+        )
+        logging.debug(f"median_across_years_df:\n{median_across_years_df}")
 
-            out_df = self._join_tm2_node_ids(out_df)
+        all_day_df = (
+            median_across_years_df.groupby(["station_id", "type", "vehicle_class"])[
+                "observed_flow"
+            ]
+            .sum()
+            .reset_index()
+        )
+        all_day_df["time_period"] = self.c.ALL_DAY_WORD
+        logging.debug(f"all_day_df:\n{all_day_df}")
 
-            # take median across multiple stations on same link
-            median_df = (
-                out_df.groupby(
-                    [
-                        "A",
-                        "B",
-                        "emme_a_node_id",
-                        "emme_b_node_id",
-                        "time_period",
-                        "vehicle_class",
-                    ]
-                )["observed_flow"]
-                .agg("median")
-                .reset_index()
-            )
-            join_df = out_df[
+        out_df = pd.concat(
+            [all_day_df, median_across_years_df], axis="rows", ignore_index=True
+        )
+
+        out_df = pd.merge(
+            self.c.pems_to_link_crosswalk_df, out_df, how="left", on="station_id"
+        )
+
+        out_df = self._join_tm2_node_ids(out_df)
+
+        # take median across multiple stations on same link
+        median_df = (
+            out_df.groupby(
                 [
+                    "A",
+                    "B",
                     "emme_a_node_id",
                     "emme_b_node_id",
                     "time_period",
-                    "station_id",
-                    "type",
                     "vehicle_class",
                 ]
-            ].copy()
-            return_df = pd.merge(
-                median_df,
-                join_df,
-                how="left",
-                on=["emme_a_node_id", "emme_b_node_id", "time_period", "vehicle_class"],
-            ).reset_index(drop=True)
+            )["observed_flow"]
+            .agg("median")
+            .reset_index()
+        )
+        join_df = out_df[
+            [
+                "emme_a_node_id",
+                "emme_b_node_id",
+                "time_period",
+                "station_id",
+                "type",
+                "vehicle_class",
+            ]
+        ].copy()
+        return_df = pd.merge(
+            median_df,
+            join_df,
+            how="left",
+            on=["emme_a_node_id", "emme_b_node_id", "time_period", "vehicle_class"],
+        ).reset_index(drop=True)
 
-            # return_df = return_df.rename(columns = {"model_link_id" : "standard_link_id"})
-            return_df = self._join_ohio_standards(return_df)
-            return_df = self._identify_key_arterials_and_bridges(return_df)
+        # return_df = return_df.rename(columns = {"model_link_id" : "standard_link_id"})
+        return_df = self._join_ohio_standards(return_df)
+        return_df = self._identify_key_arterials_and_bridges(return_df)
 
-            return_df["source"] = "PeMS"
+        return_df["source"] = "PeMS"
 
-            return_df.to_pickle(os.path.join(file_root, out_file))
-
+        logging.debug(f"Returning\n{return_df}")
         return return_df
 
     def _reduce_caltrans_counts(self):
-        file_root = self.observed_dict["remote_io"]["obs_folder_root"]
-        in_file = self.observed_dict["roadway"]["caltrans_count_file"]
+        file_root = pathlib.Path(self.observed_dict["remote_io"]["obs_folder_root"])
+        in_file = pathlib.Path(self.observed_dict["roadway"]["caltrans_count_file"])
 
-        in_df = pd.read_csv(os.path.join(file_root, in_file))
-        temp_df = (
-            in_df[
-                [
-                    "2015 Traffic AADT",
-                    "2015 Truck AADT",
-                    "IModelNODE",
-                    "JModelNODE",
-                    "Calt_stn2",
-                ]
-            ]
-            .copy()
-            .rename(
-                columns={
-                    "IModelNODE": "A",
-                    "JModelNODE": "B",
-                    "Calt_stn2": "station_id",
-                }
-            )
-        )
-        out_cars_df = (
-            temp_df.copy()
+        # handle absolute or relative in_file
+        if not in_file.is_absolute():
+            in_file = file_root / self.observed_dict["roadway"]["caltrans_count_file"]
+
+        logging.info(f"Reading {in_file}")
+        caltrans_df = pd.read_csv(in_file, usecols=[
+            "2015 Traffic AADT",
+            "2015 Truck AADT",
+            "IModelNODE",
+            "JModelNODE",
+            "Calt_stn2",
+        ])
+        caltrans_df.rename(columns={
+            "IModelNODE": "A",
+            "JModelNODE": "B",
+            "Calt_stn2": "station_id",
+        }, inplace=True)
+        logging.debug(f"caltrans_df:\n{caltrans_df}")
+
+        caltrans_cars_df = (
+            caltrans_df.copy()
             .rename(columns={"2015 Traffic AADT": "observed_flow"})
             .drop(columns=["2015 Truck AADT"])
         )
-        out_cars_df["vehicle_class"] = self.c.ALL_VEHICLE_TYPE_WORD
+        caltrans_cars_df["vehicle_class"] = self.c.ALL_VEHICLE_TYPE_WORD
 
-        out_trucks_df = (
-            temp_df.copy()
+        caltrans_trucks_df = (
+            caltrans_df.copy()
             .rename(columns={"2015 Truck AADT": "observed_flow"})
             .drop(columns=["2015 Traffic AADT"])
         )
-        out_trucks_df["vehicle_class"] = self.c.LARGE_TRUCK_VEHICLE_TYPE_WORD
+        caltrans_trucks_df["vehicle_class"] = self.c.LARGE_TRUCK_VEHICLE_TYPE_WORD
 
-        out_df = pd.concat([out_cars_df, out_trucks_df]).reset_index(drop=True)
-        out_df = out_df[out_df["observed_flow"].notna()]
+        caltrans_df = pd.concat([caltrans_cars_df, caltrans_trucks_df]).reset_index(drop=True)
+        caltrans_df = caltrans_df[caltrans_df["observed_flow"].notna()]
 
         # convert to one-way flow
-        out_df["observed_flow"] = out_df["observed_flow"] / 2.0
+        caltrans_df["observed_flow"] = caltrans_df["observed_flow"] / 2.0
 
-        return_df = self._join_tm2_node_ids(out_df)
-        return_df["time_period"] = self.c.ALL_DAY_WORD
-        return_df["source"] = "Caltrans"
+        caltrans_df = self._join_tm2_node_ids(caltrans_df)
+        caltrans_df["time_period"] = self.c.ALL_DAY_WORD
+        caltrans_df["source"] = "Caltrans"
 
-        return_df = self._join_ohio_standards(return_df)
+        caltrans_df = self._join_ohio_standards(caltrans_df)
+        logging.debug(f"final caltrans_df:\n{caltrans_df}")
 
-        return return_df
+        return caltrans_df
