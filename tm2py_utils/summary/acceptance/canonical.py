@@ -19,23 +19,46 @@ class Canonical:
     It loads configuration from TOML files and provides crosswalk mappings.
     
     Attributes:
-        canonical_dict (dict): Configuration loaded from canonical TOML file
-        scenario_dict (dict): Scenario configuration from TOML file
-        census_2010_to_maz_crosswalk_df (pd.DataFrame): Census block group to MAZ mapping
-            Columns: [maz, blockgroup, maz_share]
-        canonical_agency_names_dict (dict): Maps agency name variations to canonical names
-        canonical_station_names_dict (dict): Maps station name variations to canonical names by operator
-        gtfs_to_tm2_mode_codes_df (pd.DataFrame): GTFS to TM2 mode code mapping
+        canonical_file (str): Path to canonical configuration TOML file.
+            Set by: __init__()
+        scenario_file (str): Path to scenario TOML file.
+            Set by: __init__()
+        scenario_dir (pathlib.Path): Parent directory of scenario file.
+            Set by: __init__()
+        canonical_dict (dict): Configuration loaded from canonical TOML file.
+            Set by: _load_configs()
+        scenario_dict (dict): Scenario configuration from TOML file.
+            Set by: _load_configs()
+        canonical_agency_names_dict (dict): Maps agency name variations to canonical names.
+            Set by: _make_canonical_agency_names_dict()
+        canonical_station_names_dict (dict): Maps station name variations to canonical names by operator.
+            Set by: _make_canonical_station_names_dict()
+        standard_to_emme_transit_nodes_df (pd.DataFrame): Standard to EMME transit node crosswalk.
+            Columns: [model_node_id, emme_node_id]
+            Set by: _read_standard_to_emme_transit()
+        gtfs_to_tm2_mode_codes_df (pd.DataFrame): GTFS to TM2 mode code mapping.
             Columns: [tm2_mode, tm2_operator, operator, technology]
-        standard_transit_to_survey_df (pd.DataFrame): Transit survey crosswalk
+            Set by: _make_tm2_to_gtfs_mode_crosswalk()
+        standard_transit_to_survey_df (pd.DataFrame): Transit survey crosswalk.
             Columns: [survey_route, survey_agency, survey_tech, standard_route_id,
                      standard_line_name, standard_operator, canonical_operator]
-        standard_to_emme_node_crosswalk_df (pd.DataFrame): Standard to EMME node mapping
-            Columns: [model_node_id, emme_node_id]
-        pems_to_link_crosswalk_df (pd.DataFrame): PeMS stations to network links
-            Columns: [station_id, A, B]
-        taz_to_district_df (pd.DataFrame): TAZ to planning district mapping
+            Set by: _read_standard_transit_to_survey_crosswalk()
+        simulated_maz_data_df (pd.DataFrame): MAZ-level land use data with county and district IDs.
+            Key columns: [MAZ_ORIGINAL, MAZSEQ, TAZ_ORIGINAL, DistID, CountyName] plus
+            land use variables from maz_landuse_file
+            Set by: _make_simulated_maz_data()
+        taz_to_district_df (pd.DataFrame): TAZ to planning district mapping.
             Columns: [taz, district]
+            Set by: _make_taz_district_crosswalk()
+        census_2010_to_maz_crosswalk_df (pd.DataFrame): Census block group to MAZ mapping.
+            Columns: [maz, blockgroup, maz_share]
+            Set by: _make_census_maz_crosswalk()
+        pems_to_link_crosswalk_df (pd.DataFrame): PeMS stations to network links.
+            Columns: [station_id, A, B]
+            Set by: _read_pems_to_link_crosswalk()
+        standard_to_emme_node_crosswalk_df (pd.DataFrame): Standard to EMME node mapping.
+            Columns: [model_node_id, emme_node_id]
+            Set by: _read_standard_to_emme_node_crosswalk()
         
     Constants:
         ALL_DAY_WORD: "daily" - keyword for daily summaries
@@ -422,14 +445,14 @@ class Canonical:
 
         return return_df
 
-    def _read_pems_to_link_crosswalk(self) -> pd.DataFrame:
+    def _read_pems_to_link_crosswalk(self) -> None:
         """Read PeMS station to network link crosswalk.
-        
+
         Loads mapping of PeMS traffic count stations to model network links.
         Creates station_id as combination of station number and direction.
-        
+
         Returns:
-            pd.DataFrame: Not used (sets instance attribute instead)
+            None
         """
         file_root = pathlib.Path(self.canonical_dict["remote_io"]["crosswalk_folder_root"])
         in_file = self.canonical_dict["crosswalks"]["pems_station_to_tm2_links_file"]
@@ -448,13 +471,13 @@ class Canonical:
 
         return
 
-    def _read_standard_to_emme_node_crosswalk(self) -> pd.DataFrame:
+    def _read_standard_to_emme_node_crosswalk(self) -> None:
         """Read standard to EMME roadway node crosswalk.
-        
+
         Loads mapping between standard network node IDs and EMME node IDs for roadway network.
-        
+
         Returns:
-            pd.DataFrame: Not used (sets instance attribute instead)
+            None
         """
         # file_root = self.canonical_dict["remote_io"]["crosswalk_folder_root"]
         # TODO: handle this better; this doesn't belong in acceptance/crosswalk
