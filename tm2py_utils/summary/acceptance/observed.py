@@ -24,7 +24,7 @@ class Observed:
     aggregation methods to prepare observed data for acceptance criteria evaluation.
     
     Attributes:
-        c (Canonical): Canonical naming and crosswalk handler
+        canonical (Canonical): Canonical naming and crosswalk handler
         observed_dict (dict): Configuration from observed TOML file
         observed_file (str): Path to observed configuration file
         
@@ -78,20 +78,51 @@ class Observed:
             - total_households: Total households
             - observed_zero_vehicle_households: Households with no vehicles
             - observed_zero_vehicle_household_share: Share with no vehicles
-            
+            Set by: _reduce_census_zero_car_households()
+
+        census_2010_geo_df (pd.DataFrame): Census 2010 block group boundaries:
+            - tract: Census tract code
+            - county_fips: County FIPS code
+            - state_fips: State FIPS code
+            - blockgroup: Full block group GEOID
+            - geometry: Block group polygon geometry
+            Set by: _make_census_geo_crosswalk()
+
         census_tract_centroids_gdf (gpd.GeoDataFrame): Census tract centroids:
             - tract: Census tract ID
             - geometry: Centroid point geometry
-    
+            Set by: _make_tract_centroids()
+
+        reduced_transit_spatial_flow_df (pd.DataFrame): TAZ-to-TAZ transit flows:
+            - orig_taz: Origin TAZ
+            - dest_taz: Destination TAZ
+            - time_period: Time period
+            - observed_trips: Number of trips
+            - is_loc_in_path, is_exp_in_path, etc.: Technology flags
+            Set by: _reduce_observed_rail_flow_summaries()
+
+        reduced_transit_district_flows_by_technology_df (pd.DataFrame): District transit flows:
+            - orig_district: Origin district ID (1-34)
+            - dest_district: Destination district ID (1-34)
+            - tech: Technology (loc, exp, ltr, fry, hvy, com, total)
+            - observed: Number of trips using this technology
+            Set by: _make_district_to_district_transit_flows_by_technology()
+
     Constants:
-        RELEVANT_PEMS_OBSERVED_YEARS_LIST: [2014, 2015, 2016]
-        RELEVANT_BRIDGE_TRANSACTIONS_YEARS_LIST: [2014, 2015, 2016]
-        RELEVANT_BART_OBSERVED_YEARS_LIST: [2014, 2015, 2016]
-        RELEVANT_PEMS_VEHICLE_CLASSES_FOR_LARGE_TRUCK: [6, 7, 8, 9, 10, 11, 12]
+        RELEVANT_PEMS_OBSERVED_YEARS_LIST: [2014, 2015, 2016] - Years to use for PeMS data
+        RELEVANT_BRIDGE_TRANSACTIONS_YEARS_LIST: [2014, 2015, 2016] - Years for bridge data
+        RELEVANT_BART_OBSERVED_YEARS_LIST: [2014, 2015, 2016] - Years for BART data
+        RELEVANT_PEMS_VEHICLE_CLASSES_FOR_LARGE_TRUCK: [6, 7, 8, 9, 10, 11, 12] - Large truck classes
         ohio_rmse_standards_df: ODOT volume-based RMSE thresholds
+            Columns: [daily_volume_midpoint, hourly_volume_midpoint, desired_percent_rmse]
         florida_transit_guidelines_df: Florida DOT boarding-based error thresholds
+            Columns: [boardings, threshold]
+        key_arterials_df: Key arterial locations for validation
+            Columns: [name, county, route, direction, pems_station_id]
+        bridges_df: Major bridge locations with PeMS stations
+            Columns: [name, direction, pems_station_id]
     """
-    c: Canonical
+    canonical: Canonical
 
     observed_dict: dict
     observed_file: str
@@ -222,7 +253,14 @@ class Observed:
     reduced_transit_spatial_flow_df: pd.DataFrame
     reduced_transit_district_flows_by_technology_df: pd.DataFrame
 
-    def _load_configs(self):
+    def _load_configs(self) -> None:
+        """Load observed data configuration from TOML file.
+
+        Reads configuration file containing paths to observed data sources.
+
+        Returns:
+            None
+        """
         with open(self.observed_file, "r", encoding="utf-8") as toml_file:
             self.observed_dict = toml.load(toml_file)
 
@@ -246,7 +284,7 @@ class Observed:
         Returns:
             None
         """
-        self.c = canonical
+        self.canonical = canonical
         self.observed_file = observed_file
         logging.info(f"Initializing Observed instance with {self.observed_file=}")
         self._load_configs()
@@ -256,8 +294,15 @@ class Observed:
         elif on_board_assign_summary:
             self._reduce_observed_rail_access_summaries()
 
-    def _validate(self):
-        """ TODO: Add docstring 
+    def _validate(self) -> None:
+        """Load and validate all observed data sources.
+
+        Orchestrates loading of all observed data including transit surveys, traffic counts,
+        bridge transactions, census data, and BART boardings. Validates that county names
+        match expected Bay Area counties.
+
+        Returns:
+            None
         """
         if self.reduced_transit_on_board_df.empty:
             self.reduce_on_board_survey()
@@ -276,9 +321,9 @@ class Observed:
 
         assert sorted(
             self.ctpp_2012_2016_df.residence_county.unique().tolist()
-        ) == sorted(self.c.county_names_list)
+        ) == sorted(self.canonical.county_names_list)
         assert sorted(self.ctpp_2012_2016_df.work_county.unique().tolist()) == sorted(
-            self.c.county_names_list
+            self.canonical.county_names_list
         )
 
         self._make_census_geo_crosswalk()
@@ -306,12 +351,12 @@ class Observed:
         df = df.rename(columns={"threshold": "florida_threshold"})
 
         all_df = (
-            input_df[input_df["time_period"] == self.c.ALL_DAY_WORD]
+            input_df[input_df["time_period"] == self.canonical.ALL_DAY_WORD]
             .copy()
             .reset_index(drop=True)
         )
         other_df = (
-            input_df[input_df["time_period"] != self.c.ALL_DAY_WORD]
+            input_df[input_df["time_period"] != self.canonical.ALL_DAY_WORD]
             .copy()
             .reset_index(drop=True)
         )
@@ -336,18 +381,39 @@ class Observed:
         return pd.concat([return_df, other_df], axis="rows", ignore_index=True)
 
     def _join_standard_route_id(self, input_df: pd.DataFrame) -> pd.DataFrame:
-        df = self.c.standard_transit_to_survey_df.copy()
+        """Join standard route IDs to survey data and adjust boardings for direction.
+
+        Maps survey routes to standard network routes, handling daily and time-of-day
+        aggregation differently. For non-rail routes, divides boardings by 2 to account
+        for direction since observed records are bidirectional.
+
+        Args:
+            input_df (pd.DataFrame): Survey data with columns:
+                - survey_operator: Operator name
+                - survey_route: Route identifier
+                - survey_boardings: Total boardings
+                - time_period: Time period
+
+        Returns:
+            pd.DataFrame: Input data with added columns:
+                - standard_route_id: Standard network route ID
+                - standard_line_name: Standard line name
+                - daily_line_name: Daily aggregated line name
+                - canonical_operator: Canonical operator name
+                - survey_boardings: Adjusted for direction (divided by 2 for non-rail)
+        """
+        df = self.canonical.standard_transit_to_survey_df.copy()
 
         df["survey_agency"] = df["survey_agency"].map(
-            self.c.canonical_agency_names_dict
+            self.canonical.canonical_agency_names_dict
         )
-        join_df = df[~df["survey_agency"].isin(self.c.rail_operators_vector)].copy()
+        join_df = df[~df["survey_agency"].isin(self.canonical.rail_operators_vector)].copy()
 
         join_all_df = join_df.copy()
         join_time_of_day_df = join_df.copy()
 
         # for daily, aggregate across time of day
-        join_all_df = self.c.aggregate_line_names_across_time_of_day(
+        join_all_df = self.canonical.aggregate_line_names_across_time_of_day(
             join_all_df, "standard_line_name"
         )
         join_all_df = (
@@ -369,7 +435,7 @@ class Observed:
         join_all_df["standard_headsign"] = "N/A -- Daily Record"
 
         all_df = pd.merge(
-            input_df[input_df["time_period"] == self.c.ALL_DAY_WORD],
+            input_df[input_df["time_period"] == self.canonical.ALL_DAY_WORD],
             join_all_df,
             how="left",
             left_on=["survey_operator", "survey_route"],
@@ -402,12 +468,12 @@ class Observed:
             [join_time_of_day_df, df["time_period"]], axis="columns"
         )
 
-        join_time_of_day_df = self.c.aggregate_line_names_across_time_of_day(
+        join_time_of_day_df = self.canonical.aggregate_line_names_across_time_of_day(
             join_time_of_day_df, "standard_line_name"
         )
 
         time_of_day_df = pd.merge(
-            input_df[input_df["time_period"] != self.c.ALL_DAY_WORD],
+            input_df[input_df["time_period"] != self.canonical.ALL_DAY_WORD],
             join_time_of_day_df,
             how="left",
             left_on=["survey_operator", "survey_route", "time_period"],
@@ -417,7 +483,7 @@ class Observed:
         # observed records are not by direction, so we need to scale the boardings by 2 when the cases match
         time_of_day_df["survey_boardings"] = np.where(
             (time_of_day_df["standard_route_id"].isna())
-            | (time_of_day_df["survey_operator"].isin(self.c.rail_operators_vector)),
+            | (time_of_day_df["survey_operator"].isin(self.canonical.rail_operators_vector)),
             time_of_day_df["survey_boardings"],
             time_of_day_df["survey_boardings"] / 2.0,
         )
@@ -446,8 +512,8 @@ class Observed:
             None
         """
 
-        if not self.c.canonical_agency_names_dict:
-            self.c._make_canonical_agency_names_dict()
+        if not self.canonical.canonical_agency_names_dict:
+            self.canonical._make_canonical_agency_names_dict()
 
         file_root = pathlib.Path(self.observed_dict["remote_io"]["obs_folder_root"])
         in_file = pathlib.Path(self.observed_dict["transit"]["on_board_survey_file"])
@@ -460,7 +526,7 @@ class Observed:
         tps_df = pd.read_csv(file_root / in_file)
         
         tps_df["survey_operator"] = tps_df["survey_operator"].map(
-            self.c.canonical_agency_names_dict
+            self.canonical.canonical_agency_names_dict
         )
         tps_df = self._join_florida_thresholds(tps_df)
         tps_df = self._join_standard_route_id(tps_df)
@@ -535,13 +601,13 @@ class Observed:
         logging.info(f"Reading {in_file}")
         bart_df = pd.read_csv(in_file)
 
-        assert "BART" in self.c.canonical_station_names_dict.keys()
+        assert "BART" in self.canonical.canonical_station_names_dict.keys()
 
         bart_df["boarding"] = bart_df["orig_name"].map(
-            self.c.canonical_station_names_dict["BART"]
+            self.canonical.canonical_station_names_dict["BART"]
         )
         bart_df["alighting"] = bart_df["dest_name"].map(
-            self.c.canonical_station_names_dict["BART"]
+            self.canonical.canonical_station_names_dict["BART"]
         )
         logging.debug(f"bart_df:\n{bart_df}")
 
@@ -561,7 +627,15 @@ class Observed:
 
         return
 
-    def _make_census_geo_crosswalk(self):
+    def _make_census_geo_crosswalk(self) -> None:
+        """Load census geography shapefile and calculate tract centroids.
+
+        Reads 2010 census block group boundaries, calculates tract centroids, and
+        renames columns to standard names.
+
+        Returns:
+            None
+        """
         file_root = pathlib.Path(self.observed_dict["remote_io"]["obs_folder_root"])
         in_file = pathlib.Path(self.observed_dict["census"]["census_geographies_shapefile"])
 
@@ -587,8 +661,20 @@ class Observed:
 
     def _make_tract_centroids(
         self, census_blockgroup_gdf: gpd.GeoDataFrame
-    ) -> gpd.GeoDataFrame:
-        """ TODO: Why do we need this?
+    ) -> None:
+        """Calculate census tract centroids from block group geometries.
+
+        Dissolves block groups to tract level, computes centroids in UTM projection,
+        and converts back to WGS84 lat/long. Stores result in census_tract_centroids_gdf.
+
+        Args:
+            census_blockgroup_gdf (gpd.GeoDataFrame): Block group geometries with
+                STATEFP10, COUNTYFP10, TRACTCE10 columns
+
+        Returns:
+            None
+
+        TODO: Why do we need this?
         """
         # https://epsg.io/26910
         EPSG_NAD83_UTM_ZONE_10M = 26910
@@ -667,7 +753,15 @@ class Observed:
 
         return
 
-    def _reduce_observed_rail_access_summaries(self):
+    def _reduce_observed_rail_access_summaries(self) -> None:
+        """Load observed rail station access mode summaries.
+
+        Reads pre-processed rail access mode data and applies canonical operator
+        and station names.
+
+        Returns:
+            None
+        """
         file_root = pathlib.Path(self.observed_dict["remote_io"]["obs_folder_root"])
         in_file = pathlib.Path(self.observed_dict["transit"]["reduced_access_summary_file"])
 
@@ -679,20 +773,27 @@ class Observed:
         df = pd.read_csv(in_file)
 
         assert "operator" in df.columns
-        df["operator"] = df["operator"].map(self.c.canonical_agency_names_dict)
+        df["operator"] = df["operator"].map(self.canonical.canonical_agency_names_dict)
 
         assert "boarding_station" in df.columns
-        for operator in self.c.canonical_station_names_dict.keys():
+        for operator in self.canonical.canonical_station_names_dict.keys():
             df.loc[df["operator"] == operator, "boarding_station"] = df.loc[
                 df["operator"] == operator, "boarding_station"
-            ].map(self.c.canonical_station_names_dict[operator])
+            ].map(self.canonical.canonical_station_names_dict[operator])
 
         self.reduced_transit_on_board_access_df = df.copy()
         logging.debug(f"self.reduced_transit_on_board_access_df:\n{self.reduced_transit_on_board_access_df}")
 
         return
 
-    def _reduce_observed_rail_flow_summaries(self):
+    def _reduce_observed_rail_flow_summaries(self) -> None:
+        """Load observed rail spatial flow summaries.
+
+        Reads pre-processed rail TAZ-to-TAZ flow data from survey sources.
+
+        Returns:
+            None
+        """
         file_root = pathlib.Path(self.observed_dict["remote_io"]["obs_folder_root"])
         in_file = pathlib.Path(self.observed_dict["transit"]["reduced_flow_summary_file"])
 
@@ -705,23 +806,32 @@ class Observed:
 
         return
 
-    def _make_district_to_district_transit_flows_by_technology(self):
+    def _make_district_to_district_transit_flows_by_technology(self) -> None:
+        """Aggregate observed transit flows to district level by technology.
+
+        Converts TAZ-to-TAZ transit flows to planning district-to-district flows,
+        separated by transit technology (local bus, express bus, light rail, ferry,
+        heavy rail, commuter rail). Only processes AM period data.
+
+        Returns:
+            None
+        """
         o_df = self.reduced_transit_spatial_flow_df.copy()
         o_df = o_df[o_df["time_period"] == "am"].copy()
 
-        tm2_district_dict = self.c.taz_to_district_df.set_index("taz")[
+        tm2_district_dict = self.canonical.taz_to_district_df.set_index("taz")[
             "district"
         ].to_dict()
         o_df["orig_district"] = o_df["orig_taz"].map(tm2_district_dict)
         o_df["dest_district"] = o_df["dest_taz"].map(tm2_district_dict)
 
-        for prefix in self.c.transit_technology_abbreviation_dict.keys():
+        for prefix in self.canonical.transit_technology_abbreviation_dict.keys():
             o_df["{}".format(prefix.lower())] = (
                 o_df["is_{}_in_path".format(prefix.lower())] * o_df["observed_trips"]
             )
 
         agg_dict = {"observed_trips": "sum"}
-        for prefix in self.c.transit_technology_abbreviation_dict.keys():
+        for prefix in self.canonical.transit_technology_abbreviation_dict.keys():
             agg_dict["{}".format(prefix.lower())] = "sum"
 
         sum_o_df = (
@@ -742,8 +852,19 @@ class Observed:
         return
 
     def _join_tm2_node_ids(self, input_df: pd.DataFrame) -> pd.DataFrame:
+        """Convert standard network node IDs to EMME node IDs.
+
+        Joins A and B node IDs with standard-to-EMME node crosswalk to add
+        emme_a_node_id and emme_b_node_id columns.
+
+        Args:
+            input_df (pd.DataFrame): Data with A and B columns (standard node IDs)
+
+        Returns:
+            pd.DataFrame: Input data with added emme_a_node_id and emme_b_node_id columns
+        """
         df = input_df.copy()
-        nodes_df = self.c.standard_to_emme_node_crosswalk_df.copy()
+        nodes_df = self.canonical.standard_to_emme_node_crosswalk_df.copy()
 
         df = (
             pd.merge(df, nodes_df, how="left", left_on="A", right_on="model_node_id")
@@ -840,6 +961,19 @@ class Observed:
     def _identify_key_arterials_and_bridges(
         self, input_df: pd.DataFrame
     ) -> pd.DataFrame:
+        """Flag traffic counts at key arterials and bridge locations.
+
+        Joins with key arterials and bridges lookup tables to add location names
+        and directions for important facilities.
+
+        Args:
+            input_df (pd.DataFrame): Traffic count data with station_id column
+
+        Returns:
+            pd.DataFrame: Input data with added columns:
+                - key_location_name: Arterial or bridge name (if applicable)
+                - key_location_direction: Direction (if applicable)
+        """
         df1 = self.key_arterials_df.copy()
         df2 = self.bridges_df.copy()
         df = pd.concat([df1, df2])[["name", "direction", "pems_station_id"]].rename(
@@ -855,6 +989,19 @@ class Observed:
         return out_df
 
     def _reduce_truck_counts(self) -> pd.DataFrame:
+        """Process PeMS large truck counts.
+
+        Filters PeMS data for large truck vehicle classes (6-12), computes median
+        flows across years 2014-2016 and by time period.
+
+        Returns:
+            pd.DataFrame: Large truck counts with columns:
+                - station_id: PeMS station identifier
+                - type: Station type
+                - time_period: Time period
+                - observed_flow: Median large truck volume
+                - vehicle_class: "Large Trucks"
+        """
         file_root = pathlib.Path(self.observed_dict["remote_io"]["obs_folder_root"])
         in_file = pathlib.Path(self.observed_dict["roadway"]["pems_truck_count_file"])
 
@@ -886,7 +1033,7 @@ class Observed:
         )
         return_df = return_df.rename(columns={"median_flow": "observed_flow"})
 
-        return_df["vehicle_class"] = self.c.LARGE_TRUCK_VEHICLE_TYPE_WORD
+        return_df["vehicle_class"] = self.canonical.LARGE_TRUCK_VEHICLE_TYPE_WORD
 
         return return_df
 
@@ -955,7 +1102,7 @@ class Observed:
             .reset_index()
             .rename(columns={"Plaza Name": "plaza_name"})
         )
-        daily_df["time_period"] = self.c.ALL_DAY_WORD
+        daily_df["time_period"] = self.canonical.ALL_DAY_WORD
 
         df = hourly_median_df.copy()
         df["time_period"] = hourly_median_df["Hour beginning"].map(time_period_dict)
@@ -996,10 +1143,25 @@ class Observed:
 
         return
 
-    def _reduce_pems_counts(self):
-        """
-        Prepares observed traffic count data for Acceptance Comparisons by computing daily counts,
-        joining with the TM2 link cross walk, and joining the Ohio Standards database.
+    def _reduce_pems_counts(self) -> pd.DataFrame:
+        """Prepare PeMS traffic counts for acceptance comparisons.
+
+        Processes PeMS station data for years 2014-2016, computes median flows across years,
+        aggregates to daily totals, joins with network link crosswalk, applies ODOT error
+        standards, and identifies key arterial/bridge locations.
+
+        Returns:
+            pd.DataFrame: Processed traffic counts with columns:
+                - emme_a_node_id, emme_b_node_id: Network node IDs
+                - station_id: PeMS station identifier
+                - type: Station type (mainline, ramp, etc.)
+                - time_period: Time period
+                - observed_flow: Median traffic volume
+                - vehicle_class: All Vehicles or Large Trucks
+                - source: "PeMS"
+                - odot_flow_category_daily/hourly: Volume range
+                - odot_maximum_error: Maximum acceptable percent error
+                - key_location_name/direction: Key location if applicable
         """
 
         file_root = pathlib.Path(self.observed_dict["remote_io"]["obs_folder_root"])
@@ -1026,7 +1188,7 @@ class Observed:
         )
         median_across_years_all_vehs_df[
             "vehicle_class"
-        ] = self.c.ALL_VEHICLE_TYPE_WORD
+        ] = self.canonical.ALL_VEHICLE_TYPE_WORD
         logging.debug(f"median_across_years_all_vehs_df:\n{median_across_years_all_vehs_df}")
         logging.debug(f"vehicle_class:\n{median_across_years_all_vehs_df['vehicle_class'].value_counts()}")
 
@@ -1048,7 +1210,7 @@ class Observed:
             .sum()
             .reset_index()
         )
-        all_day_df["time_period"] = self.c.ALL_DAY_WORD
+        all_day_df["time_period"] = self.canonical.ALL_DAY_WORD
         logging.debug(f"all_day_df:\n{all_day_df}")
 
         out_df = pd.concat(
@@ -1056,7 +1218,7 @@ class Observed:
         )
 
         out_df = pd.merge(
-            self.c.pems_to_link_crosswalk_df, out_df, how="left", on="station_id"
+            self.canonical.pems_to_link_crosswalk_df, out_df, how="left", on="station_id"
         )
 
         out_df = self._join_tm2_node_ids(out_df)
@@ -1102,7 +1264,25 @@ class Observed:
         logging.debug(f"Returning\n{return_df}")
         return return_df
 
-    def _reduce_caltrans_counts(self):
+    def _reduce_caltrans_counts(self) -> pd.DataFrame:
+        """Prepare Caltrans AADT traffic counts for acceptance comparisons.
+
+        Processes Caltrans 2015 Annual Average Daily Traffic (AADT) data, separates
+        all vehicles from large trucks, converts two-way AADT to one-way flow, joins
+        with network nodes, and applies ODOT error standards.
+
+        Returns:
+            pd.DataFrame: Processed Caltrans counts with columns:
+                - A, B: Standard network node IDs
+                - emme_a_node_id, emme_b_node_id: EMME node IDs
+                - station_id: Caltrans station identifier
+                - observed_flow: AADT / 2 (one-way)
+                - vehicle_class: All Vehicles or Large Trucks
+                - time_period: "daily"
+                - source: "Caltrans"
+                - odot_flow_category_daily/hourly: Volume range
+                - odot_maximum_error: Maximum acceptable percent error
+        """
         file_root = pathlib.Path(self.observed_dict["remote_io"]["obs_folder_root"])
         in_file = pathlib.Path(self.observed_dict["roadway"]["caltrans_count_file"])
 
@@ -1130,14 +1310,14 @@ class Observed:
             .rename(columns={"2015 Traffic AADT": "observed_flow"})
             .drop(columns=["2015 Truck AADT"])
         )
-        caltrans_cars_df["vehicle_class"] = self.c.ALL_VEHICLE_TYPE_WORD
+        caltrans_cars_df["vehicle_class"] = self.canonical.ALL_VEHICLE_TYPE_WORD
 
         caltrans_trucks_df = (
             caltrans_df.copy()
             .rename(columns={"2015 Truck AADT": "observed_flow"})
             .drop(columns=["2015 Traffic AADT"])
         )
-        caltrans_trucks_df["vehicle_class"] = self.c.LARGE_TRUCK_VEHICLE_TYPE_WORD
+        caltrans_trucks_df["vehicle_class"] = self.canonical.LARGE_TRUCK_VEHICLE_TYPE_WORD
 
         caltrans_df = pd.concat([caltrans_cars_df, caltrans_trucks_df]).reset_index(drop=True)
         caltrans_df = caltrans_df[caltrans_df["observed_flow"].notna()]
@@ -1146,7 +1326,7 @@ class Observed:
         caltrans_df["observed_flow"] = caltrans_df["observed_flow"] / 2.0
 
         caltrans_df = self._join_tm2_node_ids(caltrans_df)
-        caltrans_df["time_period"] = self.c.ALL_DAY_WORD
+        caltrans_df["time_period"] = self.canonical.ALL_DAY_WORD
         caltrans_df["source"] = "Caltrans"
 
         caltrans_df = self._join_ohio_standards(caltrans_df)
