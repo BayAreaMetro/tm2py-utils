@@ -154,7 +154,9 @@ class LookupTables:
             {'code': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
              'mode': ['DRIVEALONEFREE' , 'DRIVEALONEPAY', 'SHARED2GP' , 'SHARED2HOV' , 'SHARED2PAY' , 'SHARED3GP' , 
                       'SHARED3HOV' , 'SHARED3PAY' , 'WALK' , 'BIKE' , 'WALK_SET' , 'PNR_SET' , 'KNR_PERS' , 
-                      'KNR_TNC' , 'TAXI' , 'TNC', 'SCHBUS'] 
+                      'KNR_TNC' , 'TAXI' , 'TNC', 'SCHBUS'],
+             'simple_mode': ['DA', 'DA', 'HOV2', 'HOV2', 'HOV2', 'HOV3', 'HOV3', 'HOV3', 'WALK', 'BIKE', 'WALKTOTRANS',
+                             'DRIVETOTRANS', 'DRIVETOTRANS', 'DRIVETOTRANS', 'TNC', 'TNC', 'SCHBUS']
              }
         )
 
@@ -174,13 +176,13 @@ class DataReader:
     households
     trips
     tours
+    work-school location
     """
     
     def __init__(self, config: Config, lookups: LookupTables):
         self.config = config
         self.lookups = lookups
     
-    ## TODO: THis will be at the MAZ level
     def read_land_use(self) -> pd.DataFrame:
         """Read and process land use data."""
 
@@ -204,7 +206,12 @@ class DataReader:
     
     def read_persons(self, households: pd.DataFrame) -> pd.DataFrame:
         """Read and process person data."""
-
+        
+        ## If processed file exist, read that instead:
+        if (self.config.updated_dir / 'persons.pickle').exists():
+            print("Reading cached processed persons file")
+            persons = pd.read_pickle(self.config.updated_dir/ 'persons.pickle')
+            return persons
         # Read input files
         popsyn_file = Path(self.config.target_dir) / "inputs" / "popsyn" / "persons.csv"
         ct_file = self.config.main_dir / f"personData_{self.config.iter}.csv"
@@ -265,6 +272,11 @@ class DataReader:
         # print(households.columns)
 
         ## TM2
+        ## If processed file exist, read that instead:
+        if (self.config.updated_dir / 'households.pickle').exists():
+            print("Reading cached processed household file")
+            persons = pd.read_pickle(self.config.updated_dir/ 'households.pickle')
+            return persons
         popsyn_file = Path(self.config.target_dir) / "inputs" / "popsyn" / "households.csv"
         ct_file = self.config.main_dir / f"householdData_{self.config.iter}.csv"
 
@@ -330,6 +342,13 @@ class DataReader:
     ## TODO: Update for TM2
     def combine_tours(self, households: pd.DataFrame, landuse: pd.DataFrame) -> pd.DataFrame:
         """Combine joint and individual tours into a single DataFrame."""
+
+        ## If processed file exist, read that instead:
+        if (self.config.updated_dir / 'tours.pickle').exists():
+            print("Reading cached processed tours file")
+            tours = pd.read_pickle(self.config.updated_dir/ 'tours.pickle')
+            return tours
+
         jointTours = self._read_tours('Joint')
         indivTours = self._read_tours('Indiv')
         jointTours = jointTours.drop(columns = ['tour_composition'])
@@ -404,12 +423,21 @@ class DataReader:
         return tour
     
     def combine_trips(self, persons: pd.DataFrame) -> pd.DataFrame:
+
+        ## If processed file exist, read that instead:
+        if (self.config.updated_dir / 'trips.pickle').exists():
+            print("Reading cached processed trips file")
+            trips = pd.read_pickle(self.config.updated_dir/ 'trips.pickle')
+            return trips
+
         indiv_trip = self._read_trips('Indiv')
         joint_trip = self._read_trips('Joint')
         joint_person_trips = self._get_joint_persons_trips(joint_trip, persons)
 
         combined = pd.concat([joint_person_trips, indiv_trip], ignore_index=True)
         combined['trip_mode_label'] = combined['trip_mode'].map(self.lookups.tripMode.set_index('code')['mode'])
+
+        combined['timePeriod'] = pd.cut(combined['stop_period'], bins = [1, 4, 12, 22, 30, 40], labels = ['EA', 'AM', 'MD', 'PM', 'EV'], include_lowest= True)
 
         print(f"Combined individual trips with joint person trips to make {len(combined):,} rows")
         print(combined.head())
@@ -488,6 +516,26 @@ class DataReader:
         # TODO: Add in parking cost once we determine which field to use for parking
 
         return tours
+    
+    def read_work_school_location(self, landuse: pd.DataFrame):
+        wsLoc_File = self.config.main_dir / f'wsLocResults_{ITER}.csv'
+        wsLoc = pd.read_csv(wsLoc_File)
+        
+        # Filter out non-work travel
+        work_location = wsLoc[wsLoc['WorkLocation'] != 0]
+
+        # Add home county
+        work_location = work_location.merge(landuse[['MAZ', 'ORIG_MAZ', 'ORIG_TAZ','DistID', 'CountyID']], left_on = 'HomeMGRA', right_on = 'MAZ', suffixes = (None, '_home'))
+        ## Rename columns
+        #work_location.rename({"MAZ": "HomeMAZ", 'ORIG_MAZ': 'HomeORIGMAZ', 'ORIG_TAZ':'HomeORIGTAZ', 'CountyID': 'HomeCountyID', 'DistID': "HomeDistID"}, inplace=True)
+
+        # Add work county
+        work_location = work_location.merge(landuse[['MAZ', 'ORIG_MAZ', 'ORIG_TAZ', 'DistID', 'CountyID']], left_on = 'WorkLocation', right_on = 'MAZ', suffixes = ('_home', '_work'))
+        ## Rename columns
+        # work_location.rename({"MAZ": "WorkMAZ", 'ORIG_MAZ': 'WorkORIGMAZ', 'ORIG_TAZ':'WorkORIGTAZ', 'CountyID': 'WorkCountyID', 'DistID': "WorkDistID"}, inplace = True)
+
+
+        return work_location
 
 
 class SkimReader:
@@ -498,12 +546,6 @@ class SkimReader:
     ## TM1 uses simple skims; TM2 uses more complex skims -> do we create simple skims from our skim matrices?
     ## TODO: Use make_transit_in_vehicle_time_table function from simulated.py for transit in-vehicle times
     ## What skims do we want for transit and roadway
-
-    ## TM1 Skims
-    cost_skim = pd.DataFrame
-    distance_skim = pd.DataFrame
-    time_skim = pd.DataFrame
-    active_time_skim = pd.DataFrame
 
 
     def __init__(self, config: Config, lookups: LookupTables):
@@ -1043,6 +1085,26 @@ class SummaryGenerator:
         
         print(f"Wrote {len(summary):,} rows of autoown_summary")
     
+    def generate_journey_to_work_summary(self, work_locations: pd.DataFrame) -> None:
+        """
+        Generate journey to work summary
+
+        Universe: Persons with work location
+        """
+
+        summary = work_locations.groupby([
+            'CountyID_home', 'MAZ_home', 'ORIG_MAZ_home', 'WorkLocation', 'CountyID_work'
+        ]).agg({'PersonID': 'count'}).reset_index()
+
+        summary.rename(columns = {'PersonID': 'freq'}, inplace = True)
+        summary['freq'] = summary['freq'] / self.config.sampleshare
+
+        # Save results
+        output_file = self.config.results_dir / "JourneyToWork.csv"
+        summary.to_csv(output_file, index = False)
+
+
+    
     # TODO: update
     def generate_vmt_summary(self, persons: pd.DataFrame) -> None:
         """Generate vehicle miles traveled summary."""
@@ -1100,6 +1162,27 @@ class SummaryGenerator:
         output_file = self.config.results_dir/f'{trip_or_tour.capitalize()}Summary{output_suffix}.csv'
         summary.to_csv(output_file, index = False)        
       
+    def generate_trip_summary_survey(
+            self,
+            df: pd.DataFrame
+    ):
+        """
+        Generate trip summary for comparsion against BATS Survey results
+        """
+        dest_purpose_dict ={
+           'Discretionary': 'Socrec', 'Visiting': 'Socrec', 'Maintenance': 'Pers_Bus'
+        }
+        df['simple_trip_mode'] = df['trip_mode'].map(self.lookups.tripMode.set_index('code')['simple_mode'])
+        df['simple_dest_purpose'] = df['dest_purpose'].replace(dest_purpose_dict)
+        print(df.head())
+        summary = df.groupby(['simple_trip_mode', 'simple_dest_purpose']).size().reset_index(name = 'freq')
+
+        summary['freq'] = summary['freq']/self.config.sampleshare
+        summary['share'] = (summary['freq'] / summary['freq'].sum())*100
+
+        output_file = self.config.results_dir/f'TripSummarySimpleModePurpose.csv'
+        summary.to_csv(output_file, index = False)        
+
 
 class CoreSummaries:
     """Main class orchestrating the entire core summaries process."""
@@ -1138,11 +1221,17 @@ class CoreSummaries:
         # This would involve reading tour and trip files and processing them
         
         tours = self.data_reader.combine_tours(households, landuse)
+        print(f"Tours: \n {tours.head()}")
 
         print("Reading trip data ...")
         trips = self.data_reader.combine_trips(persons)
-        print(f"Tours: \n {tours.head()}")
         print(f"Trips \n {trips.head()}")
+
+
+        print("Reading work-school location...")
+        work_locations = self.data_reader.read_work_school_location(landuse)
+        print(f"Trips \n {work_locations.head()}")
+  
 
         # Generate summaries
         print("Generating summaries...")
@@ -1151,6 +1240,7 @@ class CoreSummaries:
         self.summary_generator.generate_activity_pattern_summary(persons)
 
         print("Generate trips summary")
+        self.summary_generator.generate_trip_summary_survey(trips)
         self.summary_generator.generate_trips_tours_summary(trips, 'trip', ['trip_mode', 'trip_mode_label'], 'ByMode')
         self.summary_generator.generate_trips_tours_summary(trips, 'trip', ['trip_mode', 'trip_mode_label', 'tour_purpose'], 'ByModePurpose')
         self.summary_generator.generate_trips_tours_summary(trips, 'trip', ['tour_purpose'], 'ByPurpose')
@@ -1160,13 +1250,15 @@ class CoreSummaries:
         self.summary_generator.generate_trips_tours_summary(tours, 'tour', ['tour_mode', 'tour_mode_label', 'tour_purpose'], 'ByModePurpose')
         self.summary_generator.generate_trips_tours_summary(tours, 'tour', ['tour_purpose'], 'ByPurpose')
 
-
+        print("Generating journey to work summary")
+        self.summary_generator.generate_journey_to_work_summary(work_locations)
         # Save processed data
         print("Saving processed data...")
         households.to_pickle(self.config.updated_dir / "households.pickle")
         persons.to_pickle(self.config.updated_dir / "persons.pickle")
         trips.to_pickle(self.config.updated_dir / "trips.pickle")
         tours.to_pickle(self.config.updated_dir / "tours.pickle")
+        work_locations.to_pickle(self.config.updated_dir / "work_locations.pickle")
         
 
         
