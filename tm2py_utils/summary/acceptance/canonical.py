@@ -258,7 +258,9 @@ class Canonical:
         # transform to dictionary with { alternative -> canonical_name }
         logging.debug(f"Read:\n{df}")
 
-        self.canonical_agency_names_dict = {}
+        # start out with just canonical_name:canonical_name
+        self.canonical_agency_names_dict = {name:name for name in df['canonical_name'].unique()}
+        # add alternates
         for colname in df.columns:
             if not colname.startswith("alternate_"): continue
 
@@ -298,7 +300,8 @@ class Canonical:
         self.canonical_station_names_dict = {}
         for operator in df["operator"].unique():
             operator_df = df[df["operator"] == operator]
-            self.canonical_station_names_dict[operator] = {}
+            # start out with just canonical:canonical
+            self.canonical_station_names_dict[operator] =  {name:name for name in operator_df['canonical'].unique()}
 
             for colname in operator_df.columns:
                 if not colname.startswith("alternate_"): continue
