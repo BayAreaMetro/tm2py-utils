@@ -149,6 +149,7 @@ class Simulated:
     transit_demand_df: pd.DataFrame
     transit_tech_in_vehicle_times_df: pd.DataFrame
     transit_district_to_district_by_tech_df: pd.DataFrame
+    transit_district_to_district_by_tech_pldf: pl.DataFrame
     am_segment_boardings_df: pd.DataFrame
 
     HEAVY_RAIL_NETWORK_MODE_DESCR: str
@@ -189,6 +190,18 @@ class Simulated:
     }
 
     def _load_configs(self, scenario: bool = True, model: bool = True):
+        """Load scenario and/or model configuration files.
+
+        Reads TOML configuration files for scenario and model settings. Stores
+        configurations in instance variables scenario_dict and model_dict.
+
+        Args:
+            scenario (bool, optional): If True, load scenario config. Defaults to True.
+            model (bool, optional): If True, load model config. Defaults to True.
+
+        Returns:
+            None
+        """
         if scenario:
             with open(self.scenario_file, "r", encoding="utf-8") as toml_file:
                 self.scenario_dict = toml.load(toml_file)
@@ -200,6 +213,14 @@ class Simulated:
         return
 
     def _get_model_time_periods(self):
+        """Extract time period names from model configuration.
+
+        Populates model_time_periods list with time period names (e.g., 'ea', 'am',
+        'md', 'pm', 'ev') from model configuration dictionary.
+
+        Returns:
+            None
+        """
         if not self.model_time_periods:
             # this is a list of dictionaries
             for time_dict in self.model_dict["time_periods"]:
@@ -208,6 +229,14 @@ class Simulated:
         return
 
     def _get_morning_commute_capacity_factor(self):
+        """Get AM period highway capacity factor from model configuration.
+
+        Extracts the highway capacity factor for the AM time period, used for
+        scaling transit vehicle capacities in the morning peak period.
+
+        Returns:
+            None
+        """
         for time_dict in self.model_dict["time_periods"]:
             if time_dict["name"] == "am":
                 self.model_morning_capacity_factor = time_dict[
@@ -275,7 +304,26 @@ class Simulated:
         return
 
     def _validate(self):
-        """ #TODO: I don't think of these things as "validation"; this is just preparing simulation data...
+        """Prepare and validate all simulated model outputs.
+
+        Orchestrates the loading and processing of all simulated data outputs including
+        transit demand, roadway volumes, demographics, and accessibility metrics. Despite
+        the name, this method primarily prepares simulation data rather than validates it.
+
+        Processes:
+        - Transit mode dictionaries and network stops/routes/shapes
+        - Transit demand matrices (pandas and polars versions)
+        - Transit technology in-vehicle times from skims
+        - District-to-district transit summaries
+        - Transit segments, boardings, and access summaries
+        - Home-work flows and zero-vehicle households
+        - Station-to-station flows
+        - Roadway assignment volumes and speeds
+
+        Returns:
+            None
+
+        #TODO: I don't think of these things as "validation"; this is just preparing simulation data...
         """
         self._make_transit_mode_dict()
         self._read_standard_transit_stops()
@@ -293,7 +341,8 @@ class Simulated:
         self._make_transit_technology_in_vehicle_table_from_skims_pandas()
 
         # this is dependent upon reading transit demand and transit skims
-        self._make_district_to_district_transit_summaries()
+        self._make_district_to_district_transit_summaries_pandas()
+        self._make_district_to_district_transit_summaries_polars()
 
         self._reduce_simulated_transit_by_segment()
         self._reduce_simulated_transit_boardings()
@@ -316,6 +365,21 @@ class Simulated:
         return
 
     def _reduce_simulated_transit_by_segment(self):
+        """Process AM transit segment boardings.
+
+        Reads transit segment data for AM period, extracts segment-level boarding
+        counts, and parses line names to get line IDs and node pairs. Excludes
+        park-and-ride dummy routes.
+
+        Results stored in am_segment_boardings_df with columns:
+            - LINE_ID: Transit line identifier
+            - line: Full line name
+            - INODE, JNODE: Segment node pair
+            - board: Segment boardings
+
+        Returns:
+            None
+        """
         file_prefix = "transit_segment_"
         time_period = "am"  # am only
 
@@ -340,6 +404,19 @@ class Simulated:
     def _get_operator_name_from_line_name(
         self, input_df: pd.DataFrame, input_column_name: str, output_column_name: str
     ) -> pd.DataFrame:
+        """Extract operator name from transit line name.
+
+        Parses line names to extract operator code (second element when split by
+        underscore). Adds operator name as new column to input DataFrame.
+
+        Args:
+            input_df (pd.DataFrame): Input DataFrame with line names
+            input_column_name (str): Name of column containing line names
+            output_column_name (str): Name for output operator column
+
+        Returns:
+            pd.DataFrame: Input DataFrame with added operator column
+        """
         df = input_df[input_column_name].str.split(pat="_", expand=True).copy()
         df[output_column_name] = df[1]
         return_df = pd.concat([input_df, df[output_column_name]], axis="columns")
@@ -347,6 +424,18 @@ class Simulated:
         return return_df
 
     def _reduce_simulated_transit_shapes(self):
+        """Process AM transit segment shapes with volumes and V/C ratios.
+
+        Reads transit segment GeoJSON, joins with boarding data, calculates segment
+        volumes, capacities, and volume-to-capacity ratios. Computes mean V/C by line.
+        Excludes park-and-ride dummy routes from capacity calculations.
+
+        Results stored in transit_segments_gdf (GeoDataFrame) with columns documented
+        in class docstring.
+
+        Returns:
+            None
+        """
         time_period = "am"  # am only
 
         in_file = self.scenario_dir / f"output_summaries/boardings_by_segment_{time_period}.geojson"
@@ -1534,22 +1623,27 @@ class Simulated:
             polars_df = polars_df.filter(pl.col(core_name) > 0)
         return polars_df
 
-    def _make_district_to_district_transit_summaries(self):
-        """Create district-to-district transit flows by technology.
-        
+    def _make_district_to_district_transit_summaries_pandas(self):
+        """Create district-to-district transit flows by technology using pandas.
+
         Combines transit demand and in-vehicle times to allocate trips to technologies.
         Aggregates TAZ-level flows to planning districts. Calculates trips using each
         technology based on in-vehicle time proportions.
-        
+
+        Uses pandas DataFrames: transit_demand_df and transit_tech_in_vehicle_times_df
+
         Results stored in transit_district_to_district_by_tech_df with columns:
             - orig_district: Origin district ID (1-34)
             - dest_district: Destination district ID (1-34)
             - tech: Technology code (loc, exp, ltr, fry, hvy, com, total)
             - simulated: Number of trips using this technology
-        
+
         Returns:
             None
         """
+        start_time = time.perf_counter()
+        logging.info("_make_district_to_district_transit_summaries_pandas()")
+
         taz_district_dict = self.canonical.taz_to_district_df.set_index("taz")[
             "district"
         ].to_dict()
@@ -1600,6 +1694,113 @@ class Simulated:
         long_sum_s_df["tech"] = long_sum_s_df["tech"].map(rename_dict)
 
         self.transit_district_to_district_by_tech_df = long_sum_s_df.copy()
+
+        end_time = time.perf_counter()
+        logging.info(f"time taken: {(end_time - start_time):.2f} seconds")
+        logging.debug(f"transit_district_to_district_by_tech_df (pandas):\n{self.transit_district_to_district_by_tech_df}")
+
+        return
+
+    def _make_district_to_district_transit_summaries_polars(self):
+        """Create district-to-district transit flows by technology using polars.
+
+        Combines transit demand and in-vehicle times to allocate trips to technologies.
+        Aggregates TAZ-level flows to planning districts. Calculates trips using each
+        technology based on in-vehicle time proportions.
+
+        Uses polars DataFrames: simulated_transit_demand_pldf and transit_tech_in_vehicle_times_pldf
+
+        Results stored in transit_district_to_district_by_tech_pldf with columns:
+            - orig_district: Origin district ID (1-34)
+            - dest_district: Destination district ID (1-34)
+            - tech: Technology code (loc, exp, ltr, fry, hvy, com, total)
+            - simulated: Number of trips using this technology
+
+        Returns:
+            None
+        """
+        start_time = time.perf_counter()
+        logging.info("_make_district_to_district_transit_summaries_polars()")
+
+        # Create TAZ-to-district lookup dictionary for mapping zones to districts
+        taz_district_dict = self.canonical.taz_to_district_df.set_index("taz")[
+            "district"
+        ].to_dict()
+
+        # Clone input dataframes to avoid modifying originals
+        s_dem_pldf = self.simulated_transit_demand_pldf.clone()
+        s_path_pldf = self.transit_tech_in_vehicle_times_pldf.clone()
+
+        # Aggregate demand by OD pair and time period (sum across all paths/modes)
+        s_dem_sum_pldf = (
+            s_dem_pldf.group_by(["origin", "destination", "time_period"])
+            .agg(pl.col("simulated_flow").sum())
+        )
+
+        # Join demand with path/skim data to get in-vehicle times and boardings
+        s_pldf = s_dem_sum_pldf.join(
+            s_path_pldf,
+            on=["origin", "destination", "time_period"],
+            how="inner",
+        )
+
+        # Filter to AM period only
+        s_pldf = s_pldf.filter(pl.col("time_period") == "am")
+
+        # Calculate technology-specific flows using formula:
+        # tech_flow = total_flow * boards * tech_ivt / total_ivt
+        # This allocates trips to technologies based on their share of in-vehicle time
+        for tech in self.canonical.transit_technology_abbreviation_dict.keys():
+            column_name = "simulated_{}_flow".format(tech.lower())
+            s_pldf = s_pldf.with_columns(
+                (
+                    pl.col("simulated_flow")
+                    * pl.col("boards")
+                    * pl.col("{}".format(tech.lower()))
+                    / pl.col("ivt")
+                ).alias(column_name)
+            )
+
+        # Map TAZ origins and destinations to planning districts
+        s_pldf = s_pldf.with_columns([
+            pl.col("origin").replace_strict(taz_district_dict, default=None).alias("orig_district"),
+            pl.col("destination").replace_strict(taz_district_dict, default=None).alias("dest_district"),
+        ])
+
+        # Build aggregation expressions for all flow columns
+        agg_exprs = [pl.col("simulated_flow").sum()]
+        for tech in self.canonical.transit_technology_abbreviation_dict.keys():
+            agg_exprs.append(pl.col("simulated_{}_flow".format(tech.lower())).sum())
+
+        # Aggregate flows by district OD pairs
+        sum_s_pldf = (
+            s_pldf.group_by(["orig_district", "dest_district"]).agg(agg_exprs)
+        )
+
+        # Reshape from wide to long format (one row per district OD + technology)
+        long_sum_s_pldf = sum_s_pldf.melt(
+            id_vars=["orig_district", "dest_district"],
+            variable_name="tech",
+            value_name="simulated",
+        )
+
+        # Create mapping to rename flow columns to technology codes
+        # e.g., "simulated_flow" -> "total", "simulated_loc_flow" -> "loc"
+        rename_dict = {"simulated_flow": "total"}
+        for tech in self.canonical.transit_technology_abbreviation_dict.keys():
+            rename_dict["simulated_{}_flow".format(tech.lower())] = tech.lower()
+
+        # Apply the renaming to get clean technology codes
+        long_sum_s_pldf = long_sum_s_pldf.with_columns(
+            pl.col("tech").replace_strict(rename_dict, default=None)
+        )
+
+        # Store the result
+        self.transit_district_to_district_by_tech_pldf = long_sum_s_pldf.clone()
+
+        end_time = time.perf_counter()
+        logging.info(f"time taken: {(end_time - start_time):.2f} seconds")
+        logging.debug(f"transit_district_to_district_by_tech_pldf (polars):\n{self.transit_district_to_district_by_tech_pldf}")
 
         return
 
