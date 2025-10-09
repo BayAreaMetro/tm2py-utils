@@ -1,4 +1,5 @@
 geopandas
+polars # faster pandas
 toml # used in config.py to load config files. alternative is json
 pydantic < 2.0 # used in config.py to validate config files. alternative?
 requests # logger.py, used to post msg to slack about model run; also a deep dependency of the documentation libs. alternative?

@@ -39,12 +39,12 @@ class Simulated:
         model_morning_capacity_factor (float): AM peak capacity adjustment factor
         
         Roadway Data:
-        simulated_roadway_am_shape_gdf (gpd.GeoDataFrame): AM roadway network geometry:
+        roadway_am_shape_gdf (gpd.GeoDataFrame): AM roadway network geometry:
             - emme_a_node_id, emme_b_node_id: Network nodes
             - standard_link_id: Link identifier
             - geometry: Link shape
             
-        simulated_roadway_assignment_results_df (pd.DataFrame): Link volumes by time:
+        roadway_assignment_results_df (pd.DataFrame): Link volumes by time:
             - emme_a_node_id, emme_b_node_id: Network nodes
             - standard_link_id: Link identifier
             - time_period: Time period
@@ -57,7 +57,7 @@ class Simulated:
             - ft: Facility type
             
         Transit Data:
-        simulated_boardings_df (pd.DataFrame): Route-level boardings:
+        boardings_df (pd.DataFrame): Route-level boardings:
             - line_name: Transit line identifier
             - daily_line_name: Daily aggregated line
             - operator: Transit agency
@@ -66,7 +66,7 @@ class Simulated:
             - total_boarding: Total boardings
             - total_hour_cap: Hourly capacity
             
-        simulated_transit_segments_gdf (gpd.GeoDataFrame): Segment-level transit:
+        transit_segments_gdf (gpd.GeoDataFrame): Segment-level transit:
             - LINE_ID: Line identifier
             - INODE, JNODE: Segment nodes
             - board: Segment boardings
@@ -75,7 +75,7 @@ class Simulated:
             - am_segment_vc_ratio_total/seated: V/C ratios
             - geometry: Segment shape
             
-        simulated_transit_access_df (pd.DataFrame): Rail station access:
+        transit_access_df (pd.DataFrame): Rail station access:
             - operator: Rail operator
             - boarding: Station node
             - boarding_name: Station name
@@ -83,29 +83,29 @@ class Simulated:
             - simulated_boardings: Boardings by access mode
             - time_period: Time period
             
-        simulated_station_to_station_df (pd.DataFrame): Station OD flows:
+        station_to_station_df (pd.DataFrame): Station OD flows:
             - operator: Transit operator
             - boarding_name, alighting_name: Station names
             - simulated: Passenger flow
             
         Home-Work & Demographics:
-        simulated_home_work_flows_df (pd.DataFrame): County commute flows:
+        home_work_flows_df (pd.DataFrame): County commute flows:
             - residence_county: Home county
             - work_county: Work county
             - simulated_flow: Number of workers
             
-        simulated_zero_vehicle_hhs_df (pd.DataFrame): Zero-vehicle households by MAZ:
+        zero_vehicle_hhs_df (pd.DataFrame): Zero-vehicle households by MAZ:
             - maz: Model zone ID
             - simulated_zero_vehicle_share: Share with no vehicles
             - simulated_households: Total households
             
-        reduced_simulated_zero_vehicle_hhs_df (pd.DataFrame): By census tract:
+        reduced_zero_vehicle_hhs_df (pd.DataFrame): By census tract:
             - tract: Census tract ID
             - simulated_zero_vehicle_share: Tract-level share
             - simulated_households: Total households
             
         Bridge Data:
-        simulated_bridge_details_df (pd.DataFrame): Bridge toll links:
+        bridge_details_df (pd.DataFrame): Bridge toll links:
             - plaza_name: Bridge name
             - direction: Travel direction
             - standard_link_id: Link ID
@@ -130,26 +130,26 @@ class Simulated:
     model_time_periods = []
     model_morning_capacity_factor: float
 
-    simulated_roadway_am_shape_gdf: gpd.GeoDataFrame
+    roadway_am_shape_gdf: gpd.GeoDataFrame
 
-    simulated_roadway_assignment_results_df = pd.DataFrame
+    roadway_assignment_results_df = pd.DataFrame
 
     transit_access_mode_dict = {}
     transit_mode_dict = {}
 
 
-    simulated_boardings_df: pd.DataFrame
-    simulated_home_work_flows_df: pd.DataFrame
+    boardings_df: pd.DataFrame
+    home_work_flows_df: pd.DataFrame
     simulated_maz_data_df: pd.DataFrame
-    simulated_transit_segments_gdf: gpd.GeoDataFrame
-    simulated_transit_access_df: pd.DataFrame
-    simulated_zero_vehicle_hhs_df: pd.DataFrame
-    reduced_simulated_zero_vehicle_hhs_df: pd.DataFrame
-    simulated_station_to_station_df: pd.DataFrame
-    simulated_transit_demand_df: pd.DataFrame
-    simulated_transit_tech_in_vehicle_times_df: pd.DataFrame
-    simulated_transit_district_to_district_by_tech_df: pd.DataFrame
-    am_segment_simulated_boardings_df: pd.DataFrame
+    transit_segments_gdf: gpd.GeoDataFrame
+    transit_access_df: pd.DataFrame
+    zero_vehicle_hhs_df: pd.DataFrame
+    reduced_zero_vehicle_hhs_df: pd.DataFrame
+    station_to_station_df: pd.DataFrame
+    transit_demand_df: pd.DataFrame
+    transit_tech_in_vehicle_times_df: pd.DataFrame
+    transit_district_to_district_by_tech_df: pd.DataFrame
+    am_segment_boardings_df: pd.DataFrame
 
     HEAVY_RAIL_NETWORK_MODE_DESCR: str
     COMMUTER_RAIL_NETWORK_MODE_DESCR: str
@@ -160,7 +160,7 @@ class Simulated:
     standard_nodes_gdf: gpd.GeoDataFrame
     standard_to_emme_transit_nodes_df: pd.DataFrame
 
-    simulated_bridge_details_df = pd.DataFrame(
+    bridge_details_df = pd.DataFrame(
         [
             ["Bay Bridge", "WB", 3082623, True],
             ["Bay Bridge", "EB", 3055540, False],
@@ -304,14 +304,14 @@ class Simulated:
         self._reduce_simulated_rail_access_summaries()
 
         assert sorted(
-            self.simulated_home_work_flows_df.residence_county.unique().tolist()
+            self.home_work_flows_df.residence_county.unique().tolist()
         ) == sorted(self.canonical.county_names_list)
         assert sorted(
-            self.simulated_home_work_flows_df.work_county.unique().tolist()
+            self.home_work_flows_df.work_county.unique().tolist()
         ) == sorted(self.canonical.county_names_list)
 
         # requires emme_links.py from post_process.py
-        # self._reduce_simulated_roadway_assignment_outcomes()
+        self._reduce_simulated_roadway_assignment_outcomes()
 
         return
 
@@ -335,7 +335,7 @@ class Simulated:
         a_df["JNODE"] = a_df["JNODE"].astype("float").astype("Int64")
         df = a_df[["LINE_ID", "line", "INODE", "JNODE", "board"]]
 
-        self.am_segment_simulated_boardings_df = df
+        self.am_segment_boardings_df = df
 
     def _get_operator_name_from_line_name(
         self, input_df: pd.DataFrame, input_column_name: str, output_column_name: str
@@ -359,7 +359,7 @@ class Simulated:
         df = pd.DataFrame(gdf.drop(columns=["geometry"]))
 
         # Add am boards
-        a_df = self.am_segment_simulated_boardings_df
+        a_df = self.am_segment_boardings_df
 
         df = pd.merge(df, a_df, how="left", on=["LINE_ID", "INODE", "JNODE"])
 
@@ -395,11 +395,11 @@ class Simulated:
             on="LINE_ID",
             how="left",
         )
-        print(a_gdf.head())
-        print(a_gdf.columns)
+        logging.debug(a_gdf.head())
+        logging.debug(a_gdf.columns)
 
 
-        self.simulated_transit_segments_gdf = pd.merge(
+        self.transit_segments_gdf = pd.merge(
             a_gdf,
             a_df[
                 [
@@ -479,7 +479,7 @@ class Simulated:
         Reads workplace location results from CTRAMP, aggregates to county-to-county
         flows for comparison with CTPP data.
         
-        Results stored in simulated_home_work_flows_df with columns:
+        Results stored in home_work_flows_df with columns:
             - residence_county: Home county name
             - work_county: Work county name
             - simulated_flow: Number of workers making this commute
@@ -526,8 +526,8 @@ class Simulated:
             simulated_flow = pd.NamedAgg(column="num_workers", aggfunc="sum")
         ).reset_index()
 
-        self.simulated_home_work_flows_df = workloc_df
-        logging.debug(f"self.simulated_home_work_flows_df:\nself.simulated_home_work_flows_df")
+        self.home_work_flows_df = workloc_df
+        logging.debug(f"self.home_work_flows_df:\nself.home_work_flows_df")
 
         return
 
@@ -570,7 +570,7 @@ class Simulated:
         Focuses on heavy rail and commuter rail stations. Aggregates walk access from
         multiple sub-modes (walk-to-transit, walk-transfer-walk, etc.).
         
-        Results stored in simulated_transit_access_df with columns:
+        Results stored in transit_access_df with columns:
             - operator: Rail operator canonical name
             - boarding: Station node ID
             - boarding_name: Station canonical name
@@ -706,8 +706,8 @@ class Simulated:
 
             out_df = pd.concat([out_df, running_df], axis="rows", ignore_index=True)
 
-        self.simulated_transit_access_df = out_df
-        logging.debug(f"self.simulated_transit_access_df:\n{self.simulated_transit_access_df}")
+        self.transit_access_df = out_df
+        logging.debug(f"self.transit_access_df:\n{self.transit_access_df}")
 
         return
 
@@ -718,7 +718,7 @@ class Simulated:
         modes (walk, drive, park-and-ride) and time periods. Applies canonical
         station names and sums across all paths.
         
-        Results stored in simulated_station_to_station_df with columns:
+        Results stored in station_to_station_df with columns:
             - operator: Rail operator (BART, Caltrain)
             - boarding_name: Origin station canonical name
             - alighting_name: Destination station canonical name
@@ -796,7 +796,7 @@ class Simulated:
             .reset_index()
         )
 
-        self.simulated_station_to_station_df = sum_df.copy()
+        self.station_to_station_df = sum_df.copy()
 
         return
 
@@ -826,7 +826,7 @@ class Simulated:
         Reads boardings_by_line CSV files for each time period, joins with mode/operator
         crosswalk, applies canonical naming, and aggregates to daily totals.
         
-        Results stored in simulated_boardings_df with columns:
+        Results stored in boardings_df with columns:
             - line_name: Time-specific line identifier
             - daily_line_name: Daily aggregated line name
             - tm2_mode: TM2 mode code
@@ -888,7 +888,7 @@ class Simulated:
         daily_df["time_period"] = self.canonical.ALL_DAY_WORD
         daily_df["line_name"] = "N/A -- Daily Record"
 
-        self.simulated_boardings_df = pd.concat(
+        self.boardings_df = pd.concat(
             [daily_df, time_period_df], axis="rows", ignore_index=True
         )
 
@@ -902,8 +902,8 @@ class Simulated:
         crosswalk.
         
         Results stored in:
-        - simulated_zero_vehicle_hhs_df: MAZ-level data
-        - reduced_simulated_zero_vehicle_hhs_df: Census tract-level aggregation
+        - zero_vehicle_hhs_df: MAZ-level data
+        - reduced_zero_vehicle_hhs_df: Census tract-level aggregation
             with columns: tract, simulated_zero_vehicle_share, simulated_households
         
         Returns:
@@ -944,12 +944,12 @@ class Simulated:
             "vehicle_share": "simulated_zero_vehicle_share",
             "hhld_count": "simulated_households",
         }, inplace=True)
-        self.simulated_zero_vehicle_hhs_df = hhld_summary_df
+        self.zero_vehicle_hhs_df = hhld_summary_df
         
         # prepare simulated data
         a_df = (
             pd.merge(
-                self.simulated_zero_vehicle_hhs_df,
+                self.zero_vehicle_hhs_df,
                 self.canonical.simulated_maz_data_df[["MAZ_ORIGINAL", "MAZSEQ"]],
                 left_on="maz",
                 right_on="MAZSEQ",
@@ -988,7 +988,7 @@ class Simulated:
             c_df["product"] / c_df["simulated_households"]
         )
 
-        self.reduced_simulated_zero_vehicle_hhs_df = c_df
+        self.reduced_zero_vehicle_hhs_df = c_df
 
         return
 
@@ -1185,7 +1185,7 @@ class Simulated:
         for each OD pair. Used to allocate trips to technologies based on
         in-vehicle time shares.
         
-        Results stored in simulated_transit_tech_in_vehicle_times_df with columns:
+        Results stored in transit_tech_in_vehicle_times_df with columns:
             - origin, destination: TAZ pair
             - path: Access mode path (WLK_TRN_WLK, PNR_TRN_WLK, etc.)
             - time_period: Time period
@@ -1212,7 +1212,7 @@ class Simulated:
 
         skim_dir = self.scenario_dir / "skim_matrices/transit"
 
-        self.simulated_transit_tech_in_vehicle_times_df = None
+        self.transit_tech_in_vehicle_times_df = None
         for path, time_period in itertools.product(path_list, self.model_time_periods):
             filename = skim_dir / f"trnskm{time_period.upper()}_{path}.omx"
 
@@ -1262,18 +1262,18 @@ class Simulated:
                     on=["origin", "destination"],
                 )
 
-            self.simulated_transit_tech_in_vehicle_times_df = pd.concat([
-                self.simulated_transit_tech_in_vehicle_times_df, 
+            self.transit_tech_in_vehicle_times_df = pd.concat([
+                self.transit_tech_in_vehicle_times_df, 
                 path_time_df
             ], axis="rows", ignore_index=True).reset_index(drop=True)
 
             omx_handle.close()
 
-        self.simulated_transit_tech_in_vehicle_times_df.fillna(value=0, inplace=True)
+        self.transit_tech_in_vehicle_times_df.fillna(value=0, inplace=True)
         end_time = time.perf_counter()
-        logging.debug(f"self.simulated_transit_tech_in_vehicle_times_df:\n{self.simulated_transit_tech_in_vehicle_times_df}")
-        logging.debug(f"description:\n{self.simulated_transit_tech_in_vehicle_times_df.describe()}")
-        logging.info(f"memroy usage: {self.simulated_transit_tech_in_vehicle_times_df.memory_usage(deep=True).sum() / 1024**2:.2f} MB")
+        logging.debug(f"self.transit_tech_in_vehicle_times_df:\n{self.transit_tech_in_vehicle_times_df}")
+        logging.debug(f"description:\n{self.transit_tech_in_vehicle_times_df.describe()}")
+        logging.info(f"memroy usage: {self.transit_tech_in_vehicle_times_df.memory_usage(deep=True).sum() / 1024**2:.2f} MB")
         logging.info(f"time taken: {(end_time - start_time)/60:.1f} minutes")
         return
 
@@ -1285,7 +1285,7 @@ class Simulated:
         for each OD pair. Used to allocate trips to technologies based on
         in-vehicle time shares.
         
-        Results stored in simulated_transit_tech_in_vehicle_times_df with columns:
+        Results stored in transit_tech_in_vehicle_times_df with columns:
             - origin, destination: TAZ pair
             - path: Access mode path (WLK_TRN_WLK, PNR_TRN_WLK, etc.)
             - time_period: Time period
@@ -1312,7 +1312,7 @@ class Simulated:
 
         skim_dir = self.scenario_dir / "skim_matrices/transit"
 
-        self.simulated_transit_tech_in_vehicle_times_pldf = pl.DataFrame()
+        self.transit_tech_in_vehicle_times_pldf = pl.DataFrame()
         for path, time_period in itertools.product(path_list, self.model_time_periods):
             filename = skim_dir / f"trnskm{time_period.upper()}_{path}.omx"
 
@@ -1372,15 +1372,15 @@ class Simulated:
                 # fill null tech-IVT
                 path_time_pldf = path_time_pldf.with_columns(pl.col(tech.lower()).fill_null(0))
 
-            self.simulated_transit_tech_in_vehicle_times_pldf = pl.concat([
-                self.simulated_transit_tech_in_vehicle_times_pldf, 
+            self.transit_tech_in_vehicle_times_pldf = pl.concat([
+                self.transit_tech_in_vehicle_times_pldf, 
                 path_time_pldf
             ])
             omx_handle.close()
         end_time = time.perf_counter()
-        logging.debug(f"self.simulated_transit_tech_in_vehicle_times_pldf:\n{self.simulated_transit_tech_in_vehicle_times_pldf}")
-        logging.debug(f"description:\n{self.simulated_transit_tech_in_vehicle_times_pldf.describe()}")
-        logging.info(f"memory usage: {self.simulated_transit_tech_in_vehicle_times_pldf.estimated_size('mb'):.2f} MB")
+        logging.debug(f"self.transit_tech_in_vehicle_times_pldf:\n{self.transit_tech_in_vehicle_times_pldf}")
+        logging.debug(f"description:\n{self.transit_tech_in_vehicle_times_pldf.describe()}")
+        logging.info(f"memory usage: {self.transit_tech_in_vehicle_times_pldf.estimated_size('mb'):.2f} MB")
         logging.info(f"time taken: {(end_time - start_time)/60:.1f} minutes")
         return    
 
@@ -1397,7 +1397,7 @@ class Simulated:
         transit_demand_dir = self.scenario_dir / "demand_matrices/transit"
 
         # pandas version
-        self.simulated_transit_demand_df = pd.DataFrame()
+        self.transit_demand_df = pd.DataFrame()
         for time_period in self.model_time_periods:
             filename = transit_demand_dir / f"trn_demand_{time_period}_{self.iter}.omx"
             logging.info(f"Reading {filename}")
@@ -1412,19 +1412,19 @@ class Simulated:
                 df["path"] = path
                 df["time_period"] = time_period
 
-                self.simulated_transit_demand_df = pd.concat([
-                    self.simulated_transit_demand_df,
+                self.transit_demand_df = pd.concat([
+                    self.transit_demand_df,
                     df
                 ], axis="index", ignore_index=True)
-                self.simulated_transit_demand_df.reset_index(drop=True)
+                self.transit_demand_df.reset_index(drop=True)
 
             omx_handle.close()
 
-        self.simulated_transit_demand_df.fillna(value=0, inplace=True)
+        self.transit_demand_df.fillna(value=0, inplace=True)
         end_time = time.perf_counter()
-        logging.debug(f"self.simulated_transit_demand_df:\n{self.simulated_transit_demand_df}")
-        logging.debug(f"description:\n{self.simulated_transit_demand_df.describe()}")
-        logging.info(f"memory usage: {self.simulated_transit_demand_df.memory_usage(deep=True).sum() / 1024**2:.2f} MB")
+        logging.debug(f"self.transit_demand_df:\n{self.transit_demand_df}")
+        logging.debug(f"description:\n{self.transit_demand_df.describe()}")
+        logging.info(f"memory usage: {self.transit_demand_df.memory_usage(deep=True).sum() / 1024**2:.2f} MB")
         logging.info(f"time taken: {(end_time - start_time)/60:.1f} minutes")
 
     def _read_transit_demand_polars(self):
@@ -1541,7 +1541,7 @@ class Simulated:
         Aggregates TAZ-level flows to planning districts. Calculates trips using each
         technology based on in-vehicle time proportions.
         
-        Results stored in simulated_transit_district_to_district_by_tech_df with columns:
+        Results stored in transit_district_to_district_by_tech_df with columns:
             - orig_district: Origin district ID (1-34)
             - dest_district: Destination district ID (1-34)
             - tech: Technology code (loc, exp, ltr, fry, hvy, com, total)
@@ -1554,8 +1554,8 @@ class Simulated:
             "district"
         ].to_dict()
 
-        s_dem_df = self.simulated_transit_demand_df.copy()
-        s_path_df = self.simulated_transit_tech_in_vehicle_times_df.copy()
+        s_dem_df = self.transit_demand_df.copy()
+        s_path_df = self.transit_tech_in_vehicle_times_df.copy()
 
         s_dem_sum_df = (
             s_dem_df.groupby(["origin", "destination", "time_period"])
@@ -1599,7 +1599,7 @@ class Simulated:
         )
         long_sum_s_df["tech"] = long_sum_s_df["tech"].map(rename_dict)
 
-        self.simulated_transit_district_to_district_by_tech_df = long_sum_s_df.copy()
+        self.transit_district_to_district_by_tech_df = long_sum_s_df.copy()
 
         return
 
@@ -1684,7 +1684,7 @@ class Simulated:
         class, speeds, and capacities. Combines general purpose and managed lane
         volumes. Aggregates to daily totals.
         
-        Results stored in simulated_roadway_assignment_results_df with columns:
+        Results stored in roadway_assignment_results_df with columns:
             - emme_a_node_id, emme_b_node_id: Link nodes
             - standard_link_id: Link identifier
             - time_period: Time period (am, pm, daily, etc.)
@@ -1698,7 +1698,7 @@ class Simulated:
             - ft: Facility type code
             - distance_in_miles: Link length
         
-        Also creates simulated_roadway_am_shape_gdf with AM period geometry.
+        Also creates roadway_am_shape_gdf with AM period geometry.
         
         Returns:
             None
@@ -1711,7 +1711,7 @@ class Simulated:
         logging.info(f"Reading {in_file}")
         shape_gdf = gpd.read_file(in_file)
         logging.debug(f"shape_gdf:\n{shape_gdf}")
-        self.simulated_roadway_am_shape_gdf = (
+        self.roadway_am_shape_gdf = (
             shape_gdf[["INODE", "JNODE", "#link_id", "geometry"]]
             .copy()
             .rename(
@@ -1897,6 +1897,6 @@ class Simulated:
 
         return_df = pd.concat([across_df, daily_df], axis="rows").reset_index(drop=True)
 
-        self.simulated_roadway_assignment_results_df = return_df
+        self.roadway_assignment_results_df = return_df
 
         return

@@ -40,7 +40,7 @@ class Observed:
             - odot_maximum_error: Maximum acceptable percent error
             - key_location: Key arterial or bridge name if applicable
             
-        observed_bridge_transactions_df (pd.DataFrame): Bridge toll transactions:
+        bridge_transactions_df (pd.DataFrame): Bridge toll transactions:
             - plaza_name: Bridge toll plaza name
             - time_period: Time period
             - transactions: Number of toll transactions
@@ -62,7 +62,7 @@ class Observed:
             - survey_trips: Number of trips by access mode
             - time_period: Time period
             
-        observed_bart_boardings_df (pd.DataFrame): BART station-to-station flows:
+        bart_boardings_df (pd.DataFrame): BART station-to-station flows:
             - boarding: Origin station name
             - alighting: Destination station name
             - observed: Average daily trips
@@ -223,9 +223,9 @@ class Observed:
         columns=["name", "direction", "pems_station_id"],
     )
 
-    observed_bridge_transactions_df: pd.DataFrame
+    bridge_transactions_df: pd.DataFrame
 
-    observed_bart_boardings_df: pd.DataFrame
+    bart_boardings_df: pd.DataFrame
     RELEVANT_BART_OBSERVED_YEARS_LIST = [2014, 2015, 2016]
 
     florida_transit_guidelines_df = pd.DataFrame(
@@ -583,7 +583,7 @@ class Observed:
         Reads BART origin-destination data and applies canonical station names.
         Takes average of years 2014-2016.
         
-        Results stored in observed_bart_boardings_df with columns:
+        Results stored in bart_boardings_df with columns:
             - boarding: Origin station canonical name
             - alighting: Destination station canonical name
             - observed: Average daily trips between stations
@@ -622,8 +622,8 @@ class Observed:
         bart_df = bart_df.rename(columns={"avg_trips": "observed"})
         logging.debug(f"bart_df:\n{bart_df}")
 
-        self.observed_bart_boardings_df = bart_df
-        logging.debug(f"self.observed_bart_boardings_df:\n{self.observed_bart_boardings_df}")
+        self.bart_boardings_df = bart_df
+        logging.debug(f"self.bart_boardings_df:\n{self.bart_boardings_df}")
 
         return
 
@@ -1043,7 +1043,7 @@ class Observed:
         Processes bridge toll transaction data, aggregates to time periods and daily
         totals. Takes median across years 2014-2016.
         
-        Results stored in observed_bridge_transactions_df with columns:
+        Results stored in bridge_transactions_df with columns:
             - plaza_name: Bridge toll plaza name
             - time_period: Time period (am, pm, md, ev, ea, daily)
             - transactions: Number of toll transactions (median across years)
@@ -1112,8 +1112,8 @@ class Observed:
             .reset_index()
             .rename(columns={"Plaza Name": "plaza_name"})
         )
-        self.observed_bridge_transactions_df = pd.concat([time_period_df, daily_df]).reset_index(drop=True)
-        logging.debug(f"self.observed_bridge_transactions_df:\n{self.observed_bridge_transactions_df}")
+        self.bridge_transactions_df = pd.concat([time_period_df, daily_df]).reset_index(drop=True)
+        logging.debug(f"self.bridge_transactions_df:\n{self.bridge_transactions_df}")
         return
 
     def reduce_traffic_counts(self):
