@@ -1697,7 +1697,18 @@ class Simulated:
 
         end_time = time.perf_counter()
         logging.info(f"time taken: {(end_time - start_time):.2f} seconds")
-        logging.debug(f"transit_district_to_district_by_tech_df (pandas):\n{self.transit_district_to_district_by_tech_df}")
+
+        # Log pivoted matrices by technology for easier comparison
+        for tech_value in sorted(self.transit_district_to_district_by_tech_df['tech'].unique()):
+            tech_df = self.transit_district_to_district_by_tech_df[
+                self.transit_district_to_district_by_tech_df['tech'] == tech_value
+            ].copy()
+            pivot_df = tech_df.pivot(
+                index='orig_district',
+                columns='dest_district',
+                values='simulated'
+            )
+            logging.debug(f"transit_district_to_district matrix (pandas) - {tech_value}:\n{pivot_df}")
 
         return
 
@@ -1800,7 +1811,18 @@ class Simulated:
 
         end_time = time.perf_counter()
         logging.info(f"time taken: {(end_time - start_time):.2f} seconds")
-        logging.debug(f"transit_district_to_district_by_tech_pldf (polars):\n{self.transit_district_to_district_by_tech_pldf}")
+
+        # Log pivoted matrices by technology for easier comparison
+        for tech_value in sorted(self.transit_district_to_district_by_tech_pldf['tech'].unique().to_list()):
+            tech_pldf = self.transit_district_to_district_by_tech_pldf.filter(
+                pl.col('tech') == tech_value
+            )
+            pivot_pldf = tech_pldf.pivot(
+                index='orig_district',
+                columns='dest_district',
+                values='simulated'
+            )
+            logging.debug(f"transit_district_to_district matrix (polars) - {tech_value}:\n{pivot_pldf}")
 
         return
 
