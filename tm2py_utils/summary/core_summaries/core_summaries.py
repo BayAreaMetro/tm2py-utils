@@ -3,11 +3,11 @@ import pandas as pd
 import numpy as np
 import re
 from pathlib import Path
-import pickle
 from typing import Dict, List, Tuple, Optional
 import openmatrix as omx
 import itertools
 from pydantic import BaseModel, Field
+import logging
 
 ## TODO: Add logging
 ## TODO: Potentially move this to .toml configuration? Or reference .toml file
@@ -208,9 +208,9 @@ class DataReader:
         """Read and process person data."""
         
         ## If processed file exist, read that instead:
-        if (self.config.updated_dir / 'persons.pickle').exists():
+        if (self.config.updated_dir / 'persons.parquet').exists():
             print("Reading cached processed persons file")
-            persons = pd.read_pickle(self.config.updated_dir/ 'persons.pickle')
+            persons = pd.read_parquet(self.config.updated_dir / 'persons.parquet')
             return persons
         # Read input files
         popsyn_file = Path(self.config.target_dir) / "inputs" / "popsyn" / "persons.csv"
@@ -273,9 +273,9 @@ class DataReader:
 
         ## TM2
         ## If processed file exist, read that instead:
-        if (self.config.updated_dir / 'households.pickle').exists():
+        if (self.config.updated_dir / 'households.parquet').exists():
             print("Reading cached processed household file")
-            persons = pd.read_pickle(self.config.updated_dir/ 'households.pickle')
+            persons = pd.read_parquet(self.config.updated_dir/ 'households.parquet')
             return persons
         popsyn_file = Path(self.config.target_dir) / "inputs" / "popsyn" / "households.csv"
         ct_file = self.config.main_dir / f"householdData_{self.config.iter}.csv"
@@ -344,9 +344,9 @@ class DataReader:
         """Combine joint and individual tours into a single DataFrame."""
 
         ## If processed file exist, read that instead:
-        if (self.config.updated_dir / 'tours.pickle').exists():
+        if (self.config.updated_dir / 'tours.parquet').exists():
             print("Reading cached processed tours file")
-            tours = pd.read_pickle(self.config.updated_dir/ 'tours.pickle')
+            tours = pd.read_parquet(self.config.updated_dir/ 'tours.parquet')
             return tours
 
         jointTours = self._read_tours('Joint')
@@ -376,7 +376,8 @@ class DataReader:
         - households: DataFrame of households to join with tours
         - persons: DataFrame of persons to join with tours
         - IndivJoint: 'Indiv' or 'Joint' to specify tour type
-                                                                           """
+        """
+
         # Read input file
         tour_file = self.config.main_dir / f"{IndivJoint}TourData_{self.config.iter}.csv"
         tour = pd.read_csv(tour_file)
@@ -399,7 +400,7 @@ class DataReader:
         
         if IndivJoint == 'Indiv':
             tour['num_participants'] = 1
-            tour['tour_participants'] = tour['person_num']
+            tour['tour_participants'] = tour['person_num'].astype(str)
             ## TODO: Add parking information later
             # Add free-parking choice from persons table
             # tour = tour.merge(persons[['person_id', 'fp_choice']], on='person_id', how='left')
@@ -425,9 +426,9 @@ class DataReader:
     def combine_trips(self, persons: pd.DataFrame) -> pd.DataFrame:
 
         ## If processed file exist, read that instead:
-        if (self.config.updated_dir / 'trips.pickle').exists():
+        if (self.config.updated_dir / 'trips.parquet').exists():
             print("Reading cached processed trips file")
-            trips = pd.read_pickle(self.config.updated_dir/ 'trips.pickle')
+            trips = pd.read_parquet(self.config.updated_dir/ 'trips.parquet')
             return trips
 
         indiv_trip = self._read_trips('Indiv')
@@ -455,7 +456,7 @@ class DataReader:
 
         if IndivJoint == 'Indiv':
             trip['num_participants'] = 1
-            trip['tour_participants'] = trip['person_num']
+            trip['tour_participants'] = trip['person_num'].astype(str)
 
         print(f"Read {len(trip):,} rows from {trip_file}")
         print(trip.head())
@@ -517,7 +518,18 @@ class DataReader:
 
         return tours
     
-    def read_work_school_location(self, landuse: pd.DataFrame):
+    def read_work_school_location(self, landuse: pd.DataFrame, tours: pd.DataFrame):
+        """
+        Read and process work school location file
+
+        Args:
+            Landuse (df): Processed landuse dataframe
+            tours (df): Processed Tours dataframe
+
+        Return:
+            Dataframe with work locations only
+
+        """
         wsLoc_File = self.config.main_dir / f'wsLocResults_{ITER}.csv'
         wsLoc = pd.read_csv(wsLoc_File)
         
@@ -525,21 +537,34 @@ class DataReader:
         work_location = wsLoc[wsLoc['WorkLocation'] != 0]
 
         # Add home county
-        work_location = work_location.merge(landuse[['MAZ', 'ORIG_MAZ', 'ORIG_TAZ','DistID', 'CountyID']], left_on = 'HomeMGRA', right_on = 'MAZ', suffixes = (None, '_home'))
-        ## Rename columns
-        #work_location.rename({"MAZ": "HomeMAZ", 'ORIG_MAZ': 'HomeORIGMAZ', 'ORIG_TAZ':'HomeORIGTAZ', 'CountyID': 'HomeCountyID', 'DistID': "HomeDistID"}, inplace=True)
-
+        work_location = work_location.merge(landuse[['MAZ', 'ORIG_MAZ', 'ORIG_TAZ','DistID', 'CountyID']], left_on = 'HomeMGRA', right_on = 'MAZ', suffixes = (None, '_home'), how = 'left')
+        
         # Add work county
-        work_location = work_location.merge(landuse[['MAZ', 'ORIG_MAZ', 'ORIG_TAZ', 'DistID', 'CountyID']], left_on = 'WorkLocation', right_on = 'MAZ', suffixes = ('_home', '_work'))
-        ## Rename columns
-        # work_location.rename({"MAZ": "WorkMAZ", 'ORIG_MAZ': 'WorkORIGMAZ', 'ORIG_TAZ':'WorkORIGTAZ', 'CountyID': 'WorkCountyID', 'DistID': "WorkDistID"}, inplace = True)
+        ## WFH tours do not have a work county 
+        work_location = work_location.merge(landuse[['MAZ', 'ORIG_MAZ', 'ORIG_TAZ', 'DistID', 'CountyID']], left_on = 'WorkLocation', right_on = 'MAZ', suffixes = ('_home', '_work'), how = 'left')
+        
+        ## Add relevant information for journey to work by modes (tour)
+        # Add tour mode, wfh, walk subzone(?) - this may not be included in our outputs
+        ## Filter commute tours
 
+        # Adding WFH variable - these will not have a work county or taz
+        work_location['WFH'] = np.where(work_location['WorkSegment'] == 99999, 1, 0)
+
+        # Filtering tours to only tours with commutes
+        # TODO: Determine which id to merge on
+        # commute_tours = tours[tours['tour_purpose']== 'Work']
+        #commute_tours = commute_tours[['hh_id', 'tour_participants', 'tour_purpose','tour_mode']]
+        #commute_tours['person_num'] = commute_tours['tour_participants'].astype(int)
+        # Merging tour mode from commute tour 
+        #work_location = work_location.merge(right = commute_tours[['hh_id', 'person_num','tour_mode']],
+        #                                      how = 'left',left_on = ['HHID', 'PersonNum'], right_on = ['hh_id', 'person_num'])
 
         return work_location
 
 
 class SkimReader:
-    """Class for processing skim data and adding costs, distances, and times to trips/tours.
+    """
+    Class for processing skim data and adding costs, distances, and times to trips/tours.
     
     """
     ## TODO: What is part of skim processing vs data reading? - should we be adding costs/distances/times here? This could also be used for acceptance criteria 
@@ -1039,8 +1064,7 @@ class SummaryGenerator:
         output_file = self.config.results_dir / "ActiveTransport.csv"
         summary.to_csv(output_file, index=False)
         
-        with open(self.config.results_dir / "ActiveTransport.pickle", 'wb') as f:
-            pickle.dump(summary, f)
+        summary.to_parquet(self.config.results_dir / "ActiveTransport.parquet")
         
         print(f"Wrote {len(summary):,} rows of active_summary")
 
@@ -1050,6 +1074,11 @@ class SummaryGenerator:
 
         Universe: Persons
         
+        Args:
+            persons: Dataframe of the processed Persons output data
+
+        Returns:
+            Outputs a csv and parquet of the summary
         """
         summary = persons.groupby(['type', 'cdap', 'imf_choice', 
                                    'inmf_choice', 'incQ', 'incQ_label']).agg({'person_id':'count'}).reset_index()
@@ -1060,9 +1089,8 @@ class SummaryGenerator:
         # Save results
         output_file = self.config.results_dir / "ActivityPattern.csv"
         summary.to_csv(output_file, index=False)
-        
-        with open(self.config.results_dir / "ActivityPattern.pickle", 'wb') as f:
-            pickle.dump(summary, f)
+
+        summary.to_parquet(self.config.results_dir / "ActivityPattern.parquet")
         
         print(f"Wrote {len(summary):,} rows of activity_pattern_summary")     
     
@@ -1079,22 +1107,22 @@ class SummaryGenerator:
         # Save results
         output_file = self.config.results_dir / "AutomobileOwnership.csv"
         summary.to_csv(output_file, index=False)
-        
-        with open(self.config.results_dir / "AutomobileOwnership.pickle", 'wb') as f:
-            pickle.dump(summary, f)
+
+        summary.to_parquet(self.config.results_dir / "AutomobileOwnership.parquet")
         
         print(f"Wrote {len(summary):,} rows of autoown_summary")
     
     def generate_journey_to_work_summary(self, work_locations: pd.DataFrame) -> None:
         """
-        Generate journey to work summary
+        Generate workplace location summaries.
 
         Universe: Persons with work location
         """
 
         summary = work_locations.groupby([
-            'CountyID_home', 'MAZ_home', 'ORIG_MAZ_home', 'WorkLocation', 'CountyID_work'
-        ]).agg({'PersonID': 'count'}).reset_index()
+            'CountyID_home', 'MAZ_home', 'ORIG_MAZ_home', 'WorkLocation', 'CountyID_work', 'WFH'
+        ]).agg({'PersonID': 'count',
+                'Income': 'mean'}).reset_index()
 
         summary.rename(columns = {'PersonID': 'freq'}, inplace = True)
         summary['freq'] = summary['freq'] / self.config.sampleshare
@@ -1103,11 +1131,29 @@ class SummaryGenerator:
         output_file = self.config.results_dir / "JourneyToWork.csv"
         summary.to_csv(output_file, index = False)
 
+    def generate_journey_to_work_mode_summary(self, work_locations: pd.DataFrame) -> None:
+        """
+        Generate journey to work by mode summary.
 
+        Universe: Persons with work location
+        """
+
+        summary = work_locations.groupby([
+            'CountyID_home', 'MAZ_home', 'ORIG_MAZ_home', 'WorkLocation', 'CountyID_work', 'WFH', 'tour_mode'
+        ]).agg({'PersonID': 'count',
+                'Income': 'mean'}).reset_index()
+
+        summary.rename(columns = {'PersonID': 'freq'}, inplace = True)
+        summary['freq'] = summary['freq'] / self.config.sampleshare
+
+        # Save results
+        output_file = self.config.results_dir / "JourneyToWorkByMode.csv"
+        summary.to_csv(output_file, index = False)
     
-    # TODO: update
+    # TODO: update - can't do this one until I join with skim 
     def generate_vmt_summary(self, persons: pd.DataFrame) -> None:
         """Generate vehicle miles traveled summary."""
+
         summary = persons.groupby([
             'COUNTY', 'county_name', 'SD', 'taz', 'walk_subzone', 'walk_subzone_label',
             'ptype', 'ptype_label', 'autoSuff', 'autoSuff_label'
@@ -1129,9 +1175,8 @@ class SummaryGenerator:
         output_file = self.config.results_dir / "VehicleMilesTraveled.csv"
         summary.to_csv(output_file, index=False)
         
-        with open(self.config.results_dir / "VehicleMilesTraveled.pickle", 'wb') as f:
-            pickle.dump(summary, f)
-        
+        summary.to_parquet(self.config.results_dir / "VehicleMilesTraveled.parquet")
+
         print(f"Wrote {len(summary):,} rows of vmt_summary")
     
     def generate_trips_tours_summary(
@@ -1142,7 +1187,9 @@ class SummaryGenerator:
             output_suffix: str,
     ):
         """
-        Generate trip or tour summaries with flexible groupin
+        Generate trip or tour summaries with flexible grouping
+
+        NOTE: Trips are done at a person trip level
 
         Args:
             df: Dataframe to summarize (trips or tours)
@@ -1151,7 +1198,7 @@ class SummaryGenerator:
             output_suffix: Suffix for output filename (e.g., 'ByMode', 'ByPurpose')
         
         Returns:
-            Summary CSV
+            Summary in CSV and Parquet files
 
         """
         summary = df.groupby(group_by).size().reset_index(name = 'freq')
@@ -1168,6 +1215,7 @@ class SummaryGenerator:
     ):
         """
         Generate trip summary for comparsion against BATS Survey results
+
         """
         dest_purpose_dict ={
            'Discretionary': 'Socrec', 'Visiting': 'Socrec', 'Maintenance': 'Pers_Bus'
@@ -1217,9 +1265,7 @@ class CoreSummaries:
         #households = self.data_reader.add_kids_no_driver(persons, households)
         
         # Read tour and trip data
-        print("Reading tour data...")
-        # This would involve reading tour and trip files and processing them
-        
+        print("Reading tour data...")        
         tours = self.data_reader.combine_tours(households, landuse)
         print(f"Tours: \n {tours.head()}")
 
@@ -1227,11 +1273,21 @@ class CoreSummaries:
         trips = self.data_reader.combine_trips(persons)
         print(f"Trips \n {trips.head()}")
 
+        print("Filtering commute tours ...")
+        commute_tours =tours[tours['tour_purpose'] == 'Work']
 
         print("Reading work-school location...")
-        work_locations = self.data_reader.read_work_school_location(landuse)
-        print(f"Trips \n {work_locations.head()}")
+        work_locations = self.data_reader.read_work_school_location(landuse, commute_tours)
+        print(f"Work Locations: \n {work_locations.head()}")
   
+        # Save processed data
+        print("Saving processed data...")
+        households.to_parquet(self.config.updated_dir / "households.parquet")
+        persons.to_parquet(self.config.updated_dir / "persons.parquet")
+        trips.to_parquet(self.config.updated_dir / "trips.parquet")
+        tours.to_parquet(self.config.updated_dir / "tours.parquet")
+        work_locations.to_parquet(self.config.updated_dir / "work_locations.parquet")
+        commute_tours.to_parquet(self.config.updated_dir / "commute_tours.parquet")
 
         # Generate summaries
         print("Generating summaries...")
@@ -1252,13 +1308,6 @@ class CoreSummaries:
 
         print("Generating journey to work summary")
         self.summary_generator.generate_journey_to_work_summary(work_locations)
-        # Save processed data
-        print("Saving processed data...")
-        households.to_pickle(self.config.updated_dir / "households.pickle")
-        persons.to_pickle(self.config.updated_dir / "persons.pickle")
-        trips.to_pickle(self.config.updated_dir / "trips.pickle")
-        tours.to_pickle(self.config.updated_dir / "tours.pickle")
-        work_locations.to_pickle(self.config.updated_dir / "work_locations.pickle")
         
 
         
@@ -1274,6 +1323,27 @@ def main():
         print(f"Error running analysis: {e}")
         raise
 
+def _setup_logging(self):
+        """
+        Set up logging to file and console.
+        """
+        log_file = 'core_summmaries/core_summaries.log'
+
+        self.logger = logging.getLogger()
+        self.logger.setLevel(logging.DEBUG)
+        # console handler
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.INFO)
+        ch.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p'))
+        self.logger.addHandler(ch)
+
+        # file handler
+        fh = logging.FileHandler(log_file, mode = 'w')
+        fh.setLevel(logging.DEBUG)
+        fh.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p'))
+        self.logger.addHandler(fh)
 
 if __name__ == "__main__":
     main()
+
+
