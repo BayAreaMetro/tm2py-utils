@@ -183,6 +183,88 @@ class DataReader:
         self.config = config
         self.lookups = lookups
     
+    ## TODO: Update for TM2
+    def combine_tours(self, households: pd.DataFrame, landuse: pd.DataFrame) -> pd.DataFrame:
+        """Combine joint and individual tours into a single DataFrame."""
+
+        ## If processed file exist, read that instead:
+        if (self.config.updated_dir / 'tours.parquet').exists():
+            print("Reading cached processed tours file")
+            tours = pd.read_parquet(self.config.updated_dir/ 'tours.parquet')
+            return tours
+
+        jointTours = self._read_tours('Joint')
+        indivTours = self._read_tours('Indiv')
+        jointTours = jointTours.drop(columns = ['tour_composition'])
+        indivTours = indivTours.drop(columns = ['person_type', 'atWork_freq'])
+        tours = pd.concat([jointTours, indivTours], ignore_index=True)
+        print(tours.columns)
+        # Add Residence Landuse Info
+        tours = tours.merge(households[['hh_id', 'ORIG_MAZ', 'ORIG_TAZ', 'CountyID', 'DistID', 'incQ', 'incQ_label']], on='hh_id', how='left')
+        print(tours.columns)
+
+        ## TODO: Add CountyID for Destination MAZ
+        tours = tours.merge(landuse[['MAZ', 'TAZ', 'ORIG_MAZ', 'ORIG_TAZ','CountyID', 'DistID']], left_on='dest_mgra', right_on='MAZ', how='left', suffixes= (None, "_dest"))
+
+        print(f"Combined tours; have {len(tours):,} rows")
+        print(tours.columns)
+        tours['tour_mode_label'] = tours['tour_mode'].map(self.lookups.tripMode.set_index('code')['mode'])
+        print(tours.head())
+        #tours = tours._add_tours_attrs()
+        return tours
+    
+    def combine_trips(self, persons: pd.DataFrame) -> pd.DataFrame:
+
+        ## If processed file exist, read that instead:
+        if (self.config.updated_dir / 'trips.parquet').exists():
+            print("Reading cached processed trips file")
+            trips = pd.read_parquet(self.config.updated_dir/ 'trips.parquet')
+            return trips
+
+        indiv_trip = self._read_trips('Indiv')
+        joint_trip = self._read_trips('Joint')
+        joint_person_trips = self._get_joint_persons_trips(joint_trip, persons)
+
+        combined = pd.concat([joint_person_trips, indiv_trip], ignore_index=True)
+        combined['trip_mode_label'] = combined['trip_mode'].map(self.lookups.tripMode.set_index('code')['mode'])
+
+        combined['timePeriod'] = pd.cut(combined['stop_period'], bins = [1, 4, 12, 22, 30, 40], labels = ['EA', 'AM', 'MD', 'PM', 'EV'], include_lowest= True)
+
+        print(f"Combined individual trips with joint person trips to make {len(combined):,} rows")
+        print(combined.head())
+        return combined
+
+    def read_households(self, land_use: pd.DataFrame) -> pd.DataFrame:
+        """Read and process household data."""
+        
+        ## TM2
+        ## If processed file exist, read that instead:
+        if (self.config.updated_dir / 'households.parquet').exists():
+            print("Reading cached processed household file")
+            persons = pd.read_parquet(self.config.updated_dir/ 'households.parquet')
+            return persons
+        popsyn_file = Path(self.config.target_dir) / "inputs" / "popsyn" / "households.csv"
+        ct_file = self.config.main_dir / f"householdData_{self.config.iter}.csv"
+
+        input_pop_hh = pd.read_csv(popsyn_file)
+        print(input_pop_hh.columns)
+
+        output_ct_hh = pd.read_csv(ct_file)
+        print(output_ct_hh.columns)
+
+        # Join input and output datasets
+        households = input_pop_hh.merge(output_ct_hh, left_on = 'HHID', right_on = 'hh_id', how = 'inner')
+
+        # Add land use data
+        households = households.merge(land_use, on= ['ORIG_MAZ', 'ORIG_TAZ'], how = 'inner')
+        print(households.columns)
+
+        # Add household variables
+        households = self._add_household_variables(households)
+       
+        return households
+    
+    
     def read_land_use(self) -> pd.DataFrame:
         """Read and process land use data."""
 
@@ -242,62 +324,54 @@ class DataReader:
         print(persons.columns)
         print(persons.head())
         return persons
-
-    ## TODO: Update for the MAZ level
-    def read_households(self, land_use: pd.DataFrame) -> pd.DataFrame:
-        """Read and process household data."""
-        # Read input files
-        # ##TM1
-        # ## TODO: Make this not hard carded
-        # popsyn_file = Path(self.config.target_dir) / "popsyn" / "hhFile.FBP.2050.PBA50Plus_Final_Blueprint_v65.csv"
-        # ct_file = self.config.main_dir / f"householdData_{self.config.iter}.csv"
-        
-        # input_pop_hh = pd.read_csv(popsyn_file)
-        # input_ct_hh = pd.read_csv(ct_file)
-        
-        # # Drop random number fields from CT file
-        # drop_cols = [col for col in input_ct_hh.columns if col.endswith('_rn')] + ['pct_of_poverty']
-        # input_ct_hh = input_ct_hh.drop(columns=drop_cols, errors='ignore')
-        
-        # # Rename HHID column
-        # input_pop_hh.rename(columns={'HHID': 'hh_id'}, inplace=True)
-        
-        # # Join datasets
-        # households = input_pop_hh.merge(input_ct_hh, on='hh_id', how='inner')
-        # households = households.merge(taz_data, on='taz', how='inner')
-        
-        # print(f"Read household files; have {len(households):,} rows")
-        # # Add derived variables
-        # households = self._add_household_variables(households)
-        # print(households.columns)
-
-        ## TM2
-        ## If processed file exist, read that instead:
-        if (self.config.updated_dir / 'households.parquet').exists():
-            print("Reading cached processed household file")
-            persons = pd.read_parquet(self.config.updated_dir/ 'households.parquet')
-            return persons
-        popsyn_file = Path(self.config.target_dir) / "inputs" / "popsyn" / "households.csv"
-        ct_file = self.config.main_dir / f"householdData_{self.config.iter}.csv"
-
-        input_pop_hh = pd.read_csv(popsyn_file)
-        print(input_pop_hh.columns)
-
-        output_ct_hh = pd.read_csv(ct_file)
-        print(output_ct_hh.columns)
-
-        # Join input and output datasets
-        households = input_pop_hh.merge(output_ct_hh, left_on = 'HHID', right_on = 'hh_id', how = 'inner')
-
-        # Add land use data
-        households = households.merge(land_use, on= ['ORIG_MAZ', 'ORIG_TAZ'], how = 'inner')
-        print(households.columns)
-
-        # Add household variables
-        households = self._add_household_variables(households)
-       
-        return households
     
+    def read_work_school_location(self, landuse: pd.DataFrame, tours: pd.DataFrame):
+        """
+        Read and process work school location file
+
+        Args:
+            Landuse (df): Processed landuse dataframe
+            tours (df): Processed Tours dataframe
+
+        Return:
+            Dataframe with work locations only
+
+        """
+        wsLoc_File = self.config.main_dir / f'wsLocResults_{ITER}.csv'
+        wsLoc = pd.read_csv(wsLoc_File)
+        
+        # Filter out non-work travel
+        work_location = wsLoc[wsLoc['WorkLocation'] != 0]
+
+        # Add home county
+        work_location = work_location.merge(landuse[['MAZ', 'ORIG_MAZ', 'ORIG_TAZ','DistID', 'CountyID']], left_on = 'HomeMGRA', right_on = 'MAZ', suffixes = (None, '_home'), how = 'left')
+        
+        # Add work county
+        ## WFH tours do not have a work county 
+        work_location = work_location.merge(landuse[['MAZ', 'ORIG_MAZ', 'ORIG_TAZ', 'DistID', 'CountyID']], left_on = 'WorkLocation', right_on = 'MAZ', suffixes = ('_home', '_work'), how = 'left')
+        
+        ## Add relevant information for journey to work by modes (tour)
+        # Add tour mode, wfh, walk subzone(?) - this may not be included in our outputs
+        ## Filter commute tours
+
+        # Adding WFH variable - these will not have a work county or taz
+        work_location['WFH'] = np.where(work_location['WorkSegment'] == 99999, 1, 0)
+
+        # Filtering tours to only tours with commutes
+        # TODO: Determine which id to merge on
+        commute_tours = tours[tours['tour_purpose']== 'Work']
+        commute_tours = commute_tours[['hh_id', 'tour_participants', 'person_id','tour_purpose','tour_mode']]
+        commute_tours['person_num'] = commute_tours['tour_participants'].astype(int)
+        
+        #Merging tour mode from commute tour 
+        work_location = work_location.merge(right = commute_tours[['hh_id', 'person_num', 'person_id', 'tour_mode']], how = 'left',
+                                            left_on = 'PersonID', right_on = 'person_id')
+        
+        # Fill in missing values for all merges 
+        work_location.fillna(0, inplace = True)
+
+        return work_location
+ 
     def _add_household_variables(self, households: pd.DataFrame) -> pd.DataFrame:
         """
         Add derived variables to households data.
@@ -327,8 +401,8 @@ class DataReader:
         
         return households
 
-    
-    def add_kids_no_driver(self,persons, households):
+    ## TODO: Revise this
+    def _add_kids_no_driver(self,persons, households):
         """
         Add kids No Driver as a variable to the household data.
         
@@ -337,39 +411,65 @@ class DataReader:
         kidsNoDr_hhlds = persons[['hh_id', 'kidsNoDr']].groupby('hh_id', as_index= False ).agg({'kidsNoDr': 'max'})
         households = households.merge(kidsNoDr_hhlds, on = 'hh_id')
 
-        return households          
-    
-    ## TODO: Update for TM2
-    def combine_tours(self, households: pd.DataFrame, landuse: pd.DataFrame) -> pd.DataFrame:
-        """Combine joint and individual tours into a single DataFrame."""
+        return households  
 
-        ## If processed file exist, read that instead:
-        if (self.config.updated_dir / 'tours.parquet').exists():
-            print("Reading cached processed tours file")
-            tours = pd.read_parquet(self.config.updated_dir/ 'tours.parquet')
-            return tours
+    # TODO: This still needs to be revised        
+    def _add_tours_attributes(self, tours: pd.DataFrame):
+        # Add duration
+        # TM1
+        """Add duration and parking costs to tours"""
+        ## TM1: start_hour and end_hour
+        tours['duration'] = tours['end_hour'] - tours['start_hour']
+        ## TM2: start_time and end_time
+        tours['duration'] = tours['end_time'] - tours['start_time']
 
-        jointTours = self._read_tours('Joint')
-        indivTours = self._read_tours('Indiv')
-        jointTours = jointTours.drop(columns = ['tour_composition'])
-        indivTours = indivTours.drop(columns = ['person_type', 'atWork_freq'])
-        tours = pd.concat([jointTours, indivTours], ignore_index=True)
-        print(tours.columns)
-        # Add Residence Landuse Info
-        tours = tours.merge(households[['hh_id', 'ORIG_MAZ', 'ORIG_TAZ', 'CountyID', 'DistID', 'incQ', 'incQ_label']], on='hh_id', how='left')
-        print(tours.columns)
+        # Parking Cost is based on tour duration
+        tours['parking_cost'] = tours['parking_rate'] * tours['duration']
+        
+        #Distribute costs across shared ride modes for individual tours
+        tours['parking_cost'] = np.where((tours['num_participants'] == 1) & (tours['tour_mode'].isin([3,4])), tours['parking_cost']/ 1.75, tours['parking_cost']) 
 
-        ## TODO: Add CountyID for Destination MAZ
-        tours = tours.merge(landuse[['MAZ', 'TAZ', 'ORIG_MAZ', 'ORIG_TAZ','CountyID', 'DistID']], left_on='dest_mgra', right_on='MAZ', how='left', suffixes= (None, "_dest"))
+        tours['parking_cost'] = np.where((tours['num_participants'] == 1) & (tours['tour_mode'].isin([5,6])), tours['parking_cost']/ 2.5, tours['parking_cost'])
+
+        # Set transit parking cost to zero
+        tours['parking_cost'] = np.where(tours['tour_mode'] >= 9, 0.0, tours['parking_cost'])
 
 
-        print(f"Combined tours; have {len(tours):,} rows")
-        print(tours.columns)
-        tours['tour_mode_label'] = tours['tour_mode'].map(self.lookups.tripMode.set_index('code')['mode'])
-        print(tours.head())
-        #tours = tours._add_tours_attrs()
+        ## TODO: Do we need to do this if tours have tour_time?
+        ## Stop and End Period are coded with different increments of time
+
+        # Add Parking Costs
+        # TODO: Add in parking cost once we determine which field to use for parking
+
         return tours
+    
+    def _get_joint_persons_trips(self, trips: pd.DataFrame, persons: pd.DataFrame) -> pd.DataFrame:
+        """Get persons associated with each tour and trip."""
+        
+        # Unwind the participants for joint tours and make each person their own row
+        # TODO: Verify the TM2 uses person_num in the persons file
+        tour_files = self.config.main_dir / f"JointTourData_{self.config.iter}.csv"
+        participants = pd.read_csv(tour_files)
+        participants = participants[['hh_id', 'tour_id', 'tour_participants']]
+        participants['person_num'] = participants['tour_participants'].str.split(' ')
+        participants = participants.explode('person_num')
+        participants['person_num'] = participants['person_num'].astype(int)
 
+        ## Join on household and person num to get person_id
+        joint_tour_persons = pd.merge(participants, persons[['hh_id', 'person_num', 'person_id']], on=['hh_id', 'person_num'], how='left')
+
+        print(f"Combined joint tours and persons; have {len(joint_tour_persons):,} rows")
+        print(joint_tour_persons.head())
+
+        print("Attaching person to joint trips")
+        joint_persons_trips = pd.merge(trips, joint_tour_persons, on= ['hh_id', 'tour_id'], how = 'inner')
+
+        print(('Created joint_person_trips with {0} rows from {1} rows from joint trips {2} rows from joint_tour_persons')
+              .format(len(joint_persons_trips), len(trips), len(joint_tour_persons))
+              )
+
+        return joint_persons_trips 
+    
     def _read_tours(self, IndivJoint: str) -> pd.DataFrame:
         """Read and process tour data.
         Arguments:
@@ -423,27 +523,6 @@ class DataReader:
         print(tour.head())
         return tour
     
-    def combine_trips(self, persons: pd.DataFrame) -> pd.DataFrame:
-
-        ## If processed file exist, read that instead:
-        if (self.config.updated_dir / 'trips.parquet').exists():
-            print("Reading cached processed trips file")
-            trips = pd.read_parquet(self.config.updated_dir/ 'trips.parquet')
-            return trips
-
-        indiv_trip = self._read_trips('Indiv')
-        joint_trip = self._read_trips('Joint')
-        joint_person_trips = self._get_joint_persons_trips(joint_trip, persons)
-
-        combined = pd.concat([joint_person_trips, indiv_trip], ignore_index=True)
-        combined['trip_mode_label'] = combined['trip_mode'].map(self.lookups.tripMode.set_index('code')['mode'])
-
-        combined['timePeriod'] = pd.cut(combined['stop_period'], bins = [1, 4, 12, 22, 30, 40], labels = ['EA', 'AM', 'MD', 'PM', 'EV'], include_lowest= True)
-
-        print(f"Combined individual trips with joint person trips to make {len(combined):,} rows")
-        print(combined.head())
-        return combined
-    
     def _read_trips(self, IndivJoint: str) -> pd.DataFrame:
         """Read and process trip data.
         Arguments:
@@ -461,105 +540,6 @@ class DataReader:
         print(f"Read {len(trip):,} rows from {trip_file}")
         print(trip.head())
         return trip
-
-    def _get_joint_persons_trips(self, trips: pd.DataFrame, persons: pd.DataFrame) -> pd.DataFrame:
-        """Get persons associated with each tour and trip."""
-        
-        # Unwind the participants for joint tours and make each person their own row
-        # TODO: Verify the TM2 uses person_num in the persons file
-        tour_files = self.config.main_dir / f"JointTourData_{self.config.iter}.csv"
-        participants = pd.read_csv(tour_files)
-        participants = participants[['hh_id', 'tour_id', 'tour_participants']]
-        participants['person_num'] = participants['tour_participants'].str.split(' ')
-        participants = participants.explode('person_num')
-        participants['person_num'] = participants['person_num'].astype(int)
-
-        ## Join on household and person num to get person_id
-        joint_tour_persons = pd.merge(participants, persons[['hh_id', 'person_num', 'person_id']], on=['hh_id', 'person_num'], how='left')
-
-        print(f"Combined joint tours and persons; have {len(joint_tour_persons):,} rows")
-        print(joint_tour_persons.head())
-
-        print("Attaching person to joint trips")
-        joint_persons_trips = pd.merge(trips, joint_tour_persons, on= ['hh_id', 'tour_id'], how = 'inner')
-
-        print(('Created joint_person_trips with {0} rows from {1} rows from joint trips {2} rows from joint_tour_persons')
-              .format(len(joint_persons_trips), len(trips), len(joint_tour_persons))
-              )
-
-        return joint_persons_trips 
-
-    def _add_tours_attributes(self, tours: pd.DataFrame):
-        # Add duration
-        # TM1
-        """Add duration and parking costs to tours"""
-        ## TM1: start_hour and end_hour
-        tours['duration'] = tours['end_hour'] - tours['start_hour']
-        ## TM2: start_time and end_time
-        tours['duration'] = tours['end_time'] - tours['start_time']
-
-        # Parking Cost is based on tour duration
-        tours['parking_cost'] = tours['parking_rate'] * tours['duration']
-        
-        #Distribute costs across shared ride modes for individual tours
-        tours['parking_cost'] = np.where((tours['num_participants'] == 1) & (tours['tour_mode'].isin([3,4])), tours['parking_cost']/ 1.75, tours['parking_cost']) 
-
-        tours['parking_cost'] = np.where((tours['num_participants'] == 1) & (tours['tour_mode'].isin([5,6])), tours['parking_cost']/ 2.5, tours['parking_cost'])
-
-        # Set transit parking cost to zero
-        tours['parking_cost'] = np.where(tours['tour_mode'] >= 9, 0.0, tours['parking_cost'])
-
-
-        ## TODO: Do we need to do this if tours have tour_time?
-        ## Stop and End Period are coded with different increments of time
-
-        # Add Parking Costs
-        # TODO: Add in parking cost once we determine which field to use for parking
-
-        return tours
-    
-    def read_work_school_location(self, landuse: pd.DataFrame, tours: pd.DataFrame):
-        """
-        Read and process work school location file
-
-        Args:
-            Landuse (df): Processed landuse dataframe
-            tours (df): Processed Tours dataframe
-
-        Return:
-            Dataframe with work locations only
-
-        """
-        wsLoc_File = self.config.main_dir / f'wsLocResults_{ITER}.csv'
-        wsLoc = pd.read_csv(wsLoc_File)
-        
-        # Filter out non-work travel
-        work_location = wsLoc[wsLoc['WorkLocation'] != 0]
-
-        # Add home county
-        work_location = work_location.merge(landuse[['MAZ', 'ORIG_MAZ', 'ORIG_TAZ','DistID', 'CountyID']], left_on = 'HomeMGRA', right_on = 'MAZ', suffixes = (None, '_home'), how = 'left')
-        
-        # Add work county
-        ## WFH tours do not have a work county 
-        work_location = work_location.merge(landuse[['MAZ', 'ORIG_MAZ', 'ORIG_TAZ', 'DistID', 'CountyID']], left_on = 'WorkLocation', right_on = 'MAZ', suffixes = ('_home', '_work'), how = 'left')
-        
-        ## Add relevant information for journey to work by modes (tour)
-        # Add tour mode, wfh, walk subzone(?) - this may not be included in our outputs
-        ## Filter commute tours
-
-        # Adding WFH variable - these will not have a work county or taz
-        work_location['WFH'] = np.where(work_location['WorkSegment'] == 99999, 1, 0)
-
-        # Filtering tours to only tours with commutes
-        # TODO: Determine which id to merge on
-        # commute_tours = tours[tours['tour_purpose']== 'Work']
-        #commute_tours = commute_tours[['hh_id', 'tour_participants', 'tour_purpose','tour_mode']]
-        #commute_tours['person_num'] = commute_tours['tour_participants'].astype(int)
-        # Merging tour mode from commute tour 
-        #work_location = work_location.merge(right = commute_tours[['hh_id', 'person_num','tour_mode']],
-        #                                      how = 'left',left_on = ['HHID', 'PersonNum'], right_on = ['hh_id', 'person_num'])
-
-        return work_location
 
 
 class SkimReader:
@@ -1112,6 +1092,8 @@ class SummaryGenerator:
         
         print(f"Wrote {len(summary):,} rows of autoown_summary")
     
+    
+    ## TODO: Currently summaries are to a MAZ level - may need to change to TAZ for a more aggregated
     def generate_journey_to_work_summary(self, work_locations: pd.DataFrame) -> None:
         """
         Generate workplace location summaries.
@@ -1151,33 +1133,6 @@ class SummaryGenerator:
         summary.to_csv(output_file, index = False)
     
     # TODO: update - can't do this one until I join with skim 
-    def generate_vmt_summary(self, persons: pd.DataFrame) -> None:
-        """Generate vehicle miles traveled summary."""
-
-        summary = persons.groupby([
-            'COUNTY', 'county_name', 'SD', 'taz', 'walk_subzone', 'walk_subzone_label',
-            'ptype', 'ptype_label', 'autoSuff', 'autoSuff_label'
-        ]).agg({
-            'person_id': 'count',
-            'vmt_indiv': 'mean',
-            'vmt_joint': 'mean',
-            'vmt': 'mean',
-            'person_trips': 'sum',
-            'vehicle_trips': 'sum'
-        }).reset_index()
-        
-        summary.rename(columns={'person_id': 'freq'}, inplace=True)
-        summary['freq'] = summary['freq'] / self.config.sampleshare
-        summary['person_trips'] = summary['person_trips'] / self.config.sampleshare
-        summary['vehicle_trips'] = summary['vehicle_trips'] / self.config.sampleshare
-        
-        # Save results
-        output_file = self.config.results_dir / "VehicleMilesTraveled.csv"
-        summary.to_csv(output_file, index=False)
-        
-        summary.to_parquet(self.config.results_dir / "VehicleMilesTraveled.parquet")
-
-        print(f"Wrote {len(summary):,} rows of vmt_summary")
     
     def generate_trips_tours_summary(
             self,
@@ -1229,7 +1184,36 @@ class SummaryGenerator:
         summary['share'] = (summary['freq'] / summary['freq'].sum())*100
 
         output_file = self.config.results_dir/f'TripSummarySimpleModePurpose.csv'
-        summary.to_csv(output_file, index = False)        
+        summary.to_csv(output_file, index = False)      
+
+    def generate_vmt_summary(self, persons: pd.DataFrame) -> None:
+        """Generate vehicle miles traveled summary."""
+
+        summary = persons.groupby([
+            'COUNTY', 'county_name', 'SD', 'taz', 'walk_subzone', 'walk_subzone_label',
+            'ptype', 'ptype_label', 'autoSuff', 'autoSuff_label'
+        ]).agg({
+            'person_id': 'count',
+            'vmt_indiv': 'mean',
+            'vmt_joint': 'mean',
+            'vmt': 'mean',
+            'person_trips': 'sum',
+            'vehicle_trips': 'sum'
+        }).reset_index()
+        
+        summary.rename(columns={'person_id': 'freq'}, inplace=True)
+        summary['freq'] = summary['freq'] / self.config.sampleshare
+        summary['person_trips'] = summary['person_trips'] / self.config.sampleshare
+        summary['vehicle_trips'] = summary['vehicle_trips'] / self.config.sampleshare
+        
+        # Save results
+        output_file = self.config.results_dir / "VehicleMilesTraveled.csv"
+        summary.to_csv(output_file, index=False)
+        
+        summary.to_parquet(self.config.results_dir / "VehicleMilesTraveled.parquet")
+
+        print(f"Wrote {len(summary):,} rows of vmt_summary")
+      
 
 
 class CoreSummaries:
@@ -1308,6 +1292,7 @@ class CoreSummaries:
 
         print("Generating journey to work summary")
         self.summary_generator.generate_journey_to_work_summary(work_locations)
+        self.summary_generator.generate_journey_to_work_mode_summary(work_locations)
         
 
         
