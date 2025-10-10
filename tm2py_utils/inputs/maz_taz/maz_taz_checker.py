@@ -78,10 +78,9 @@ WORKSPACE          = pathlib.Path(".")
 CROSSWALK_ROOT     = "blocks_mazs_tazs"
 
 # Set directory to the Census Block Version
-CENSUS_BLOCK_DIR   = pathlib.Path("M:\\Data\\Census\\Geography\\tl_2010_06_tabblock10")
-CENSUS_BLOCK_ROOT  = "tl_2010_06_tabblock10_9CountyBayArea"
-#CENSUS_BLOCK_SHP   = CENSUS_BLOCK_DIR /  f"{CENSUS_BLOCK_ROOT}.shp"
-CENSUS_BLOCK_SHP   = "E:\\Box\\Documents\\Data\\Census Data\\tl_2020_06_tabblock10\\tl_2020_06_tabblock10_9CBA.shp"
+CENSUS_BLOCK_DIR   = pathlib.Path("M:\\Data\\Census\\Geography\\tl_2020_06_tabblock10")
+CENSUS_BLOCK_ROOT  = "tl_2020_06_tabblock10_9CBA"
+CENSUS_BLOCK_SHP   = CENSUS_BLOCK_DIR /  f"{CENSUS_BLOCK_ROOT}.shp"
 CENSUS_BLOCK_COLS  = ["STATEFP10", "COUNTYFP10", "TRACTCE10", "BLOCKCE10", "GEOID10", "ALAND10", "AWATER10"]
 
 CENSUS_BLOCK_NEIGHBOR_CSV = "E:\\GitHub\\tm2\\tm2py-utils\\tm2py_utils\\inputs\\maz_taz\\tl_2020_06_tabblock10_9CBA_neighbors.csv"
