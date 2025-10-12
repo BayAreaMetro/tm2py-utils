@@ -37,9 +37,20 @@ There are a handful of exceptions to the above axioms.
 The python script [maz_taz_checker.py](maz_taz_checker.py) does a number of checks on the MAZs and TAZs and fixes,
 and creates the shapefiles and geoJSON files.
 
-## GeoJSON and Shapefiles
+## Shapefiles and CSVs
 
-The resulting shapefiles (produced by the correspondence csv via the python script) have the following fields:
+The *current* MAZs and TAZs are defined in:
+* [blocks_mazs_tazs_v2.5.csv](blocks_mazs_tazs_v2.5.csv) - these are the definitions of the MAZs and TAZs which are processed by [maz_taz_checker.py](maz_taz_checker.py)
+
+The resulting MAZs and TAZs are:
+* [shapefiles\mazs_TM2_2_5.shp](shapefiles\mazs_TM2_2_5.shp)
+* [shapefiles\tazs_TM2_2_5.shp](shapefiles\tazs_TM2_2_5.shp)
+
+And correspondences between them 2010 census geographies can be found in:
+* [mazs_tazs_county_tract_PUMA_2.5.csv](mazs_tazs_county_tract_PUMA_2.5.csv)
+* [tazs_tazs_county_tract_PUMA_2.5.csv](tazs_tazs_county_tract_PUMA_2.5.csv)
+
+The shapefiles have the following fields:
 
 * *MAZ_NODE*, *TAZ_NODE* - The MAZ and TAZ ids.  These are [numeric and grouped by county](https://bayareametro.github.io/tm2py/input/network/#county-node-numbering-system).  Note *MAZ_NODE* isn't specified in the TAZ shapefile.
 * *MAZ_SEQ*, *TAZ_SEQ* - Sequential renumbering of *MAZ_NODE* and *TAZ_NODE* respectively, starting from 1. These are required for matrices (skims, trip tabels, etc.)
