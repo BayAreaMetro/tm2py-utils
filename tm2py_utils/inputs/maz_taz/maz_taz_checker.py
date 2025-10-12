@@ -46,8 +46,8 @@ This draft update is saved into blocks_mazs_tazs_v{version}.csv
   - Blocks "06 041 104300 10[17,18,19]" (maz 810745, taz 800095) spans a block group/tract boundary but the're a
     tiny bit on the water's edge and moving them would separate them from the rest of the maz/taz
 
-  - Blocks "06 041 122000 100[0,1,2]" (maz 813480, taz 800203) are a tract that is inside another tract so keeping
-    as is so as not to create a donut hole maz
+  - Blocks "06 041 122000 100[0,1,2]" (maz 813480, taz 800203) are a tract (San Quentin Rehabilitation Center)
+    that is inside another tract so keeping as is so as not to create a donut hole maz
 
   - Block "06 013 301000 3000" (maz 410304, taz 400507) is a block that Census 2010 claims has no land area ("Webb Tract")
     but appears to be a delta island so it's an exception to the zero-land/non-zero water blocks having a maz/taz
@@ -683,19 +683,35 @@ if __name__ == '__main__':
     logging.info(f"Writing {output_mapping_file}")
     blocks_maz_df.to_csv(output_mapping_file, index=False)
 
-    taz_tract_df = blocks_maz_df[['TAZ','COUNTY','county_name','COUNTYFP10','TRACTCE10','PUMA10']].drop_duplicates()
+    taz_tract_df = blocks_maz_df[['TAZ','COUNTY','county_name','COUNTYFP10','TRACTCE10','PUMA10','DistID', 'DistName']].drop_duplicates()
     logging.debug(f"taz_tract_df:\n{taz_tract_df}")
-    # check unique TAZ
-    dupe_taz = taz_tract_df.loc[ taz_tract_df['TAZ'].duplicated(keep=False)]
-    logging.error(f"dupe_taz:\n{dupe_taz}")
-    # temp - we'll output this when dupes are resolved
-    sys.exit(0)
 
-    logging.debug(f"taz_gdf.dtypes:\n{taz_gdf.dtypes}")
-    taz_gdf = taz_gdf[['taz','DistID', 'DistName','TAZ_X','TAZ_Y']].sort_values(by="taz").reset_index(drop=True)
-    logging.debug(f"taz_gdf:\n{taz_gdf}")
+    # manual fixes for tazs that map to more than one tract due to exceptions documented above
+    # drop TAZ=327 TRACTCE10='017902' -- the sliver from a mostly water/Treasure Island track
+    taz_tract_df = taz_tract_df.loc[ (taz_tract_df.TAZ != 327) & (taz_tract_df.TRACTCE10 != '017902')]
+    # drop TAZ=700241 TRACTCE10='151700' -- sliver from a mostly water tract in Sonoma, south part of Santa Rosa Creek Reservoir
+    taz_tract_df = taz_tract_df.loc[ (taz_tract_df.TAZ != 700241) & (taz_tract_df.TRACTCE10 != '151700')]
+    # drop TAZ=800095 TRACTCE10='104300' -- sliver from an adjacent tract in Marin
+    taz_tract_df = taz_tract_df.loc[ (taz_tract_df.TAZ != 800095) & (taz_tract_df.TRACTCE10 != '104300')]
+    # drop TAZ=800203 TRACTCE10='122000' -- San Quentin Rehabilitation Center is nested within another donut tract
+    taz_tract_df = taz_tract_df.loc[ (taz_tract_df.TAZ != 800095) & (taz_tract_df.TRACTCE10 != '122000')]
+
+    # add taz centroid coordinates
+    taz_tract_df = pandas.merge(
+        left=taz_tract_df,
+        right=taz_gdf[['taz','TAZ_X','TAZ_Y']].rename(columns={"taz":"TAZ"}),
+        how='left',
+        on="TAZ",
+        validate="one_to_one"
+    )
+    taz_tract_df = taz_tract_df.sort_values(by="TAZ").reset_index(drop=True)
+    logging.debug(f"taz_tract_df:\n{taz_tract_df}")
+
+    # verify TAZs are unique
+    dupe_taz = taz_tract_df.loc[ taz_tract_df['TAZ'].duplicated(keep=False)]
+    assert(len(dupe_taz)==0)
 
     output_mapping_file = f'tazs_county_tract_PUMA_{VERSION}.csv'
     logging.info(f"Writing {output_mapping_file}")
-    taz_gdf.to_csv(f"tazs_{VERSION}.csv", index=False)
+    taz_tract_df.to_csv(output_mapping_file, index=False)
     sys.exit(0)
