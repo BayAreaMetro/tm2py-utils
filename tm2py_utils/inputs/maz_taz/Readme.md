@@ -16,22 +16,22 @@ See [web map](https://public.tableau.com/app/profile/bayareametro/viz/TravelMode
 
 There are a handful of exceptions to the above axioms.
 
-* Blocks "06 075 980401 100[1,2,3]" (maz 16084, taz 287) are the Farallon Islands.  It's a standalone maz but the
+* Blocks "06 075 980401 100[1,2,3]" (MAZ_NODE 16084, taz 287) are the Farallon Islands.  It's a standalone maz but the
   taz spans tracts because it's not worth it's own taz.
-* Block "06 081 608002 2004" (maz 112279, taz 100178) spans a block group boundary but not doing so would split up
+* Block "06 081 608002 2004" (MAZ_NODE 112279, taz 100178) spans a block group boundary but not doing so would split up
   and island with two blocks.
-* Blocks "06 075 017902 10[05,80]" (maz 16495, taz 312) is a tiny sliver that's barely land so not worth
+* Blocks "06 075 017902 10[05,80]" (MAZ_NODE 16495, taz 312) is a tiny sliver that's barely land so not worth
   making a new maz, so that maz includes a second tract (mostly water)
-* Blocks "06 041 104300 10[17,18,19]" (maz 810745, taz 800095) spans a block group/tract boundary but the're a
+* Blocks "06 041 104300 10[17,18,19]" (MAZ_NODE 810745, taz 800095) spans a block group/tract boundary but the're a
   tiny bit on the water's edge and moving them would separate them from the rest of the maz/taz
-* Blocks "06 041 122000 100[0,1,2]" (maz 813480, taz 800203) are a tract that is inside another tract so keeping
+* Blocks "06 041 122000 100[0,1,2]" (MAZ_NODE 813480, taz 800203) are a tract that is inside another tract so keeping
   as is so as not to create a donut hole maz
-* Block "06 013 301000 3000" (maz 410304, taz 400507) is a block that Census 2010 claims has no land area ("Webb Tract")
+* Block "06 013 301000 3000" (MAZ_NODE 410304, taz 400507) is a block that Census 2010 claims has no land area ("Webb Tract")
   but appears to be a delta island so it's an exception to the zero-land/non-zero water blocks having a maz/taz
 * Blocks with very small percent of land were not assigned a MAZ and TAZ
 
 ### Notes
-* Block "06 075 017902 1009" (maz 10186, taz 592) is the little piece of Alameda island that the Census 2010
+* Block "06 075 017902 1009" (MAZ_NODE 10186, taz 592) is the little piece of Alameda island that the Census 2010
   calls San Francisco.  Left in SF as its own maz.
 
 The python script [maz_taz_checker.py](maz_taz_checker.py) does a number of checks on the MAZs and TAZs and fixes,
@@ -41,12 +41,14 @@ and creates the shapefiles and geoJSON files.
 
 The resulting shapefiles (produced by the correspondence csv via the python script) have the following fields:
 
-* *maz*, *taz* - The MAZ and TAZ ids.  These are [numeric and grouped by county](http://bayareametro.github.io/travel-model-two/input/#county-node-numbering-system).  Note *maz* isn't specified in the TAZ shapefile.
+* *MAZ_NODE*, *TAZ_NODE* - The MAZ and TAZ ids.  These are [numeric and grouped by county](https://bayareametro.github.io/tm2py/input/network/#county-node-numbering-system).  Note *MAZ_NODE* isn't specified in the TAZ shapefile.
+* *MAZ_SEQ*, *TAZ_SEQ* - Sequential renumbering of *MAZ_NODE* and *TAZ_NODE* respectively, starting from 1. These are required for matrices (skims, trip tabels, etc.)
 * *ALAND10*, *AWATER10* - the land and water area (summed from the census 2010 blocks, in square meters)
 * *blockcount* - the count of census 2010 blocks in the MAZ/MAZ
 * *partcount* - the number of disjoint parts
-* *PERIM_GEO* - the perimeter around the MAZ/TAZ, in meters
-* *psq_overa* - the perimeter squared divided by the area; the bigger this is, the less round/square the MAZ/TAZ
+* *PERIM_MI* - the perimeter around the MAZ/TAZ, in miles
+* *AREA_SQMI* - the area of the MAZ/TAZ, in square miles
+* *psq_overa* - the perimeter squared divided by the area or  or isoperimetric ratio; the bigger this is, the less round/square the MAZ/TAZ
 * *mazcount* - for TAZs only, this is the count of MAZs in the TAZ
 
 ## Revision History

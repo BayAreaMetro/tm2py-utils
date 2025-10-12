@@ -52,6 +52,25 @@ This draft update is saved into blocks_mazs_tazs_v{version}.csv
   - Block "06 013 301000 3000" (maz 410304, taz 400507) is a block that Census 2010 claims has no land area ("Webb Tract")
     but appears to be a delta island so it's an exception to the zero-land/non-zero water blocks having a maz/taz
 
+Input files:
+  - M:\Data\Census\Geography\\tl_2020_06_tabblock10\\tl_2020_06_tabblock10_9CBA.shp
+  - blocks crosswalk file (input arg)
+  - CENSUS_BLOCK_NEIGHBOR_CSV
+  - CENSUS_TRACT_PUMA
+  - SUPERDISTRICT_FILE
+Output files:
+  - shapefiles\\mazs_TM2_{version}.shp with columns:
+    MAZ_NODE, COUNTYFP10, ALAND10, AWATER10, blockcount, TAZ_NODE, partcount, PERIM_MI, AREA_SQMI, psq_overa, acres, MAZ_X, MAZ_Y, MAZ_SEQ
+
+  - shapefiles\\tazs_TM2_{version}.shp with columns:
+    TAZ_NODE, COUNTYFP10, ALAND10, AWATER10, blockcount, mazcount, partcount, PERIM_MI, AREA_SQMI, psq_overa, acres, TAZ_X, TAZ_Y, TAZ_SEQ
+
+  - mazs_tazs_county_tract_PUMA_{version}.csv where MAZ_NODE & MAZ_SEQ are unique; columns:
+    MAZ_NODE,MAZ_SEQ,TAZ_NODE,TAZ_SEQ,COUNTY,county_name,COUNTYFP10,TRACTCE10,PUMA10,DistID,DistName,MAZ_X,MAZ_Y
+
+  - tazs_county_tract_PUMA_{version}.csv where TAZ_NODE & TAZ_SEQ are unique; columns:
+    TAZ_NODE,TAZ_SEQ,COUNTY,county_name,COUNTYFP10,TRACTCE10,PUMA10,DistID,DistName,TAZ_X,TAZ_Y
+
 """
 EXEMPT_MAZ = [     16495, 112279, 810745, 813480]
 EXEMPT_TAZ = [287,                800095, 800203]
@@ -264,7 +283,7 @@ def dissolve_into_shapefile(blocks_maz_gdf: geopandas.GeoDataFrame, maz_or_taz: 
         else:
             agg_field = {'ALAND10':'sum', 'AWATER10':'sum', 'GEOID10':'count', 'maz':'count'}
         
-        maz_or_taz_gdf = blocks_maz_gdf.dissolve(by = maz_or_taz, aggfunc = agg_field, as_index = False)
+        maz_or_taz_gdf = blocks_maz_gdf.dissolve(by = [maz_or_taz, 'COUNTYFP10'], aggfunc = agg_field, as_index = False)
         logging.debug(f"blocks_maz_gdf.crs:{blocks_maz_gdf.crs}")
         logging.debug(f"blocks_maz_gdf:\n{blocks_maz_gdf}")
         # Calculate partcount -number of geometries in the multi
@@ -308,6 +327,23 @@ def dissolve_into_shapefile(blocks_maz_gdf: geopandas.GeoDataFrame, maz_or_taz: 
         maz_or_taz_gdf[f'{maz_or_taz.upper()}_Y'] = maz_or_taz_gdf['centroid'].y
         maz_or_taz_gdf.drop(columns=['centroid'],inplace=True)
 
+        # rename to [MAZ,TAZ]_NODE or and create sequential version, [MAZ,TAZ]_SEQ
+        maz_or_taz_gdf.sort_values(by=maz_or_taz, inplace=True)
+        maz_or_taz_gdf.rename(columns={maz_or_taz:f"{maz_or_taz.upper()}_NODE"}, inplace=True)
+        if maz_or_taz == "maz":
+            maz_or_taz_gdf.rename(columns={"taz":f"TAZ_NODE"}, inplace=True)
+
+        maz_or_taz_gdf = maz_or_taz_gdf.reset_index(drop=True)
+        maz_or_taz_gdf[f"{maz_or_taz.upper()}_SEQ"] = maz_or_taz_gdf.index + 1
+        logging.debug(f"Final version of maz_or_taz_gdf for {maz_or_taz} len={len(maz_or_taz_gdf):,}:\n{maz_or_taz_gdf}")
+
+        # verify maz/taz numbering alignment with https://bayareametro.github.io/tm2py/inputs/#county-node-numbering-system
+        county_check_df = maz_or_taz_gdf.groupby("COUNTYFP10").agg({
+            f'{maz_or_taz.upper()}_NODE':['min','max'],
+            f'{maz_or_taz.upper()}_SEQ':['min','max']
+        })
+        logging.info(f"county_check_df for {maz_or_taz}:\n{county_check_df}")
+
         # Save the dissolved maz_or_taz_gdf
         shapefile_name = MAZS_SHP if maz_or_taz=="maz" else TAZS_SHP
         output_dir = WORKSPACE / "shapefiles"
@@ -334,7 +370,8 @@ if __name__ == '__main__':
     CROSSWALK_CSV = pathlib.Path(args.crosswalk_csv)
     LOG_FILE = f"maz_taz_checker_{VERSION}.log"
     
-    pandas.options.display.width = 300
+    pandas.options.display.width = None
+    pandas.options.display.max_columns = None
     pandas.options.display.float_format = '{:.2f}'.format
     # This is to resolve errors like this:
     #  PROJ_ERROR: hgridshift: could not find required grid(s).
@@ -553,16 +590,17 @@ if __name__ == '__main__':
     # blocks with no land should not have mazs/tazs
     blocks_maz_noland_df = blocks_maz_df.loc[ (blocks_maz_df.ALAND10 == 0)&(blocks_maz_df.GEOID10.isin(EXEMPT_NOLAND_BLOCK)==False) ]
     logging.info(f"Number of blocks with maz/taz without land area: {len(blocks_maz_noland_df)}")
-    blocks_maz_noland_df[["GEOID10","ALAND10"]].to_csv("block_noland.csv", index=False)
     if len(blocks_maz_noland_df) > 0:
         logging.fatal(f"\n{blocks_maz_noland_df}")
         logging.fatal("")
+        logging.info(f"Writing block_noland.csv")
+        blocks_maz_noland_df[["GEOID10","ALAND10"]].to_csv("block_noland.csv", index=False)
         sys.exit("ERROR")
 
     # verify maz/taz numbering alignment with https://bayareametro.github.io/tm2py/inputs/#county-node-numbering-system
     maz_taz_county_check = blocks_maz_df.groupby("GEOID10_COUNTY").agg({'maz':['min','max'],
                                                                         'taz':['min','max']})
-    logging.info(f"maz_taz_county_check=\n{maz_taz_county_check}")
+    logging.info(f"maz_taz_county_check:\n{maz_taz_county_check}")
 
     logging.info("Dissolving blocks into MAZs and TAZs")
     maz_gdf = dissolve_into_shapefile(blocks_maz_gdf, "maz")
@@ -617,9 +655,9 @@ if __name__ == '__main__':
     taz_gdf['area'] = taz_gdf.geometry.area
     taz_gdf.to_crs(WGS84_CRS, inplace=True)
     taz_gdf.sort_values(by = ['area'], inplace = True)
-    taz_gdf.drop_duplicates(subset = ['taz'], keep = 'last', inplace = True)
+    taz_gdf.drop_duplicates(subset = ['TAZ_NODE'], keep = 'last', inplace = True)
     # add district to mazs
-    maz_gdf = maz_gdf.merge(taz_gdf[['taz','suprdistid', 'DistName']], on='taz', how='left')
+    maz_gdf = maz_gdf.merge(taz_gdf[['TAZ_NODE','suprdistid', 'DistName']], on='TAZ_NODE', how='left')
   
     # create MAZ_TAZ_COUNTY_PUMA_FILE with columns,MAZ,TAZ,COUNTY,county_name,PUMA
     census_tract_puma_df = pandas.read_csv(CENSUS_TRACT_PUMA, dtype=str)
@@ -635,10 +673,11 @@ if __name__ == '__main__':
 
     # merge blocks to get MAZ centroid
     blocks_maz_df = pandas.merge(
-        left=blocks_maz_df,
-        right=maz_gdf[['maz', 'suprdistid','DistName','MAZ_X','MAZ_Y']],
+        left=blocks_maz_df.rename(columns={"maz":"MAZ_NODE"}),
+        right=maz_gdf[['MAZ_NODE','MAZ_SEQ','suprdistid','DistName','MAZ_X','MAZ_Y']],
         how='left',
-        on='maz',
+        on=['MAZ_NODE'],
+        validate="many_to_one"
     )
 
     blocks_maz_df = pandas.merge(
@@ -674,44 +713,63 @@ if __name__ == '__main__':
         "Sonoma": 8,
         "Marin": 9,
     })
+    blocks_maz_df.rename(columns={'suprdistid':'DistID','taz':'TAZ_NODE'}, inplace=True)
+    blocks_maz_df = pandas.merge(
+        left=blocks_maz_df,
+        right=taz_gdf[['TAZ_NODE','TAZ_SEQ']],
+        how='left',
+        on='TAZ_NODE',
+        validate='many_to_one',
+        indicator=True
+    )
+    assert(blocks_maz_df['_merge'] == "both").all()
+    blocks_maz_df.drop(columns=['_merge'], inplace=True)
+
     # keep only these columns
-    blocks_maz_df.rename(columns={'maz':'MAZ','taz':'TAZ', 'suprdistid':'DistID'}, inplace=True)
-    blocks_maz_df = blocks_maz_df[['MAZ','TAZ','COUNTY','county_name','COUNTYFP10','TRACTCE10','PUMA10', 'DistID', 'DistName','MAZ_X','MAZ_Y']]
-    blocks_maz_df.sort_values(by='MAZ', inplace=True)
+    blocks_maz_df = blocks_maz_df[['MAZ_NODE','MAZ_SEQ','TAZ_NODE','TAZ_SEQ','COUNTY','county_name','COUNTYFP10','TRACTCE10','PUMA10', 'DistID', 'DistName','MAZ_X','MAZ_Y']]
+    blocks_maz_df.sort_values(by='MAZ_SEQ', inplace=True)
     blocks_maz_df.drop_duplicates(inplace=True)
+    logging.debug(f"After drop_duplicates, len(blocks_maz_df)={len(blocks_maz_df):,} blocks_maz_df.MAZ_NODE.nunique()={blocks_maz_df.MAZ_NODE.nunique():,}")
+
+    # manual fixes for mazs that map to more than one tract due to exceptions documented above
+    # drop TAZ_NODE=327 TRACTCE10='017902' -- the sliver from a mostly water/Treasure Island track
+    blocks_maz_df = blocks_maz_df.loc[ ~((blocks_maz_df.MAZ_NODE ==  16495) & (blocks_maz_df.TRACTCE10 == '017902'))]
+    # drop TAZ_NODE=700241 TRACTCE10='151700' -- sliver from a mostly water tract in Sonoma, south part of Santa Rosa Creek Reservoir
+    blocks_maz_df = blocks_maz_df.loc[ ~((blocks_maz_df.MAZ_NODE == 718685) & (blocks_maz_df.TRACTCE10 == '151700'))]
+    # drop TAZ_NODE=800095 TRACTCE10='104300' -- sliver from an adjacent tract in Marin
+    blocks_maz_df = blocks_maz_df.loc[ ~((blocks_maz_df.MAZ_NODE == 810745) & (blocks_maz_df.TRACTCE10 == '104300'))]
+    # drop TAZ_NODE=800203 TRACTCE10='122000' -- San Quentin Rehabilitation Center is nested within another donut tract
+    blocks_maz_df = blocks_maz_df.loc[ ~((blocks_maz_df.MAZ_NODE == 813480) & (blocks_maz_df.TRACTCE10 == '122000'))]
+    logging.debug(f"After manual fixes, len(blocks_maz_df)={len(blocks_maz_df):,} blocks_maz_df.MAZ_NODE.nunique()={blocks_maz_df.MAZ_NODE.nunique():,}")
+
+    # verify MAZs are unique
+    dupe_maz = blocks_maz_df.loc[ blocks_maz_df['MAZ_NODE'].duplicated(keep=False)]
+    logging.debug(f"dupe_maz:\n{dupe_maz}")
+    assert(len(dupe_maz)==0)
+
     output_mapping_file = f'mazs_tazs_county_tract_PUMA_{VERSION}.csv'
-    logging.info(f"Writing {output_mapping_file}")
+    logging.info(f"Writing {len(blocks_maz_df):,} rows to {output_mapping_file}")
     blocks_maz_df.to_csv(output_mapping_file, index=False)
 
-    taz_tract_df = blocks_maz_df[['TAZ','COUNTY','county_name','COUNTYFP10','TRACTCE10','PUMA10','DistID', 'DistName']].drop_duplicates()
+    taz_tract_df = blocks_maz_df[['TAZ_NODE','TAZ_SEQ','COUNTY','county_name','COUNTYFP10','TRACTCE10','PUMA10','DistID', 'DistName']].drop_duplicates()
     logging.debug(f"taz_tract_df:\n{taz_tract_df}")
-
-    # manual fixes for tazs that map to more than one tract due to exceptions documented above
-    # drop TAZ=327 TRACTCE10='017902' -- the sliver from a mostly water/Treasure Island track
-    taz_tract_df = taz_tract_df.loc[ (taz_tract_df.TAZ != 327) & (taz_tract_df.TRACTCE10 != '017902')]
-    # drop TAZ=700241 TRACTCE10='151700' -- sliver from a mostly water tract in Sonoma, south part of Santa Rosa Creek Reservoir
-    taz_tract_df = taz_tract_df.loc[ (taz_tract_df.TAZ != 700241) & (taz_tract_df.TRACTCE10 != '151700')]
-    # drop TAZ=800095 TRACTCE10='104300' -- sliver from an adjacent tract in Marin
-    taz_tract_df = taz_tract_df.loc[ (taz_tract_df.TAZ != 800095) & (taz_tract_df.TRACTCE10 != '104300')]
-    # drop TAZ=800203 TRACTCE10='122000' -- San Quentin Rehabilitation Center is nested within another donut tract
-    taz_tract_df = taz_tract_df.loc[ (taz_tract_df.TAZ != 800095) & (taz_tract_df.TRACTCE10 != '122000')]
 
     # add taz centroid coordinates
     taz_tract_df = pandas.merge(
         left=taz_tract_df,
-        right=taz_gdf[['taz','TAZ_X','TAZ_Y']].rename(columns={"taz":"TAZ"}),
+        right=taz_gdf[['TAZ_NODE','TAZ_X','TAZ_Y']],
         how='left',
-        on="TAZ",
+        on="TAZ_NODE",
         validate="one_to_one"
     )
-    taz_tract_df = taz_tract_df.sort_values(by="TAZ").reset_index(drop=True)
+    taz_tract_df = taz_tract_df.sort_values(by="TAZ_SEQ").reset_index(drop=True)
     logging.debug(f"taz_tract_df:\n{taz_tract_df}")
 
     # verify TAZs are unique
-    dupe_taz = taz_tract_df.loc[ taz_tract_df['TAZ'].duplicated(keep=False)]
+    dupe_taz = taz_tract_df.loc[ taz_tract_df['TAZ_NODE'].duplicated(keep=False)]
     assert(len(dupe_taz)==0)
 
     output_mapping_file = f'tazs_county_tract_PUMA_{VERSION}.csv'
-    logging.info(f"Writing {output_mapping_file}")
+    logging.info(f"Writing {len(taz_tract_df):,} rows to {output_mapping_file}")
     taz_tract_df.to_csv(output_mapping_file, index=False)
     sys.exit(0)
