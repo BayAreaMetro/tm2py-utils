@@ -28,7 +28,7 @@ The script attempts to fix them with split_taz_for_tract()
     non-trivial (>10 percent of land), then split the taz on the tract boundary,
     creating new tazs.
 
-This draft update is saved into blocks_mazs_tazs_updated.csv
+This draft update is saved into blocks_mazs_tazs_v{version}.csv
 
   Notes:
   - Block "06 075 017902 1009" (maz 10186, taz 592) is the little piece of Alameda island that the Census 2010
@@ -72,15 +72,15 @@ EXEMPT_LAND_BLOCK = ['060014273002003','060014301021079','060014415031031','0601
 import argparse, csv, logging, os, pathlib, sys, numpy, shutil
 import pandas
 import geopandas
+import pyproj
+import shapely
 
 # The script should be run from the tm2py-utils directory
 WORKSPACE          = pathlib.Path(".")
 CROSSWALK_ROOT     = "blocks_mazs_tazs"
 
 # Set directory to the Census Block Version
-CENSUS_BLOCK_DIR   = pathlib.Path("M:\\Data\\Census\\Geography\\tl_2020_06_tabblock10")
-CENSUS_BLOCK_ROOT  = "tl_2020_06_tabblock10_9CBA"
-CENSUS_BLOCK_SHP   = CENSUS_BLOCK_DIR /  f"{CENSUS_BLOCK_ROOT}.shp"
+CENSUS_BLOCK_SHP   = pathlib.Path("M:\\Data\\Census\\Geography\\tl_2020_06_tabblock10\\tl_2020_06_tabblock10_9CBA.shp")
 CENSUS_BLOCK_COLS  = ["STATEFP10", "COUNTYFP10", "TRACTCE10", "BLOCKCE10", "GEOID10", "ALAND10", "AWATER10"]
 
 CENSUS_BLOCK_NEIGHBOR_CSV = "E:\\GitHub\\tm2\\tm2py-utils\\tm2py_utils\\inputs\\maz_taz\\tl_2020_06_tabblock10_9CBA_neighbors.csv"
@@ -92,14 +92,21 @@ MAZS_SHP           = "mazs_TM2"
 TAZS_SHP           = "tazs_TM2"
 
 # Default CRS for analysis
-ANALYSIS_CRS = "EPSG:4326"
+LOCAL_CRS_FEET = "EPSG:2227"
+WGS84_CRS = "EPSG:4326"
+FEET_PER_MILE = 5280
 
 #Number of Iteration for moving mazs/tazs
 NUM_ITER = 5
 
 
-def move_small_block_to_neighbor(blocks_maz_df, blocks_neighbor_df,
-                                 maz_multiple_geo_df, bigger_geo, crosswalk_out_df):
+def move_small_block_to_neighbor(
+        blocks_maz_df: pandas.DataFrame, 
+        blocks_neighbor_df: pandas.DataFrame,
+        maz_multiple_geo_df: pandas.DataFrame, 
+        bigger_geo: str,
+        crosswalk_out_df: pandas.DataFrame
+    ) -> int:
     """
     The simplest fix is to move small blocks to a neighboring maz/taz.
     Returns number of blocks moved.
@@ -175,7 +182,7 @@ def move_small_block_to_neighbor(blocks_maz_df, blocks_neighbor_df,
     logging.info(f"====> moved {blocks_moved} blocks to neighbor")
     return blocks_moved
 
-def find_next_unused_taz_id(crosswalk_out_df, taz):
+def find_next_unused_taz_id(crosswalk_out_df: pandas.DataFrame, taz:int) -> int:
     """
     Find the next unused taz id after taz
     """
@@ -191,7 +198,11 @@ def find_next_unused_taz_id(crosswalk_out_df, taz):
             return unused_taz_id
     return -1
 
-def split_taz_for_tract(blocks_maz_df, taz_multiple_geo_df, crosswalk_out_df):
+def split_taz_for_tract(
+        blocks_maz_df: pandas.DataFrame,
+        taz_multiple_geo_df: pandas.DataFrame, 
+        crosswalk_out_df: pandas.DataFrame
+    ) -> int:
     """
     The simplest fix for TAZs that span tract boundaries is to split the TAZ.
     Since there aren't that many, let's do that so long as the tract portions are non-trivial (>10%)
@@ -242,65 +253,75 @@ def split_taz_for_tract(blocks_maz_df, taz_multiple_geo_df, crosswalk_out_df):
 
     return tazs_split
 
-def dissolve_into_shapefile(blocks_maz_layer, maz_or_taz):
+def dissolve_into_shapefile(blocks_maz_gdf: geopandas.GeoDataFrame, maz_or_taz: str):
     """
     Dissolve the blocks into final MAZ/TAZ shapefile
     """
-    #shapefile = MAZS_SHP if maz_or_taz=="maz" else TAZS_SHP    
-
     try:
-        # create mazs shapefile 
+        # create maz_or_taz_gdf 
         if maz_or_taz == 'maz':
             agg_field = {'ALAND10':'sum', 'AWATER10':'sum', 'GEOID10':'count', 'taz':'first'}
         else:
             agg_field = {'ALAND10':'sum', 'AWATER10':'sum', 'GEOID10':'count', 'maz':'count'}
         
-        print(blocks_maz_layer[maz_or_taz].head())
-
-        shapefile = blocks_maz_layer.dissolve(by = maz_or_taz, aggfunc = agg_field, as_index = False)
-        print(shapefile.info())
-        print(shapefile.head())
+        maz_or_taz_gdf = blocks_maz_gdf.dissolve(by = maz_or_taz, aggfunc = agg_field, as_index = False)
+        logging.debug(f"blocks_maz_gdf.crs:{blocks_maz_gdf.crs}")
+        logging.debug(f"blocks_maz_gdf:\n{blocks_maz_gdf}")
         # Calculate partcount -number of geometries in the multi
-        shapefile['partcount'] = shapefile.count_geometries()
+        maz_or_taz_gdf['partcount'] = maz_or_taz_gdf.count_geometries()
         logging.info(f'Calculated part count for {maz_or_taz}s')
 
-        # Add perimter in meters because ALAND10 is square meters
-        shapefile['PERIM_GEO'] = shapefile.geometry.length
+        # convert to local projected CRS first
+        maz_or_taz_gdf.to_crs(LOCAL_CRS_FEET, inplace=True)
+        # Add perimeter in miles and area in square miles
+        maz_or_taz_gdf['PERIM_MI'] = maz_or_taz_gdf.geometry.length / FEET_PER_MILE
+        maz_or_taz_gdf['AREA_SQMI']  = maz_or_taz_gdf.geometry.area / (FEET_PER_MILE*FEET_PER_MILE)
         logging.info(f'Calculated perimeter length for {maz_or_taz}s')
 
-        # Add perimeter squared over area
-        shapefile['psq_overa'] = shapefile['PERIM_GEO'] * shapefile['PERIM_GEO'] / shapefile['ALAND10']
+        # Add perimeter squared over area, or isoperimetric ratio
+        # https://en.wikipedia.org/wiki/Isoperimetric_ratio - measure of how far from circular a shape is
+        maz_or_taz_gdf['psq_overa'] = maz_or_taz_gdf['PERIM_MI'] * maz_or_taz_gdf['PERIM_MI'] / maz_or_taz_gdf['AREA_SQMI']
         logging.info(f'Calculated perim*perim/area for {maz_or_taz}s')
 
         # Add acres from ALAND10
         SQUARE_METERS_PER_ACRE = 4046.86
-        shapefile['acres'] = shapefile['ALAND10'] / SQUARE_METERS_PER_ACRE
+        maz_or_taz_gdf['acres'] = maz_or_taz_gdf['ALAND10'] / SQUARE_METERS_PER_ACRE
         logging.info(f'Calculated acres for {maz_or_taz}s')
 
         # Delete maz/taz = 0 since it is not a real maz/taz 
-        shapefile = shapefile[shapefile[maz_or_taz] != 0]
+        maz_or_taz_gdf = maz_or_taz_gdf[maz_or_taz_gdf[maz_or_taz] != 0]
 
         # Rename fields for clarity
-        shapefile.rename(columns = {'GEOID10': 'blockcount'},inplace = True)
-        if maz_or_taz == 'taz': shapefile.rename(columns = {'maz': 'mazcount'}, inplace = True)
+        maz_or_taz_gdf.rename(columns = {'GEOID10': 'blockcount'},inplace = True)
+        if maz_or_taz == 'taz': maz_or_taz_gdf.rename(columns = {'maz': 'mazcount'}, inplace = True)
 
         # Create centroids for mazs and tazs
         logging.info(f"Creating centroids for {maz_or_taz}")
-        shapefile[f'{maz_or_taz.upper()}_X'] = shapefile.geometry.centroid.x
-        shapefile[f'{maz_or_taz.upper()}_Y'] = shapefile.geometry.centroid.y
-        print(shapefile.head())
+        # create centroid in LOCAL_CRS_FEET and then transform back to WGS84
+        maz_or_taz_gdf["centroid"] = maz_or_taz_gdf.geometry.centroid.to_crs(WGS84_CRS)
+        # transform the boundary geometry back to WGS84
+        maz_or_taz_gdf.to_crs(WGS84_CRS, inplace=True)
+        logging.debug(f"maz_or_taz_gdf with crs {WGS84_CRS}:\n{maz_or_taz_gdf}")
 
-        # Save the dissolved shapefile to workspace
+        # save coords
+        maz_or_taz_gdf[f'{maz_or_taz.upper()}_X'] = maz_or_taz_gdf['centroid'].x
+        maz_or_taz_gdf[f'{maz_or_taz.upper()}_Y'] = maz_or_taz_gdf['centroid'].y
+        maz_or_taz_gdf.drop(columns=['centroid'],inplace=True)
+
+        # Save the dissolved maz_or_taz_gdf
         shapefile_name = MAZS_SHP if maz_or_taz=="maz" else TAZS_SHP
-        if not os.path.exists(f"{WORKSPACE}\shapefiles"):
-            os.makedirs(f"{WORKSPACE}\shapefiles")
+        output_dir = WORKSPACE / "shapefiles"
+        output_dir.mkdir(exist_ok=True)
+        
         version_shp = VERSION.replace(".", "_")
-        shapefile.to_file(f"{WORKSPACE}\shapefiles\{shapefile_name}_{version_shp}.shp")
-        logging.info(f"Saving final {maz_or_taz}s into {shapefile_name}_{version_shp}.shp")
-        return shapefile
+        output_file = output_dir / f"{shapefile_name}_{version_shp}.shp"
+        logging.info(f"Writing {maz_or_taz}s into {output_file}")
+        maz_or_taz_gdf.to_file(output_file)
+        return maz_or_taz_gdf
 
     except Exception as err:
-        logging.error(err.args)
+        logging.error(err)
+        raise err
       
 if __name__ == '__main__':
 
@@ -310,10 +331,16 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     VERSION = args.version
-    CROSSWALK_CSV = args.crosswalk_csv
+    CROSSWALK_CSV = pathlib.Path(args.crosswalk_csv)
+    LOG_FILE = f"maz_taz_checker_{VERSION}.log"
     
     pandas.options.display.width = 300
     pandas.options.display.float_format = '{:.2f}'.format
+    # This is to resolve errors like this:
+    #  PROJ_ERROR: hgridshift: could not find required grid(s).
+    #  PROJ_ERROR: pipeline: Pipeline: Bad step definition: proj=hgridshift (File not found or invalid)
+    # Enable PROJ network capabilities
+    pyproj.network.set_network_enabled(True)
 
     # create logger
     logger = logging.getLogger()
@@ -324,23 +351,32 @@ if __name__ == '__main__':
     ch.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p'))
     logger.addHandler(ch)
     # file handler
-    fh = logging.FileHandler(f"maz_taz_checker_{VERSION}.log", mode='w')
+    fh = logging.FileHandler(LOG_FILE, mode='w')
     fh.setLevel(logging.DEBUG)
     fh.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p'))
     logger.addHandler(fh)
-
+    print(f"Writing log file to {LOG_FILE}")
     
      #######################################################
     # Create a GeoDataFrame from the 2010 block shapefile
     # and converting dataframe to the default analysis CRS
     blocks_maz_shp = geopandas.read_file(CENSUS_BLOCK_SHP)
-    blocks_maz_shp.to_crs(ANALYSIS_CRS,  inplace=True)
-    block_count = len(blocks_maz_shp)
-    print(blocks_maz_shp.head())
-    logging.info(f"Reading in the 2010 block shapefile with {block_count} rows")
+    blocks_maz_shp.to_crs(WGS84_CRS,  inplace=True)
+    logging.info(f"Reading {CENSUS_BLOCK_SHP}; Read {len(blocks_maz_shp):,} rows")
+    logging.debug(blocks_maz_shp.head())
 
-    logging.info(f"Reading in crosswalk file: {CROSSWALK_CSV}")
+    logging.info(f"Reading crosswalk file: {CROSSWALK_CSV}")
     crosswalk_df = pandas.read_csv(CROSSWALK_CSV)
+
+    # drop the Farallon Islands
+    FARALLON_ISLANDS = [
+        "060759804011000",
+        "060759804011001",
+        "060759804011002",
+        "060759804011003",
+    ]
+    blocks_maz_shp = blocks_maz_shp.loc[ ~blocks_maz_shp.GEOID10.isin(FARALLON_ISLANDS)]
+    block_count = len(blocks_maz_shp)
 
     for x in range(1,NUM_ITER + 1,1):
         logging.info(f"Starting iteration {x} of {NUM_ITER}")
@@ -349,30 +385,28 @@ if __name__ == '__main__':
             ########################################################
             # Join the census blocks to the maz/taz crosswalk - this needs to be included in the looping
             crosswalk_df['GEOID10'] = crosswalk_df['GEOID10'].astype(str).str.zfill(15)  # Ensure GEOID10 is string with leading zeros
-            blocks_maz_layer = blocks_maz_shp.merge(crosswalk_df, on = 'GEOID10')
-            block_join_count = len(blocks_maz_layer)
+            blocks_maz_gdf = blocks_maz_shp.merge(crosswalk_df, on = 'GEOID10')
+            block_join_count = len(blocks_maz_gdf)
             logging.info(f"Join block shapefile to crosswalk csv resulting in {block_join_count} rows")
 
             # assert we didn't lose rows in the join
             assert(block_count==block_join_count)
 
             # verify
-            fields = blocks_maz_layer.columns
             ## Printing out field columns and types
-            logging.info(f"The Dataframe has the following columns:")
-            logging.info(f"{blocks_maz_layer.info()}")
+            logging.debug(f"blocks_maz_gdf.type:{type(blocks_maz_gdf)}")
+            logging.debug(f"blocks_maz_gdf.dtypes:\n{blocks_maz_gdf.dtypes}")
             
             # create Dataframe from merged GeoDataFrame
-            blocks_maz_df = pandas.DataFrame(blocks_maz_layer) #, columns = fields)
-            logging.info(f"blocks_maz_df has length {len(blocks_maz_df)}")
+            blocks_maz_df = pandas.DataFrame(blocks_maz_gdf) #, columns = fields)
+            logging.info(f"blocks_maz_df has length {len(blocks_maz_df):,}")
 
             # the GEOID10 = state(2) + county(3) + tract(6) + block(4)
             # block group is the firist digit of the block number
-            print(blocks_maz_df["GEOID10"].head())
             blocks_maz_df["GEOID10_BG"]     = blocks_maz_df["GEOID10"].str[:12]
             blocks_maz_df["GEOID10_TRACT"]  = blocks_maz_df["GEOID10"].str[:11]
             blocks_maz_df["GEOID10_COUNTY"] = blocks_maz_df["GEOID10"].str[:5]
-            logging.info(f"\n{blocks_maz_df.head()}")
+            logging.debug(f"\n{blocks_maz_df.head()}")
 
             # this dataframe is the one we'll modify and output 
             crosswalk_out_df = blocks_maz_df[["GEOID10","maz","taz","GEOID10_TRACT"]]
@@ -380,16 +414,18 @@ if __name__ == '__main__':
             #####################################################
             # Create a table from the 2010 block neighbor mapping
             # For use in move_small_block_to_neighbor()
+            logging.info(f"Reading {CENSUS_BLOCK_NEIGHBOR_CSV}")
             blocks_neighbor_df = pandas.read_csv(CENSUS_BLOCK_NEIGHBOR_CSV, dtype= {"src_GEOID10":str, "nbr_GEOID10":str, "LENGTH":float, "NODE_COUNT":int})
             blocks_neighbor_df["nbr_GEOID10_BG"] = blocks_neighbor_df["nbr_GEOID10"].str[:12]
             # get the maz/taz for these neighbors
-            blocks_neighbor_df = pandas.merge(left   =blocks_neighbor_df,
-                                            right   =blocks_maz_df[["GEOID10","maz","taz"]],
-                                            how     ="left",
-                                            left_on ="nbr_GEOID10",
-                                            right_on="GEOID10")
-            logging.info(f"blocks_neighbor_df has length {len(blocks_neighbor_df)}")
-            logging.info(f"\n{blocks_neighbor_df.head()}")
+            blocks_neighbor_df = pandas.merge(
+                left    =blocks_neighbor_df,
+                right   =blocks_maz_df[["GEOID10","maz","taz"]],
+                how     ="left",
+                left_on ="nbr_GEOID10",
+                right_on="GEOID10")
+            logging.debug(f"blocks_neighbor_df has length {len(blocks_neighbor_df)}")
+            logging.debug(f"\n{blocks_neighbor_df.head()}")
 
         except Exception as err:
             logging.error(err.args[0])
@@ -473,13 +509,18 @@ if __name__ == '__main__':
             crosswalk_out_df.sort_values(by="GEOID10", ascending=True, inplace=True)
             crosswalk_df = crosswalk_out_df
             
-        # Once loops end or no blocks moved or tazs split, save the final crosswalk 
+        # Once loops end or no blocks moved or tazs split, save the final crosswalk
         else:
             logging.info("No blocks moved or tazs split -- exiting iterations")
-            logging.info(f"Saving crosswalk as final crosswalk: {CROSSWALK_ROOT}_{VERSION}.csv")
-            crosswalk_out_df = crosswalk_out_df[["GEOID10","maz","taz"]]
-            crosswalk_out_df.sort_values(by="GEOID10", ascending=True, inplace=True)
-            crosswalk_out_df.to_csv(f"{WORKSPACE}\{CROSSWALK_ROOT}_{VERSION}.csv", index=False, quoting=csv.QUOTE_NONNUMERIC)
+            output_file = WORKSPACE / f"{CROSSWALK_ROOT}_{VERSION}.csv"
+            # if the input file is the same as this, don't write it
+            if CROSSWALK_CSV.samefile(output_file):
+                logging.info(f"Skipping write of {output_file} since it's the same as the input file")
+            else:
+                logging.info(f"Saving crosswalk as final crosswalk: {CROSSWALK_ROOT}_{VERSION}.csv")
+                crosswalk_out_df = crosswalk_out_df[["GEOID10","maz","taz"]]
+                crosswalk_out_df.sort_values(by="GEOID10", ascending=True, inplace=True)
+                crosswalk_out_df.to_csv(output_file, index=False, quoting=csv.QUOTE_NONNUMERIC)
             break
 
     # count blocks per maz
@@ -524,14 +565,13 @@ if __name__ == '__main__':
     logging.info(f"maz_taz_county_check=\n{maz_taz_county_check}")
 
     logging.info("Dissolving blocks into MAZs and TAZs")
-    maz_shapefile = dissolve_into_shapefile(blocks_maz_layer, "maz")
-    taz_shapefile = dissolve_into_shapefile(blocks_maz_layer, "taz")
+    maz_gdf = dissolve_into_shapefile(blocks_maz_gdf, "maz")
+    taz_gdf = dissolve_into_shapefile(blocks_maz_gdf, "taz")
 
-    
     ## Join MAZs/TAZs to superdistricts
     logging.info("Joining mazs/tazs to superdistricts")
     superdistricts = geopandas.read_file(SUPERDISTRICT_FILE)
-    superdistricts.to_crs(ANALYSIS_CRS, inplace=True)
+    superdistricts.to_crs(WGS84_CRS, inplace=True)
 
     ## Naming Superdistricts based on the descriptors: https://opendata.mtc.ca.gov/datasets/MTC::travel-model-super-districts/about
     superdistricts['DistName'] = superdistricts.suprdistid.map({
@@ -571,13 +611,16 @@ if __name__ == '__main__':
         34: 'Mill Valley & Sausalito',
     })
 
-    taz_shapefile = geopandas.overlay(taz_shapefile, superdistricts, how='intersection')
-    taz_shapefile['area'] = taz_shapefile.geometry.area
-    taz_shapefile.sort_values(by = ['area'], inplace = True)
-    taz_shapefile.drop_duplicates(subset = ['taz'], keep = 'last', inplace = True)
-    maz_shapefile = maz_shapefile.merge(taz_shapefile[['taz','suprdistid', 'DistName']], on='taz', how='left')
+    taz_gdf = geopandas.overlay(taz_gdf, superdistricts, how='intersection')
+    # switch to feet for area calculation
+    taz_gdf.to_crs(LOCAL_CRS_FEET, inplace=True)
+    taz_gdf['area'] = taz_gdf.geometry.area
+    taz_gdf.to_crs(WGS84_CRS, inplace=True)
+    taz_gdf.sort_values(by = ['area'], inplace = True)
+    taz_gdf.drop_duplicates(subset = ['taz'], keep = 'last', inplace = True)
+    # add district to mazs
+    maz_gdf = maz_gdf.merge(taz_gdf[['taz','suprdistid', 'DistName']], on='taz', how='left')
   
-
     # create MAZ_TAZ_COUNTY_PUMA_FILE with columns,MAZ,TAZ,COUNTY,county_name,PUMA
     census_tract_puma_df = pandas.read_csv(CENSUS_TRACT_PUMA, dtype=str)
     census_tract_puma_df.rename(columns={
@@ -586,13 +629,14 @@ if __name__ == '__main__':
         'TRACTCE' :'TRACTCE10',
         'PUMA5CE' :'PUMA10'
     }, inplace=True)
-    logging.info(f"Read {CENSUS_TRACT_PUMA}; head=\n{census_tract_puma_df.head()}")
-    logging.info(f"blocks_maz_df len={len(blocks_maz_df):,}.head():\n{blocks_maz_df.head()}")
+    logging.info(f"Read {CENSUS_TRACT_PUMA}")
+    logging.debug(f"census_tract_puma_df:\n{census_tract_puma_df}")
+    logging.debug(f"blocks_maz_df len={len(blocks_maz_df):,}:\n{blocks_maz_df}")
 
     # merge blocks to get MAZ centroid
     blocks_maz_df = pandas.merge(
         left=blocks_maz_df,
-        right=maz_shapefile[['maz', 'suprdistid','DistName','MAZ_X','MAZ_Y']],
+        right=maz_gdf[['maz', 'suprdistid','DistName','MAZ_X','MAZ_Y']],
         how='left',
         on='maz',
     )
@@ -604,7 +648,7 @@ if __name__ == '__main__':
         on=['STATEFP10','COUNTYFP10','TRACTCE10'],
         validate='many_to_one'
     )
-    logging.info(f"blocks_maz_df len={len(blocks_maz_df):,}.head():\n{blocks_maz_df.head()}")
+    logging.debug(f"blocks_maz_df len={len(blocks_maz_df):,}:\n{blocks_maz_df}")
 
     # this should be defined somewhere standard; mtcpy? 
     blocks_maz_df['county_name'] = blocks_maz_df.COUNTYFP10.map({
@@ -635,8 +679,23 @@ if __name__ == '__main__':
     blocks_maz_df = blocks_maz_df[['MAZ','TAZ','COUNTY','county_name','COUNTYFP10','TRACTCE10','PUMA10', 'DistID', 'DistName','MAZ_X','MAZ_Y']]
     blocks_maz_df.sort_values(by='MAZ', inplace=True)
     blocks_maz_df.drop_duplicates(inplace=True)
-    blocks_maz_df.to_csv(f'mazs_tazs_county_tract_PUMA_{VERSION}.csv', index=False)
+    output_mapping_file = f'mazs_tazs_county_tract_PUMA_{VERSION}.csv'
+    logging.info(f"Writing {output_mapping_file}")
+    blocks_maz_df.to_csv(output_mapping_file, index=False)
 
-    blocks_maz_df[['MAZ','TAZ','COUNTY','county_name']].to_csv(f"mazs_tazs_county_{VERSION}.csv", index=False)
-    taz_shapefile[['taz', 'TAZ_X', 'TAZ_Y']].to_csv(f"tazs_{VERSION}.csv", index=False)
+    taz_tract_df = blocks_maz_df[['TAZ','COUNTY','county_name','COUNTYFP10','TRACTCE10','PUMA10']].drop_duplicates()
+    logging.debug(f"taz_tract_df:\n{taz_tract_df}")
+    # check unique TAZ
+    dupe_taz = taz_tract_df.loc[ taz_tract_df['TAZ'].duplicated(keep=False)]
+    logging.error(f"dupe_taz:\n{dupe_taz}")
+    # temp - we'll output this when dupes are resolved
+    sys.exit(0)
+
+    logging.debug(f"taz_gdf.dtypes:\n{taz_gdf.dtypes}")
+    taz_gdf = taz_gdf[['taz','DistID', 'DistName','TAZ_X','TAZ_Y']].sort_values(by="taz").reset_index(drop=True)
+    logging.debug(f"taz_gdf:\n{taz_gdf}")
+
+    output_mapping_file = f'tazs_county_tract_PUMA_{VERSION}.csv'
+    logging.info(f"Writing {output_mapping_file}")
+    taz_gdf.to_csv(f"tazs_{VERSION}.csv", index=False)
     sys.exit(0)
