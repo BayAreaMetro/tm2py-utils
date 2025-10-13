@@ -610,44 +610,7 @@ if __name__ == '__main__':
     logging.info("Joining mazs/tazs to superdistricts")
     superdistricts = geopandas.read_file(SUPERDISTRICT_FILE)
     superdistricts.to_crs(WGS84_CRS, inplace=True)
-
-    ## Naming Superdistricts based on the descriptors: https://opendata.mtc.ca.gov/datasets/MTC::travel-model-super-districts/about
-    superdistricts['DistName'] = superdistricts.suprdistid.map({
-        1:'Downtown SF',
-        2:'Richmond District',
-        3:'Mission District',
-        4:'Sunset District',
-        5: 'Daly City & San Bruno',
-        6: 'San Mateo & Burlingame',
-        7: "Redwood City & Menlo Park",
-        8: 'Palo Alto & Los Altos',
-        9: 'Mountain View & Sunnyvale',
-        10:'Cupertino & Saratoga',
-        11: 'Central San Jose',
-        12: 'Milipitas & East San Jose',
-        13: 'South San Jose',
-        14: 'Gilroy & Morgan Hill',
-        15: 'Livermore & Pleasanton',
-        16: 'Fremont & Union City',
-        17: "Hayward & San Leandro",
-        18: 'Oakland & Alameda',
-        19: 'Berkeley & Albany',
-        20: 'Richmond & El Cerrito',
-        21: 'Concord & Martinez',
-        22: 'Walnut Creek',
-        23: 'Danville & San Ramon',
-        24: 'Antioch & Pittsburg',
-        25: 'Vallejo & Benicia',
-        26: 'Fairfield & Vacaville',
-        27: 'Napa',
-        28: 'Saint Helena',
-        29: 'Petaluma & Rohnert Park',
-        30: 'Santa Rosa & Sebastopol',
-        31: 'Healdsburg & Cloverdale',
-        32: 'Novato',
-        33: 'San Rafael',
-        34: 'Mill Valley & Sausalito',
-    })
+    logging.debug(f"superdistricts:\n{superdistricts}")
 
     taz_gdf = geopandas.overlay(taz_gdf, superdistricts, how='intersection')
     # switch to feet for area calculation
