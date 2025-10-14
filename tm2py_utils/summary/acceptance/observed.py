@@ -563,6 +563,7 @@ class Observed:
         ])
         logging.debug(f"acs_vehs_df:\n{acs_vehs_df}")
 
+        # TODO: What is this? block group? tract? could we be more specific?
         acs_vehs_df.rename(columns={
             "id": "geoid",
             "Estimate!!Total": "total_households",
@@ -819,7 +820,7 @@ class Observed:
         o_df = self.reduced_transit_spatial_flow_df.copy()
         o_df = o_df[o_df["time_period"] == "am"].copy()
 
-        tm2_district_dict = self.canonical.taz_to_district_df.set_index("taz")[
+        tm2_district_dict = self.canonical.taz_to_district_df.set_index("TAZ_NODE")[
             "district"
         ].to_dict()
         o_df["orig_district"] = o_df["orig_taz"].map(tm2_district_dict)

@@ -44,7 +44,7 @@ class Canonical:
                      standard_line_name, standard_operator, canonical_operator]
             Set by: _read_standard_transit_to_survey_crosswalk()
         simulated_maz_data_df (pd.DataFrame): MAZ-level land use data with county and district IDs.
-            Key columns: [MAZ_ORIGINAL, MAZSEQ, TAZ_ORIGINAL, DistID, CountyName] plus
+            Key columns: [MAZ_NODE, MAZ_SEQ, TAZ_NODE, TAZ_SEQ, DistID, CountyName] plus
             land use variables from maz_landuse_file
             Set by: _make_simulated_maz_data()
         taz_to_district_df (pd.DataFrame): TAZ to planning district mapping.
@@ -199,20 +199,31 @@ class Canonical:
         logging.debug(f"self.simulated_maz_data_df.head()\n{self.simulated_maz_data_df.head()}")
 
         # TODO Note this is here -- this should be updated for 2023 & MAZ/TAZ updates
-        maz_map_file = self.scenario_dir / "inputs/landuse/mtc_final_network_zone_seq.csv"
-        logging.info(f"Reading {maz_map_file}")
-        maz_map_df = pd.read_csv(maz_map_file, usecols=["N","MAZSEQ"])
-        logging.debug(f"maz_map_df.head()\n{maz_map_df.head()}")
+        node_map_file = self.scenario_dir / "inputs/landuse/mtc_final_network_zone_seq.csv"
+        logging.info(f"Reading {node_map_file}")
+        node_map_df = pd.read_csv(node_map_file, usecols=["N","MAZSEQ","TAZSEQ"])
+        logging.debug(f"node_map_df.head()\n{node_map_df.head()}")
 
         # map MAZ_ORIGINAL -> MAZSEQ and add that column to self.simulated_maz_data_df
-        maz_map_df.rename(columns={"N": "MAZ_ORIGINAL"}, inplace=True)
+        maz_map_df = node_map_df[["N","MAZSEQ"]].rename(columns={"N": "MAZ_NODE"})
         maz_map_df = maz_map_df.loc[maz_map_df.MAZSEQ > 0]
-        maz_map_df.set_index("MAZ_ORIGINAL", inplace=True)
+        maz_map_df.set_index("MAZ_NODE", inplace=True)
         logging.debug(f"maz_map_df.head()\n{maz_map_df.head()}")
         maz_map = maz_map_df["MAZSEQ"].to_dict()
         logging.debug(f"maz_map: {maz_map}")
 
-        self.simulated_maz_data_df["MAZSEQ"] = self.simulated_maz_data_df["MAZ_ORIGINAL"].map(maz_map)
+        # map TAZ_ORIGINAL -> TAZSEQ
+        taz_map_df = node_map_df[["N","TAZSEQ"]].rename(columns={"N": "TAZ_NODE"})
+        taz_map_df = taz_map_df.loc[taz_map_df.TAZSEQ > 0]
+        taz_map_df.set_index("TAZ_NODE", inplace=True)
+        logging.debug(f"taz_map_df.head()\n{taz_map_df.head()}")
+        taz_map = taz_map_df["TAZSEQ"].to_dict()
+        logging.debug(f"taz_map: {taz_map}")
+
+        if "TAZ_ORIGINAL" in self.simulated_maz_data_df.columns:
+            self.simulated_maz_data_df.rename(columns={"TAZ_ORIGINAL":"TAZ_NODE", "MAZ_ORIGINAL":"MAZ_NODE"}, inplace=True)
+        self.simulated_maz_data_df["MAZ_SEQ"] = self.simulated_maz_data_df["MAZ_NODE"].map(maz_map)
+        self.simulated_maz_data_df["TAZ_SEQ"] = self.simulated_maz_data_df["TAZ_NODE"].map(taz_map)
         logging.debug(f"self.simulated_maz_data_df:\n{self.simulated_maz_data_df}")
 
         self._make_taz_district_crosswalk()
@@ -229,8 +240,8 @@ class Canonical:
             None
         """
 
-        df = self.simulated_maz_data_df[["TAZ_ORIGINAL", "DistID"]].copy()
-        df = df.rename(columns={"TAZ_ORIGINAL": "taz", "DistID": "district"})
+        df = self.simulated_maz_data_df[["TAZ_NODE", "TAZ_SEQ", "DistID"]].copy()
+        df = df.rename(columns={"DistID": "district"})
         self.taz_to_district_df = df.drop_duplicates().reset_index(drop=True)
         logging.debug(f"self.taz_to_district_df:\n{self.taz_to_district_df}")
 
@@ -330,7 +341,16 @@ class Canonical:
 
         # TODO: This is out of date with updated MAZ/TAZ and will need to be fixed
         self.census_2010_to_maz_crosswalk_df = pd.read_csv(url_string)
+        self.census_2010_to_maz_crosswalk_df.rename(columns={"maz":"MAZ_NODE"},inplace=True)
 
+        # TODO: blockgroup should be 12 chracters
+        self.census_2010_to_maz_crosswalk_df['blockgroup'] = self.census_2010_to_maz_crosswalk_df['blockgroup'].astype(str).str.zfill(12) 
+        logging.debug(f"self.census_2010_to_maz_crosswalk_df:\n{self.census_2010_to_maz_crosswalk_df}")
+
+        # note: neither blockgroup nor MAZ_NODE are unique
+        dupe_maz_node = self.census_2010_to_maz_crosswalk_df.loc[ self.census_2010_to_maz_crosswalk_df['MAZ_NODE'] != 0 ].copy()
+        dupe_maz_node = dupe_maz_node.loc[ dupe_maz_node['MAZ_NODE'].duplicated(keep=False) ]
+        logging.debug(f"dupe_maz_node:\n{dupe_maz_node}")
         return
 
     def _read_standard_to_emme_transit(self):

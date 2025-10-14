@@ -589,24 +589,32 @@ class Simulated:
         # get home county from home MAZ
         workloc_df = pd.merge(
             workloc_df,
-            self.canonical.simulated_maz_data_df[["MAZSEQ", "CountyName"]],
+            self.canonical.simulated_maz_data_df[["MAZ_SEQ", "CountyName"]],
             how="left",
             left_on="HomeMGRA",
-            right_on="MAZSEQ",
+            right_on="MAZ_SEQ",
+            validate="many_to_one",
+            indicator=True
         )
+        logging.debug(workloc_df['_merge'].value_counts())
+        assert (workloc_df['_merge'] == 'both').all()
         workloc_df.rename(columns={"CountyName": "residence_county"}, inplace=True)
-        workloc_df.drop(columns=["MAZSEQ"], inplace=True)
+        workloc_df.drop(columns=["MAZ_SEQ","_merge"], inplace=True)
 
         # get work county from work MAZ
         workloc_df = pd.merge(
             workloc_df,
-            self.canonical.simulated_maz_data_df[["MAZSEQ", "CountyName"]],
+            self.canonical.simulated_maz_data_df[["MAZ_SEQ", "CountyName"]],
             how="left",
             left_on="WorkLocation",
-            right_on="MAZSEQ",
+            right_on="MAZ_SEQ",
+            validate="many_to_one",
+            indicator=True
         )
+        # WorkLocation either matches to county or is 0 or 99999
+        assert ((workloc_df['_merge'] == 'both') | (workloc_df['WorkLocation'].isin([0,99999]))).all()
         workloc_df.rename(columns={"CountyName": "work_county"}, inplace=True)
-        workloc_df.drop(columns=["MAZSEQ"], inplace=True)
+        workloc_df.drop(columns=["MAZ_SEQ","_merge"], inplace=True)
 
         # TODO: this should use household samplerate
         workloc_df["num_workers"] = 1
@@ -1003,16 +1011,18 @@ class Simulated:
         logging.info(f"Reading {in_file}")
         hhlds_df = pd.read_csv(in_file)
         logging.debug(f"hhlds_df:\n{hhlds_df}")
+        hhlds_df.rename(columns={"home_mgra":"HOME_MAZ_SEQ"}, inplace=True)
+        assert(hhlds_df.HOME_MAZ_SEQ.max() < 100_000)
 
         # sum households by home MAZ and number of autos
         hhlds_df["hhld_count"] = 1.0 / hhlds_df["sampleRate"]
-        hhld_summary_df = hhlds_df.groupby(["home_mgra", "autos"]).agg(
+        hhld_summary_df = hhlds_df.groupby(["HOME_MAZ_SEQ", "autos"]).agg(
             hhld_count = pd.NamedAgg(column="hhld_count", aggfunc="sum")
         ).reset_index(drop=False)
         logging.debug(f"hhld_summary_df:\n{hhld_summary_df}")
 
         # sum households by MAZ
-        home_maz_summary_df = hhlds_df.groupby("home_mgra").agg(
+        home_maz_summary_df = hhlds_df.groupby("HOME_MAZ_SEQ").agg(
             maz_hhld_count = pd.NamedAgg(column="hhld_count", aggfunc="sum")
         ).reset_index(drop=False)
         logging.debug(f"home_maz_summary_df:\n{home_maz_summary_df}")
@@ -1021,63 +1031,54 @@ class Simulated:
             left=hhld_summary_df,
             right=home_maz_summary_df,
             how="left",
-            on="home_mgra",
+            on="HOME_MAZ_SEQ",
             validate="many_to_one"
         )
-        hhld_summary_df["vehicle_share"] = hhld_summary_df["hhld_count"] / hhld_summary_df["maz_hhld_count"]
         logging.debug(f"hhld_summary_df:\n{hhld_summary_df}")
         # keep only zero autos
-        hhld_summary_df = hhld_summary_df.loc[hhld_summary_df.autos == 0]
-        hhld_summary_df.rename(columns={
-            "home_mgra": "maz",
-            "vehicle_share": "simulated_zero_vehicle_share",
-            "hhld_count": "simulated_households",
+        self.zero_vehicle_hhs_df = hhld_summary_df.loc[hhld_summary_df.autos == 0].copy()
+        self.zero_vehicle_hhs_df.rename(columns={
+            "hhld_count": "zero_auto_hhld_count",
         }, inplace=True)
-        self.zero_vehicle_hhs_df = hhld_summary_df
-        
-        # prepare simulated data
-        a_df = (
-            pd.merge(
-                self.zero_vehicle_hhs_df,
-                self.canonical.simulated_maz_data_df[["MAZ_ORIGINAL", "MAZSEQ"]],
-                left_on="maz",
-                right_on="MAZSEQ",
-                how="left",
-            )
-            .drop(columns=["maz", "MAZSEQ"])
-            .rename(columns={"MAZ_ORIGINAL": "maz"})
-        )
 
-        a_df = pd.merge(
-            a_df,
+        # add column MAZ_NODE equivalent for HOME_MAZ_SEQ
+        zero_vehicle_hhs_df = pd.merge(
+            self.zero_vehicle_hhs_df,
+            self.canonical.simulated_maz_data_df[["MAZ_NODE", "MAZ_SEQ"]].rename(columns={"MAZ_SEQ":"HOME_MAZ_SEQ"}),
+            on="HOME_MAZ_SEQ",
+            how="left",
+            validate="many_to_one",
+            indicator=True
+        )
+        logging.debug(f"zero_vehicle_hhs_df:\n{zero_vehicle_hhs_df}")
+        assert (zero_vehicle_hhs_df['_merge'] == 'both').all()
+        zero_vehicle_hhs_df.drop(columns=["_merge"], inplace=True)
+
+        # add column blockgroup
+        # TODO: BUG: This isn't valid because MAZ_NODE is not unique
+        zero_vehicle_hhs_df = pd.merge(
+            zero_vehicle_hhs_df,
             self.canonical.census_2010_to_maz_crosswalk_df,
             how="left",
-            on="maz",
+            on="MAZ_NODE",
+            # validate="many_to_one",  # TODO
+            indicator=True,
         )
+        logging.debug(f"zero_vehicle_hhs_df['_merge'].value_counts():\n{zero_vehicle_hhs_df['_merge'].value_counts()}")
+        assert (zero_vehicle_hhs_df['_merge'] == 'both').all()
+        zero_vehicle_hhs_df.drop(columns=["_merge"], inplace=True)
+        zero_vehicle_hhs_df["tract"] = zero_vehicle_hhs_df["blockgroup"].astype("str").str.slice(stop=-1)
 
-        a_df["product"] = a_df["simulated_zero_vehicle_share"] * a_df["maz_share"]
+        # summarize to tract
+        zero_vehicle_tract_df = zero_vehicle_hhs_df.groupby("tract").agg(
+            zero_auto_hhld_count = pd.NamedAgg(column="zero_auto_hhld_count", aggfunc="sum"),
+            maz_hhld_count       = pd.NamedAgg(column="maz_hhld_count",       aggfunc="sum")
+        ).reset_index(drop=False)
+        zero_vehicle_tract_df["simulated_zero_vehicle_share"] = \
+            zero_vehicle_tract_df["zero_auto_hhld_count"] / zero_vehicle_tract_df["maz_hhld_count"]
+        logging.debug(f"zero_vehicle_tract_df:\n{zero_vehicle_tract_df}")
 
-        b_df = (
-            a_df.groupby("blockgroup")
-            .agg({"product": "sum", "simulated_households": "sum"})
-            .reset_index()
-            .rename(columns={"product": "simulated_zero_vehicle_share"})
-        )
-        b_df["tract"] = b_df["blockgroup"].astype("str").str.slice(stop=-1)
-        b_df["product"] = (
-            b_df["simulated_zero_vehicle_share"] * b_df["simulated_households"]
-        )
-
-        c_df = (
-            b_df.groupby("tract")
-            .agg({"product": "sum", "simulated_households": "sum"})
-            .reset_index()
-        )
-        c_df["simulated_zero_vehicle_share"] = (
-            c_df["product"] / c_df["simulated_households"]
-        )
-
-        self.reduced_zero_vehicle_hhs_df = c_df
+        self.reduced_zero_vehicle_hhs_df = zero_vehicle_tract_df
 
         return
 
@@ -1330,7 +1331,7 @@ class Simulated:
             boards_df.rename(columns={matrix_name: "boards"}, inplace=True)
 
             path_time_df = pd.merge(
-                ivt_df, boards_df, on=["origin", "destination"], how="left"
+                ivt_df, boards_df, on=["origin_TAZ_SEQ", "destination_TAZ_SEQ"], how="left"
             )
             path_time_df["path"] = path
             path_time_df["time_period"] = time_period
@@ -1348,7 +1349,7 @@ class Simulated:
                     path_time_df,
                     tech_ivt_df,
                     how="left",
-                    on=["origin", "destination"],
+                    on=["origin_TAZ_SEQ", "destination_TAZ_SEQ"],
                 )
 
             self.transit_tech_in_vehicle_times_df = pd.concat([
@@ -1362,7 +1363,7 @@ class Simulated:
         end_time = time.perf_counter()
         logging.debug(f"self.transit_tech_in_vehicle_times_df:\n{self.transit_tech_in_vehicle_times_df}")
         logging.debug(f"description:\n{self.transit_tech_in_vehicle_times_df.describe()}")
-        logging.info(f"memroy usage: {self.transit_tech_in_vehicle_times_df.memory_usage(deep=True).sum() / 1024**2:.2f} MB")
+        logging.info(f"memory usage: {self.transit_tech_in_vehicle_times_df.memory_usage(deep=True).sum() / 1024**2:.2f} MB")
         logging.info(f"time taken: {(end_time - start_time)/60:.1f} minutes")
         return
 
@@ -1432,7 +1433,7 @@ class Simulated:
 
             path_time_pldf = ivt_pldf.join(
                 boards_pldf,
-                on=["origin", "destination"],
+                on=["origin_TAZ_SEQ", "destination_TAZ_SEQ"],
                 how="left",
                 coalesce=True,
                 validate="1:1"
@@ -1454,7 +1455,7 @@ class Simulated:
                 path_time_pldf = path_time_pldf.join(
                     tech_ivt_pldf,
                     how="left",
-                    on=["origin", "destination"],
+                    on=["origin_TAZ_SEQ", "destination_TAZ_SEQ"],
                     coalesce=True,
                     validate="1:1"
                 )
@@ -1574,8 +1575,8 @@ class Simulated:
         
         Returns:
             pd.DataFrame: Long-format DataFrame with columns:
-                - origin: Origin TAZ (1-indexed)
-                - destination: Destination TAZ (1-indexed)
+                - origin_TAZ_SEQ: Origin TAZ_SEQ
+                - destination_TAZ_SEQ: Destination TAZ_SEQ
                 - {core_name}: Matrix value
         """
         df = pd.DataFrame(np.array(input_mtx))
@@ -1583,11 +1584,11 @@ class Simulated:
             df.unstack()
             .reset_index()
             .rename(
-                columns={"level_0": "origin", "level_1": "destination", 0: core_name}
+                columns={"level_0": "origin_TAZ_SEQ", "level_1": "destination_TAZ_SEQ", 0: core_name}
             )
         )
-        df["origin"] = df["origin"] + 1
-        df["destination"] = df["destination"] + 1
+        df["origin_TAZ_SEQ"] = df["origin_TAZ_SEQ"] + 1
+        df["destination_TAZ_SEQ"] = df["destination_TAZ_SEQ"] + 1
         if filter_zero:
             df = df.loc[df[core_name] > 0]
         return df
@@ -1607,15 +1608,15 @@ class Simulated:
 
         Returns:
             pl.DataFrame: Long-format DataFrame with columns:
-                - origin: Origin TAZ (1-indexed)
-                - destination: Destination TAZ (1-indexed)
+                - origin_TAZ_SEQ: Origin TAZ
+                - destination_TAZ_SEQ: Destination TAZ
                 - {core_name}: Matrix value
         """
         np_matrix = np.array(input_mtx)
         origins, destinations = np.indices(np_matrix.shape)
         polars_df = pl.DataFrame({
-            "origin": origins.flatten() + 1,
-            "destination": destinations.flatten() + 1,
+            "origin_TAZ_SEQ": origins.flatten() + 1,
+            "destination_TAZ_SEQ": destinations.flatten() + 1,
             core_name:np_matrix.flatten()
         })
 
@@ -1644,56 +1645,58 @@ class Simulated:
         start_time = time.perf_counter()
         logging.info("_make_district_to_district_transit_summaries_pandas()")
 
-        taz_district_dict = self.canonical.taz_to_district_df.set_index("taz")[
+        taz_seq_district_dict = self.canonical.taz_to_district_df.set_index("TAZ_SEQ")[
             "district"
         ].to_dict()
+        logging.debug(f"taz_seq_district_dict:{taz_seq_district_dict}")
 
-        s_dem_df = self.transit_demand_df.copy()
-        s_path_df = self.transit_tech_in_vehicle_times_df.copy()
+        # summarize demand by origin/dest/time_period and join to skims
+        summary_df = self.transit_demand_df.groupby(
+            ["origin_TAZ_SEQ", "destination_TAZ_SEQ", "time_period"]
+        ).agg({"simulated_flow": "sum"}).reset_index()
 
-        s_dem_sum_df = (
-            s_dem_df.groupby(["origin", "destination", "time_period"])
-            .agg({"simulated_flow": "sum"})
-            .reset_index()
-        )
-        s_df = s_dem_sum_df.merge(
-            s_path_df,
-            left_on=["origin", "destination", "time_period"],
-            right_on=["origin", "destination", "time_period"],
+        summary_df = summary_df.merge(
+            self.transit_tech_in_vehicle_times_df,
+            on=["origin_TAZ_SEQ", "destination_TAZ_SEQ", "time_period"],
         )
 
-        s_df = s_df[s_df["time_period"] == "am"].copy()
+        # select AM only
+        summary_df = summary_df[summary_df["time_period"] == "am"]
+        logging.debug(f"demand_summary_df:\n{summary_df}")
 
         for tech in self.canonical.transit_technology_abbreviation_dict.keys():
-            column_name = "simulated_{}_flow".format(tech.lower())
-            s_df[column_name] = (
-                s_df["simulated_flow"]
-                * s_df["boards"]
-                * s_df["{}".format(tech.lower())]
-                / s_df["ivt"]
+            column_name = f"simulated_{tech.lower()}_flow"
+            summary_df[column_name] = (
+                summary_df["simulated_flow"]
+                * summary_df["boards"]
+                * summary_df["{}".format(tech.lower())]
+                / summary_df["ivt"]
             )
+        logging.debug(f"summary_df:\n{summary_df}")
 
-        s_df["orig_district"] = s_df["origin"].map(taz_district_dict)
-        s_df["dest_district"] = s_df["destination"].map(taz_district_dict)
+        summary_df["orig_district"] = summary_df["origin_TAZ_SEQ"].map(taz_seq_district_dict)
+        summary_df["dest_district"] = summary_df["destination_TAZ_SEQ"].map(taz_seq_district_dict)
 
         agg_dict = {"simulated_flow": "sum"}
         rename_dict = {"simulated_flow": "total"}
         for tech in self.canonical.transit_technology_abbreviation_dict.keys():
-            agg_dict["simulated_{}_flow".format(tech.lower())] = "sum"
-            rename_dict["simulated_{}_flow".format(tech.lower())] = tech.lower()
+            agg_dict[f"simulated_{tech.lower()}_flow"] = "sum"
+            rename_dict[f"simulated_{tech.lower()}_flow"] = tech.lower()
+        logging.debug(f"agg_dict:\n{pprint.pformat(agg_dict)}")
+        logging.debug(f"rename_dict:\n{pprint.pformat(rename_dict)}")
 
-        sum_s_df = (
-            s_df.groupby(["orig_district", "dest_district"]).agg(agg_dict).reset_index()
-        )
+        summary_df = summary_df.groupby(
+            ["orig_district", "dest_district"]
+        ).agg(agg_dict).reset_index()
 
-        long_sum_s_df = sum_s_df.melt(
+        summary_df = summary_df.melt(
             id_vars=["orig_district", "dest_district"],
             var_name="tech",
             value_name="simulated",
         )
-        long_sum_s_df["tech"] = long_sum_s_df["tech"].map(rename_dict)
+        summary_df["tech"] = summary_df["tech"].map(rename_dict)
 
-        self.transit_district_to_district_by_tech_df = long_sum_s_df.copy()
+        self.transit_district_to_district_by_tech_df = summary_df
 
         end_time = time.perf_counter()
         logging.info(f"time taken: {(end_time - start_time):.2f} seconds")
@@ -1734,36 +1737,32 @@ class Simulated:
         logging.info("_make_district_to_district_transit_summaries_polars()")
 
         # Create TAZ-to-district lookup dictionary for mapping zones to districts
-        taz_district_dict = self.canonical.taz_to_district_df.set_index("taz")[
+        taz_seq_district_dict = self.canonical.taz_to_district_df.set_index("TAZ_SEQ")[
             "district"
         ].to_dict()
-
-        # Clone input dataframes to avoid modifying originals
-        s_dem_pldf = self.simulated_transit_demand_pldf.clone()
-        s_path_pldf = self.transit_tech_in_vehicle_times_pldf.clone()
+        logging.debug(f"taz_seq_district_dict:{taz_seq_district_dict}")
 
         # Aggregate demand by OD pair and time period (sum across all paths/modes)
-        s_dem_sum_pldf = (
-            s_dem_pldf.group_by(["origin", "destination", "time_period"])
-            .agg(pl.col("simulated_flow").sum())
-        )
-
+        summary_pldf = self.simulated_transit_demand_pldf.group_by(
+            ["origin_TAZ_SEQ", "destination_TAZ_SEQ", "time_period"]
+        ).agg(pl.col("simulated_flow").sum())
+        
         # Join demand with path/skim data to get in-vehicle times and boardings
-        s_pldf = s_dem_sum_pldf.join(
-            s_path_pldf,
-            on=["origin", "destination", "time_period"],
+        summary_pldf = summary_pldf.join(
+            self.transit_tech_in_vehicle_times_pldf,
+            on=["origin_TAZ_SEQ", "destination_TAZ_SEQ", "time_period"],
             how="inner",
         )
 
         # Filter to AM period only
-        s_pldf = s_pldf.filter(pl.col("time_period") == "am")
+        summary_pldf = summary_pldf.filter(pl.col("time_period") == "am")
 
         # Calculate technology-specific flows using formula:
         # tech_flow = total_flow * boards * tech_ivt / total_ivt
         # This allocates trips to technologies based on their share of in-vehicle time
         for tech in self.canonical.transit_technology_abbreviation_dict.keys():
-            column_name = "simulated_{}_flow".format(tech.lower())
-            s_pldf = s_pldf.with_columns(
+            column_name = f"simulated_{tech.lower()}_flow"
+            summary_pldf = summary_pldf.with_columns(
                 (
                     pl.col("simulated_flow")
                     * pl.col("boards")
@@ -1773,9 +1772,9 @@ class Simulated:
             )
 
         # Map TAZ origins and destinations to planning districts
-        s_pldf = s_pldf.with_columns([
-            pl.col("origin").replace_strict(taz_district_dict, default=None).alias("orig_district"),
-            pl.col("destination").replace_strict(taz_district_dict, default=None).alias("dest_district"),
+        summary_pldf = summary_pldf.with_columns([
+            pl.col("origin_TAZ_SEQ").replace_strict(taz_seq_district_dict, default=None).alias("orig_district"),
+            pl.col("destination_TAZ_SEQ").replace_strict(taz_seq_district_dict, default=None).alias("dest_district"),
         ])
 
         # Build aggregation expressions for all flow columns
@@ -1784,45 +1783,47 @@ class Simulated:
             agg_exprs.append(pl.col("simulated_{}_flow".format(tech.lower())).sum())
 
         # Aggregate flows by district OD pairs
-        sum_s_pldf = (
-            s_pldf.group_by(["orig_district", "dest_district"]).agg(agg_exprs)
+        summary_pldf = (
+            summary_pldf.group_by(["orig_district", "dest_district"]).agg(agg_exprs)
         )
 
         # Reshape from wide to long format (one row per district OD + technology)
-        long_sum_s_pldf = sum_s_pldf.melt(
+        summary_pldf = summary_pldf.melt(
             id_vars=["orig_district", "dest_district"],
             variable_name="tech",
             value_name="simulated",
         )
+        logging.debug(f"summary_pldf:\n{summary_pldf}")
 
         # Create mapping to rename flow columns to technology codes
         # e.g., "simulated_flow" -> "total", "simulated_loc_flow" -> "loc"
         rename_dict = {"simulated_flow": "total"}
         for tech in self.canonical.transit_technology_abbreviation_dict.keys():
-            rename_dict["simulated_{}_flow".format(tech.lower())] = tech.lower()
+            rename_dict[f"simulated_{tech.lower()}_flow"] = tech.lower()
 
         # Apply the renaming to get clean technology codes
-        long_sum_s_pldf = long_sum_s_pldf.with_columns(
+        summary_pldf = summary_pldf.with_columns(
             pl.col("tech").replace_strict(rename_dict, default=None)
         )
 
-        # Store the result
-        self.transit_district_to_district_by_tech_pldf = long_sum_s_pldf.clone()
+        # Store the result - convert to pandas
+        self.transit_district_to_district_by_tech_pldf = summary_pldf.to_pandas()
 
         end_time = time.perf_counter()
         logging.info(f"time taken: {(end_time - start_time):.2f} seconds")
 
         # Log pivoted matrices by technology for easier comparison
-        for tech_value in sorted(self.transit_district_to_district_by_tech_pldf['tech'].unique().to_list()):
-            tech_pldf = self.transit_district_to_district_by_tech_pldf.filter(
-                pl.col('tech') == tech_value
-            )
-            pivot_pldf = tech_pldf.pivot(
+        for tech_value in sorted(self.transit_district_to_district_by_tech_df['tech'].unique()):
+            tech_df = self.transit_district_to_district_by_tech_df[
+                self.transit_district_to_district_by_tech_df['tech'] == tech_value
+            ].copy()
+            pivot_df = tech_df.pivot(
                 index='orig_district',
                 columns='dest_district',
                 values='simulated'
             )
-            logging.debug(f"transit_district_to_district matrix (polars) - {tech_value}:\n{pivot_pldf}")
+            logging.debug(f"transit_district_to_district matrix (polars) - {tech_value}:\n{pivot_df}")
+
 
         return
 
@@ -1953,7 +1954,7 @@ class Simulated:
                 gdf = shape_gdf
             else:
                 emme_scenario = self.network_shapefile_names_dict[t]
-                in_file = self.scenario / f"output_summaries/{emme_scenario}/emme_links.shp"
+                in_file = self.scenario_dir / f"output_summaries/{emme_scenario}/emme_links.shp"
                 logging.info(f"Reading {in_file}")
                 gdf = gpd.read_file(in_file)
                 logging.debug(f"gdf:\n{gdf}")
