@@ -569,10 +569,7 @@ class Simulated:
         Returns:
             None
         """
-        # if self.simulated_maz_data_df.empty:
-        #    self._make_simulated_maz_data()
-        # TODO: This should use the iteration not 1
-        in_file = self.scenario_dir / "ctramp_output/wsLocResults_1.csv"
+        in_file = self.scenario_dir / f"ctramp_output/wsLocResults_{self.iter}.csv"
         logging.info(f"Reading {in_file}")
         workloc_df = pd.read_csv(in_file, usecols=[
             "HHID", "HomeMGRA", "WorkLocation"
@@ -609,8 +606,25 @@ class Simulated:
         workloc_df.rename(columns={"CountyName": "work_county"}, inplace=True)
         workloc_df.drop(columns=["MAZ_SEQ","_merge"], inplace=True)
 
-        # TODO: this should use household samplerate
-        workloc_df["num_workers"] = 1
+        # get SampleRate from households file
+        in_file = self.scenario_dir / f"ctramp_output/householdData_{self.iter}.csv"
+        logging.info(f"Reading {in_file}")
+        hhlds_df = pd.read_csv(in_file, usecols=["hh_id","sampleRate"])
+        logging.debug(f"hhlds_df:\n{hhlds_df}")
+
+        workloc_df = pd.merge(
+            left=workloc_df,
+            right=hhlds_df.rename(columns={"hh_id":"HHID"}),
+            how="left",
+            on="HHID",
+            validate="many_to_one",
+            indicator=True
+        )
+        assert (workloc_df['_merge'] == 'both').all()
+        workloc_df.drop(columns=["_merge"], inplace=True)
+
+        # apply sampleRate
+        workloc_df["num_workers"] = 1.0/workloc_df["sampleRate"]
 
         workloc_df = workloc_df.groupby(["residence_county", "work_county"]).agg(
             simulated_flow = pd.NamedAgg(column="num_workers", aggfunc="sum")
@@ -999,8 +1013,7 @@ class Simulated:
         Returns:
             None
         """
-        # TODO: This should use the iteration not 1
-        in_file = self.scenario_dir / "ctramp_output/householdData_1.csv"
+        in_file = self.scenario_dir / f"ctramp_output/householdData_{self.iter}.csv"
         logging.info(f"Reading {in_file}")
         hhlds_df = pd.read_csv(in_file)
         logging.debug(f"hhlds_df:\n{hhlds_df}")
