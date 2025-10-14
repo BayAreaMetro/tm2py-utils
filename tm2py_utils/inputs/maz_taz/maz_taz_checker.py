@@ -404,6 +404,7 @@ if __name__ == '__main__':
 
     logging.info(f"Reading crosswalk file: {CROSSWALK_CSV}")
     crosswalk_df = pandas.read_csv(CROSSWALK_CSV)
+    crosswalk_df.rename(columns={'MAZ_NODE':'maz','TAZ_NODE':'taz'}, inplace=True)
 
     # drop the Farallon Islands
     FARALLON_ISLANDS = [
@@ -556,6 +557,7 @@ if __name__ == '__main__':
             else:
                 logging.info(f"Saving crosswalk as final crosswalk: {CROSSWALK_ROOT}_{VERSION}.csv")
                 crosswalk_out_df = crosswalk_out_df[["GEOID10","maz","taz"]]
+                crosswalk_out_df.rename(columns={"maz":"MAZ_NODE","taz":"TAZ_NODE"}, inplace=True)
                 crosswalk_out_df.sort_values(by="GEOID10", ascending=True, inplace=True)
                 crosswalk_out_df.to_csv(output_file, index=False, quoting=csv.QUOTE_NONNUMERIC)
             break
