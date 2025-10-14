@@ -14,6 +14,18 @@ This module enables modelers to:
 - Assess station-to-station flows and access mode shares
 - Generate visualization-ready outputs for Tableau dashboards
 
+## Usage
+
+Run the acceptance criteria code as follows:
+```batch
+python acceptance.py model_run_directory
+```
+
+This will read the configuration `.toml` files from the model run directory, read various observed and model input files,
+and output into `[model_run_directory]\acceptance\output`.
+
+Currently, we've been running it using the virtual environment defined by tm2py, in which the packages listed in [..\requirements.txt](..\requirements.txt) is also installed.
+
 ## Components
 
 ### Core Classes
@@ -133,45 +145,6 @@ vehicles_by_block_group_file = "acs_vehicles.csv"
 [scenario]
 root_dir = "path/to/model/run"
 maz_landuse_file = "landuse/maz_data.csv"
-```
-
-## Usage Example
-
-```python
-from tm2py_utils.summary.acceptance import Acceptance, Canonical, Observed, Simulated
-
-# Initialize components
-canonical = Canonical(
-    canonical_file="config/canonical.toml",
-    scenario_file="config/scenario.toml"
-)
-
-observed = Observed(
-    canonical=canonical,
-    observed_file="config/observed.toml"
-)
-
-simulated = Simulated(
-    canonical=canonical,
-    scenario_file="config/scenario.toml",
-    model_file="config/model.toml",
-    iteration=3  # Use iteration 3 outputs
-)
-
-# Create acceptance criteria comparisons
-acceptance = Acceptance(
-    canonical=canonical,
-    simulated=simulated,
-    observed=observed,
-    output_file_root="output/acceptance"
-)
-
-# Generate all comparisons
-acceptance.make_acceptance(
-    make_transit=True,   # Transit network comparisons
-    make_roadway=True,   # Roadway network comparisons
-    make_other=True      # Aggregate comparisons
-)
 ```
 
 ## Output Data Structure
