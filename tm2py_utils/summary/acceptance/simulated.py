@@ -331,18 +331,11 @@ class Simulated:
         self._read_standard_transit_routes()
         self._read_standard_node()
 
-        # TODO: pick one
-        self._read_transit_demand_pandas()
-        self._read_transit_demand_polars()
-
-        # TODO: short-term: pick one
+        # these methods uses polars
+        self._read_transit_demand()
         # TODO: long-term: do this in tm2py postprocessing
-        self._make_transit_technology_in_vehicle_table_from_skims_polars()
-        self._make_transit_technology_in_vehicle_table_from_skims_pandas()
-
-        # this is dependent upon reading transit demand and transit skims
-        self._make_district_to_district_transit_summaries_pandas()
-        self._make_district_to_district_transit_summaries_polars()
+        self._make_transit_technology_in_vehicle_table_from_skims()
+        self._make_district_to_district_transit_summaries()
 
         self._reduce_simulated_transit_by_segment()
         self._reduce_simulated_transit_boardings()
@@ -1267,7 +1260,7 @@ class Simulated:
         logging.debug(f"self.transit_access_mode_dict:\n{pprint.pformat(self.transit_access_mode_dict)}")
         return
 
-    def _make_transit_technology_in_vehicle_table_from_skims_pandas(self, time_period_list: list = ["am"]):
+    def _make_transit_technology_in_vehicle_table_from_skims(self, time_period_list: list = ["am"]):
         """Create in-vehicle time by technology from transit skims.
         
         Reads transit skim matrices to extract in-vehicle times by technology
@@ -1287,107 +1280,7 @@ class Simulated:
             None
         """
         start_time = time.perf_counter()
-        logging.info("_make_transit_technology_in_vehicle_table_from_skims_pandas()")
-        path_list = [
-            "WLK_TRN_WLK",
-            "PNR_TRN_WLK",
-            "WLK_TRN_PNR",
-            "KNR_TRN_WLK",
-            "WLK_TRN_KNR",
-        ]
-
-        self.model_time_periods =  time_period_list
-
-        tech_list = self.canonical.transit_technology_abbreviation_dict.keys()
-
-        skim_dir = self.scenario_dir / "skim_matrices/transit"
-
-        self.transit_tech_in_vehicle_times_df = None
-        for path, time_period in itertools.product(path_list, self.model_time_periods):
-            filename = skim_dir / f"trnskm{time_period.upper()}_{path}.omx"
-
-            if not filename.exists:
-                continue
-            
-            logging.info(f"Reading {filename}")
-            omx_handle = omx.open_file(filename)
-            # IVT
-            TIME_PERIOD = time_period.upper()
-            matrix_name = TIME_PERIOD + "_" + path + "_IVT"
-            logging.debug(f"Extracting {matrix_name}")
-            assert(matrix_name in omx_handle.listMatrices())
-            ivt_df = self._make_dataframe_from_omx(
-                omx_handle[matrix_name], matrix_name, filter_zero=True
-            )
-            ivt_df.rename(columns={matrix_name: "ivt"}, inplace=True)
-
-            # Transfers to get boardings from trips
-            matrix_name = TIME_PERIOD + "_" + path + "_BOARDS"
-            logging.debug(f"Extracting {matrix_name}")
-            assert(matrix_name in omx_handle.listMatrices())
-            boards_df = self._make_dataframe_from_omx(
-                omx_handle[matrix_name], matrix_name, filter_zero=True
-            )
-            boards_df.rename(columns={matrix_name: "boards"}, inplace=True)
-
-            path_time_df = pd.merge(
-                ivt_df, boards_df, on=["origin_TAZ_SEQ", "destination_TAZ_SEQ"], how="left"
-            )
-            path_time_df["path"] = path
-            path_time_df["time_period"] = time_period
-            
-
-            for tech in tech_list:
-                matrix_name = TIME_PERIOD + "_" + path + "_IVT" + tech
-                logging.debug(f"Extracting {matrix_name}")
-                assert(matrix_name in omx_handle.listMatrices())
-                tech_ivt_df = self._make_dataframe_from_omx(
-                    omx_handle[matrix_name], matrix_name, filter_zero=True
-                )
-                tech_ivt_df.rename(columns={matrix_name:tech.lower()}, inplace=True)
-                path_time_df = pd.merge(
-                    path_time_df,
-                    tech_ivt_df,
-                    how="left",
-                    on=["origin_TAZ_SEQ", "destination_TAZ_SEQ"],
-                )
-
-            self.transit_tech_in_vehicle_times_df = pd.concat([
-                self.transit_tech_in_vehicle_times_df, 
-                path_time_df
-            ], axis="rows", ignore_index=True).reset_index(drop=True)
-
-            omx_handle.close()
-
-        self.transit_tech_in_vehicle_times_df.fillna(value=0, inplace=True)
-        end_time = time.perf_counter()
-        logging.debug(f"self.transit_tech_in_vehicle_times_df:\n{self.transit_tech_in_vehicle_times_df}")
-        logging.debug(f"description:\n{self.transit_tech_in_vehicle_times_df.describe()}")
-        logging.info(f"memory usage: {self.transit_tech_in_vehicle_times_df.memory_usage(deep=True).sum() / 1024**2:.2f} MB")
-        logging.info(f"time taken: {(end_time - start_time)/60:.1f} minutes")
-        return
-
-    def _make_transit_technology_in_vehicle_table_from_skims_polars(self, time_period_list: list = ["am"]):
-        """Create in-vehicle time by technology from transit skims.
-        
-        Reads transit skim matrices to extract in-vehicle times by technology
-        (local bus, express bus, light rail, ferry, heavy rail, commuter rail)
-        for each OD pair. Used to allocate trips to technologies based on
-        in-vehicle time shares.
-        
-        Results stored in transit_tech_in_vehicle_times_df with columns:
-            - origin, destination: TAZ pair
-            - path: Access mode path (WLK_TRN_WLK, PNR_TRN_WLK, etc.)
-            - time_period: Time period
-            - ivt: Total in-vehicle time
-            - boards: Number of boardings
-            - loc, exp, ltr, fry, hvy, com: IVT by technology
-        
-        Returns:
-            None
-        """
-        start_time = time.perf_counter()
-        logging.info("_make_transit_technology_in_vehicle_table_from_skims_polars()")
+        logging.info("_make_transit_technology_in_vehicle_table_from_skims()")
         path_list = [
             "WLK_TRN_WLK",
             "PNR_TRN_WLK",
@@ -1416,7 +1309,7 @@ class Simulated:
             matrix_name = TIME_PERIOD + "_" + path + "_IVT"
             logging.debug(f"Extracting {matrix_name}")
             assert(matrix_name in omx_handle.listMatrices())
-            ivt_pldf = self._make_polars_dataframe_from_omx(
+            ivt_pldf = self._make_dataframe_from_omx(
                 omx_handle[matrix_name], matrix_name, filter_zero=True
             )
             ivt_pldf = ivt_pldf.rename({matrix_name: "ivt"})
@@ -1426,7 +1319,7 @@ class Simulated:
             matrix_name = TIME_PERIOD + "_" + path + "_BOARDS"
             logging.debug(f"Extracting {matrix_name}")
             assert(matrix_name in omx_handle.listMatrices())
-            boards_pldf = self._make_polars_dataframe_from_omx(
+            boards_pldf = self._make_dataframe_from_omx(
                 omx_handle[matrix_name], matrix_name, filter_zero=True
             )
             boards_pldf = boards_pldf.rename({matrix_name: "boards"})
@@ -1448,7 +1341,7 @@ class Simulated:
                 matrix_name = TIME_PERIOD + "_" + path + "_IVT" + tech
                 logging.debug(f"Extracting {matrix_name}")
                 assert(matrix_name in omx_handle.listMatrices())
-                tech_ivt_pldf = self._make_polars_dataframe_from_omx(
+                tech_ivt_pldf = self._make_dataframe_from_omx(
                     omx_handle[matrix_name], matrix_name, filter_zero=True
                 )
                 tech_ivt_pldf = tech_ivt_pldf.rename({matrix_name:tech.lower()})
@@ -1474,52 +1367,9 @@ class Simulated:
         logging.info(f"time taken: {(end_time - start_time)/60:.1f} minutes")
         return    
 
-    def _read_transit_demand_pandas(self):
+    def _read_transit_demand(self):
         start_time = time.perf_counter()
-        logging.info("_read_transit_demand_pandas()")
-        path_list = [
-            "WLK_TRN_WLK",
-            "PNR_TRN_WLK",
-            "WLK_TRN_PNR",
-            "KNR_TRN_WLK",
-            "WLK_TRN_KNR",
-        ]
-        transit_demand_dir = self.scenario_dir / "demand_matrices/transit"
-
-        # pandas version
-        self.transit_demand_df = pd.DataFrame()
-        for time_period in self.model_time_periods:
-            filename = transit_demand_dir / f"trn_demand_{time_period}_{self.iter}.omx"
-            logging.info(f"Reading {filename}")
-            omx_handle = omx.open_file(filename)
-            if time_period == "am":
-                logging.debug(f"omx matrices:\n{omx_handle.listMatrices()}")
-
-            for path in path_list:
-                assert(path in omx_handle.listMatrices())
-                df = self._make_dataframe_from_omx(omx_handle[path], path, filter_zero=True)
-                df = df.rename(columns={path: "simulated_flow"})
-                df["path"] = path
-                df["time_period"] = time_period
-
-                self.transit_demand_df = pd.concat([
-                    self.transit_demand_df,
-                    df
-                ], axis="index", ignore_index=True)
-                self.transit_demand_df.reset_index(drop=True)
-
-            omx_handle.close()
-
-        self.transit_demand_df.fillna(value=0, inplace=True)
-        end_time = time.perf_counter()
-        logging.debug(f"self.transit_demand_df:\n{self.transit_demand_df}")
-        logging.debug(f"description:\n{self.transit_demand_df.describe()}")
-        logging.info(f"memory usage: {self.transit_demand_df.memory_usage(deep=True).sum() / 1024**2:.2f} MB")
-        logging.info(f"time taken: {(end_time - start_time)/60:.1f} minutes")
-
-    def _read_transit_demand_polars(self):
-        start_time = time.perf_counter()
-        logging.info("_read_transit_demand_polars()")
+        logging.info("_read_transit_demand()")
         path_list = [
             "WLK_TRN_WLK",
             "PNR_TRN_WLK",
@@ -1538,7 +1388,7 @@ class Simulated:
 
             for path in path_list:
                 assert(path in omx_handle.listMatrices())
-                demand_pldf = self._make_polars_dataframe_from_omx(omx_handle[path], path, filter_zero=True)
+                demand_pldf = self._make_dataframe_from_omx(omx_handle[path], path, filter_zero=True)
                 demand_pldf = demand_pldf.rename({path: "simulated_flow"})
                 # df["path"] = path
                 demand_pldf = demand_pldf.with_columns(pl.lit(path).alias("path"))
@@ -1557,43 +1407,8 @@ class Simulated:
         logging.info(f"time taken: {(end_time - start_time)/60:.1f} minutes")
         return
 
+
     def _make_dataframe_from_omx(
-            self,
-            input_mtx: omx, 
-            core_name: str,
-            filter_zero: bool
-        ) -> pd.DataFrame:
-        """Convert OMX matrix to long-format DataFrame.
-        
-        Helper function to read OpenMatrix files and convert to pandas DataFrame
-        with origin-destination pairs.
-        
-        Args:
-            input_mtx (omx): OpenMatrix matrix object
-            core_name (str): Name of matrix core to extract
-            filter_zero (bool): If true, filters out rows with core_name == 0
-        
-        Returns:
-            pd.DataFrame: Long-format DataFrame with columns:
-                - origin_TAZ_SEQ: Origin TAZ_SEQ
-                - destination_TAZ_SEQ: Destination TAZ_SEQ
-                - {core_name}: Matrix value
-        """
-        df = pd.DataFrame(np.array(input_mtx))
-        df = (
-            df.unstack()
-            .reset_index()
-            .rename(
-                columns={"level_0": "origin_TAZ_SEQ", "level_1": "destination_TAZ_SEQ", 0: core_name}
-            )
-        )
-        df["origin_TAZ_SEQ"] = df["origin_TAZ_SEQ"] + 1
-        df["destination_TAZ_SEQ"] = df["destination_TAZ_SEQ"] + 1
-        if filter_zero:
-            df = df.loc[df[core_name] > 0]
-        return df
-    
-    def _make_polars_dataframe_from_omx(
             self, 
             input_mtx: omx,
             core_name: str,
@@ -1624,98 +1439,7 @@ class Simulated:
             polars_df = polars_df.filter(pl.col(core_name) > 0)
         return polars_df
 
-    def _make_district_to_district_transit_summaries_pandas(self):
-        """Create district-to-district transit flows by technology using pandas.
-
-        Combines transit demand and in-vehicle times to allocate trips to technologies.
-        Aggregates TAZ-level flows to planning districts. Calculates trips using each
-        technology based on in-vehicle time proportions.
-
-        Uses pandas DataFrames: transit_demand_df and transit_tech_in_vehicle_times_df
-
-        Results stored in transit_district_to_district_by_tech_df with columns:
-            - orig_district: Origin district ID (1-34)
-            - dest_district: Destination district ID (1-34)
-            - tech: Technology code (loc, exp, ltr, fry, hvy, com, total)
-            - simulated: Number of trips using this technology
-
-        Returns:
-            None
-        """
-        start_time = time.perf_counter()
-        logging.info("_make_district_to_district_transit_summaries_pandas()")
-
-        taz_seq_district_dict = self.canonical.taz_to_district_df.set_index("TAZ_SEQ")[
-            "district"
-        ].to_dict()
-        logging.debug(f"taz_seq_district_dict:{taz_seq_district_dict}")
-
-        # summarize demand by origin/dest/time_period and join to skims
-        summary_df = self.transit_demand_df.groupby(
-            ["origin_TAZ_SEQ", "destination_TAZ_SEQ", "time_period"]
-        ).agg({"simulated_flow": "sum"}).reset_index()
-
-        summary_df = summary_df.merge(
-            self.transit_tech_in_vehicle_times_df,
-            on=["origin_TAZ_SEQ", "destination_TAZ_SEQ", "time_period"],
-        )
-
-        # select AM only
-        summary_df = summary_df[summary_df["time_period"] == "am"]
-        logging.debug(f"demand_summary_df:\n{summary_df}")
-
-        for tech in self.canonical.transit_technology_abbreviation_dict.keys():
-            column_name = f"simulated_{tech.lower()}_flow"
-            summary_df[column_name] = (
-                summary_df["simulated_flow"]
-                * summary_df["boards"]
-                * summary_df["{}".format(tech.lower())]
-                / summary_df["ivt"]
-            )
-        logging.debug(f"summary_df:\n{summary_df}")
-
-        summary_df["orig_district"] = summary_df["origin_TAZ_SEQ"].map(taz_seq_district_dict)
-        summary_df["dest_district"] = summary_df["destination_TAZ_SEQ"].map(taz_seq_district_dict)
-
-        agg_dict = {"simulated_flow": "sum"}
-        rename_dict = {"simulated_flow": "total"}
-        for tech in self.canonical.transit_technology_abbreviation_dict.keys():
-            agg_dict[f"simulated_{tech.lower()}_flow"] = "sum"
-            rename_dict[f"simulated_{tech.lower()}_flow"] = tech.lower()
-        logging.debug(f"agg_dict:\n{pprint.pformat(agg_dict)}")
-        logging.debug(f"rename_dict:\n{pprint.pformat(rename_dict)}")
-
-        summary_df = summary_df.groupby(
-            ["orig_district", "dest_district"]
-        ).agg(agg_dict).reset_index()
-
-        summary_df = summary_df.melt(
-            id_vars=["orig_district", "dest_district"],
-            var_name="tech",
-            value_name="simulated",
-        )
-        summary_df["tech"] = summary_df["tech"].map(rename_dict)
-
-        self.transit_district_to_district_by_tech_df = summary_df
-
-        end_time = time.perf_counter()
-        logging.info(f"time taken: {(end_time - start_time):.2f} seconds")
-
-        # Log pivoted matrices by technology for easier comparison
-        for tech_value in sorted(self.transit_district_to_district_by_tech_df['tech'].unique()):
-            tech_df = self.transit_district_to_district_by_tech_df[
-                self.transit_district_to_district_by_tech_df['tech'] == tech_value
-            ].copy()
-            pivot_df = tech_df.pivot(
-                index='orig_district',
-                columns='dest_district',
-                values='simulated'
-            )
-            logging.debug(f"transit_district_to_district matrix (pandas) - {tech_value}:\n{pivot_df}")
-
-        return
-
-    def _make_district_to_district_transit_summaries_polars(self):
+    def _make_district_to_district_transit_summaries(self):
         """Create district-to-district transit flows by technology using polars.
 
         Combines transit demand and in-vehicle times to allocate trips to technologies.
@@ -1734,7 +1458,7 @@ class Simulated:
             None
         """
         start_time = time.perf_counter()
-        logging.info("_make_district_to_district_transit_summaries_polars()")
+        logging.info("_make_district_to_district_transit_summaries()")
 
         # Create TAZ-to-district lookup dictionary for mapping zones to districts
         taz_seq_district_dict = self.canonical.taz_to_district_df.set_index("TAZ_SEQ")[
@@ -1807,7 +1531,7 @@ class Simulated:
         )
 
         # Store the result - convert to pandas
-        self.transit_district_to_district_by_tech_pldf = summary_pldf.to_pandas()
+        self.transit_district_to_district_by_tech_df = summary_pldf.to_pandas()
 
         end_time = time.perf_counter()
         logging.info(f"time taken: {(end_time - start_time):.2f} seconds")
