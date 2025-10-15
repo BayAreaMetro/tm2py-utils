@@ -2,7 +2,7 @@
 # Setup Model Configs #
 #######################
 
-### This is the current MTC 2023 model run for MTC staff
+### This is the current MTC 2015 model run for MTC staff
 
 # TODO: replace E:/Box with //tsclient/E/Box in setup.py
 # for model servers, when staff Remote Desktop Connect to a server, they should pass their E drive
@@ -28,7 +28,7 @@ INPUT_NONRES_DIR = "E:/Box/Modeling and Surveys/Development/Travel Model Two Con
 
 # this is the location of a previous run folder which has the warm start demand or skims
 # Box: https://mtcdrive.box.com/s/rj0kh56lbqjxhtcmg96ifcc4x6knsmqz
-WARMSTART_FILES_DIR = "E:/Box/Modeling and Surveys/Development/Travel Model Two Conversion/Model Inputs/2015-tm22-dev-sprint-03/warmstart"
+WARMSTART_FILES_DIR = "E:/Box/Modeling and Surveys/Development/Travel Model Two Conversion/Model Inputs/2015-tm22-dev-sprint-04/warmstart"
 
 # this is the location/folder for Emme Netorks 
 # Box: https://mtcdrive.box.com/s/a59dn0o6c3s11tbb65b5z2ww2wc0ixtl
