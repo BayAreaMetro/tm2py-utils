@@ -292,6 +292,7 @@ class DataReader:
         # taz_data.rename(columns={'ZONE': 'taz'}, inplace=True)
 
         ## TM2
+        # TODO: Confirm land use file after update
         maz_file = Path(self.config.target_dir) / "inputs" / "landuse" / "maz_data_withDensity.csv"
         maz_data = pd.read_csv(maz_file, usecols = ['MAZ', 'TAZ','MAZ_ORIGINAL', 'TAZ_ORIGINAL', 'CountyID', 'DistID', 'hparkcost'])
 
@@ -545,6 +546,12 @@ class DataReader:
         print(f"Read {len(trip):,} rows from {trip_file}")
         print(trip.head())
         return trip
+    
+    def _rename_maz_taz_columns(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Rename MAZ and TAZ columns to standard names (MAZ_NODE, TAZ_NODE, MAZ_SEQ, TAZ_SEQ)
+        """
+
 
 
 class SkimReader:
@@ -1142,7 +1149,82 @@ class SummaryGenerator:
 
         summary.to_parquet(self.config.results_dir / "JourneyToWorkByMode.parquet")
     
-    # TODO: update - can't do this one until I join with skim 
+    def generate_time_summary(self, tours: pd.DataFrame):
+        """
+        Generate time summary for tours and number of persons touring at a given hour summary via generate_time_persons_summary function
+
+        Args:
+            tours: Dataframe of the processed Tours output data
+
+        Returns:
+            Outputs a csv and parquet of the summary with columns:
+                - DistID: Superdistrict of residence
+                - CountyID: County of residence
+                - tour_purpose: one of {'Work', 'School', 'Maintenace', 'Escort', Discretionary', 'Shop', 'Visiting', 'University', 'Work-Based', 'Eating Out'}
+                - tour_mode
+                - start_period
+                - end_period
+                - freq (number of tours)
+                - num_participants: Number of person participants 
+        """
+
+        summary = tours.groupby(['DistID', 'CountyID', 'tour_purpose', 'tour_mode', 'start_period', 'end_period']).agg({
+            'tour_id': 'count',
+            'num_participants': 'sum'
+        }).reset_index()
+        summary.rename(columns={'tour_id': 'freq'}, inplace=True)
+        summary['freq'] = summary['freq'] / self.config.sampleshare
+
+        # Save results
+        output_file = self.config.results_dir / "TimeOfDay.csv"
+        summary.to_csv(output_file, index=False)
+        summary.to_parquet(self.config.results_dir / "TimeOfDay.parquet")
+
+        # Create number of persons touring at a given hour summary
+        self.generate_time_persons_summary(summary)
+        
+
+
+    def generate_time_persons_summary(self, timeofday_summary: pd.DataFrame):
+        """
+        Generate summary of how many persons are touring at a given hour
+        
+        Args:
+            timeofday_summary: Dataframe of the time of day summary from generate_time_summary function
+
+        Returns:
+            Outputs a csv and parquet of the summary with columns:
+                - tour_purpose: purpose of the tour
+                - persons_touring: Number of persons touring during that time period
+                - time_period: Time period (https://bayareametro.github.io/tm2py/output/ctramp/#time-period-codes)
+        """
+        
+        persons_touring = pd.DataFrame(columns=['tour_purpose', 'time_period', 'persons_touring'])
+
+        time_period_range = range(1, 41) # Time periods from 1 to 40 based on the time period codes
+
+        for time_period in time_period_range:
+            # Filter for activites active during this time period
+            touring_mask = ((timeofday_summary['start_period'] <= time_period) &
+                             (timeofday_summary['end_period'] >= time_period))
+            touring_at_hour = timeofday_summary[touring_mask]
+
+            # Group by purpose and sum participants
+            hour_summary = (touring_at_hour.groupby('tour_purpose')
+                            ['num_participants'].sum().reset_index())
+
+            # Add time period column
+            hour_summary['time_period'] = time_period
+            hour_summary.rename(columns={'num_participants': 'persons_touring'}, inplace=True)
+
+            #Append to results
+            persons_touring = pd.concat([persons_touring, hour_summary], ignore_index=True)
+        
+
+        # Save results
+        output_file = self.config.results_dir / "TimeOfDay_personsTouring.csv"
+        persons_touring.to_csv(output_file, index=False)
+
     
     def generate_trips_tours_summary(
             self,
@@ -1290,6 +1372,9 @@ class CoreSummaries:
 
         print("Generate Auto Ownership summary")
         self.summary_generator.generate_auto_ownership_summary(households)
+
+        print("Generate time of day summary")
+        self.summary_generator.generate_time_summary(tours) 
 
         print("Generate trips summary")
         self.summary_generator.generate_trip_summary_survey(trips)
