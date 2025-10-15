@@ -1,5 +1,12 @@
 """Methods to create Acceptance Criteria summaries from a tm2py model run."""
-USAGE = __doc__
+USAGE = """
+  Run acceptance criteria summaries for a model run by running:
+
+  python acceptance.py model_run_dir [output_dir]
+
+  If output_dir is not specified, summaries will be written to model_run_dir\\acceptance\\output
+
+"""
 
 from tm2py_utils.summary.acceptance.simulated import Simulated
 from tm2py_utils.summary.acceptance.observed import Observed
@@ -7,12 +14,12 @@ from tm2py_utils.summary.acceptance.canonical import Canonical
 
 import argparse
 import logging
-import os
 import pathlib
 
 import numpy as np
 import geopandas as gpd
 import pandas as pd
+import polars as pl
 import tm2py_utils
 
 class Acceptance:
@@ -23,10 +30,10 @@ class Acceptance:
     suitable for visualization in Tableau or other GIS platforms.
     
     Attributes:
-        s (Simulated): Simulated data handler instance
-        o (Observed): Observed data handler instance
-        c (Canonical): Canonical naming and crosswalk handler instance
-        acceptance_output_folder_root (str): Root directory for output files
+        simulated (Simulated): Simulated data handler instance
+        observed (Observed): Observed data handler instance
+        canonical (Canonical): Canonical naming and crosswalk handler instance
+        output_folder_root (pathlib.Path): Root directory for output files
         road_network_gdf (gpd.GeoDataFrame): Road network comparison results with columns:
             - emme_a_node_id, emme_b_node_id: Link node IDs
             - station_id: PeMS station ID if applicable
@@ -59,11 +66,11 @@ class Acceptance:
         >>> acceptance = Acceptance(canonical, simulated, observed, "output/acceptance")
         >>> acceptance.make_acceptance(make_transit=True, make_roadway=True)
     """
-    s: Simulated
-    o: Observed
-    c: Canonical
+    simulated: Simulated
+    observed: Observed
+    canonical: Canonical
 
-    acceptance_output_folder_root: str
+    output_folder_root: pathlib.Path
 
     output_transit_filename = "acceptance-transit-network.geojson"
     output_other_filename = "acceptance-other.geojson"
@@ -159,12 +166,12 @@ class Acceptance:
         canonical: Canonical,
         simulated: Simulated,
         observed: Observed,
-        output_file_root: str,
+        output_file_root: pathlib.Path,
     ) -> None:
-        self.c = canonical
-        self.s = simulated
-        self.o = observed
-        self.acceptance_output_folder_root = output_file_root
+        self.canonical = canonical
+        self.simulated = simulated
+        self.observed = observed
+        self.output_folder_root = output_file_root
 
     def make_acceptance(self, make_transit=True, make_roadway=True, make_other=False):
         """Generate acceptance criteria comparisons.
@@ -199,13 +206,13 @@ class Acceptance:
         """Write roadway network comparison results to GeoJSON file.
         
         Outputs the road_network_gdf to a GeoJSON file for visualization.
-        File is written to: {acceptance_output_folder_root}/acceptance-roadway-network.geojson
+        File is written to: {output_folder_root}/acceptance-roadway-network.geojson
         
         Returns:
             None
         """
-        file_root = self.acceptance_output_folder_root
-        out_file = os.path.join(file_root, self.output_roadway_filename)
+        out_file = self.output_folder_root / self.output_roadway_filename
+        logging.info(f"Writing {out_file}")
         self.road_network_gdf.to_file(out_file, driver="GeoJSON")
 
         return
@@ -214,13 +221,13 @@ class Acceptance:
         """Write transit network comparison results to GeoJSON file.
         
         Outputs the transit_network_gdf to a GeoJSON file for visualization.
-        File is written to: {acceptance_output_folder_root}/acceptance-transit-network.geojson
+        File is written to: {output_folder_root}/acceptance-transit-network.geojson
         
         Returns:
             None
         """
-        file_root = self.acceptance_output_folder_root
-        out_file = os.path.join(file_root, self.output_transit_filename)
+        out_file = self.output_folder_root / self.output_transit_filename
+        logging.info(f"Writing {out_file}")
         self.transit_network_gdf.to_file(out_file, driver="GeoJSON")
 
         return
@@ -229,13 +236,13 @@ class Acceptance:
         """Write other comparison results to GeoJSON file.
         
         Outputs the compare_gdf containing various non-network comparisons to a GeoJSON file.
-        File is written to: {acceptance_output_folder_root}/acceptance-other.geojson
+        File is written to: {output_folder_root}/acceptance-other.geojson
         
         Returns:
             None
         """
-        file_root = self.acceptance_output_folder_root
-        out_file = os.path.join(file_root, self.output_other_filename)
+        out_file = self.output_folder_root / self.output_other_filename
+        logging.info(f"Writing {out_file}")
         self.compare_gdf.to_file(out_file, driver="GeoJSON")
 
         return
@@ -273,11 +280,11 @@ class Acceptance:
         Returns:
             None
         """
-        o_df = self.o.reduced_traffic_counts_df.copy()
-        o_trans_df = self.o.observed_bridge_transactions_df.copy()
-        s_df = self.s.simulated_roadway_assignment_results_df.copy()
-        s_am_shape_gdf = self.s.simulated_roadway_am_shape_gdf.copy()
-        s_bridge_df = self.s.simulated_bridge_details_df.copy()
+        o_df = self.observed.reduced_traffic_counts_df.copy()
+        o_trans_df = self.observed.bridge_transactions_df.copy()
+        s_df = self.simulated.roadway_assignment_results_df.copy()
+        s_am_shape_gdf = self.simulated.roadway_am_shape_gdf.copy()
+        s_bridge_df = self.simulated.bridge_details_df.copy()
 
         o_df["time_period"] = o_df.time_period.str.lower()
         # o_df = o_df.drop(columns = ["standard_link_id"])
@@ -311,7 +318,7 @@ class Acceptance:
         )
 
         out_df["odot_flow_category"] = np.where(
-            out_df["time_period"] == self.c.ALL_DAY_WORD,
+            out_df["time_period"] == self.canonical.ALL_DAY_WORD,
             out_df["odot_flow_category_daily"],
             out_df["odot_flow_category_hourly"],
         )
@@ -428,9 +435,9 @@ class Acceptance:
         """
 
         # step 1: outer merge for rail operators (ignore route)
-        obs_df = self.o.reduced_transit_on_board_df[
-            self.o.reduced_transit_on_board_df["survey_operator"].isin(
-                self.c.rail_operators_vector
+        obs_df = self.observed.reduced_transit_on_board_df[
+            self.observed.reduced_transit_on_board_df["survey_operator"].isin(
+                self.canonical.rail_operators_vector
             )
         ].copy()
 
@@ -448,9 +455,9 @@ class Acceptance:
         obs_df = self._fix_technology_labels(obs_df, "technology")
 
         sim_df = (
-            self.s.simulated_boardings_df[
-                self.s.simulated_boardings_df["operator"].isin(
-                    self.c.rail_operators_vector
+            self.simulated.boardings_df[
+                self.simulated.boardings_df["operator"].isin(
+                    self.canonical.rail_operators_vector
                 )
             ]
             .groupby(["tm2_mode", "line_mode", "operator", "technology", "time_period"])
@@ -468,9 +475,9 @@ class Acceptance:
         )
 
         # step 2: outer merge for non-rail operators (still want observed, even if not in network)
-        obs_df = self.o.reduced_transit_on_board_df[
-            ~self.o.reduced_transit_on_board_df["survey_operator"].isin(
-                self.c.rail_operators_vector
+        obs_df = self.observed.reduced_transit_on_board_df[
+            ~self.observed.reduced_transit_on_board_df["survey_operator"].isin(
+                self.canonical.rail_operators_vector
             )
         ].copy()
 
@@ -492,9 +499,9 @@ class Acceptance:
 
         obs_df = self._fix_technology_labels(obs_df, "survey_tech")
 
-        sim_df = self.s.simulated_boardings_df[
-            ~self.s.simulated_boardings_df["operator"].isin(
-                self.c.rail_operators_vector
+        sim_df = self.simulated.boardings_df[
+            ~self.simulated.boardings_df["operator"].isin(
+                self.canonical.rail_operators_vector
             )
         ].copy()
 
@@ -557,9 +564,9 @@ class Acceptance:
         boards_df = self.compare_transit_boardings()
 
         # step 3: create a daily shape
-        df = pd.DataFrame(self.s.simulated_transit_segments_gdf).copy()
+        df = pd.DataFrame(self.simulated.transit_segments_gdf).copy()
         am_shape_df = df[~(df["LINE_ID"].str.contains("pnr_"))].reset_index().copy()
-        am_shape_df = self.c.aggregate_line_names_across_time_of_day(
+        am_shape_df = self.canonical.aggregate_line_names_across_time_of_day(
             am_shape_df, "LINE_ID"
         )
         b_df = (
@@ -569,8 +576,8 @@ class Acceptance:
             .copy()
         )
         c_df = pd.DataFrame(
-            self.s.simulated_transit_segments_gdf[
-                self.s.simulated_transit_segments_gdf["LINE_ID"].isin(b_df["LINE_ID"])
+            self.simulated.transit_segments_gdf[
+                self.simulated.transit_segments_gdf["LINE_ID"].isin(b_df["LINE_ID"])
             ].copy()
         )
         daily_shape_df = pd.merge(c_df, b_df, how="left", on="LINE_ID")
@@ -581,7 +588,7 @@ class Acceptance:
         # step 4 -- join the shapes to the boardings
         # for daily, join boardings to shape, as I care about the boardings more than the daily shapes
         daily_join_df = pd.merge(
-            boards_df[boards_df["time_period"] == self.c.ALL_DAY_WORD],
+            boards_df[boards_df["time_period"] == self.canonical.ALL_DAY_WORD],
             daily_shape_df,
             how="left",
             on="daily_line_name",
@@ -589,7 +596,7 @@ class Acceptance:
         daily_join_df["model_line_id"] = daily_join_df["daily_line_name"]
         daily_join_df["time_period"] = np.where(
             daily_join_df["time_period"].isnull(),
-            self.c.ALL_DAY_WORD,
+            self.canonical.ALL_DAY_WORD,
             daily_join_df["time_period"],
         )
 
@@ -605,12 +612,12 @@ class Acceptance:
         am_join_df["time_period"] = np.where(
             am_join_df["time_period"].isnull(), "am", am_join_df["time_period"]
         )
-        am_join_df = self.s._get_operator_name_from_line_name(
+        am_join_df = self.simulated._get_operator_name_from_line_name(
             am_join_df, "LINE_ID", "temp_operator"
         )
         am_join_df["operator"] = np.where(
             am_join_df["operator"].isnull()
-            & am_join_df["temp_operator"].isin(self.c.rail_operators_vector),
+            & am_join_df["temp_operator"].isin(self.canonical.rail_operators_vector),
             am_join_df["temp_operator"],
             am_join_df["operator"],
         )
@@ -750,14 +757,14 @@ class Acceptance:
                 - simulated_outcome: Simulated worker flow
         """
         adjust_observed = (
-            self.s.simulated_home_work_flows_df.simulated_flow.sum()
-            / self.o.ctpp_2012_2016_df.observed_flow.sum()
+            self.simulated.home_work_flows_df.simulated_flow.sum()
+            / self.observed.ctpp_2012_2016_df.observed_flow.sum()
         )
-        j_df = self.o.ctpp_2012_2016_df.copy()
+        j_df = self.observed.ctpp_2012_2016_df.copy()
         j_df["observed_flow"] = j_df["observed_flow"] * adjust_observed
 
         df = pd.merge(
-            self.s.simulated_home_work_flows_df,
+            self.simulated.home_work_flows_df,
             j_df,
             how="left",
             on=["residence_county", "work_county"],
@@ -800,10 +807,10 @@ class Acceptance:
                 - simulated_outcome: Simulated zero-vehicle household share (0-1)
                 - geometry: Tract centroid point geometry
         """
-        c_df = self.s.reduced_simulated_zero_vehicle_hhs_df
+        c_df = self.simulated.reduced_zero_vehicle_hhs_df
 
         # prepare the observed data
-        join_df = self.o.census_2017_zero_vehicle_hhs_df.copy()
+        join_df = self.observed.census_2017_zero_vehicle_hhs_df.copy()
         join_df["tract"] = join_df["geoid"].str.replace("1400000US0", "")
         join_df = join_df[
             ["tract", "total_households", "observed_zero_vehicle_household_share"]
@@ -816,7 +823,7 @@ class Acceptance:
             on="tract",
         )
 
-        df = pd.merge(df, self.o.census_tract_centroids_gdf, how="left", on="tract")
+        df = pd.merge(df, self.observed.census_tract_centroids_gdf, how="left", on="tract")
 
         df["criteria_number"] = 24
         df["acceptance_threshold"] = "MTC's Assessment of Reasonableness"
@@ -856,10 +863,10 @@ class Acceptance:
                 - simulated_outcome: Simulated station-to-station flow
                 - geometry: Boarding station point geometry
         """
-        s_df = self.s.simulated_station_to_station_df.copy()
+        s_df = self.simulated.station_to_station_df.copy()
 
         df = pd.merge(
-            self.o.observed_bart_boardings_df,
+            self.observed.bart_boardings_df,
             s_df[s_df["operator"] == "BART"].drop(columns=["operator"]),
             left_on=["boarding", "alighting"],
             right_on=["boarding_name", "alighting_name"],
@@ -922,11 +929,11 @@ class Acceptance:
         """
         PARK_AND_RIDE_OBSERVED_THRESHOLD = 500
 
-        s_df = self.s.simulated_transit_access_df.copy()
-        o_df = self.o.reduced_transit_on_board_access_df.copy()
+        s_df = self.simulated.transit_access_df.copy()
+        o_df = self.observed.reduced_transit_on_board_access_df.copy()
 
-        s_df["access_mode"] = s_df["access_mode"].map(self.s.transit_access_mode_dict)
-        o_df["access_mode"] = o_df["access_mode"].map(self.s.transit_access_mode_dict)
+        s_df["access_mode"] = s_df["access_mode"].map(self.simulated.transit_access_mode_dict)
+        o_df["access_mode"] = o_df["access_mode"].map(self.simulated.transit_access_mode_dict)
 
         # am for now
         join_df = pd.merge(
@@ -957,7 +964,7 @@ class Acceptance:
         )
 
         # TODO: do this on the simulation side rather than here
-        df = self.s._join_coordinates_to_stations(df, "boarding")
+        df = self.simulated._join_coordinates_to_stations(df, "boarding")
 
         df["criteria_number"] = 19
         df[
@@ -1042,15 +1049,15 @@ class Acceptance:
                 - observed_outcome: Observed district-to-district flow
                 - simulated_outcome: Simulated district-to-district flow
         """
-        s_df = self.s.simulated_transit_district_to_district_by_tech_df.copy()
-        o_df = self.o.reduced_transit_district_flows_by_technology_df.copy()
+        s_df = self.simulated.transit_district_to_district_by_tech_df.copy()
+        o_df = self.observed.reduced_transit_district_flows_by_technology_df.copy()
 
         df = pd.merge(
             o_df, s_df, how="left", on=["orig_district", "dest_district", "tech"]
         ).reset_index(drop=True)
         df = df[df["tech"] != "total"].reset_index(drop=True).copy()
         df["tech_name"] = (
-            df["tech"].str.upper().map(self.c.transit_technology_abbreviation_dict)
+            df["tech"].str.upper().map(self.canonical.transit_technology_abbreviation_dict)
         )
         df = df.drop(columns=["tech"]).copy()
         df["simulated"] = df["simulated"].fillna(0.0)
@@ -1083,11 +1090,18 @@ if __name__ == "__main__":
     # printing options
     pd.set_option('display.max_columns',None)
     pd.set_option('display.width', None)
+    pl.Config.set_ascii_tables(True) # log in ascii
 
     parser = argparse.ArgumentParser(description=USAGE, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("model_run_dir", type=pathlib.Path)
-    parser.add_argument("output_dir", type=pathlib.Path)
+    parser.add_argument("output_dir", type=pathlib.Path, 
+                        help="Output directory for acceptance-related output",
+                        nargs='?')
     args = parser.parse_args()
+
+    # if output_dir is not specified, assume model_run_dir/acceptance/output
+    if not args.output_dir:
+        args.output_dir = args.model_run_dir / "acceptance/output"
 
     # make output_dir if needed
     args.output_dir.mkdir(exist_ok=True)
