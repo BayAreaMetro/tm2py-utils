@@ -183,7 +183,22 @@ class DataReader:
         self.config = config
         self.lookups = lookups
     
-    ## TODO: Update for TM2
+    def add_kids_no_driver(self, persons, households):
+        """
+        Add kids No Driver as a variable to the household data.
+        
+        """
+        # If variable already exists, return households
+        if 'kidsNoDr' in households.columns:
+            print("kidsNoDr variable already exists in households")
+            return households
+
+        #  No Driver as a binary (1 for kid, 0 for no kid)
+        kidsNoDr_hhlds = persons[['hh_id', 'kidsNoDr']].groupby('hh_id', as_index= False ).agg({'kidsNoDr': 'max'})
+        households = households.merge(kidsNoDr_hhlds, on = 'hh_id')
+
+        return households  
+
     def combine_tours(self, households: pd.DataFrame, landuse: pd.DataFrame) -> pd.DataFrame:
         """Combine joint and individual tours into a single DataFrame."""
 
@@ -310,14 +325,12 @@ class DataReader:
         # Add income quartile from households
         persons = persons.merge(households[['hh_id', 'incQ', 'incQ_label']], on='hh_id', how='left')
         
-        # Add person type labels
-        # TODO: Update for TM2
-        ## persons = persons.merge(self.lookups.ptype, on='ptype', how='left')
+        # Add kids no driver indicator
+        persons['kidsNoDr'] = np.where(persons['type'].isin(['Child too young for school', 'Non-driving-age student']), 1, 0)
         
         print(f"Read persons files; have {len(persons):,} rows")
 
-        # Add kids no driver indicator
-
+        
         ## TODO: Add kids no driver - need to figure out data dictionary for types
         # persons['kidsNoDr'] = ((persons['ptype'] == 7) | (persons['ptype'] == 8)).astype(int)
         
@@ -337,6 +350,11 @@ class DataReader:
             Dataframe with work locations only
 
         """
+        if (self.config.updated_dir / 'work_location.parquet').exists():
+            print("Reading cached processed work_location file")
+            work_location = pd.read_parquet(self.config.updated_dir / 'work_location.parquet')
+            return work_location
+
         wsLoc_File = self.config.main_dir / f'wsLocResults_{ITER}.csv'
         wsLoc = pd.read_csv(wsLoc_File)
         
@@ -386,32 +404,19 @@ class DataReader:
         
         # Workers (capped at 4)
         # TODO: Do we need to do this?
-        #Households['workers'] = np.minimum(households['workers'], 4)
+        households['workers'] = np.minimum(households['workers'], 4)
         
         # Auto sufficiency
         households['autoSuff'] = np.where(households['autos'] == 0, 0,
                                  np.where(households['autos'] < households['NWRKRS_ESR'], 1, 2))
         households = households.merge(self.lookups.autosuff, on='autoSuff', how='left')
         
-        # Walk subzone label
-        # TODO: Find TM2 equivalent - doesn't look like we have this
-        #households = households.merge(self.lookups.walk_subzone, on='walk_subzone', how='left')
-        
         print(households.head())
         
         return households
 
     ## TODO: Revise this
-    def _add_kids_no_driver(self,persons, households):
-        """
-        Add kids No Driver as a variable to the household data.
-        
-        """
-        #  No Driver as a binary (1 for kid, 0 for no kid)
-        kidsNoDr_hhlds = persons[['hh_id', 'kidsNoDr']].groupby('hh_id', as_index= False ).agg({'kidsNoDr': 'max'})
-        households = households.merge(kidsNoDr_hhlds, on = 'hh_id')
-
-        return households  
+    
 
     # TODO: This still needs to be revised        
     def _add_tours_attributes(self, tours: pd.DataFrame):
@@ -1078,8 +1083,8 @@ class SummaryGenerator:
     def generate_auto_ownership_summary(self, households: pd.DataFrame) -> None:
         """Generate auto ownership summary."""
         summary = households.groupby([
-            'SD', 'COUNTY', 'county_name', 'autos', 'incQ', 'incQ_label',
-            'walk_subzone', 'walk_subzone_label', 'workers', 'kidsNoDr'
+            'DistID', 'CountyID', 'autos', 'incQ', 'incQ_label',
+            'workers', 'kidsNoDr'
         ]).size().reset_index(name='freq')
         
         summary['freq'] = summary['freq'] / self.config.sampleshare
@@ -1112,6 +1117,9 @@ class SummaryGenerator:
         # Save results
         output_file = self.config.results_dir / "JourneyToWork.csv"
         summary.to_csv(output_file, index = False)
+        
+        summary.to_parquet(self.config.results_dir / "JourneyToWork.parquet")
+
 
     def generate_journey_to_work_mode_summary(self, work_locations: pd.DataFrame) -> None:
         """
@@ -1131,6 +1139,8 @@ class SummaryGenerator:
         # Save results
         output_file = self.config.results_dir / "JourneyToWorkByMode.csv"
         summary.to_csv(output_file, index = False)
+
+        summary.to_parquet(self.config.results_dir / "JourneyToWorkByMode.parquet")
     
     # TODO: update - can't do this one until I join with skim 
     
@@ -1244,9 +1254,8 @@ class CoreSummaries:
         persons = self.data_reader.read_persons(households)
         print(f"Persons: \n {persons.head()}")
         
-        #print("Adding kids no driver variable")
-        ## TODO: Skipping this for now until I resolve type dictionary 
-        #households = self.data_reader.add_kids_no_driver(persons, households)
+        print("Adding kids no driver variable")
+        households = self.data_reader.add_kids_no_driver(persons, households)
         
         # Read tour and trip data
         print("Reading tour data...")        
@@ -1279,11 +1288,15 @@ class CoreSummaries:
         print("Gerenate Activity Pattern summary")
         self.summary_generator.generate_activity_pattern_summary(persons)
 
+        print("Generate Auto Ownership summary")
+        self.summary_generator.generate_auto_ownership_summary(households)
+
         print("Generate trips summary")
         self.summary_generator.generate_trip_summary_survey(trips)
         self.summary_generator.generate_trips_tours_summary(trips, 'trip', ['trip_mode', 'trip_mode_label'], 'ByMode')
         self.summary_generator.generate_trips_tours_summary(trips, 'trip', ['trip_mode', 'trip_mode_label', 'tour_purpose'], 'ByModePurpose')
         self.summary_generator.generate_trips_tours_summary(trips, 'trip', ['tour_purpose'], 'ByPurpose')
+        self.summary_generator.generate_trips_tours_summary(trips, 'trip', ['timePeriod','trip_mode_label'], 'ByModeTimePeriod')
         
         print("Generate tours summaries")
         self.summary_generator.generate_trips_tours_summary(tours, 'tour', ['tour_mode', 'tour_mode_label'], 'ByMode')
