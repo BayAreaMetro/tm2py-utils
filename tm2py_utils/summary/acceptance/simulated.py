@@ -388,7 +388,7 @@ class Simulated:
         temp = a_df["line_long"].str.split(pat="-", expand=True)
         a_df["LINE_ID"] = temp[0]
         a_df = a_df.rename(columns={"i_node": "INODE", "j_node": "JNODE"})
-        a_df = a_df[~(a_df["JNODE"] == "None")].reset_index().copy()
+        a_df = a_df[a_df["JNODE"].notna() & (a_df["JNODE"] != "None")].reset_index().copy()
         a_df["JNODE"] = a_df["JNODE"].astype("float").astype("Int64")
         df = a_df[["LINE_ID", "line", "INODE", "JNODE", "board"]]
 
@@ -696,7 +696,7 @@ class Simulated:
             names_df = self._get_station_names_from_standard_network(rail_nodes_df)
             logging.debug(f"names_df:\n{names_df}")
             if "level_0" in names_df.columns:
-                names_df = names_df.drop(columns=["level_0", "index"])
+                names_df = names_df.drop(columns=["level_0", "index"]).drop_duplicates()
             station_list = names_df.boarding.astype(str).unique().tolist()
 
             access_df = transit_df.copy()
