@@ -8,7 +8,7 @@ import openmatrix as omx
 import itertools
 from pydantic import BaseModel, Field
 import logging
-from tm2py.config import TimePeriodConfig, HouseholdConfig
+from tm2py.config import Configuration
 
 ## TODO: Add logging
 ## TODO: Potentially move this to .toml configuration? Or reference .toml file
@@ -24,17 +24,41 @@ class Config:
     """Configuration class for model parameters and paths."""
     ## TODO: These will most likely change for TM2
 
-    def __init__(self, timeperiod_config, household_config):
+    def __init__(self):
         # Environment variables
+        _model_config = os.path.join(TARGET_DIR, 'model_config.toml')
+        _scenario_config = os.path.join(TARGET_DIR, 'scenario_config.toml')
+        self.config = Configuration.load_toml([_scenario_config, _model_config])
         self.target_dir = TARGET_DIR
         self.iter = ITER
-        self.sampleshare = float(os.getenv("SAMPLESHARE", "1.0"))
-        self.timeperiod = timeperiod_config
+        self.sampleshare = self.config.household.sample_rate_by_iteration[self.iter - 1]
+        self.timeperiod = pd.DataFrame(self.config.time_periods)
+        self.income_quartiles = pd.DataFrame(self.config.household.income_segment)
+        self.modes = pd.DataFrame(self.config.household.ctramp_mode_names.items(), columns = ['code', 'mode'])
+
+
         
+        # Adding additional lookups
+        # Counties
+        self.county = pd.DataFrame({
+            'COUNTY': [1, 2, 3, 4, 5, 6, 7, 8, 9],
+            'county_name': ['San Francisco', 'San Mateo', 'Santa Clara', 'Alameda',
+                           'Contra Costa', 'Solano', 'Napa', 'Sonoma', 'Marin']
+        })
+
+        # Auto sufficiency
+        self.autosuff = pd.DataFrame({
+            'autoSuff': [0, 1, 2],
+            'autoSuff_label': ['Zero automobiles', 'Automobiles < workers', 'Automobiles >= workers']
+        })
+        
+                
+
         # Validate required parameters
         if not self.target_dir or not self.iter or not self.sampleshare:
             raise ValueError("TARGET_DIR, ITER, and SAMPLESHARE environment variables must be set")
         
+
         # Directory paths
         self.target_dir = self.target_dir.replace("\\", "/")
         self.main_dir = Path(self.target_dir) / "ctramp_output"
@@ -91,55 +115,6 @@ class Config:
                 return factor
         raise ValueError(f"Could not find {name} in parameter file")
 
-## Move this to dictionary? 
-## TODO: Update to correct dictionary values
-class LookupTables:
-    """Class containing lookup tables for data recoding."""
-    
-    def __init__(self):
-        # Time periods
-        self.timeperiod = pd.DataFrame({
-            'timeCodeNum': [1, 2, 3, 4, 5],
-            'timeperiod_label': ['Early AM', 'AM Peak', 'Midday', 'PM Peak', 'Evening'],
-            'timeperiod_abbrev': ['EA', 'AM', 'MD', 'PM', 'EV']
-        })
-        
-        # Counties
-        self.county = pd.DataFrame({
-            'COUNTY': [1, 2, 3, 4, 5, 6, 7, 8, 9],
-            'county_name': ['San Francisco', 'San Mateo', 'Santa Clara', 'Alameda',
-                           'Contra Costa', 'Solano', 'Napa', 'Sonoma', 'Marin']
-        })
-        
-        # Income quartiles
-        self.incq = pd.DataFrame({
-            'incQ': [1, 2, 3, 4],
-            'incQ_label': ['Less than $30k', '$30k to $60k', '$60k to $100k', 'More than $100k']
-        })
-        
-        # Auto sufficiency
-        self.autosuff = pd.DataFrame({
-            'autoSuff': [0, 1, 2],
-            'autoSuff_label': ['Zero automobiles', 'Automobiles < workers', 'Automobiles >= workers']
-        })
-
-        # Trip and Tour Modes
-        self.tripMode = pd.DataFrame(
-            {'code': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
-             'mode': ['DRIVEALONEFREE' , 'DRIVEALONEPAY', 'SHARED2GP' , 'SHARED2HOV' , 'SHARED2PAY' , 'SHARED3GP' , 
-                      'SHARED3HOV' , 'SHARED3PAY' , 'WALK' , 'BIKE' , 'WALK_SET' , 'PNR_SET' , 'KNR_PERS' , 
-                      'KNR_TNC' , 'TAXI' , 'TNC', 'SCHBUS'],
-             'simple_mode': ['DA', 'DA', 'HOV2', 'HOV2', 'HOV2', 'HOV3', 'HOV3', 'HOV3', 'WALK', 'BIKE', 'WALKTOTRANS',
-                             'DRIVETOTRANS', 'DRIVETOTRANS', 'DRIVETOTRANS', 'TNC', 'TNC', 'SCHBUS']
-             }
-        )
-
-        #Transit Modes
-        self.transitMode = pd.DataFrame({
-            'mode': ['LOC', 'EXP', 'LTR', 'FRY', 'HVY', 'COM'],
-            'mode_label': ['Local Bus', 'Express Bus', 'Light Rail', 'Ferry', 'Heavy Rail', 'Commuter Rail']
-        })
-
 
 class DataReader:
     """Class for reading and processing input data files.
@@ -153,9 +128,8 @@ class DataReader:
     work-school location
     """
     
-    def __init__(self, config: Config, lookups: LookupTables):
+    def __init__(self, config: Config):
         self.config = config
-        self.lookups = lookups
     
     def add_kids_no_driver(self, persons, households):
         """
@@ -191,7 +165,7 @@ class DataReader:
         tours.rename(columns = {'orig_mgra': 'origin_MAZ_SEQ', 'dest_mgra':'destination_MAZ_SEQ'}, inplace = True)
         print(tours.columns)
         # Add Residence Landuse Info
-        tours = tours.merge(households[['hh_id', 'MAZ_NODE', 'TAZ_NODE', 'CountyID', 'DistID', 'incQ', 'incQ_label']], on='hh_id', how='left')
+        tours = tours.merge(households[['hh_id', 'MAZ_NODE', 'TAZ_NODE', 'CountyID', 'DistID', 'incQ']], on='hh_id', how='left')
         print(tours.columns)
 
         ## TODO: Add CountyID for Destination MAZ
@@ -205,7 +179,7 @@ class DataReader:
 
         print(f"Combined tours; have {len(tours):,} rows")
         print(tours.columns)
-        tours['tour_mode_label'] = tours['tour_mode'].map(self.lookups.tripMode.set_index('code')['mode'])
+        tours['tour_mode_label'] = tours['tour_mode'].map(self.config.modes.set_index('code')['mode'])
         print(tours.head())
         #tours = tours._add_tours_attrs()
         return tours
@@ -223,7 +197,7 @@ class DataReader:
         joint_person_trips = self._get_joint_persons_trips(joint_trip, persons)
 
         combined = pd.concat([joint_person_trips, indiv_trip], ignore_index=True)
-        combined['trip_mode_label'] = combined['trip_mode'].map(self.lookups.tripMode.set_index('code')['mode'])
+        combined['trip_mode_label'] = combined['trip_mode'].map(self.config.modesu8jhkkkkkkkk.set_index('code')['mode'])
 
         combined['timePeriod'] = pd.cut(combined['stop_period'], bins = [1, 4, 12, 22, 30, 40], labels = ['EA', 'AM', 'MD', 'PM', 'EV'], include_lowest= True)
 
@@ -310,7 +284,7 @@ class DataReader:
         persons = input_pop_persons.merge(input_ct_persons, on=['hh_id', 'person_id'], how='inner')
         
         # Add income quartile from households
-        persons = persons.merge(households[['hh_id', 'incQ', 'incQ_label']], on='hh_id', how='left')
+        persons = persons.merge(households[['hh_id', 'incQ']], on='hh_id', how='left')
         
         # Add kids no driver indicator
         persons['kidsNoDr'] = np.where(persons['type'].isin(['Child too young for school', 'Non-driving-age student']), 1, 0)
@@ -393,9 +367,9 @@ class DataReader:
         """
         # Income quartiles
         households['incQ'] = pd.cut(households['income'], 
-                                   bins=[households['income'].min(), 30000, 60000, 100000, float('inf')],
-                                   labels=[1, 2, 3, 4], include_lowest=True).astype(int)
-        households = households.merge(self.lookups.incq, on='incQ', how='left')
+                                   bins=pd.concat([self.config.income_quartiles['cutoffs'],pd.Series(np.inf)], ignore_index=True),
+                                   labels=self.config.income_quartiles['segment_suffixes'], include_lowest=True)
+        #households = households.merge(self.config.income_quartiles, on='incQ', how='left')
         
         # Workers (capped at 4)
         # TODO: Do we need to do this?
@@ -404,7 +378,7 @@ class DataReader:
         # Auto sufficiency
         households['autoSuff'] = np.where(households['autos'] == 0, 0,
                                  np.where(households['autos'] < households['NWRKRS_ESR'], 1, 2))
-        households = households.merge(self.lookups.autosuff, on='autoSuff', how='left')
+        households = households.merge(self.config.autosuff, on='autoSuff', how='left')
         
         print(households.head())
         
@@ -546,9 +520,8 @@ class SummaryGenerator:
     """Class for generating various summary reports."""
     
     # TODO: Need to make this run properly
-    def __init__(self, config: Config, lookups: LookupTables):
+    def __init__(self, config: Config):
         self.config = config
-        self.lookups = lookups
 
     def generate_activity_pattern_summary(self, persons: pd.DataFrame) -> None:
         """
@@ -563,7 +536,7 @@ class SummaryGenerator:
             Outputs a csv and parquet of the summary
         """
         summary = persons.groupby(['type', 'cdap', 'imf_choice', 
-                                   'inmf_choice', 'incQ', 'incQ_label']).agg({'person_id':'count'}).reset_index()
+                                   'inmf_choice', 'incQ']).agg({'person_id':'count'}).reset_index()
         
         summary.rename(columns={'person_id': 'freq'}, inplace=True)
         summary['freq'] = summary['freq'] / self.config.sampleshare
@@ -580,7 +553,7 @@ class SummaryGenerator:
     def generate_auto_ownership_summary(self, households: pd.DataFrame) -> None:
         """Generate auto ownership summary."""
         summary = households.groupby([
-            'DistID', 'CountyID', 'autos', 'incQ', 'incQ_label',
+            'DistID', 'CountyID', 'autos', 'incQ',
             'workers', 'kidsNoDr'
         ]).size().reset_index(name='freq')
         
@@ -757,7 +730,12 @@ class SummaryGenerator:
         dest_purpose_dict ={
            'Discretionary': 'Socrec', 'Visiting': 'Socrec', 'Maintenance': 'Pers_Bus'
         }
-        df['simple_trip_mode'] = df['trip_mode'].map(self.lookups.tripMode.set_index('code')['simple_mode'])
+        simple_mode_dict = {
+            1: 'DA', 2: 'DA', 3: 'HOV2', 4: 'HOV2', 5: 'HOV2', 6: 'HOV3',
+            7: 'HOV3', 8: 'HOV3', 9: 'Walk', 10: 'Bike', 11: 'WALKTRAN', 12: 'DRIVETRAN',
+            13: 'DRIVETRAN', 14: 'DRIVETRAN', 15: 'TNC', 16: 'TNC', 17: 'SCHBUS'}
+        
+        df['simple_trip_mode'] = df['trip_mode'].replace(simple_mode_dict)
         df['simple_dest_purpose'] = df['dest_purpose'].replace(dest_purpose_dict)
         print(df.head())
         summary = df.groupby(['simple_trip_mode', 'simple_dest_purpose']).size().reset_index(name = 'freq')
@@ -802,10 +780,9 @@ class CoreSummaries:
     """Main class orchestrating the entire core summaries process."""
     
     def __init__(self):
-        self.config = Config(TimePeriodConfig, HouseholdConfig)
-        self.lookups = LookupTables()
-        self.data_reader = DataReader(self.config, self.lookups)
-        self.summary_generator = SummaryGenerator(self.config, self.lookups)
+        self.config = Config()
+        self.data_reader = DataReader(self.config)
+        self.summary_generator = SummaryGenerator(self.config)
 
 
     def run_analysis(self):
