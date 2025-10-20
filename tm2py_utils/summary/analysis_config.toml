@@ -1,0 +1,47 @@
+# Configuration file for aggregated_analysis.py
+# Copy this file and modify the paths and settings for your specific analysis
+
+[paths]
+# Input directory containing pre-aggregated files
+input_directory = "E:/Box/Modeling and Surveys/Development/Travel Model Two Conversion/Model Outputs/2015-tm22-dev-sprint-04/core_summaries"
+
+# Output directory for results
+output_directory = "E:/Box/Modeling and Surveys/Development/Travel Model Two Conversion/Model Outputs/2015-tm22-dev-sprint-04/analysis_output"
+
+[file_patterns]
+# File patterns based on actual TM2 core summaries files
+trip_summaries = "*TripSummary*"
+tour_summaries = "*TourSummary*"
+activity_patterns = "*ActivityPattern*"
+automobile_ownership = "*AutomobileOwnership*"
+journey_to_work = "*JourneyToWork*"
+time_of_day = "*TimeOfDay*"
+mode_choice = "*Mode*"
+purpose_analysis = "*Purpose*"
+time_period = "*TimePeriod*"
+all_summaries = "*"
+
+[analysis_categories]
+# Categories for grouping and analysis - TM2 specific
+geography = ["DistID", "CountyID", "taz", "district"]
+demographics = ["incQ", "incQ_label", "workers", "kidsNoDr", "autos"]
+trip_purpose = ["work", "school", "shop", "other", "purpose"]
+travel_mode = ["mode", "simple_mode"]
+time_period = ["time_period", "tod"]
+activity_patterns = ["type", "cdap", "imf_choice", "inmf_choice"]
+household_characteristics = ["autos", "workers", "income_quartile"]
+
+[output_options]
+# Output format options
+create_excel = true
+create_html_charts = true
+create_png_charts = true
+create_summary_dashboard = true
+
+[chart_options]
+# Chart customization
+max_categories_in_pie = 10
+chart_width = 1000
+chart_height = 600
+dashboard_width = 1200
+dashboard_height = 800
