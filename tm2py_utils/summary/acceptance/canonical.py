@@ -192,7 +192,7 @@ class Canonical:
         Returns:
             None
         """
-        in_file = self.scenario_dict["scenario"]["maz_landuse_file"]
+        in_file = self.scenario_dict["scenario"]["landuse_file"]
 
         logging.info(f"Reading {self.scenario_dir / in_file}")
         self.simulated_maz_data_df = pd.read_csv(self.scenario_dir / in_file)
