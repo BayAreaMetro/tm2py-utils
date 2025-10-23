@@ -45,7 +45,7 @@ class Canonical:
             Set by: _read_standard_transit_to_survey_crosswalk()
         simulated_maz_data_df (pd.DataFrame): MAZ-level land use data with county and district IDs.
             Key columns: [MAZ_NODE, MAZ_SEQ, TAZ_NODE, TAZ_SEQ, DistID, CountyName] plus
-            land use variables from maz_landuse_file
+            land use variables from landuse_file
             Set by: _make_simulated_maz_data()
         taz_to_district_df (pd.DataFrame): TAZ to planning district mapping.
             Columns: [taz, district]
