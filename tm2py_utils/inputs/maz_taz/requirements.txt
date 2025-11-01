@@ -1,0 +1,1 @@
+geopandas > 1.0 # for count_geometries
