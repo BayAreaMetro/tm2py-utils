@@ -1,4 +1,4 @@
-USAGE = """
+USAGE = r"""
 
 MAZ and TAZ checker.
 
@@ -92,7 +92,6 @@ import argparse, csv, logging, os, pathlib, sys, numpy, shutil
 import pandas
 import geopandas
 import pyproj
-import shapely
 
 # The script should be run from the tm2py-utils directory
 WORKSPACE          = pathlib.Path(".")
