@@ -146,7 +146,7 @@ def get_jobs_maz(write=False):
     firms_maz = spatil_join_firms_to_maz(firms, maz)
     jobs_maz = summarize_jobs_by_maz(firms_maz, maz)
     if write==True:
-        OUT_FILE = r"E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-test\landuse\jobs_maz_2023_v1.csv"
+        OUT_FILE = r"E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-version-05\landuse\jobs_maz_2023_v1.csv"
         jobs_maz.to_csv(OUT_FILE)        
     return jobs_maz
 
