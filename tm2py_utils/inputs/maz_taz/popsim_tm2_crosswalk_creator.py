@@ -25,7 +25,7 @@ If you're in a populationsim repository, it will automatically write to:
     output_2023/populationsim_working_dir/data/
 
 If not in a populationsim repo, it falls back to:
-    ./crosswalk_outputs/
+    ./crosswalks/
 
 CUSTOM OUTPUT DIRECTORY:
     python popsim_tm2_crosswalk_creator.py \\
@@ -46,7 +46,7 @@ EXAMPLE USAGE:
         --puma-shapefile "C:/path/to/tl_2022_06_puma20.shp" \\
         --county-shapefile "C:/path/to/Counties.shp" \\
         --blocks-file "C:/path/to/blocks_mazs_tazs_2.5.csv" \\
-        --output-dir "crosswalk_outputs" \\
+        --output-dir "crosswalks" \\
         --verbose
 
     # For tm2py-utils repository:
@@ -55,7 +55,7 @@ EXAMPLE USAGE:
         --puma-shapefile "C:/GitHub/tm2py-utils/tm2py_utils/inputs/maz_taz/shapefiles/tl_2022_06_puma20.shp" \\
         --county-shapefile "C:/GitHub/tm2py-utils/tm2py_utils/inputs/maz_taz/shapefiles/Counties.shp" \\
         --blocks-file "C:/GitHub/tm2py-utils/tm2py_utils/inputs/maz_taz/blocks_mazs_tazs_2.5.csv" \\
-        --output-dir "crosswalk_outputs" \\
+        --output-dir "crosswalks" \\
         --verbose
 
 INPUTS:
@@ -616,8 +616,8 @@ def main():
             args.output_dir = pipeline_dir
             print(f"🔗 AUTO-DETECTED: Writing to pipeline directory {args.output_dir}")
         else:
-            # Fall back to crosswalk_outputs if no pipeline directory found
-            args.output_dir = Path.cwd() / "crosswalk_outputs"
+            # Fall back to crosswalks if no pipeline directory found
+            args.output_dir = Path.cwd() / "crosswalks"
             print(f"📁 FALLBACK: Pipeline directory not found, using {args.output_dir}")
             print("    (To write to pipeline, ensure you're in a populationsim repo with output_2023/ directory)")
     else:
