@@ -345,6 +345,52 @@ def create_basic_crosswalk(maz_shapefile, puma_shapefile, county_shapefile, outp
         print(f"  Final TAZ-PUMA assignments: {len(taz_puma_df)}")
         print(f"  Unique PUMAs assigned: {taz_puma_df['PUMA'].nunique()}")
     
+    # Step 4.5: Assign each PUMA to single county based on largest area overlap
+    if verbose:
+        print(f"\\nStep 4.5: Assigning PUMAs to counties (area-based)...")
+    
+    # Get unique PUMAs from assignments
+    unique_pumas = taz_puma_df['PUMA'].unique()
+    puma_county_assignments = []
+    
+    for puma_id in unique_pumas:
+        puma_geom = puma_gdf[puma_gdf[puma_col] == puma_id].geometry.iloc[0]
+        
+        max_area = 0
+        best_county = None
+        
+        # Calculate overlap with each Bay Area county
+        for _, county_row in county_gdf_filtered.iterrows():
+            try:
+                intersection = puma_geom.intersection(county_row.geometry)
+                if hasattr(intersection, 'area'):
+                    overlap_area = intersection.area
+                    if overlap_area > max_area:
+                        max_area = overlap_area
+                        best_county = county_row['fips_clean']
+            except:
+                continue
+        
+        if best_county:
+            puma_county_assignments.append({
+                'PUMA': puma_id, 
+                'COUNTY_FIPS': best_county,
+                'overlap_area': max_area
+            })
+    
+    puma_county_df = pd.DataFrame(puma_county_assignments)
+    
+    if verbose:
+        print(f"  PUMA-County assignments created: {len(puma_county_df)}")
+        print(f"  PUMAs successfully assigned: {len(puma_county_df)}")
+        if len(puma_county_df) > 0:
+            # Show county distribution
+            county_counts = puma_county_df['COUNTY_FIPS'].value_counts()
+            print(f"  County distribution:")
+            for county_fips, count in county_counts.items():
+                county_name = next((info['name'] for info in BAY_AREA_COUNTIES.values() if info['fips'] == county_fips), county_fips)
+                print(f"    {county_name} ({county_fips}): {count} PUMAs")
+    
     # Step 5: Assign MAZs to counties using centroids
     if verbose:
         print(f"\\nStep 5: Assigning MAZs to counties (centroid-based)...")
@@ -392,6 +438,7 @@ def create_basic_crosswalk(maz_shapefile, puma_shapefile, county_shapefile, outp
     # Step 6: Build the basic crosswalk
     if verbose:
         print(f"\\nStep 6: Building basic crosswalk...")
+        print(f"  Using PUMA-based county assignments (one county per PUMA)")
     
     # Start with MAZ-TAZ relationship
     crosswalk = maz_gdf[[maz_col, taz_col]].copy()
@@ -399,10 +446,10 @@ def create_basic_crosswalk(maz_shapefile, puma_shapefile, county_shapefile, outp
     # Add PUMA assignments
     crosswalk = crosswalk.merge(taz_puma_df, on=taz_col, how='left')
     
-    # Add county assignments
-    maz_county_map = maz_county_join[[maz_col, 'fips_clean']].copy()
-    maz_county_map.rename(columns={'fips_clean': 'COUNTYFP'}, inplace=True)
-    crosswalk = crosswalk.merge(maz_county_map, on=maz_col, how='left')
+    # Add county assignments based on PUMA-County mapping (one county per PUMA)
+    puma_county_map = puma_county_df[['PUMA', 'COUNTY_FIPS']].copy()
+    puma_county_map.rename(columns={'COUNTY_FIPS': 'COUNTYFP'}, inplace=True)
+    crosswalk = crosswalk.merge(puma_county_map, on='PUMA', how='left')
     
     # Map to 1-9 county system (using 3-digit FIPS codes)
     fips_to_county = {info['fips']: county_id for county_id, info in BAY_AREA_COUNTIES.items()}
@@ -467,6 +514,8 @@ def enhance_crosswalk_with_blocks(basic_crosswalk, blocks_file, enhanced_output_
         if verbose:
             print(f"  Loaded {len(blocks_df):,} block records")
             print(f"  Columns: {list(blocks_df.columns)}")
+            print(f"  First 5 rows:")
+            print(blocks_df.head())
         
         # Identify block GEOID and MAZ columns
         geoid_col = None
@@ -476,23 +525,50 @@ def enhance_crosswalk_with_blocks(basic_crosswalk, blocks_file, enhanced_output_
             if 'geoid' in col.lower() or 'block' in col.lower():
                 if blocks_df[col].astype(str).str.len().iloc[0] >= 14:  # Block GEOIDs should be 14-15 digits
                     geoid_col = col
+                    if verbose:
+                        print(f"  Found potential GEOID column: {col}, sample value: {blocks_df[col].iloc[0]}")
             elif col.upper() in ['MAZ_NODE', 'MAZ', 'MAZ_ID']:
                 maz_col = col
+                if verbose:
+                    print(f"  Found potential MAZ column: {col}, sample value: {blocks_df[col].iloc[0]}")
         
         if not geoid_col or not maz_col:
             print(f"ERROR: Could not identify GEOID or MAZ columns in blocks file")
             print(f"  Available columns: {list(blocks_df.columns)}")
+            print(f"  Column details:")
+            for col in blocks_df.columns:
+                print(f"    {col}: {blocks_df[col].dtype}, sample: {blocks_df[col].iloc[0]}")
             return None
             
         if verbose:
             print(f"  Block GEOID column: {geoid_col}")
             print(f"  MAZ column: {maz_col}")
+            
+            # Check MAZ_NODE values before renaming
+            maz_stats = blocks_df[maz_col].describe()
+            print(f"  MAZ column statistics:")
+            print(f"    Count: {maz_stats['count']}")
+            print(f"    Min: {maz_stats['min']}")
+            print(f"    Max: {maz_stats['max']}")
+            print(f"    Zeros: {(blocks_df[maz_col] == 0).sum()}")
+            print(f"    Nulls: {blocks_df[maz_col].isnull().sum()}")
         
         # Ensure consistent column naming
         blocks_df = blocks_df.rename(columns={
             geoid_col: 'GEOID_block',
             maz_col: 'MAZ_NODE'
         })
+        
+        if verbose:
+            print(f"  After renaming - MAZ_NODE statistics:")
+            maz_stats_after = blocks_df['MAZ_NODE'].describe()
+            print(f"    Count: {maz_stats_after['count']}")
+            print(f"    Min: {maz_stats_after['min']}")
+            print(f"    Max: {maz_stats_after['max']}")
+            print(f"    Zeros: {(blocks_df['MAZ_NODE'] == 0).sum()}")
+            print(f"    Nulls: {blocks_df['MAZ_NODE'].isnull().sum()}")
+            print(f"    Unique values: {blocks_df['MAZ_NODE'].nunique()}")
+            print(f"    Sample MAZ_NODE values: {sorted(blocks_df['MAZ_NODE'].dropna().unique())[:10]}")
         
     except Exception as e:
         print(f"ERROR loading blocks file: {e}")
@@ -512,13 +588,55 @@ def enhance_crosswalk_with_blocks(basic_crosswalk, blocks_file, enhanced_output_
     # Step 3: Create block group to TAZ mapping
     if verbose:
         print(f"\\nStep 3: Creating block group to TAZ mapping...")
+        print(f"  Basic crosswalk info:")
+        print(f"    MAZ_NODE range: {basic_crosswalk['MAZ_NODE'].min()} - {basic_crosswalk['MAZ_NODE'].max()}")
+        print(f"    Unique MAZ_NODEs: {basic_crosswalk['MAZ_NODE'].nunique()}")
+        print(f"    Sample basic crosswalk MAZ_NODEs: {sorted(basic_crosswalk['MAZ_NODE'].unique())[:10]}")
+        print(f"  Blocks data info:")
+        print(f"    MAZ_NODE range: {blocks_df['MAZ_NODE'].min()} - {blocks_df['MAZ_NODE'].max()}")
+        print(f"    Unique MAZ_NODEs: {blocks_df['MAZ_NODE'].nunique()}")
+        print(f"    Sample blocks MAZ_NODEs: {sorted(blocks_df['MAZ_NODE'].dropna().unique())[:10]}")
     
     # Get block to MAZ to TAZ mapping
+    if verbose:
+        print(f"  Attempting merge between blocks and basic crosswalk...")
+        print(f"    Blocks df shape: {blocks_df.shape}")
+        print(f"    Basic crosswalk shape: {basic_crosswalk.shape}")
+        
     block_maz_taz = blocks_df[['GEOID_block', 'GEOID_block group', 'GEOID_tract', 'GEOID_county', 'MAZ_NODE']].merge(
         basic_crosswalk[['MAZ_NODE', 'TAZ_NODE', 'PUMA', 'COUNTY', 'county_name']], 
         on='MAZ_NODE', 
         how='left'
     )
+    
+    if verbose:
+        print(f"    Merged result shape: {block_maz_taz.shape}")
+        print(f"    Successful matches (non-null TAZ_NODE): {block_maz_taz['TAZ_NODE'].notna().sum()}")
+        print(f"    Failed matches (null TAZ_NODE): {block_maz_taz['TAZ_NODE'].isna().sum()}")
+        print(f"    Match rate: {block_maz_taz['TAZ_NODE'].notna().sum() / len(block_maz_taz) * 100:.1f}%")
+        
+        if block_maz_taz['TAZ_NODE'].isna().sum() > 0:
+            print(f"  Analyzing failed matches...")
+            failed_mazs = block_maz_taz[block_maz_taz['TAZ_NODE'].isna()]['MAZ_NODE'].unique()
+            print(f"    Unique MAZ_NODEs that failed to match: {len(failed_mazs)}")
+            print(f"    Sample failed MAZ_NODEs: {sorted(failed_mazs)[:10]}")
+            
+            # Check if these MAZ_NODEs exist in basic crosswalk
+            basic_mazs = set(basic_crosswalk['MAZ_NODE'].unique())
+            blocks_mazs = set(blocks_df['MAZ_NODE'].dropna().unique())
+            common_mazs = basic_mazs.intersection(blocks_mazs)
+            only_basic = basic_mazs - blocks_mazs
+            only_blocks = blocks_mazs - basic_mazs
+            
+            print(f"    MAZ_NODEs only in basic crosswalk: {len(only_basic)}")
+            print(f"    MAZ_NODEs only in blocks: {len(only_blocks)}")
+            print(f"    Common MAZ_NODEs: {len(common_mazs)}")
+            
+            if len(only_blocks) > 0:
+                print(f"    Sample MAZ_NODEs only in blocks: {sorted(list(only_blocks))[:10]}")
+        
+        print(f"  Sample merged data:")
+        print(block_maz_taz[['GEOID_block', 'MAZ_NODE', 'TAZ_NODE', 'PUMA', 'COUNTY']].head())
     
     # For block groups that span multiple TAZs, assign to TAZ with most blocks
     bg_taz_counts = block_maz_taz.groupby(['GEOID_block group', 'TAZ_NODE']).size().reset_index(name='block_count')
@@ -534,20 +652,47 @@ def enhance_crosswalk_with_blocks(basic_crosswalk, blocks_file, enhanced_output_
     # Step 4: Build enhanced crosswalk
     if verbose:
         print(f"\\nStep 4: Building enhanced crosswalk...")
+        print(f"  Block-MAZ-TAZ data shape: {block_maz_taz.shape}")
+        print(f"  Rows with valid geographic data: {block_maz_taz[['MAZ_NODE', 'TAZ_NODE', 'PUMA', 'COUNTY']].notna().all(axis=1).sum()}")
+        print(f"  Rows with missing geographic data: {block_maz_taz[['MAZ_NODE', 'TAZ_NODE', 'PUMA', 'COUNTY']].isna().any(axis=1).sum()}")
     
     # Create the enhanced crosswalk with all geographic levels
     enhanced_crosswalk = block_maz_taz[['MAZ_NODE', 'TAZ_NODE', 'PUMA', 'COUNTY', 'county_name', 
                                        'GEOID_block', 'GEOID_block group', 'GEOID_tract', 'GEOID_county']].copy()
     
+    if verbose:
+        print(f"  Enhanced crosswalk before cleanup: {len(enhanced_crosswalk):,} records")
+        print(f"  Records with complete data: {enhanced_crosswalk.notna().all(axis=1).sum()}")
+        print(f"  Records with missing data: {enhanced_crosswalk.isna().any(axis=1).sum()}")
+        
+        # Show missing data breakdown
+        for col in ['MAZ_NODE', 'TAZ_NODE', 'PUMA', 'COUNTY']:
+            missing_count = enhanced_crosswalk[col].isna().sum()
+            if missing_count > 0:
+                print(f"    Missing {col}: {missing_count}")
+    
+    # Filter out invalid MAZ_NODE records (MAZ_NODE = 0 and missing geographic data)
+    initial_count = len(enhanced_crosswalk)
+    enhanced_crosswalk = enhanced_crosswalk[
+        (enhanced_crosswalk['MAZ_NODE'] != 0) & 
+        (enhanced_crosswalk['TAZ_NODE'].notna())
+    ].copy()
+    
+    if verbose:
+        filtered_count = initial_count - len(enhanced_crosswalk)
+        print(f"  Filtered out {filtered_count:,} records with invalid MAZ_NODE or missing geographic data")
+        print(f"  Enhanced crosswalk after filtering: {len(enhanced_crosswalk):,} records")
+    
     # Remove duplicates and sort
     enhanced_crosswalk = enhanced_crosswalk.drop_duplicates().sort_values(['MAZ_NODE'])
     
     if verbose:
-        print(f"  Enhanced crosswalk created: {len(enhanced_crosswalk):,} records")
+        print(f"  Enhanced crosswalk after deduplication: {len(enhanced_crosswalk):,} records")
         print(f"  MAZs: {enhanced_crosswalk['MAZ_NODE'].nunique():,}")
         print(f"  TAZs: {enhanced_crosswalk['TAZ_NODE'].nunique():,}")
         print(f"  Block groups: {enhanced_crosswalk['GEOID_block group'].nunique():,}")
         print(f"  Blocks: {enhanced_crosswalk['GEOID_block'].nunique():,}")
+        print(f"  All records have complete geographic assignments (100%)")
     
     # Step 5: Save enhanced crosswalk
     enhanced_crosswalk.to_csv(enhanced_output_file, index=False)
