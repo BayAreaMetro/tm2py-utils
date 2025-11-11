@@ -522,6 +522,9 @@
     # reliability
     reliability = true
     apply_msa_demand = true
+    # model ID to Emme node ID crosswalk written out in network build process
+    model_to_emme_node_id_xwalk = "emme_project/Database_highway/emme_drive_network_node_id_crosswalk.csv"
+    output_node_sequential_id_xwalk = "inputs/hwy/mtc_final_network_zone_seq.csv"
     [highway.tolls]
         file_path = "inputs/hwy/tolls.csv"
         src_vehicle_group_names = ["da", "s2",  "s3",  "vsm", "sml", "med", "lrg"]
