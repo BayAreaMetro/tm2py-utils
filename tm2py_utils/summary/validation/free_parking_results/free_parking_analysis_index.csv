@@ -1,0 +1,6 @@
+summary_name,filename,rows,columns,summary_type
+free_parking_regional,free_parking_regional.csv,2,6,free_parking_analysis
+free_parking_by_person_type,free_parking_by_person_type.csv,4,6,free_parking_analysis
+free_parking_by_income,free_parking_by_income.csv,8,6,free_parking_analysis
+free_parking_regional_comparison,free_parking_regional_comparison.csv,4,6,free_parking_analysis
+free_parking_by_person_type_comparison,free_parking_by_person_type_comparison.csv,8,6,free_parking_analysis

@@ -1,0 +1,81 @@
+# CTRAMP Validation Configuration Template
+# Copy and customize this file for your validation analysis needs
+
+# Input datasets to analyze
+input_directories:
+  - path: "/path/to/model/run/1/ctramp_output"
+    name: "baseline_2015"
+    source_type: "model"
+    description: "2015 Baseline Model Run"
+  
+  - path: "/path/to/model/run/2/ctramp_output" 
+    name: "scenario_2050"
+    source_type: "model"
+    description: "2050 Forecast Scenario"
+    
+  - path: "/path/to/survey/data"
+    name: "acs_2019"
+    source_type: "survey"
+    description: "ACS 2019 Survey Data"
+
+# Output location
+output_directory: "/path/to/summary/outputs"
+
+# Summary generation settings
+summary_config:
+  enabled_summaries:
+    - "auto_ownership"
+    - "work_location" 
+    - "tour_frequency"
+    - "tour_mode"
+    - "tour_time"
+  
+  geographic_levels:
+    - "regional"
+    - "county"
+    - "taz"
+  
+  income_categories:
+    - "Q1"  # Bottom quartile
+    - "Q2"  # Second quartile
+    - "Q3"  # Third quartile  
+    - "Q4"  # Top quartile
+  
+  comparison_mode: "survey_vs_model"  # or "scenario_vs_scenario"
+
+# File specifications (customize if your files have different names)
+file_specs:
+  households:
+    filename: "householdData_1.csv"
+    required: true
+    description: "Household demographics and characteristics"
+  
+  persons:
+    filename: "personData_1.csv" 
+    required: true
+    description: "Person-level attributes and patterns"
+    
+  workplace_school:
+    filename: "wsLocResults_1.csv"
+    required: true
+    description: "Workplace and school location results"
+    
+  individual_tours:
+    filename: "indivTourData_1.csv"
+    required: true
+    description: "Individual tour patterns"
+    
+  individual_trips:
+    filename: "indivTripData_1.csv"
+    required: true
+    description: "Individual trip segments"
+    
+  joint_tours:
+    filename: "jointTourData_1.csv"
+    required: false
+    description: "Joint household tours"
+    
+  joint_trips:
+    filename: "jointTripData_1.csv"
+    required: false
+    description: "Joint household trips"

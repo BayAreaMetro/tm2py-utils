@@ -1,0 +1,29 @@
+header:
+  description: Summary visualization of transportation model outputs
+  tab: Summary Dashboard
+  title: TM2py-Utils Transportation Summary
+layout:
+  row1:
+  - color: '#4e79a7'
+    dataset: ./mode_share.csv
+    title: Mode Share
+    type: bar
+    x: mode
+    y: share
+  - dataset: ./daily_activity_by_income.csv
+    title: Daily Activity by Income
+    type: table
+  row2:
+  - dataset: ./trips_by_income_mode.csv
+    groupBy: mode
+    title: Trips by Income Quartile and Mode
+    type: bar
+    x: income_quartile
+    y: trips
+  row3:
+  - dataset: ./trips_by_time_purpose.csv
+    fill: trips
+    title: Trips by Time Period and Purpose
+    type: heatmap
+    x: time_period
+    y: purpose

@@ -1,0 +1,5 @@
+fp_choice,workers,share,scenario,geography,fp_choice_label
+0,2059,69.46693657219973,Scenario_1,Regional,No Free Parking
+1,905,30.533063427800272,Scenario_1,Regional,Free Parking Available
+0,1802,60.652978795018505,Scenario_2,Regional,No Free Parking
+1,1169,39.34702120498149,Scenario_2,Regional,Free Parking Available

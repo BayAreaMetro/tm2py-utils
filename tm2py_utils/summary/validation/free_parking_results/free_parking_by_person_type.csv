@@ -1,0 +1,5 @@
+person_type,fp_choice,workers,scenario,person_type_label,fp_choice_label
+1,0,1183,Scenario_2,Full-time Worker,No Free Parking
+1,1,794,Scenario_2,Full-time Worker,Free Parking Available
+2,0,619,Scenario_2,Part-time Worker,No Free Parking
+2,1,375,Scenario_2,Part-time Worker,Free Parking Available
