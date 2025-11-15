@@ -1,0 +1,69 @@
+# Example Configuration for Mode Choice Analysis
+# This shows how the same framework can be used for different analysis types
+
+analysis:
+  type: "mode_choice"
+  module: "mode_choice_analysis"
+  load_function: "load_trip_file"
+  analysis_function: "analyze_mode_choice"
+  save_function: "save_mode_summaries"
+  title: "Mode Choice Analysis"
+  description: "Comparison of transportation mode choices across scenarios"
+
+scenarios:
+  - name: "baseline_2020"
+    display_name: "2020 Baseline"
+    parameters:
+      transit_fare: 2.50
+      parking_cost: 15.0
+      gas_price: 3.50
+      income_distribution: "current"
+      sample_rate: 0.05  # 5% sample
+      
+  - name: "low_fare_scenario"
+    display_name: "Reduced Transit Fares"
+    parameters:
+      transit_fare: 1.50
+      parking_cost: 15.0
+      gas_price: 3.50
+      income_distribution: "current"
+      sample_rate: 0.05  # 5% sample
+      
+  - name: "congestion_pricing"
+    display_name: "Congestion Pricing"
+    parameters:
+      transit_fare: 2.50
+      parking_cost: 25.0
+      gas_price: 3.50
+      congestion_charge: 10.0
+      income_distribution: "current"
+      sample_rate: 0.05  # 5% sample
+
+simwrapper:
+  charts:
+    - title: "Mode Share by Scenario"
+      type: "bar"
+      file: "mode_choice_comparison.csv"
+      x: "scenario"
+      y: "percentage"
+      groupBy: "mode"
+      style:
+        height: "400"
+        
+    - title: "Mode Choice by Income Level"
+      type: "line"
+      file: "mode_choice_by_category.csv"
+      x: "category"
+      y: "percentage"
+      groupBy: "scenario"
+      style:
+        height: "400"
+        
+    - title: "Trip Count by Mode"
+      type: "stacked-bar"
+      file: "mode_choice_comparison.csv"
+      x: "scenario"
+      y: "count"
+      groupBy: "mode"
+      style:
+        height: "350"

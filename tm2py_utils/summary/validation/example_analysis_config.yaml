@@ -1,0 +1,62 @@
+# Example Configuration for Generalized SimWrapper Analysis Test
+# This demonstrates how to configure the system for different analysis types
+
+analysis:
+  type: "free_parking"
+  module: "free_parking_analysis"
+  load_function: "load_person_file"
+  analysis_function: "analyze_free_parking_choice"
+  save_function: "save_summaries"
+  title: "Free Parking Choice Analysis"
+  description: "Comparison of free parking availability across scenarios"
+
+scenarios:
+  - name: "2015_baseline"
+    display_name: "2015 Baseline"
+    parameters:
+      free_parking_rate: 0.65
+      income_distribution: "current"
+      sample_rate: 0.05  # 5% sample
+      
+  - name: "2023_current"
+    display_name: "2023 Current Conditions" 
+    parameters:
+      free_parking_rate: 0.58  # Reduced from 2015 due to policy changes
+      income_distribution: "recent"
+      sample_rate: 0.05  # 5% sample
+      
+  - name: "2023_with_policies"
+    display_name: "2023 with Enhanced Policies"
+    parameters:
+      free_parking_rate: 0.52  # Further reduced with additional policies
+      income_distribution: "recent"
+      sample_rate: 0.05  # 5% sample
+      policy_intensity: "moderate"
+
+simwrapper:
+  charts:
+    - title: "Free Parking Rate by Scenario"
+      type: "bar"
+      file: "free_parking_comparison.csv"
+      x: "scenario"
+      y: "percentage" 
+      groupBy: "choice"
+      style:
+        height: "400"
+        
+    - title: "Free Parking by Person Type"
+      type: "line"
+      file: "free_parking_by_category.csv"
+      x: "category"
+      y: "percentage"
+      groupBy: "scenario"
+      style:
+        height: "400"
+        
+    - title: "Policy Impact Distribution"
+      type: "histogram"
+      file: "free_parking_comparison.csv"
+      x: "count"
+      groupBy: "scenario"
+      style:
+        height: "300"

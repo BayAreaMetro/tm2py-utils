@@ -10,57 +10,36 @@ This directory contains focused validation analysis scripts for specific CTRAMP 
 **Key Features**:
 - Loads person-level CTRAMP data with free parking choices
 - Generates aggregated choice summaries by demographics
-- Supports both test data generation and real data analysis
 - Outputs standardized CSV results for comparison
 
 **Associated Directories**:
-- `test_free_parking/` - Test data and sample results
-- `free_parking_results/` - Production analysis outputs
+- `free_parking_results/` - Analysis outputs
 
 **Usage**:
 ```bash
 python validation/free_parking_analysis.py --input-dir path/to/model/output --output-dir results/
 ```
 
-### `analyze_real_data.py`
-**Purpose**: Processes and compares real model output data across multiple scenarios.
+### `analyze_data.py`
+**Purpose**: Processes and compares model output data across multiple scenarios.
 
 **Key Features**:
 - Configured for MTC 2015 vs 2023 model comparison
-- Handles large-scale production model outputs
+- Handles large-scale model outputs
 - Supports multiple analysis types within single script
-- Real data path integration
+- Data path integration
 
 **Usage**:
 ```bash
-python validation/analyze_real_data.py --config ../analysis_config.toml
+python validation/analyze_data.py
 ```
 
 ## Data and Results Directories
 
-### `test_free_parking/`
-Contains test data and sample results for free parking validation:
-- Sample CTRAMP person data files
-- Test configuration files
-- Expected output examples
-
 ### `free_parking_results/`
-Contains production results from free parking choice analysis:
+Contains results from free parking choice analysis:
 - Scenario comparison outputs
 - Summary statistics and aggregations
-- SimWrapper-ready dashboard data
-
-### `simwrapper_demo/`
-Contains SimWrapper dashboard examples and configurations for validation:
-- Interactive dashboard configurations
-- Sample data visualizations
-- Chart and plot examples for validation analysis
-
-### `simwrapper_demo.py`
-Utility script for SimWrapper integration:
-- Dashboard creation helpers
-- Data formatting for visualization
-- Integration patterns for validation workflows
 
 ## Script Architecture
 

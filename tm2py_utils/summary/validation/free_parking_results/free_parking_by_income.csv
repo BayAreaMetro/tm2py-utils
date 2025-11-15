@@ -1,9 +1,0 @@
-income,fp_choice,workers,scenario,income_label,fp_choice_label
-1,0,428,Scenario_2,Low Income (Q1),No Free Parking
-1,1,283,Scenario_2,Low Income (Q1),Free Parking Available
-2,0,479,Scenario_2,Medium-Low Income (Q2),No Free Parking
-2,1,276,Scenario_2,Medium-Low Income (Q2),Free Parking Available
-3,0,466,Scenario_2,Medium-High Income (Q3),No Free Parking
-3,1,310,Scenario_2,Medium-High Income (Q3),Free Parking Available
-4,0,429,Scenario_2,High Income (Q4),No Free Parking
-4,1,300,Scenario_2,High Income (Q4),Free Parking Available

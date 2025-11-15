@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Real Data Free Parking Analysis
+Free Parking Analysis
 
-Script to analyze free parking choice between the two real model runs:
+Script to analyze free parking choice between two model runs:
 - C:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Outputs\2015-tm22-dev-sprint-04\ctramp_output
 - A:\2023-tm22-dev-version-05\ctramp_output
 """
@@ -25,12 +25,12 @@ logger = logging.getLogger(__name__)
 def main():
     """Analyze free parking choice between 2015 and 2023 model runs."""
     
-    # Define the real data paths
+    # Define the data paths
     scenario1_dir = Path(r"C:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Outputs\2015-tm22-dev-sprint-04\ctramp_output")
     scenario2_dir = Path(r"A:\2023-tm22-dev-version-05\ctramp_output")
-    output_dir = Path("real_free_parking_results")
+    output_dir = Path("free_parking_results")
     
-    logger.info("Real Data Free Parking Choice Analysis")
+    logger.info("Free Parking Choice Analysis")
     logger.info("=" * 50)
     logger.info(f"Scenario 1 (2015): {scenario1_dir}")
     logger.info(f"Scenario 2 (2023): {scenario2_dir}")
@@ -126,9 +126,8 @@ if __name__ == "__main__":
     
     if success:
         print(f"\n🎯 Next steps:")
-        print(f"1. Review the CSV files in real_free_parking_results/")
+        print(f"1. Review the CSV files in free_parking_results/")
         print(f"2. Use these as templates for other summary types")
-        print(f"3. Create SimWrapper dashboards from the CSV outputs")
     else:
         print(f"\n❌ Analysis failed - check logs above")
         sys.exit(1)

@@ -1,0 +1,112 @@
+# CTRAMP Free Parking Validation Configuration
+# Real data comparison between 2015 and 2023 model runs with SimWrapper visualization
+
+# Input datasets to analyze
+input_directories:
+  - path: "C:\\Box\\Modeling and Surveys\\Development\\Travel Model Two Conversion\\Model Outputs\\2015-tm22-dev-sprint-04\\ctramp_output"
+    name: "2015_baseline"
+    source_type: "model"
+    description: "2015 TM2 Baseline Model Run"
+  
+  - path: "A:\\2023-tm22-dev-version-05\\ctramp_output"
+    name: "2023_updated"
+    source_type: "model"
+    description: "2023 TM2 Updated Model Version"
+
+# Output location
+output_directory: "real_data_validation_results"
+
+# Summary generation settings
+summary_config:
+  enabled_summaries:
+    - name: "free_parking_choice"
+      module: "free_parking_analysis"
+      description: "Free parking availability analysis"
+      geographic_levels: ["regional"]
+      demographic_breakdowns: ["person_type"]
+      output_prefix: "free_parking"
+      simwrapper_charts:
+        - title: "Free Parking Rate by Scenario"
+          type: "bar"
+          file: "free_parking_comparison.csv"
+          x: "scenario"
+          y: "percentage"
+          group_by: "choice"
+        - title: "Free Parking by Person Type"
+          type: "line"
+          file: "free_parking_by_person_type.csv"
+          x: "person_type"
+          y: "percentage"
+          group_by: "scenario"
+    
+    # Future summaries can be added here:
+    # - name: "mode_choice"
+    #   module: "mode_choice_analysis"
+    #   description: "Travel mode choice patterns"
+    #   geographic_levels: ["regional", "county"]
+    #   demographic_breakdowns: ["person_type", "income_category"]
+    #   output_prefix: "mode_choice"
+    
+    # - name: "tour_frequency"
+    #   module: "tour_frequency_analysis" 
+    #   description: "Daily tour frequency patterns"
+    #   geographic_levels: ["regional"]
+    #   demographic_breakdowns: ["person_type"]
+    #   output_prefix: "tour_freq"
+  
+  # Global settings that apply to all summaries
+  global_geographic_levels:
+    - "regional"
+    - "county"
+    - "taz"
+  
+  global_demographic_breakdowns:
+    - "person_type"
+    - "income_category"
+    - "age_category"
+  
+  comparison_mode: "scenario_vs_scenario"
+
+# SimWrapper configuration
+simwrapper:
+  enabled: true
+  output_subdir: "simwrapper_dashboard"
+  dashboard_title: "Transportation Model Validation Dashboard"
+  dashboard_description: "Multi-summary comparison between 2015 and 2023 TM2 model runs"
+  
+  # Global dashboard settings
+  layout:
+    panels_per_row: 2
+    panel_height: 400
+    
+  # Summary-specific charts will be pulled from summary configs above
+  # Additional global charts can be defined here:
+  global_charts:
+    - title: "Scenario Overview"
+      type: "table"
+      file: "scenario_metadata.csv"
+      description: "High-level comparison of scenarios"
+
+# File specifications
+file_specs:
+  persons:
+    filename: "personData_3.csv"
+    required: true
+    validation:
+      required_fields: ["hh_id", "person_id", "person_type"]
+      optional_fields: ["fp_choice"]
+  
+  households:
+    filename: "householdData_1.csv" 
+    required: false
+
+# Analysis parameters
+analysis_params:
+  free_parking:
+    worker_person_types: [1, 2]  # Only analyze workers
+    missing_choice_handling: "exclude"  # or "include_as_category"
+    
+# Logging configuration  
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(levelname)s - %(message)s"

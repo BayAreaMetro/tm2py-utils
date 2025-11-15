@@ -30,12 +30,23 @@ def load_person_file(file_path: Path) -> pd.DataFrame:
     df = pd.read_csv(file_path)
     logger.info(f"  ✓ Loaded {len(df):,} person records")
     
-    # Check for required fields
-    required_fields = ['hh_id', 'person_id', 'person_num', 'person_type']
+    # Check for required fields (with alternative names)
+    required_fields = ['hh_id', 'person_id', 'person_num']
     missing_fields = [field for field in required_fields if field not in df.columns]
     
     if missing_fields:
         raise ValueError(f"Missing required fields: {missing_fields}")
+    
+    # Handle different column name conventions
+    # Standardize person_type field
+    if 'person_type' not in df.columns and 'type' in df.columns:
+        df['person_type'] = df['type']
+        logger.info("  ✓ Mapped 'type' to 'person_type'")
+    
+    # Standardize sample_rate field  
+    if 'sample_rate' not in df.columns and 'sampleRate' in df.columns:
+        df['sample_rate'] = df['sampleRate']
+        logger.info("  ✓ Mapped 'sampleRate' to 'sample_rate'")
     
     # Check for fp_choice field
     if 'fp_choice' not in df.columns:
@@ -52,10 +63,17 @@ def analyze_free_parking_choice(df: pd.DataFrame, scenario_name: str) -> Dict[st
     
     summaries = {}
     
-    # Filter to workers only (person types 1 and 2)
+    # Filter to workers only (person types 1 and 2, or descriptive text)
     if 'person_type' in df.columns:
-        workers = df[df['person_type'].isin([1, 2])].copy()
-        logger.info(f"  ✓ Found {len(workers):,} workers")
+        # Handle both numeric and text person types
+        if df['person_type'].dtype == 'object':
+            # Text-based person types
+            workers = df[df['person_type'].isin(['Full-time worker', 'Part-time worker'])].copy()
+            logger.info(f"  ✓ Found {len(workers):,} workers (text-based person types)")
+        else:
+            # Numeric person types
+            workers = df[df['person_type'].isin([1, 2])].copy()
+            logger.info(f"  ✓ Found {len(workers):,} workers (numeric person types)")
     else:
         workers = df.copy()
         logger.warning("  ⚠ No person_type field - analyzing all persons")
@@ -66,12 +84,19 @@ def analyze_free_parking_choice(df: pd.DataFrame, scenario_name: str) -> Dict[st
     
     # Regional free parking summary
     if workers['fp_choice'].notna().sum() > 0:
+        # Calculate sample rate expansion factor
+        sample_rate = workers['sample_rate'].iloc[0] if 'sample_rate' in workers.columns else 1.0
+        expansion_factor = 1.0 / sample_rate
+        
         regional_summary = (workers['fp_choice']
                           .value_counts()
-                          .reset_index(name='workers'))
-        regional_summary.columns = ['fp_choice', 'workers']
-        regional_summary['share'] = (regional_summary['workers'] / 
-                                   regional_summary['workers'].sum() * 100)
+                          .reset_index(name='sample_workers'))
+        regional_summary.columns = ['fp_choice', 'sample_workers']
+        
+        # Expand to population estimates
+        regional_summary['workers'] = (regional_summary['sample_workers'] * expansion_factor).round().astype(int)
+        regional_summary['share'] = (regional_summary['sample_workers'] / 
+                                   regional_summary['sample_workers'].sum() * 100)
         regional_summary['scenario'] = scenario_name
         regional_summary['geography'] = 'Regional'
         
@@ -82,27 +107,53 @@ def analyze_free_parking_choice(df: pd.DataFrame, scenario_name: str) -> Dict[st
             -1: 'Not Modeled'
         })
         
+        # Drop the sample_workers column for cleaner output
+        regional_summary = regional_summary.drop('sample_workers', axis=1)
+        
         summaries['free_parking_regional'] = regional_summary
         logger.info(f"  ✓ Created regional summary: {len(regional_summary)} categories")
+        if sample_rate < 1.0:
+            logger.info(f"  ✓ Applied sample expansion: {sample_rate:.1%} sample → {expansion_factor:.1f}x expansion")
     
     # Free parking by person type
     if 'person_type' in workers.columns and workers['fp_choice'].notna().sum() > 0:
+        # Calculate sample rate expansion factor
+        sample_rate = workers['sample_rate'].iloc[0] if 'sample_rate' in workers.columns else 1.0
+        expansion_factor = 1.0 / sample_rate
+        
         person_type_summary = (workers.groupby(['person_type', 'fp_choice'])
                              .size()
-                             .reset_index(name='workers'))
+                             .reset_index(name='sample_workers'))
+        
+        # Expand to population estimates
+        person_type_summary['workers'] = (person_type_summary['sample_workers'] * expansion_factor).round().astype(int)
         person_type_summary['scenario'] = scenario_name
         
+        # Calculate shares within each person type
+        person_type_totals = person_type_summary.groupby('person_type')['sample_workers'].sum()
+        person_type_summary['share'] = person_type_summary.apply(
+            lambda row: row['sample_workers'] / person_type_totals[row['person_type']] * 100, axis=1
+        )
+        
         # Add person type labels
-        person_type_summary['person_type_label'] = person_type_summary['person_type'].map({
-            1: 'Full-time Worker',
-            2: 'Part-time Worker'
-        })
+        if person_type_summary['person_type'].dtype == 'object':
+            # Already text-based, no mapping needed
+            person_type_summary['person_type_label'] = person_type_summary['person_type']
+        else:
+            # Numeric person types, apply mapping
+            person_type_summary['person_type_label'] = person_type_summary['person_type'].map({
+                1: 'Full-time Worker',
+                2: 'Part-time Worker'
+            })
         
         person_type_summary['fp_choice_label'] = person_type_summary['fp_choice'].map({
             0: 'No Free Parking',
             1: 'Free Parking Available',
             -1: 'Not Modeled'
         })
+        
+        # Drop the sample_workers column for cleaner output
+        person_type_summary = person_type_summary.drop('sample_workers', axis=1)
         
         summaries['free_parking_by_person_type'] = person_type_summary
         logger.info(f"  ✓ Created person type summary: {len(person_type_summary)} records")
