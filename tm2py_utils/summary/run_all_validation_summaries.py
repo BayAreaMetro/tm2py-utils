@@ -24,9 +24,15 @@ from enum import Enum
 import sys
 import os
 
-# ActivitySim imports
-import activitysim
-import activitysim.core.config as asim_config
+# Validation summary modules
+from .validation import household_summary, worker_summary, tour_summary, trip_summary
+from .ctramp_data_model_loader import load_data_model
+from .validation.simwrapper_writer import (
+    create_household_dashboard, 
+    create_worker_dashboard,
+    create_tour_dashboard,
+    create_trip_dashboard
+)
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -101,6 +107,35 @@ class InputDirectory(BaseModel):
         return v
 
 
+class OutputConfig(BaseModel):
+    """Configuration for output file customization."""
+    filename_patterns: Dict[str, str] = Field(default_factory=dict)
+    column_renames: Dict[str, str] = Field(default_factory=dict)
+    
+    class Config:
+        arbitrary_types_allowed = True
+
+
+class ColumnMapping(BaseModel):
+    """Configuration for input column name mapping."""
+    persons: Dict[str, str] = Field(default_factory=dict)
+    households: Dict[str, str] = Field(default_factory=dict)
+    tours: Dict[str, str] = Field(default_factory=dict)
+    trips: Dict[str, str] = Field(default_factory=dict)
+    
+    class Config:
+        arbitrary_types_allowed = True
+
+
+class BinningSpec(BaseModel):
+    """Specification for binning a continuous variable."""
+    bins: List[float]
+    labels: Optional[List[str]] = None
+    
+    class Config:
+        arbitrary_types_allowed = True
+
+
 class SummaryConfig(BaseModel):
     """Configuration for summary generation."""
     enabled_summaries: List[SummaryType] = Field(default_factory=lambda: list(SummaryType))
@@ -115,6 +150,9 @@ class RunConfig(BaseModel):
     output_directory: Path
     summary_config: SummaryConfig = Field(default_factory=SummaryConfig)
     file_specs: CTRAMPFileSpecs = Field(default_factory=CTRAMPFileSpecs)
+    column_mapping: ColumnMapping = Field(default_factory=ColumnMapping)
+    output_config: OutputConfig = Field(default_factory=OutputConfig)
+    binning_specs: Dict[str, BinningSpec] = Field(default_factory=dict)
     
     class Config:
         arbitrary_types_allowed = True
@@ -123,9 +161,102 @@ class RunConfig(BaseModel):
 class DataLoader:
     """Handles loading and validation of CTRAMP output files."""
     
-    def __init__(self, file_specs: CTRAMPFileSpecs):
+    def __init__(self, file_specs: CTRAMPFileSpecs, column_mapping: ColumnMapping = None, data_model_path: Optional[Path] = None, binning_specs: Optional[Dict[str, BinningSpec]] = None):
         self.file_specs = file_specs
+        self.column_mapping = column_mapping or ColumnMapping()
         self.data_cache: Dict[str, Dict[str, pd.DataFrame]] = {}
+        self.binning_specs = binning_specs or {}
+        
+        # Load data model for column mapping
+        if data_model_path is None:
+            # Use default path relative to this file
+            data_model_path = Path(__file__).parent / "ctramp_data_model.yaml"
+        
+        self.data_model = None
+        if data_model_path.exists():
+            try:
+                self.data_model = load_data_model(data_model_path)
+                logger.info(f"  ✓ Loaded data model from {data_model_path.name}")
+            except Exception as e:
+                logger.warning(f"  ⚠ Could not load data model: {e}")
+        else:
+            logger.warning(f"  ⚠ Data model not found at {data_model_path}")
+    
+    def _find_highest_iteration_file(self, directory: Path, base_filename: str) -> Optional[Path]:
+        """Find the file with the highest iteration number.
+        
+        Args:
+            directory: Directory to search in
+            base_filename: Base filename pattern (e.g., 'householdData_1.csv')
+            
+        Returns:
+            Path to file with highest iteration number, or None if not found
+        """
+        # Extract the base name and extension
+        # e.g., 'householdData_1.csv' -> 'householdData', '.csv'
+        parts = base_filename.rsplit('_', 1)
+        if len(parts) != 2:
+            # No underscore pattern, return original
+            return directory / base_filename if (directory / base_filename).exists() else None
+        
+        base_name = parts[0]
+        ext_part = parts[1]  # e.g., '1.csv'
+        extension = '.' + ext_part.split('.', 1)[1] if '.' in ext_part else ''
+        
+        # Find all matching files with pattern: baseName_N.ext
+        import re
+        pattern = re.compile(rf'^{re.escape(base_name)}_(\d+){re.escape(extension)}$')
+        
+        matching_files = []
+        for file_path in directory.iterdir():
+            if file_path.is_file():
+                match = pattern.match(file_path.name)
+                if match:
+                    iteration_num = int(match.group(1))
+                    matching_files.append((iteration_num, file_path))
+        
+        if not matching_files:
+            return None
+        
+        # Return file with highest iteration number
+        matching_files.sort(key=lambda x: x[0], reverse=True)
+        highest_iteration, highest_file = matching_files[0]
+        logger.info(f"  → Found highest iteration: {highest_file.name} (iteration {highest_iteration})")
+        return highest_file
+    
+    def _apply_binning_specs(self, df: pd.DataFrame, file_type: str) -> pd.DataFrame:
+        """
+        Apply binning specifications to continuous variables in the dataframe.
+        
+        Args:
+            df: Input dataframe
+            file_type: Type of file (households, persons, tours, trips, etc.)
+            
+        Returns:
+            DataFrame with binned columns added
+        """
+        from .validation.summary_utils import bin_continuous_variable
+        
+        if not self.binning_specs:
+            return df
+        
+        for col_name, bin_spec in self.binning_specs.items():
+            # Check if this column exists in the dataframe
+            if col_name in df.columns:
+                try:
+                    # Create binned version with '_bin' suffix
+                    df = bin_continuous_variable(
+                        df,
+                        value_col=col_name,
+                        bins=bin_spec.bins,
+                        labels=bin_spec.labels,
+                        bin_col_name=f'{col_name}_bin'
+                    )
+                    logger.info(f"    → Binned '{col_name}' into {len(bin_spec.bins)-1} categories")
+                except Exception as e:
+                    logger.warning(f"    ⚠ Could not bin '{col_name}': {e}")
+        
+        return df
     
     def load_directory(self, input_dir: InputDirectory) -> Dict[str, pd.DataFrame]:
         """Load all available files from a directory."""
@@ -138,21 +269,42 @@ class DataLoader:
         
         # Load each file type
         for file_type, file_spec in self.file_specs.dict().items():
-            file_path = input_dir.path / file_spec.filename
+            # Find the file with highest iteration number
+            file_path = self._find_highest_iteration_file(input_dir.path, file_spec.filename)
             
-            if file_path.exists():
+            if file_path and file_path.exists():
                 try:
                     df = pd.read_csv(file_path)
+                    
+                    # Apply data model column mapping (CSV names → internal standard names)
+                    if self.data_model:
+                        try:
+                            df = self.data_model.apply_column_mapping(df, file_type)
+                            logger.info(f"    → Applied data model mapping for {file_type}")
+                        except Exception as e:
+                            logger.warning(f"    ⚠ Could not apply data model mapping: {e}")
+                    
+                    # Apply legacy column mapping if configured (for backward compatibility)
+                    mapping_dict = getattr(self.column_mapping, file_type, {})
+                    if isinstance(mapping_dict, dict) and mapping_dict:
+                        rename_dict = {v: k for k, v in mapping_dict.items() if v in df.columns}
+                        if rename_dict:
+                            df = df.rename(columns=rename_dict)
+                            logger.info(f"    → Mapped {len(rename_dict)} columns: {', '.join(f'{v}→{k}' for v, k in list(rename_dict.items())[:3])}")
+                    
+                    # Apply binning specs to continuous variables
+                    df = self._apply_binning_specs(df, file_type)
+                    
                     loaded_data[file_type] = df
-                    logger.info(f"  ✓ Loaded {file_type}: {len(df):,} records")
+                    logger.info(f"  ✓ Loaded {file_type}: {len(df):,} records from {file_path.name}")
                 except Exception as e:
                     logger.error(f"  ✗ Error loading {file_type}: {e}")
                     if file_spec.required:
                         raise
             elif file_spec.required:
-                raise FileNotFoundError(f"Required file not found: {file_path}")
+                raise FileNotFoundError(f"Required file not found: {file_spec.filename} in {input_dir.path}")
             else:
-                logger.warning(f"  ⚠ Optional file not found: {file_path}")
+                logger.warning(f"  ⚠ Optional file not found: {file_spec.filename}")
         
         # Cache the loaded data
         self.data_cache[input_dir.name] = loaded_data
@@ -164,23 +316,33 @@ class DataLoader:
         
         issues = []
         
-        # Check household-person relationships
+        # Check household-person relationships (using standard column names after mapping)
         if 'households' in data and 'persons' in data:
-            hh_ids_hh = set(data['households']['hh_id'].unique())
-            hh_ids_person = set(data['persons']['hh_id'].unique())
+            # Use mapped column names
+            hh_col = 'household_id' if 'household_id' in data['households'].columns else 'hh_id'
+            person_hh_col = 'household_id' if 'household_id' in data['persons'].columns else 'hh_id'
             
-            if not hh_ids_person.issubset(hh_ids_hh):
-                missing = hh_ids_person - hh_ids_hh
-                issues.append(f"Person records reference {len(missing)} non-existent households")
+            if hh_col in data['households'].columns and person_hh_col in data['persons'].columns:
+                hh_ids_hh = set(data['households'][hh_col].unique())
+                hh_ids_person = set(data['persons'][person_hh_col].unique())
+                
+                if not hh_ids_person.issubset(hh_ids_hh):
+                    missing = hh_ids_person - hh_ids_hh
+                    issues.append(f"Person records reference {len(missing)} non-existent households")
         
-        # Check tour-trip relationships
+        # Check tour-trip relationships (using standard column names after mapping)
         if 'individual_tours' in data and 'individual_trips' in data:
-            tour_ids_tours = set(data['individual_tours']['tour_id'].unique())
-            tour_ids_trips = set(data['individual_trips']['tour_id'].unique())
+            # Use mapped column names
+            tour_col = 'tour_id' if 'tour_id' in data['individual_tours'].columns else 'tour_id'
+            trip_tour_col = 'tour_id' if 'tour_id' in data['individual_trips'].columns else 'tour_id'
             
-            if not tour_ids_trips.issubset(tour_ids_tours):
-                missing = tour_ids_trips - tour_ids_tours
-                issues.append(f"Trip records reference {len(missing)} non-existent tours")
+            if tour_col in data['individual_tours'].columns and trip_tour_col in data['individual_trips'].columns:
+                tour_ids_tours = set(data['individual_tours'][tour_col].unique())
+                tour_ids_trips = set(data['individual_trips'][trip_tour_col].unique())
+                
+                if not tour_ids_trips.issubset(tour_ids_tours):
+                    missing = tour_ids_trips - tour_ids_tours
+                    issues.append(f"Trip records reference {len(missing)} non-existent tours")
         
         if issues:
             for issue in issues:
@@ -192,154 +354,135 @@ class DataLoader:
 
 
 class SummaryGenerator:
-    """Generates standardized summaries from CTRAMP output data."""
+    """Orchestrates summary generation using modular validation summary modules."""
     
-    def __init__(self, config: SummaryConfig):
+    def __init__(self, config: SummaryConfig, data_model=None):
         self.config = config
-    
-    def generate_auto_ownership_summaries(self, datasets: Dict[str, Dict[str, pd.DataFrame]]) -> Dict[str, pd.DataFrame]:
-        """Generate auto ownership summary tables."""
-        logger.info("Generating auto ownership summaries...")
-        
-        summaries = {}
-        
-        for dataset_name, data in datasets.items():
-            if 'households' not in data:
-                logger.warning(f"  ⚠ Skipping {dataset_name}: missing household data")
-                continue
-            
-            hh_data = data['households'].copy()
-            
-            # Regional auto ownership share
-            regional_summary = (hh_data.groupby('vehicles')
-                              .size()
-                              .reset_index(name='households'))
-            regional_summary['share'] = regional_summary['households'] / regional_summary['households'].sum() * 100
-            regional_summary['dataset'] = dataset_name
-            regional_summary['geography'] = 'Regional'
-            
-            summaries[f'auto_ownership_regional_{dataset_name}'] = regional_summary
-            
-            # Auto ownership by income (if available)
-            if 'income' in hh_data.columns:
-                income_summary = (hh_data.groupby(['income', 'vehicles'])
-                                .size()
-                                .reset_index(name='households'))
-                income_summary['dataset'] = dataset_name
-                summaries[f'auto_ownership_by_income_{dataset_name}'] = income_summary
-        
-        return summaries
-    
-    def generate_work_location_summaries(self, datasets: Dict[str, Dict[str, pd.DataFrame]]) -> Dict[str, pd.DataFrame]:
-        """Generate work location and telecommuting summaries."""
-        logger.info("Generating work location summaries...")
-        
-        summaries = {}
-        
-        for dataset_name, data in datasets.items():
-            if 'persons' not in data:
-                logger.warning(f"  ⚠ Skipping {dataset_name}: missing person data")
-                continue
-            
-            person_data = data['persons'].copy()
-            
-            # Filter to workers only
-            if 'person_type' in person_data.columns:
-                workers = person_data[person_data['person_type'].isin([1, 2])]  # Full-time, part-time workers
-            else:
-                logger.warning(f"  ⚠ No person_type field found in {dataset_name}")
-                continue
-            
-            if len(workers) == 0:
-                logger.warning(f"  ⚠ No workers found in {dataset_name}")
-                continue
-            
-            # Work from home analysis (if telecommute field available)
-            if 'telecommute_frequency' in workers.columns:
-                wfh_summary = (workers.groupby('telecommute_frequency')
-                             .size()
-                             .reset_index(name='workers'))
-                wfh_summary['share'] = wfh_summary['workers'] / wfh_summary['workers'].sum() * 100
-                wfh_summary['dataset'] = dataset_name
-                summaries[f'work_from_home_{dataset_name}'] = wfh_summary
-        
-        return summaries
-    
-    def generate_tour_summaries(self, datasets: Dict[str, Dict[str, pd.DataFrame]]) -> Dict[str, pd.DataFrame]:
-        """Generate tour frequency, mode, and timing summaries."""
-        logger.info("Generating tour summaries...")
-        
-        summaries = {}
-        
-        for dataset_name, data in datasets.items():
-            if 'individual_tours' not in data:
-                logger.warning(f"  ⚠ Skipping {dataset_name}: missing tour data")
-                continue
-            
-            tour_data = data['individual_tours'].copy()
-            
-            # Tour frequency by purpose
-            if 'tour_purpose' in tour_data.columns:
-                purpose_summary = (tour_data.groupby('tour_purpose')
-                                 .size()
-                                 .reset_index(name='tours'))
-                purpose_summary['dataset'] = dataset_name
-                summaries[f'tour_frequency_by_purpose_{dataset_name}'] = purpose_summary
-            
-            # Tour mode choice
-            if 'tour_mode' in tour_data.columns:
-                mode_summary = (tour_data.groupby('tour_mode')
-                              .size()
-                              .reset_index(name='tours'))
-                mode_summary['share'] = mode_summary['tours'] / mode_summary['tours'].sum() * 100
-                mode_summary['dataset'] = dataset_name
-                summaries[f'tour_mode_choice_{dataset_name}'] = mode_summary
-            
-            # Tour time of day (if available)
-            if 'start_period' in tour_data.columns and 'end_period' in tour_data.columns:
-                tod_summary = (tour_data.groupby(['start_period', 'end_period'])
-                             .size()
-                             .reset_index(name='tours'))
-                tod_summary['dataset'] = dataset_name
-                summaries[f'tour_time_of_day_{dataset_name}'] = tod_summary
-        
-        return summaries
+        self.data_model = data_model
     
     def generate_all_summaries(self, datasets: Dict[str, Dict[str, pd.DataFrame]]) -> Dict[str, pd.DataFrame]:
-        """Generate all enabled summaries."""
+        """Generate all enabled summaries using modular summary functions."""
         all_summaries = {}
         
-        if SummaryType.AUTO_OWNERSHIP in self.config.enabled_summaries:
-            all_summaries.update(self.generate_auto_ownership_summaries(datasets))
+        for dataset_name, data in datasets.items():
+            logger.info(f"\nProcessing dataset: {dataset_name}")
+            
+            # Household summaries
+            if SummaryType.AUTO_OWNERSHIP in self.config.enabled_summaries:
+                if 'households' in data:
+                    # Get weight field from data model
+                    weight_col = None
+                    if hasattr(self, 'data_model') and self.data_model:
+                        weight_col = self.data_model.get_weight_field('households')
+                    
+                    all_summaries.update(
+                        household_summary.generate_all_household_summaries(
+                            data['households'], dataset_name, weight_col
+                        )
+                    )
+                else:
+                    logger.warning(f"  ⚠ No household data for {dataset_name}")
+            
+            # Worker summaries
+            if SummaryType.WORK_LOCATION in self.config.enabled_summaries:
+                if 'persons' in data:
+                    # Get weight field from data model
+                    weight_col = None
+                    if hasattr(self, 'data_model') and self.data_model:
+                        weight_col = self.data_model.get_weight_field('persons')
+                    
+                    all_summaries.update(
+                        worker_summary.generate_all_worker_summaries(
+                            data['persons'], dataset_name, weight_col
+                        )
+                    )
+                else:
+                    logger.warning(f"  ⚠ No person data for {dataset_name}")
+            
+            # Tour summaries
+            if (SummaryType.TOUR_FREQUENCY in self.config.enabled_summaries or 
+                SummaryType.TOUR_MODE in self.config.enabled_summaries or 
+                SummaryType.TOUR_TIME in self.config.enabled_summaries):
+                if 'individual_tours' in data:
+                    # Get weight field from data model
+                    weight_col = None
+                    if hasattr(self, 'data_model') and self.data_model:
+                        weight_col = self.data_model.get_weight_field('tours')
+                    
+                    all_summaries.update(
+                        tour_summary.generate_all_tour_summaries(
+                            data['individual_tours'], dataset_name, weight_col
+                        )
+                    )
+                else:
+                    logger.warning(f"  ⚠ No tour data for {dataset_name}")
+            
+            # Trip summaries
+            if SummaryType.TRIP_MODE in self.config.enabled_summaries:
+                if 'individual_trips' in data:
+                    # Get weight field from data model
+                    weight_col = None
+                    if hasattr(self, 'data_model') and self.data_model:
+                        weight_col = self.data_model.get_weight_field('trips')
+                    
+                    all_summaries.update(
+                        trip_summary.generate_all_trip_summaries(
+                            data['individual_trips'], dataset_name, weight_col
+                        )
+                    )
+                else:
+                    logger.warning(f"  ⚠ No trip data for {dataset_name}")
         
-        if SummaryType.WORK_LOCATION in self.config.enabled_summaries:
-            all_summaries.update(self.generate_work_location_summaries(datasets))
-        
-        if SummaryType.TOUR_FREQUENCY in self.config.enabled_summaries or \
-           SummaryType.TOUR_MODE in self.config.enabled_summaries or \
-           SummaryType.TOUR_TIME in self.config.enabled_summaries:
-            all_summaries.update(self.generate_tour_summaries(datasets))
-        
+        logger.info(f"\n✓ Generated {len(all_summaries)} total summary tables")
         return all_summaries
 
 
-def save_summaries(summaries: Dict[str, pd.DataFrame], output_dir: Path):
-    """Save all summary tables to CSV files."""
+def save_summaries(summaries: Dict[str, pd.DataFrame], output_dir: Path, 
+                  output_config: OutputConfig = None, generate_simwrapper: bool = True):
+    """Save all summary tables to CSV files and optionally generate SimWrapper dashboards.
+    
+    Args:
+        summaries: Dictionary of summary name to DataFrame
+        output_dir: Directory to save output files
+        output_config: Optional configuration for custom filenames and column names
+        generate_simwrapper: Whether to generate SimWrapper dashboard files (default: True)
+    """
     output_dir.mkdir(parents=True, exist_ok=True)
+    
+    if output_config is None:
+        output_config = OutputConfig()
     
     logger.info(f"Saving {len(summaries)} summary tables to {output_dir}")
     
     for summary_name, summary_df in summaries.items():
-        output_path = output_dir / f"{summary_name}.csv"
-        summary_df.to_csv(output_path, index=False)
-        logger.info(f"  ✓ Saved {summary_name}: {len(summary_df)} rows")
+        # Apply column renaming if configured
+        df_out = summary_df.copy()
+        if output_config.column_renames:
+            rename_dict = {old: new for old, new in output_config.column_renames.items() 
+                          if old in df_out.columns}
+            if rename_dict:
+                df_out = df_out.rename(columns=rename_dict)
+                logger.info(f"    → Renamed {len(rename_dict)} columns in {summary_name}")
+        
+        # Determine output filename
+        filename = output_config.filename_patterns.get(summary_name, f"{summary_name}.csv")
+        if not filename.endswith('.csv'):
+            filename = f"{filename}.csv"
+        
+        output_path = output_dir / filename
+        df_out.to_csv(output_path, index=False)
+        logger.info(f"  ✓ Saved {filename}: {len(df_out)} rows")
     
     # Create a summary index
     index_data = []
     for summary_name, summary_df in summaries.items():
+        filename = output_config.filename_patterns.get(summary_name, f"{summary_name}.csv")
+        if not filename.endswith('.csv'):
+            filename = f"{filename}.csv"
+        
         index_data.append({
             'summary_name': summary_name,
-            'filename': f"{summary_name}.csv",
+            'filename': filename,
             'rows': len(summary_df),
             'columns': len(summary_df.columns),
             'description': f"Summary table: {summary_name}"
@@ -348,6 +491,37 @@ def save_summaries(summaries: Dict[str, pd.DataFrame], output_dir: Path):
     index_df = pd.DataFrame(index_data)
     index_df.to_csv(output_dir / "summary_index.csv", index=False)
     logger.info(f"  ✓ Created summary index with {len(index_data)} tables")
+    
+    # Generate SimWrapper dashboards if enabled
+    if generate_simwrapper:
+        logger.info("\nGenerating SimWrapper dashboards...")
+        simwrapper_dir = output_dir / "simwrapper"
+        simwrapper_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Group summaries by type
+        household_summaries = {k: v for k, v in summaries.items() if 'household' in k.lower() or 'auto_ownership' in k.lower()}
+        worker_summaries = {k: v for k, v in summaries.items() if 'worker' in k.lower() or 'person' in k.lower()}
+        tour_summaries = {k: v for k, v in summaries.items() if 'tour' in k.lower()}
+        trip_summaries = {k: v for k, v in summaries.items() if 'trip' in k.lower()}
+        
+        # Create dashboards for each category
+        if household_summaries:
+            create_household_dashboard(simwrapper_dir, household_summaries)
+            logger.info(f"  ✓ Created household dashboard with {len(household_summaries)} summaries")
+        
+        if worker_summaries:
+            create_worker_dashboard(simwrapper_dir, worker_summaries)
+            logger.info(f"  ✓ Created worker dashboard with {len(worker_summaries)} summaries")
+        
+        if tour_summaries:
+            create_tour_dashboard(simwrapper_dir, tour_summaries)
+            logger.info(f"  ✓ Created tour dashboard with {len(tour_summaries)} summaries")
+        
+        if trip_summaries:
+            create_trip_dashboard(simwrapper_dir, trip_summaries)
+            logger.info(f"  ✓ Created trip dashboard with {len(trip_summaries)} summaries")
+        
+        logger.info(f"  ✓ SimWrapper dashboards saved to {simwrapper_dir}")
 
 
 def create_default_config(input_dirs: List[Path], output_dir: Path) -> RunConfig:
@@ -390,7 +564,6 @@ def main():
     parser.add_argument(
         "--output-dir",
         type=Path,
-        required=True,
         help="Output directory for validation summary files"
     )
     parser.add_argument(
@@ -404,6 +577,11 @@ def main():
         choices=[s.value for s in SummaryType],
         help="Specific summaries to generate (default: all)"
     )
+    parser.add_argument(
+        "--no-simwrapper",
+        action="store_true",
+        help="Disable SimWrapper dashboard generation"
+    )
     
     args = parser.parse_args()
     
@@ -411,9 +589,12 @@ def main():
         # Load configuration
         if args.config:
             config = load_config_file(args.config)
+            # Override output directory if specified on command line
+            if args.output_dir:
+                config.output_directory = args.output_dir
         else:
-            if not args.input_dirs:
-                parser.error("Either --config or --input-dirs must be provided")
+            if not args.input_dirs or not args.output_dir:
+                parser.error("Either --config or both --input-dirs and --output-dir must be provided")
             config = create_default_config(args.input_dirs, args.output_dir)
         
         # Override summaries if specified
@@ -426,8 +607,8 @@ def main():
         logger.info(f"Enabled summaries: {[s.value for s in config.summary_config.enabled_summaries]}")
         
         # Initialize components
-        data_loader = DataLoader(config.file_specs)
-        summary_generator = SummaryGenerator(config.summary_config)
+        data_loader = DataLoader(config.file_specs, config.column_mapping, binning_specs=config.binning_specs)
+        summary_generator = SummaryGenerator(config.summary_config, data_loader.data_model)
         
         # Load all datasets
         all_datasets = {}
@@ -451,8 +632,9 @@ def main():
             logger.warning("No summaries generated")
             sys.exit(1)
         
-        # Save results
-        save_summaries(summaries, config.output_directory)
+        # Save results with output configuration
+        save_summaries(summaries, config.output_directory, config.output_config, 
+                      generate_simwrapper=not args.no_simwrapper)
         
         logger.info("✅ Validation summary generation completed successfully!")
         

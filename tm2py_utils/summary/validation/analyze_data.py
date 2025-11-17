@@ -11,6 +11,8 @@ import pandas as pd
 from pathlib import Path
 import sys
 import os
+import yaml
+import argparse
 
 # Add the summary directory to path to import our modules
 sys.path.append(str(Path(__file__).parent.parent))
@@ -22,8 +24,31 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 
-def main():
+def load_config(config_path: Path = None) -> dict:
+    """Load configuration file."""
+    if config_path is None:
+        config_path = Path(__file__).parent / "free_parking_config.yaml"
+    
+    if config_path.exists():
+        logger.info(f"Loading config from {config_path}")
+        with open(config_path, 'r') as f:
+            return yaml.safe_load(f)
+    else:
+        logger.warning(f"Config file not found: {config_path}, using defaults")
+        return {}
+
+
+def main(config_path: Path = None):
     """Analyze free parking choice between 2015 and 2023 model runs."""
+    
+    # Load configuration
+    config = load_config(config_path)
+    
+    # Get column mappings from config
+    column_mapping = config.get('column_mapping', {}).get('persons', {})
+    output_config = config.get('output_config', {})
+    filename_mapping = output_config.get('filenames', {})
+    output_column_mapping = output_config.get('column_names', {})
     
     # Define the data paths
     scenario1_dir = Path(r"C:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Outputs\2015-tm22-dev-sprint-04\ctramp_output")
@@ -50,8 +75,8 @@ def main():
         person2_file = scenario2_dir / "personData_1.csv"
         
         logger.info(f"\nLoading data files...")
-        df1 = load_person_file(person1_file)
-        df2 = load_person_file(person2_file)
+        df1 = load_person_file(person1_file, column_mapping=column_mapping)
+        df2 = load_person_file(person2_file, column_mapping=column_mapping)
         
         # Show data info
         logger.info(f"\nData Summary:")
@@ -80,8 +105,10 @@ def main():
         # Combine all summaries
         all_summaries = {**summaries1, **summaries2, **comparisons}
         
-        # Save results
-        save_summaries(all_summaries, output_dir)
+        # Save results with custom filenames and column names
+        save_summaries(all_summaries, output_dir, 
+                      filename_mapping=filename_mapping,
+                      column_mapping=output_column_mapping)
         
         logger.info("✅ Analysis completed successfully!")
         logger.info(f"Results saved to: {output_dir.absolute()}")
@@ -122,12 +149,17 @@ def main():
 
 
 if __name__ == "__main__":
-    success = main()
+    parser = argparse.ArgumentParser(description='Analyze free parking choice between model runs')
+    parser.add_argument('--config', type=Path, help='Path to configuration YAML file')
+    args = parser.parse_args()
+    
+    success = main(config_path=args.config)
     
     if success:
         print(f"\n🎯 Next steps:")
         print(f"1. Review the CSV files in free_parking_results/")
         print(f"2. Use these as templates for other summary types")
+        print(f"3. Customize output filenames and column names in free_parking_config.yaml")
     else:
         print(f"\n❌ Analysis failed - check logs above")
         sys.exit(1)

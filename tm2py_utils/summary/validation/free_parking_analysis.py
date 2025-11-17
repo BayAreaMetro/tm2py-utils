@@ -19,8 +19,14 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 
-def load_person_file(file_path: Path) -> pd.DataFrame:
-    """Load and validate person data file."""
+def load_person_file(file_path: Path, column_mapping: Optional[Dict[str, str]] = None) -> pd.DataFrame:
+    """Load and validate person data file.
+    
+    Args:
+        file_path: Path to the person data CSV file
+        column_mapping: Optional dict mapping standard column names to actual column names in the file
+                       e.g., {'person_type': 'type', 'sample_rate': 'sampleRate'}
+    """
     logger.info(f"Loading person data from {file_path}")
     
     if not file_path.exists():
@@ -30,6 +36,13 @@ def load_person_file(file_path: Path) -> pd.DataFrame:
     df = pd.read_csv(file_path)
     logger.info(f"  ✓ Loaded {len(df):,} person records")
     
+    # Apply column mapping if provided
+    if column_mapping:
+        for standard_name, actual_name in column_mapping.items():
+            if actual_name in df.columns and standard_name not in df.columns:
+                df[standard_name] = df[actual_name]
+                logger.info(f"  ✓ Mapped '{actual_name}' to '{standard_name}'")
+    
     # Check for required fields (with alternative names)
     required_fields = ['hh_id', 'person_id', 'person_num']
     missing_fields = [field for field in required_fields if field not in df.columns]
@@ -37,16 +50,17 @@ def load_person_file(file_path: Path) -> pd.DataFrame:
     if missing_fields:
         raise ValueError(f"Missing required fields: {missing_fields}")
     
-    # Handle different column name conventions
-    # Standardize person_type field
-    if 'person_type' not in df.columns and 'type' in df.columns:
-        df['person_type'] = df['type']
-        logger.info("  ✓ Mapped 'type' to 'person_type'")
-    
-    # Standardize sample_rate field  
-    if 'sample_rate' not in df.columns and 'sampleRate' in df.columns:
-        df['sample_rate'] = df['sampleRate']
-        logger.info("  ✓ Mapped 'sampleRate' to 'sample_rate'")
+    # Handle legacy column name conventions if column_mapping not provided
+    if not column_mapping:
+        # Standardize person_type field
+        if 'person_type' not in df.columns and 'type' in df.columns:
+            df['person_type'] = df['type']
+            logger.info("  ✓ Mapped 'type' to 'person_type'")
+        
+        # Standardize sample_rate field  
+        if 'sample_rate' not in df.columns and 'sampleRate' in df.columns:
+            df['sample_rate'] = df['sampleRate']
+            logger.info("  ✓ Mapped 'sampleRate' to 'sample_rate'")
     
     # Check for fp_choice field
     if 'fp_choice' not in df.columns:
@@ -215,30 +229,58 @@ def create_comparison_summaries(summaries1: Dict[str, pd.DataFrame],
     return comparisons
 
 
-def save_summaries(summaries: Dict[str, pd.DataFrame], output_dir: Path):
-    """Save summary tables to CSV files."""
+def save_summaries(summaries: Dict[str, pd.DataFrame], output_dir: Path, 
+                  filename_mapping: Optional[Dict[str, str]] = None,
+                  column_mapping: Optional[Dict[str, str]] = None):
+    """Save summary tables to CSV files.
+    
+    Args:
+        summaries: Dictionary of summary name to DataFrame
+        output_dir: Directory to save output files
+        filename_mapping: Optional dict mapping summary names to custom filenames
+                         e.g., {'free_parking_regional': 'regional_parking.csv'}
+        column_mapping: Optional dict mapping standard column names to custom output names
+                       e.g., {'workers': 'worker_count', 'share': 'percentage'}
+    """
     output_dir.mkdir(parents=True, exist_ok=True)
     
     logger.info(f"Saving {len(summaries)} summary files to {output_dir}")
     
+    # Default filename mapping
+    if filename_mapping is None:
+        filename_mapping = {}
+    
     for name, df in summaries.items():
-        output_path = output_dir / f"{name}.csv"
-        df.to_csv(output_path, index=False)
-        logger.info(f"  ✓ Saved {name}.csv ({len(df)} rows)")
+        # Apply column renaming if specified
+        df_out = df.copy()
+        if column_mapping:
+            rename_dict = {old: new for old, new in column_mapping.items() if old in df_out.columns}
+            if rename_dict:
+                df_out = df_out.rename(columns=rename_dict)
+                logger.info(f"  ✓ Renamed {len(rename_dict)} columns in {name}")
+        
+        # Get output filename
+        output_filename = filename_mapping.get(name, f"{name}.csv")
+        output_path = output_dir / output_filename
+        
+        df_out.to_csv(output_path, index=False)
+        logger.info(f"  ✓ Saved {output_filename} ({len(df_out)} rows)")
     
     # Create summary index
     index_data = []
     for name, df in summaries.items():
+        output_filename = filename_mapping.get(name, f"{name}.csv")
         index_data.append({
             'summary_name': name,
-            'filename': f"{name}.csv",
+            'filename': output_filename,
             'rows': len(df),
             'columns': len(df.columns),
             'summary_type': 'free_parking_analysis'
         })
     
     index_df = pd.DataFrame(index_data)
-    index_df.to_csv(output_dir / "free_parking_analysis_index.csv", index=False)
+    index_filename = filename_mapping.get('analysis_index', 'free_parking_analysis_index.csv')
+    index_df.to_csv(output_dir / index_filename, index=False)
     logger.info(f"  ✓ Created analysis index")
 
 

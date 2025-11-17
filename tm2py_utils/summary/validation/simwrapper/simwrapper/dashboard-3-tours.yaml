@@ -1,0 +1,26 @@
+header:
+  tab: Tours
+  title: Tour Pattern Statistics
+  description: Tour frequency, mode choice, and timing
+layout:
+  tour_patterns:
+  - type: bar
+    title: Tour Frequency by Purpose - 05
+    props:
+      dataset: tour_frequency_by_purpose_2023_version_05.csv
+      x: tour_purpose
+      y: tours
+  mode_choice:
+  - type: pie
+    title: Tour Mode Share - 05
+    props:
+      dataset: tour_mode_choice_2023_version_05.csv
+    description: Distribution of tour modes
+  - type: bar
+    title: Mode by Purpose - 05
+    props:
+      dataset: tour_mode_by_purpose_2023_version_05.csv
+      x: tour_purpose
+      y: tours
+      stacked: true
+    description: Mode choice by tour purpose

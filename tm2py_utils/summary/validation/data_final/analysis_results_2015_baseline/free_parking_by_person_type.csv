@@ -1,9 +1,0 @@
-person_type,fp_choice,workers,scenario,share,person_type_label,fp_choice_label
-Full-time worker,-1,2165300,2015_baseline,83.33846509121699,Full-time worker,Not Modeled
-Full-time worker,1,26680,2015_baseline,1.026864752520976,Full-time worker,Free Parking Available
-Full-time worker,2,89260,2015_baseline,3.4354553152182277,Full-time worker,
-Full-time worker,3,316960,2015_baseline,12.1992148410438,Full-time worker,
-Part-time worker,-1,566200,2015_baseline,87.9711631086666,Part-time worker,Not Modeled
-Part-time worker,1,4080,2015_baseline,0.6339144215530903,Part-time worker,Free Parking Available
-Part-time worker,2,20120,2015_baseline,3.1260681768745533,Part-time worker,
-Part-time worker,3,53220,2015_baseline,8.268854292905752,Part-time worker,
