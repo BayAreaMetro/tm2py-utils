@@ -1,0 +1,87 @@
+# CTRAMP Validation Configuration
+# Configure validation analysis runs and output summaries
+# Note: Column mappings are now defined in ctramp_data_model.yaml
+
+# Input datasets to analyze
+input_directories:
+  - path: "A:\\2023-tm22-dev-version-05\\ctramp_output" 
+    name: "2023_version_05"
+    display_name: "2023 TM2.2 v05"
+    source_type: "model"
+    description: "2023 TM2.2 Development Version 05"
+    iteration: 1  # Use iteration 1 files
+  - path: "A:\\2015-tm22-dev-sprint-04\\ctramp_output"
+    name: "2015_sprint_04"
+    display_name: "2015 TM2.2 Sprint 04"
+    source_type: "model"
+    description: "2015 TM2.2 Development Sprint 04"
+    iteration: 1  # Use iteration 1 files
+
+# Output location
+output_directory: "C:\\GitHub\\tm2py-utils\\tm2py_utils\\summary\\validation"
+
+# Dataset display order in charts (uses display_name if specified, otherwise name)
+# Datasets will appear in this order in all dashboard charts
+dataset_order:
+  - "2015 TM2.2 Sprint 04"  # Show 2015 first
+  - "2023 TM2.2 v05"        # Then 2023
+
+# Summary generation settings
+summary_config:
+  # Which summaries to generate
+  # Available: auto_ownership, work_location, cdap, tour_frequency, tour_mode, tour_time, trip_mode
+  enabled_summaries:
+    - "auto_ownership"
+    - "work_location"
+    - "tour_frequency"
+    - "tour_mode"
+    - "tour_time"
+    - "trip_mode"
+  
+  # Geographic aggregation levels
+  geographic_levels:
+    - "regional"
+  
+  # Comparison mode
+  comparison_mode: "scenario_vs_scenario"  # or "model_vs_survey"
+
+# Binning configuration for continuous variables
+# Automatically converts numeric values to categorical bins for analysis
+binning_specs:
+  # Income bins (in dollars)
+  income_category:
+    bins: [0, 30000, 60000, 100000, 150000, 1000000000]
+    labels: ['<30K', '30-60K', '60-100K', '100-150K', '150K+']
+    
+  # Tour distance bins (in miles)
+  tour_distance:
+    bins: [0, 5, 10, 20, 50, 1000]
+    labels: ['0-5', '5-10', '10-20', '20-50', '50+']
+    
+  # Tour duration bins (in minutes)
+  tour_duration:
+    bins: [0, 30, 60, 120, 240, 10000]
+    labels: ['0-30', '30-60', '60-120', '120-240', '240+']
+    
+  # Trip distance bins (in miles) - finer granularity than tours
+  trip_distance:
+    bins: [0, 1, 3, 5, 10, 20, 1000]
+    labels: ['0-1', '1-3', '3-5', '5-10', '10-20', '20+']
+    
+  # Trip duration bins (in minutes) - finer granularity than tours
+  trip_duration:
+    bins: [0, 5, 10, 15, 30, 60, 10000]
+    labels: ['0-5', '5-10', '10-15', '15-30', '30-60', '60+']
+    
+  # Worker age bins (in years)
+  worker_age:
+    bins: [0, 25, 35, 45, 55, 65, 120]
+    labels: ['<25', '25-34', '35-44', '45-54', '55-64', '65+']
+
+# File specifications (optional - defaults will be used if not specified)
+# Note: System will automatically find highest iteration number (e.g., _1.csv, _2.csv, etc.)
+
+# Logging configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(levelname)s - %(message)s"

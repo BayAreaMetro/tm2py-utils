@@ -1,0 +1,102 @@
+# Variable Display Names Configuration
+# Maps internal variable names to human-readable labels for dashboards
+
+# Household variables
+num_vehicles: "Number of Household Vehicles"
+income: "Household Income"
+income_category: "Income Category"
+income_category_bin: "Income Category"
+household_size: "Household Size"
+households: "Households"
+workers: "Workers"
+
+# Person variables
+person_type: "Person Type"
+age: "Age"
+age_bin: "Age Group"
+
+# Tour variables
+tour_purpose: "Tour Purpose"
+tour_mode: "Tour Mode"
+tour_mode_name: "Tour Mode"
+tour_distance: "Tour Distance (miles)"
+tour_distance_bin: "Tour Distance"
+start_period: "Start Time Period"
+tours: "Tours"
+num_tours: "Number of Tours"
+
+# Trip variables
+trip_mode: "Trip Mode"
+trip_mode_name: "Trip Mode"
+trip_purpose: "Trip Purpose"
+trip_distance: "Trip Distance (miles)"
+depart_period: "Departure Time Period"
+trips: "Trips"
+num_trips: "Number of Trips"
+
+# Summary statistics
+share: "Share"
+total: "Total"
+count: "Count"
+percent: "Percent"
+
+# Geography
+geography: "Geography"
+taz: "TAZ"
+maz: "MAZ"
+
+# Dataset
+dataset: "Model Run"
+
+# Categorical Variable Ordering
+# Specifies the display order for categorical variables in charts
+# Variables not listed here will use default ordering
+categorical_order:
+  income_category_bin:
+    - "<30K"
+    - "30-60K"
+    - "60-100K"
+    - "100-150K"
+    - "150K+"
+  
+  num_vehicles:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+  
+  household_size:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - "8+"
+  
+  tour_purpose:
+    - "Work"
+    - "School"
+    - "Escort"
+    - "Shopping"
+    - "Meal"
+    - "Social/Recreation"
+    - "Other Maintenance"
+    - "Other Discretionary"
+  
+  tour_distance_bin:
+    - "0-5"
+    - "5-10"
+    - "10-20"
+    - "20-50"
+    - "50+"
+  
+  start_period:
+    - "EA"
+    - "AM"
+    - "MD"
+    - "PM"
+    - "EV"
