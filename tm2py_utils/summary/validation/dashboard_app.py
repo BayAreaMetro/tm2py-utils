@@ -434,7 +434,7 @@ def main():
     """, unsafe_allow_html=True)
     
     # Sidebar for configuration
-    st.sidebar.title("📊 TM2.2 Validation")
+    st.sidebar.title("📊 Travel Model Two Validation")
     st.sidebar.markdown("---")
     
     # Get validation directory
