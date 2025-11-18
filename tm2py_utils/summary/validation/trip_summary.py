@@ -114,8 +114,33 @@ def generate_trip_purpose_summary(trip_data: pd.DataFrame, dataset_name: str, we
     
     # Mode by purpose cross-tab
     if 'trip_mode' in trip_data.columns:
+        # Map mode codes to names
+        MODE_NAMES = {
+            1: "SOV (GP)",
+            2: "SOV (Toll)",
+            3: "Carpool 2 (GP)",
+            4: "Carpool 2 (HOV)",
+            5: "Carpool 2 (Toll)",
+            6: "Carpool 3+ (GP)",
+            7: "Carpool 3+ (HOV)",
+            8: "Carpool 3+ (Toll)",
+            9: "Walk",
+            10: "Bike",
+            11: "Walk to Transit",
+            12: "Park & Ride",
+            13: "Kiss & Ride (Private)",
+            14: "Kiss & Ride (TNC)",
+            15: "Taxi",
+            16: "TNC",
+            17: "School Bus"
+        }
+        
+        # Create a copy and map mode codes to labels
+        trip_data_with_labels = trip_data.copy()
+        trip_data_with_labels['trip_mode'] = trip_data_with_labels['trip_mode'].map(MODE_NAMES).fillna(trip_data_with_labels['trip_mode'].astype(str))
+        
         mode_purpose_summary = calculate_weighted_summary(
-            trip_data,
+            trip_data_with_labels,
             group_cols=[purpose_col, 'trip_mode'],
             weight_col=weight_col,
             count_col_name='trips',

@@ -1,7 +1,7 @@
 header:
   tab: Tours
   title: Tour Pattern Statistics
-  description: Tour frequency, mode choice, distance, and duration (multi-run comparison)
+  description: Tour frequency, mode choice, distance, and duration (multi-comparison)
 layout:
   tour_patterns:
   - type: bar
@@ -45,7 +45,6 @@ layout:
       y: share
       columns: tour_mode
       groupBy: dataset
-      stacked: true
     description: 'Share: mode choice by tour purpose'
   - type: bar
     title: Tour Mode by Purpose - Total
@@ -55,5 +54,4 @@ layout:
       y: tours
       columns: tour_mode
       groupBy: dataset
-      stacked: true
     description: 'Total: mode choice by tour purpose'

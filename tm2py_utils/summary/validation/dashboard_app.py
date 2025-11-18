@@ -2,7 +2,7 @@
 Streamlit dashboard for TM2.2 validation summaries.
 
 Loads validation CSVs and displays interactive comparison charts
-for multiple model runs using YAML-based configuration.
+for multiple datasets using YAML-based configuration.
 """
 
 import streamlit as st
@@ -571,7 +571,7 @@ def main():
     
     st.sidebar.markdown("---")
     st.sidebar.markdown("### About")
-    st.sidebar.markdown("Compare multiple TM2.2 model runs across household, worker, tour, and trip summaries.")
+    st.sidebar.markdown("Compare multiple TM2.2 datasets across household, worker, tour, and trip summaries.")
     
     # Load and render selected dashboard
     config_path = dashboard_names[selected_dashboard]
