@@ -59,13 +59,25 @@ MTC_PALETTE_SEQUENTIAL = [
     MTC_COLORS['green'],
 ]
 
+# Extended categorical palette for mode charts (17 modes)
 MTC_PALETTE_CATEGORICAL = [
-    MTC_COLORS['teal'],
-    MTC_COLORS['orange'],
-    MTC_COLORS['purple'],
-    MTC_COLORS['green'],
-    MTC_COLORS['primary_blue'],
-    MTC_COLORS['red'],
+    MTC_COLORS['teal'],          # 1
+    MTC_COLORS['orange'],        # 2
+    MTC_COLORS['purple'],        # 3
+    MTC_COLORS['green'],         # 4
+    MTC_COLORS['primary_blue'],  # 5
+    MTC_COLORS['red'],           # 6
+    '#FFB6C1',  # Light Pink     # 7
+    '#87CEEB',  # Sky Blue       # 8
+    '#DDA0DD',  # Plum           # 9
+    '#F0E68C',  # Khaki          # 10
+    '#98FB98',  # Pale Green     # 11
+    '#FFE4B5',  # Moccasin       # 12
+    '#B0C4DE',  # Light Steel    # 13
+    '#FFDAB9',  # Peach          # 14
+    '#E6E6FA',  # Lavender       # 15
+    '#FAFAD2',  # Light Goldenrod# 16
+    '#D3D3D3',  # Light Gray     # 17
 ]
 
 # Default layout for all charts
