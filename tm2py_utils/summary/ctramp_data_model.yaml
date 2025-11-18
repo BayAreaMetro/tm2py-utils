@@ -85,7 +85,7 @@ input_schema:
   
   # Tour file schema
   # Source: https://bayareametro.github.io/tm2py/ctramp-outputs/individual-tours/
-  tours:
+  individual_tours:
     file_pattern: "indivTourData_{iteration}.csv"
     columns:
       # Core identification and classification fields (9 required)
@@ -154,7 +154,7 @@ input_schema:
   
   # Trip file schema
   # Source: https://bayareametro.github.io/tm2py/ctramp-outputs/individual-trips/
-  trips:
+  individual_trips:
     file_pattern: "indivTripData_{iteration}.csv"
     columns:
       # Core identification fields (4 required)
@@ -369,14 +369,14 @@ weight_fields:
     default_value: 1.0
     invert: true
   
-  tours:
+  individual_tours:
     field: "sample_rate"
     description: "Tour sampling rate - inherited from household, will be inverted"
     calculate_weighted: true
     default_value: 1.0
     invert: true
   
-  trips:
+  individual_trips:
     field: "sample_rate"
     description: "Trip sampling rate - inherited from household, will be inverted"
     calculate_weighted: true

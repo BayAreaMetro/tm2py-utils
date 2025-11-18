@@ -23,11 +23,12 @@ from dataclasses import dataclass
 from enum import Enum
 import sys
 import os
+import webbrowser
 
 # Validation summary modules
 from .validation import household_summary, worker_summary, tour_summary, trip_summary
 from .ctramp_data_model_loader import load_data_model
-from .validation.simwrapper_writer import (
+from .validation.dashboard_writer import (
     create_household_dashboard, 
     create_worker_dashboard,
     create_tour_dashboard,
@@ -91,11 +92,13 @@ class CTRAMPFileSpecs(BaseModel):
 
 
 class InputDirectory(BaseModel):
-    """Configuration for a single input directory."""
+    """Configuration for an input directory."""
     path: Path
     name: str
     source_type: DataSource = DataSource.MODEL
-    description: Optional[str] = None
+    description: str = ""
+    iteration: Optional[int] = None  # Specific iteration to load (e.g., 1 for _1.csv), None = highest
+    display_name: Optional[str] = None  # Human-readable label for dashboards (defaults to name)
     
     class Config:
         arbitrary_types_allowed = True
@@ -182,15 +185,16 @@ class DataLoader:
         else:
             logger.warning(f"  ⚠ Data model not found at {data_model_path}")
     
-    def _find_highest_iteration_file(self, directory: Path, base_filename: str) -> Optional[Path]:
-        """Find the file with the highest iteration number.
+    def _find_iteration_file(self, directory: Path, base_filename: str, iteration: Optional[int] = None) -> Optional[Path]:
+        """Find file with specific or highest iteration number.
         
         Args:
             directory: Directory to search in
             base_filename: Base filename pattern (e.g., 'householdData_1.csv')
+            iteration: Specific iteration to load, or None for highest
             
         Returns:
-            Path to file with highest iteration number, or None if not found
+            Path to file, or None if not found
         """
         # Extract the base name and extension
         # e.g., 'householdData_1.csv' -> 'householdData', '.csv'
@@ -202,6 +206,16 @@ class DataLoader:
         base_name = parts[0]
         ext_part = parts[1]  # e.g., '1.csv'
         extension = '.' + ext_part.split('.', 1)[1] if '.' in ext_part else ''
+        
+        # If specific iteration requested, check for that file directly
+        if iteration is not None:
+            target_file = directory / f"{base_name}_{iteration}{extension}"
+            if target_file.exists():
+                logger.info(f"  → Found iteration {iteration}: {target_file.name}")
+                return target_file
+            else:
+                logger.warning(f"  ⚠ Iteration {iteration} not found: {target_file.name}")
+                return None
         
         # Find all matching files with pattern: baseName_N.ext
         import re
@@ -269,8 +283,8 @@ class DataLoader:
         
         # Load each file type
         for file_type, file_spec in self.file_specs.dict().items():
-            # Find the file with highest iteration number
-            file_path = self._find_highest_iteration_file(input_dir.path, file_spec.filename)
+            # Find the file with specified or highest iteration number
+            file_path = self._find_iteration_file(input_dir.path, file_spec.filename, input_dir.iteration)
             
             if file_path and file_path.exists():
                 try:
@@ -365,7 +379,9 @@ class SummaryGenerator:
         all_summaries = {}
         
         for dataset_name, data in datasets.items():
-            logger.info(f"\nProcessing dataset: {dataset_name}")
+            # Use display name if available, otherwise use dataset_name
+            display_name = self.dataset_display_names.get(dataset_name, dataset_name)
+            logger.info(f"\nProcessing dataset: {display_name} ({dataset_name})")
             
             # Household summaries
             if SummaryType.AUTO_OWNERSHIP in self.config.enabled_summaries:
@@ -377,7 +393,7 @@ class SummaryGenerator:
                     
                     all_summaries.update(
                         household_summary.generate_all_household_summaries(
-                            data['households'], dataset_name, weight_col
+                            data['households'], display_name, weight_col
                         )
                     )
                 else:
@@ -393,7 +409,7 @@ class SummaryGenerator:
                     
                     all_summaries.update(
                         worker_summary.generate_all_worker_summaries(
-                            data['persons'], dataset_name, weight_col
+                            data['persons'], display_name, weight_col
                         )
                     )
                 else:
@@ -411,7 +427,7 @@ class SummaryGenerator:
                     
                     all_summaries.update(
                         tour_summary.generate_all_tour_summaries(
-                            data['individual_tours'], dataset_name, weight_col
+                            data['individual_tours'], display_name, weight_col
                         )
                     )
                 else:
@@ -427,7 +443,7 @@ class SummaryGenerator:
                     
                     all_summaries.update(
                         trip_summary.generate_all_trip_summaries(
-                            data['individual_trips'], dataset_name, weight_col
+                            data['individual_trips'], display_name, weight_col
                         )
                     )
                 else:
@@ -435,6 +451,86 @@ class SummaryGenerator:
         
         logger.info(f"\n✓ Generated {len(all_summaries)} total summary tables")
         return all_summaries
+
+
+def _combine_multi_run_summaries(summaries: Dict[str, pd.DataFrame]) -> Dict[str, pd.DataFrame]:
+    """
+    Combine summaries from multiple runs into single DataFrames.
+    
+    Takes summaries like:
+        'auto_ownership_regional_2023_version_05': df1
+        'auto_ownership_regional_2024_version_01': df2
+    
+    Returns:
+        'auto_ownership_regional': pd.concat([df1, df2])
+    
+    The 'dataset' column in each df identifies the run.
+    
+    Args:
+        summaries: Dictionary mapping summary name to DataFrame
+        
+    Returns:
+        Dictionary of combined summaries by base name
+    """
+    from collections import defaultdict
+    
+    # Define known summary base names (patterns to match)
+    known_patterns = [
+        # Household summaries
+        'auto_ownership_regional',
+        'auto_ownership_by_income',
+        'household_size_regional',
+        'income_distribution',
+        # Worker summaries
+        'worker_type',
+        'work_from_home',
+        'worker_age',
+        'worker_gender',
+        'worker_income',
+        # Tour summaries
+        'tour_frequency_by_purpose',
+        'tour_mode_choice',
+        'tour_mode_by_purpose',
+        'tour_time_of_day',
+        'tour_start_time',
+        'tour_distance',
+        'tour_duration',
+        # Trip summaries
+        'trip_mode_choice',
+        'trip_purpose',
+        'trip_mode_by_purpose',
+        'trip_time_of_day',
+        'trip_distance',
+        'trip_duration',
+        'trip_generation',
+    ]
+    
+    # Group summaries by base name
+    grouped = defaultdict(list)
+    
+    for name, df in summaries.items():
+        # Try to match against known patterns
+        base_name = None
+        for pattern in known_patterns:
+            if name.startswith(pattern):
+                base_name = pattern
+                break
+        
+        # If no match, use the full name (single run case)
+        if base_name is None:
+            base_name = name
+        
+        grouped[base_name].append(df)
+    
+    # Concatenate DataFrames with same base name
+    result = {}
+    for base_name, dfs in grouped.items():
+        if len(dfs) == 1:
+            result[base_name] = dfs[0]
+        else:
+            result[base_name] = pd.concat(dfs, ignore_index=True)
+    
+    return result
 
 
 def save_summaries(summaries: Dict[str, pd.DataFrame], output_dir: Path, 
@@ -492,36 +588,40 @@ def save_summaries(summaries: Dict[str, pd.DataFrame], output_dir: Path,
     index_df.to_csv(output_dir / "summary_index.csv", index=False)
     logger.info(f"  ✓ Created summary index with {len(index_data)} tables")
     
-    # Generate SimWrapper dashboards if enabled
-    if generate_simwrapper:
-        logger.info("\nGenerating SimWrapper dashboards...")
-        simwrapper_dir = output_dir / "simwrapper"
-        simwrapper_dir.mkdir(parents=True, exist_ok=True)
+    # Generate dashboards if enabled
+    if generate_dashboard:
+        logger.info("\nGenerating dashboards...")
+        dashboard_dir = output_dir / "dashboard"
+        dashboard_dir.mkdir(parents=True, exist_ok=True)
         
-        # Group summaries by type
-        household_summaries = {k: v for k, v in summaries.items() if 'household' in k.lower() or 'auto_ownership' in k.lower()}
-        worker_summaries = {k: v for k, v in summaries.items() if 'worker' in k.lower() or 'person' in k.lower()}
-        tour_summaries = {k: v for k, v in summaries.items() if 'tour' in k.lower()}
-        trip_summaries = {k: v for k, v in summaries.items() if 'trip' in k.lower()}
+        # Combine multi-run summaries (merge summaries with same base name)
+        combined_summaries = _combine_multi_run_summaries(summaries)
+        logger.info(f"  ℹ Combined {len(summaries)} summaries into {len(combined_summaries)} multi-run tables")
+        
+        # Group combined summaries by type
+        household_summaries = {k: v for k, v in combined_summaries.items() if 'household' in k.lower() or 'auto_ownership' in k.lower()}
+        worker_summaries = {k: v for k, v in combined_summaries.items() if 'worker' in k.lower() or 'person' in k.lower()}
+        tour_summaries = {k: v for k, v in combined_summaries.items() if 'tour' in k.lower()}
+        trip_summaries = {k: v for k, v in combined_summaries.items() if 'trip' in k.lower()}
         
         # Create dashboards for each category
         if household_summaries:
-            create_household_dashboard(simwrapper_dir, household_summaries)
+            create_household_dashboard(dashboard_dir, household_summaries)
             logger.info(f"  ✓ Created household dashboard with {len(household_summaries)} summaries")
         
         if worker_summaries:
-            create_worker_dashboard(simwrapper_dir, worker_summaries)
+            create_worker_dashboard(dashboard_dir, worker_summaries)
             logger.info(f"  ✓ Created worker dashboard with {len(worker_summaries)} summaries")
         
         if tour_summaries:
-            create_tour_dashboard(simwrapper_dir, tour_summaries)
+            create_tour_dashboard(dashboard_dir, tour_summaries)
             logger.info(f"  ✓ Created tour dashboard with {len(tour_summaries)} summaries")
         
         if trip_summaries:
-            create_trip_dashboard(simwrapper_dir, trip_summaries)
+            create_trip_dashboard(dashboard_dir, trip_summaries)
             logger.info(f"  ✓ Created trip dashboard with {len(trip_summaries)} summaries")
         
-        logger.info(f"  ✓ SimWrapper dashboards saved to {simwrapper_dir}")
+        logger.info(f"  ✓ Dashboards saved to {dashboard_dir}")
 
 
 def create_default_config(input_dirs: List[Path], output_dir: Path) -> RunConfig:
@@ -578,9 +678,9 @@ def main():
         help="Specific summaries to generate (default: all)"
     )
     parser.add_argument(
-        "--no-simwrapper",
+        "--no-dashboard",
         action="store_true",
-        help="Disable SimWrapper dashboard generation"
+        help="Disable dashboard generation"
     )
     
     args = parser.parse_args()
@@ -608,7 +708,14 @@ def main():
         
         # Initialize components
         data_loader = DataLoader(config.file_specs, config.column_mapping, binning_specs=config.binning_specs)
-        summary_generator = SummaryGenerator(config.summary_config, data_loader.data_model)
+        
+        # Create display name mapping for dashboards
+        dataset_display_names = {
+            input_dir.name: input_dir.display_name or input_dir.name
+            for input_dir in config.input_directories
+        }
+        
+        summary_generator = SummaryGenerator(config.summary_config, data_loader.data_model, dataset_display_names)
         
         # Load all datasets
         all_datasets = {}
@@ -634,9 +741,19 @@ def main():
         
         # Save results with output configuration
         save_summaries(summaries, config.output_directory, config.output_config, 
-                      generate_simwrapper=not args.no_simwrapper)
+                      generate_dashboard=not args.no_dashboard)
         
         logger.info("✅ Validation summary generation completed successfully!")
+        
+        # Open SimWrapper in browser if dashboards were generated
+        if not args.no_simwrapper:
+            simwrapper_dir = config.output_directory / "simwrapper"
+            if simwrapper_dir.exists():
+                logger.info("\n🌐 Opening SimWrapper in browser...")
+                # Open SimWrapper with local folder
+                webbrowser.open('https://simwrapper.github.io/site/')
+                logger.info(f"   → In SimWrapper, click 'Add Local folder' and select:")
+                logger.info(f"   → {simwrapper_dir.absolute()}")
         
     except Exception as e:
         logger.error(f"❌ Error during execution: {e}")

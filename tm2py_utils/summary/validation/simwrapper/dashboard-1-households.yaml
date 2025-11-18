@@ -11,6 +11,8 @@ layout:
       x: num_vehicles
       y: share
       groupBy: dataset
+      xAxisName: Number of Vehicles
+      yAxisName: Share
     description: 'Share: households by number of vehicles owned'
   - type: bar
     title: Households by Vehicle Ownership - Total

@@ -74,6 +74,42 @@ def generate_tour_mode_summary(tour_data: pd.DataFrame, dataset_name: str, weigh
         logger.warning(f"  ⚠ No tour_mode column in tour data for {dataset_name}")
         return summaries
     
+    # Map mode codes to names
+    MODE_NAMES = {
+        1: "SOV (GP)",
+        2: "SOV (Toll)",
+        3: "Carpool 2 (GP)",
+        4: "Carpool 2 (HOV)",
+        5: "Carpool 2 (Toll)",
+        6: "Carpool 3+ (GP)",
+        7: "Carpool 3+ (HOV)",
+        8: "Carpool 3+ (Toll)",
+        9: "Walk",
+        10: "Bike",
+        11: "Walk to Transit",
+        12: "Park & Ride",
+        13: "Kiss & Ride (Private)",
+        14: "Kiss & Ride (TNC)",
+        15: "Taxi",
+        16: "TNC",
+        17: "School Bus"
+    }
+    
+    # Create a copy to avoid modifying original data
+    tour_data = tour_data.copy()
+    tour_data['tour_mode'] = tour_data['tour_mode'].map(MODE_NAMES).fillna(tour_data['tour_mode'].astype(str))
+    
+    # Debug: Check weight column
+    if weight_col:
+        logger.info(f"  → Using weight column '{weight_col}' for {dataset_name}")
+        if weight_col in tour_data.columns:
+            logger.info(f"  → Weight stats: min={tour_data[weight_col].min():.1f}, max={tour_data[weight_col].max():.1f}, mean={tour_data[weight_col].mean():.1f}")
+            logger.info(f"  → Weighted tours: {tour_data[weight_col].sum():,.0f}")
+        else:
+            logger.warning(f"  ⚠ Weight column '{weight_col}' not found in tour data! Available columns: {list(tour_data.columns)[:10]}...")
+    else:
+        logger.warning(f"  ⚠ No weight column specified for {dataset_name} - using unweighted counts")
+    
     mode_summary = calculate_weighted_summary(
         tour_data,
         group_cols='tour_mode',

@@ -5,7 +5,9 @@ This directory contains a comprehensive system for analyzing and validating tran
 ## Directory Structure
 
 ### Core System Files
-- `run_all_validation_summaries.py` - Main orchestrator for comprehensive validation analysis
+## Key Files
+
+- `validation/run_all_validation_summaries.py` - Main orchestrator for comprehensive validation analysis
 - `ctramp_models.py` - Pydantic data models for CTRAMP file validation and type safety
 - `validation_config.yaml` - Configuration template for validation analysis parameters
 - `test_summary_system.py` - Test suite for validation system components
@@ -64,10 +66,10 @@ For complete validation across multiple scenarios:
 
 ```bash
 # Copy and customize the configuration template
-cp validation_config.yaml my_validation_config.yaml
+cp validation/validation_config.yaml my_validation_config.yaml
 
 # Run comprehensive validation
-python run_all_validation_summaries.py --config my_validation_config.yaml
+python -m tm2py_utils.summary.validation.run_all_validation_summaries --config my_validation_config.yaml
 ```
 
 ### 4. Quick Testing
@@ -108,7 +110,7 @@ Individual scripts in `validation/` directory for specific analysis tasks, makin
 - Debug specific model components
 
 ### 🎯 **Comprehensive Orchestration**  
-The main `run_all_validation_summaries.py` script coordinates multiple validation analyses:
+The main `validation/run_all_validation_summaries.py` script coordinates multiple validation analyses:
 - Multi-scenario comparison
 - Standardized output formats
 - Configurable analysis workflows

@@ -37,6 +37,31 @@ def generate_trip_mode_summary(trip_data: pd.DataFrame, dataset_name: str, weigh
         logger.warning(f"  ⚠ No trip_mode column in trip data for {dataset_name}")
         return summaries
     
+    # Map mode codes to names
+    MODE_NAMES = {
+        1: "SOV (GP)",
+        2: "SOV (Toll)",
+        3: "Carpool 2 (GP)",
+        4: "Carpool 2 (HOV)",
+        5: "Carpool 2 (Toll)",
+        6: "Carpool 3+ (GP)",
+        7: "Carpool 3+ (HOV)",
+        8: "Carpool 3+ (Toll)",
+        9: "Walk",
+        10: "Bike",
+        11: "Walk to Transit",
+        12: "Park & Ride",
+        13: "Kiss & Ride (Private)",
+        14: "Kiss & Ride (TNC)",
+        15: "Taxi",
+        16: "TNC",
+        17: "School Bus"
+    }
+    
+    # Create a copy to avoid modifying original data
+    trip_data = trip_data.copy()
+    trip_data['trip_mode'] = trip_data['trip_mode'].map(MODE_NAMES).fillna(trip_data['trip_mode'].astype(str))
+    
     mode_summary = calculate_weighted_summary(
         trip_data,
         group_cols='trip_mode',

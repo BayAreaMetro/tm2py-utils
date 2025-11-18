@@ -82,12 +82,17 @@ MTC_PALETTE_CATEGORICAL = [
 
 # Default layout for all charts
 PLOTLY_LAYOUT = {
-    'font': {'family': 'Arial, sans-serif', 'size': 12, 'color': MTC_COLORS['gray']},
-    'plot_bgcolor': 'white',
+    'font': {'family': 'Inter, Arial, sans-serif', 'size': 13, 'color': MTC_COLORS['gray']},
+    'plot_bgcolor': 'rgba(248, 249, 250, 0.3)',
     'paper_bgcolor': 'white',
-    'margin': {'l': 60, 'r': 20, 't': 40, 'b': 60},
+    'margin': {'l': 60, 'r': 20, 't': 50, 'b': 70},
     'hovermode': 'closest',
-    'hoverlabel': {'font': {'size': 12}},
+    'hoverlabel': {
+        'font': {'size': 13, 'family': 'Inter, Arial, sans-serif'},
+        'bgcolor': 'white',
+        'bordercolor': MTC_COLORS['teal'],
+        'align': 'left'
+    },
 }
 
 
@@ -192,29 +197,44 @@ def create_bar_chart(
     # Apply MTC styling
     fig.update_layout(**PLOTLY_LAYOUT)
     fig.update_layout(
-        title={'font': {'size': 16, 'color': MTC_COLORS['dark_blue']}},
-        margin={'l': 60, 'r': 20, 't': 40, 'b': 100}  # Extra bottom margin for axis labels
+        title={
+            'font': {'size': 18, 'color': MTC_COLORS['dark_blue'], 'family': 'Inter, Arial, sans-serif'},
+            'x': 0.02,
+            'xanchor': 'left'
+        },
+        margin={'l': 70, 'r': 30, 't': 60, 'b': 110}  # Extra bottom margin for axis labels
     )
     
-    # Format axes
+    # Format axes with modern styling
     fig.update_xaxes(
         showgrid=False,
         showline=True,
-        linewidth=1,
-        linecolor=MTC_COLORS['gray'],
-        title_font={'size': 12, 'color': MTC_COLORS['gray']},
+        linewidth=2,
+        linecolor='#E5E5E5',
+        title_font={'size': 13, 'color': MTC_COLORS['gray'], 'family': 'Inter, Arial, sans-serif'},
+        tickfont={'size': 12},
         tickangle=-45,  # Angle labels to prevent overlap
         automargin=True  # Auto-adjust margins for labels
     )
     fig.update_yaxes(
         showgrid=True,
-        gridwidth=1,
-        gridcolor='#E5E5E5',
+        gridwidth=1.5,
+        gridcolor='rgba(0,0,0,0.05)',
         showline=True,
-        linewidth=1,
-        linecolor=MTC_COLORS['gray'],
-        title_font={'size': 12, 'color': MTC_COLORS['gray']},
-        automargin=True  # Auto-adjust margins for labels
+        linewidth=2,
+        linecolor='#E5E5E5',
+        title_font={'size': 13, 'color': MTC_COLORS['gray'], 'family': 'Inter, Arial, sans-serif'},
+        tickfont={'size': 12},
+        automargin=True,  # Auto-adjust margins for labels
+        zeroline=True,
+        zerolinewidth=2,
+        zerolinecolor='rgba(0,0,0,0.1)'
+    )
+    
+    # Add smooth bar styling
+    fig.update_traces(
+        marker_line_width=0,
+        opacity=0.95
     )
     
     # Add % suffix to y-axis if column contains 'share' (values already in percent form)
@@ -326,35 +346,67 @@ def render_dashboard(config: Dict[str, Any], data_dir: Path):
     <style>
     /* MTC-inspired professional styling */
     .main-header {
-        background: linear-gradient(90deg, #003D7A 0%, #00A19A 100%);
-        padding: 2rem 2rem 1.5rem 2rem;
-        border-radius: 8px;
-        margin-bottom: 2rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        background: linear-gradient(135deg, #003D7A 0%, #00A19A 100%);
+        padding: 2.5rem 2rem 2rem 2rem;
+        border-radius: 12px;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 4px 12px rgba(0,61,122,0.15);
+        position: relative;
+        overflow: hidden;
+    }
+    .main-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        border-radius: 50%;
     }
     .main-header h1 {
         color: white !important;
         margin: 0;
-        font-weight: 600;
-        font-size: 2.5rem;
+        font-weight: 700;
+        font-size: 2.75rem;
+        letter-spacing: -0.5px;
+        position: relative;
     }
     .main-header p {
-        color: rgba(255,255,255,0.9);
-        margin-top: 0.5rem;
-        font-size: 1.1rem;
+        color: rgba(255,255,255,0.95);
+        margin-top: 0.75rem;
+        font-size: 1.15rem;
+        font-weight: 300;
+        position: relative;
     }
     /* Card-style sections */
     .stApp section[data-testid="stVerticalBlock"] > div {
         background: white;
-        border-radius: 8px;
+        border-radius: 10px;
         padding: 1.5rem;
         margin-bottom: 1rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        transition: box-shadow 0.3s ease;
+    }
+    .stApp section[data-testid="stVerticalBlock"] > div:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     /* Cleaner dividers */
     hr {
-        border-color: #e5e5e5;
-        margin: 2rem 0;
+        border: none;
+        height: 1px;
+        background: linear-gradient(to right, transparent, #e5e5e5, transparent);
+        margin: 2.5rem 0;
+    }
+    /* Better section headers */
+    h2 {
+        font-weight: 600;
+        letter-spacing: -0.3px;
+        margin-top: 2rem !important;
+        margin-bottom: 1.5rem !important;
+        padding-bottom: 0.75rem;
+        border-bottom: 3px solid #00A19A;
+        display: inline-block;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -427,20 +479,58 @@ def main():
     # Custom CSS for MTC branding
     st.markdown(f"""
         <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
         .stApp {{
-            background-color: white;
+            background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }}
         h1 {{
             color: {MTC_COLORS['dark_blue']};
-            font-family: Arial, sans-serif;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
         }}
         h2, h3 {{
             color: {MTC_COLORS['primary_blue']};
-            font-family: Arial, sans-serif;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
         }}
         .stButton>button {{
-            background-color: {MTC_COLORS['teal']};
+            background: linear-gradient(135deg, {MTC_COLORS['teal']} 0%, #008f89 100%);
             color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0,161,154,0.3);
+        }}
+        .stButton>button:hover {{
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,161,154,0.4);
+        }}
+        /* Sidebar enhancements */
+        section[data-testid="stSidebar"] {{
+            background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+            border-right: 1px solid #e5e5e5;
+        }}
+        section[data-testid="stSidebar"] .stMarkdown {{
+            padding: 0.25rem 0;
+        }}
+        /* Selectbox styling */
+        .stSelectbox > div > div {{
+            border-radius: 8px;
+            border-color: #d1d5db;
+            transition: all 0.2s ease;
+        }}
+        .stSelectbox > div > div:hover {{
+            border-color: {MTC_COLORS['teal']};
+            box-shadow: 0 0 0 1px {MTC_COLORS['teal']};
+        }}
+        /* Plotly chart containers */
+        .js-plotly-plot {{
+            border-radius: 8px;
+            overflow: hidden;
         }}
         </style>
     """, unsafe_allow_html=True)

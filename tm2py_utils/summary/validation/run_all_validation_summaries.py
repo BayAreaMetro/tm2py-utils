@@ -424,7 +424,7 @@ class SummaryGenerator:
                     # Get weight field from data model
                     weight_col = None
                     if hasattr(self, 'data_model') and self.data_model:
-                        weight_col = self.data_model.get_weight_field('tours')
+                        weight_col = self.data_model.get_weight_field('individual_tours')
                     
                     all_summaries.update(
                         tour_summary.generate_all_tour_summaries(
@@ -440,7 +440,7 @@ class SummaryGenerator:
                     # Get weight field from data model
                     weight_col = None
                     if hasattr(self, 'data_model') and self.data_model:
-                        weight_col = self.data_model.get_weight_field('trips')
+                        weight_col = self.data_model.get_weight_field('individual_trips')
                     
                     all_summaries.update(
                         trip_summary.generate_all_trip_summaries(

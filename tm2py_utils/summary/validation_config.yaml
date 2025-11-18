@@ -6,11 +6,19 @@
 input_directories:
   - path: "A:\\2023-tm22-dev-version-05\\ctramp_output" 
     name: "2023_version_05"
+    display_name: "2023 TM2.2 v05"
     source_type: "model"
     description: "2023 TM2.2 Development Version 05"
+    iteration: 1  # Use iteration 1 files
+  - path: "A:\\2015-tm22-dev-sprint-04\\ctramp_output"
+    name: "2015_sprint_04"
+    display_name: "2015 TM2.2 Sprint 04"
+    source_type: "model"
+    description: "2015 TM2.2 Development Sprint 04"
+    iteration: 1  # Use iteration 1 files
 
 # Output location
-output_directory: "C:\\GitHub\\tm2py-utils\\tm2py_utils\\summary\\validation\\simwrapper"
+output_directory: "C:\\GitHub\\tm2py-utils\\tm2py_utils\\summary\\validation"
 
 # Summary generation settings
 summary_config:
