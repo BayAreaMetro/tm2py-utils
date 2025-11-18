@@ -1,7 +1,7 @@
 header:
   tab: Tours
   title: Tour Pattern Statistics
-  description: Tour frequency, mode choice, distance, and duration (multi-run comparison)
+  description: Tour frequency, mode choice, distance, and duration (comparison)
 layout:
   tour_patterns:
   - type: bar

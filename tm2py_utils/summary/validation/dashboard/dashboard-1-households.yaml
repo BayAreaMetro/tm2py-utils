@@ -1,7 +1,7 @@
 header:
   tab: Households
   title: Household Summary Statistics
-  description: Household demographics and auto ownership patterns (multi-run comparison)
+  description: Household demographics and auto ownership patterns (comparison)
 layout:
   auto_ownership:
   - type: bar

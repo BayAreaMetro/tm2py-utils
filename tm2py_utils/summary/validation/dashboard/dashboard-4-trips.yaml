@@ -1,7 +1,7 @@
 header:
   tab: Trips
   title: Trip Pattern Statistics
-  description: Trip mode choice, purpose, distance, and duration (multi-run comparison)
+  description: Trip mode choice, purpose, distance, and duration (comparison)
 layout:
   trip_patterns:
   - type: bar
