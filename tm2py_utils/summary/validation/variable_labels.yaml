@@ -79,13 +79,15 @@ categorical_order:
   
   tour_purpose:
     - "Work"
+    - "Work-Based"
+    - "University"
     - "School"
     - "Escort"
-    - "Shopping"
-    - "Meal"
-    - "Social/Recreation"
-    - "Other Maintenance"
-    - "Other Discretionary"
+    - "Shop"
+    - "Maintenance"
+    - "Eating Out"
+    - "Visiting"
+    - "Discretionary"
   
   tour_distance_bin:
     - "0-5"
