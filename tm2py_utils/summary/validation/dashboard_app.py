@@ -476,6 +476,11 @@ def main():
         initial_sidebar_state="expanded"
     )
     
+    # Banner image
+    banner_path = Path(__file__).parent / "dashboard" / "validation-app-banner.PNG"
+    if banner_path.exists():
+        st.image(str(banner_path), use_container_width=True)
+    
     # Custom CSS for MTC branding
     st.markdown(f"""
         <style>
