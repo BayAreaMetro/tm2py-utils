@@ -503,7 +503,7 @@
     # reliability
     reliability = true
     apply_msa_demand = true
-    # threshold (miles) where a drive trip is short enough to be moved to a taz
+    # threshold (miles) for maz assignment; when an auto trip distance is below the threshold, it will be assigned at the MAZ level instead of the TAZ level
     maz_drive_distance_threshold = 0.5
     [highway.tolls]
         file_path = "inputs/hwy/tolls.csv"
