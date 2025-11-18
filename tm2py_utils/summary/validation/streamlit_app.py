@@ -7,13 +7,14 @@ relative paths and assumes the dashboard data is in the repository.
 
 import sys
 from pathlib import Path
+import importlib.util
 
-# Add the tm2py_utils directory to Python path
-repo_root = Path(__file__).parent.parent.parent.parent
-sys.path.insert(0, str(repo_root))
-
-# Import and run the main dashboard
-from tm2py_utils.summary.validation.dashboard_app import main
+# Load dashboard_app directly without importing tm2py_utils package
+# This avoids triggering heavy dependencies in tm2py_utils.__init__.py
+dashboard_path = Path(__file__).parent / "dashboard_app.py"
+spec = importlib.util.spec_from_file_location("dashboard_app", dashboard_path)
+dashboard_app = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(dashboard_app)
 
 if __name__ == "__main__":
-    main()
+    dashboard_app.main()
