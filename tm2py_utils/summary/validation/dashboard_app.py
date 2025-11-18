@@ -454,7 +454,7 @@ def main():
     selected_dashboard = st.sidebar.selectbox(
         "Select Dashboard",
         options=list(dashboard_names.keys()),
-        format_func=lambda x: x.replace('dashboard-', '').replace('-', ' ').title()
+        format_func=lambda x: x.replace('dashboard-', '').replace('-', ' ').replace('1', '').replace('3', '').replace('4', '').strip().title()
     )
     
     # Data freshness indicator
