@@ -137,6 +137,7 @@ custom_summaries:
 - ✅ Self-documenting
 - ✅ Easy to version control
 - ✅ Automatically generates CSV and dashboard configs
+- ✅ **Automatic label mapping** - categorical codes (mode IDs, person types) are automatically converted to human-readable labels
 
 **Current Configured Summaries (validation_config.yaml):**
 - **Household**: auto ownership (regional, by income, by size), household size, income distribution
@@ -213,13 +214,20 @@ categorical_order:
 - **enabled_summaries**: Which summaries to generate
 
 ### data_model/ctramp_data_model.yaml
+
+**Core configuration for data structure and value mappings.**
+
 - **input_schema**: Define expected CSV columns and data types for your data
 - **column_mappings**: Map CSV column names to standard names
 - **value_mappings**: Map coded values to labels (e.g., 1→"Work", 2→"School")
+  - 🎯 **Automatic Label Application**: All summaries automatically convert numeric codes to human-readable labels
+  - Works for: `tour_mode`, `trip_mode`, `person_type`, `gender`, `tour_purpose`, etc.
+  - See section below on "Adding Value Labels for Categorical Variables"
 - **weight_fields**: Define which columns contain sample rates/weights
 - **binning_specs**: Define how to bin continuous variables
 
 ### data_model/variable_labels.yaml
+
 - **Variable labels**: Human-readable names for dashboard
 - **Categorical ordering**: Control order of categories in charts
 
@@ -234,19 +242,69 @@ weight_fields:
     invert: true  # Set true to invert (sample_rate → expansion_factor)
 ```
 
-### Add New Mode Labels
-Edit `summaries/tour_summary.py` or `trip_summary.py`:
-```python
-MODE_NAMES = {
-    1: "SOV (GP)",
-    2: "SOV (Toll)",
-    # ... add new modes
-    18: "My New Mode"
-}
+### Adding Value Labels for Categorical Variables
+
+**🎯 Automatic System**: The validation framework automatically converts numeric codes to human-readable labels for ALL summaries.
+
+**How it works:**
+1. Value mappings are defined centrally in `data_model/ctramp_data_model.yaml` under `value_mappings`
+2. When summaries are generated, the system automatically:
+   - Detects columns with defined mappings (e.g., `tour_mode`, `trip_mode`, `person_type`)
+   - Creates temporary labeled columns (e.g., `tour_mode_name`)
+   - Groups by the labeled values
+   - Outputs human-readable labels in the final CSV
+
+**To add/modify labels for any categorical variable:**
+
+Edit `data_model/ctramp_data_model.yaml`:
+
+```yaml
+value_mappings:
+  # Transportation modes (used for BOTH tour_mode and trip_mode)
+  transportation_mode:
+    type: categorical
+    values:
+      1: "SOV_GP - Single Occupant Vehicle (General Purpose)"
+      2: "SOV_PAY - Single Occupant Vehicle (Express/Toll)"
+      3: "SR2_GP - Shared Ride 2 (General Purpose)"
+      # ... add your custom modes
+      18: "My Custom Mode - Description"
+  
+  # Person types
+  person_type:
+    type: categorical
+    values:
+      1: "Full-time worker"
+      2: "Part-time worker"
+      # ... etc
+  
+  # Tour purposes (if using numeric codes instead of text)
+  tour_purpose:
+    type: categorical
+    text_values:  # For text-based values
+      - "Work"
+      - "School"
+      # ... etc
 ```
 
+**What gets labeled automatically:**
+- ✅ `tour_mode` → Uses `transportation_mode` mapping
+- ✅ `trip_mode` → Uses `transportation_mode` mapping  
+- ✅ `person_type` → Uses `person_type` mapping
+- ✅ `gender` → Uses `gender` mapping
+- ✅ Any column with a matching entry in `value_mappings`
+
+**Benefits:**
+- No need to modify Python code
+- Labels applied consistently across ALL summaries
+- Single source of truth for categorical mappings
+- Easy to update labels without touching code
+
 ### Filter Data Before Summarizing
-```python
+
+Use the `filter` field in your summary configuration:
+
+```yaml
 # In any summary function
 filtered_data = tour_data[tour_data['tour_purpose'] == 'Work']
 summary = calculate_weighted_summary(filtered_data, ...)

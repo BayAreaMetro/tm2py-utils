@@ -97,6 +97,10 @@ custom_summaries:
     weight_field: "sample_rate"
     count_name: "households"
     share_within: "income_category"
+    bins:
+      income_category:
+        breaks: [0, 30000, 60000, 100000, 150000, 1000000000]
+        labels: ['<30K', '30-60K', '60-100K', '100-150K', '150K+']
   
   # Auto ownership by household size
   - name: "auto_ownership_by_household_size"
@@ -122,6 +126,10 @@ custom_summaries:
     group_by: "income_category"
     weight_field: "sample_rate"
     count_name: "households"
+    bins:
+      income_category:
+        breaks: [0, 30000, 60000, 100000, 150000, 1000000000]
+        labels: ['<30K', '30-60K', '60-100K', '100-150K', '150K+']
   
   # ==================== TOUR SUMMARIES ====================
   

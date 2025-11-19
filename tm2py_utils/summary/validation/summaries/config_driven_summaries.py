@@ -25,10 +25,20 @@ import numpy as np
 import logging
 from typing import Dict, List, Optional, Union, Any
 from pathlib import Path
+import yaml
 
 from .summary_utils import calculate_weighted_summary
 
 logger = logging.getLogger(__name__)
+
+
+# Load value mappings from data model
+def load_value_mappings() -> Dict[str, Dict]:
+    """Load value mappings from ctramp_data_model.yaml"""
+    config_path = Path(__file__).parent.parent / 'data_model' / 'ctramp_data_model.yaml'
+    with open(config_path, 'r') as f:
+        config = yaml.safe_load(f)
+    return config.get('value_mappings', {})
 
 
 class SummaryConfig:
@@ -114,10 +124,61 @@ def apply_filter(df: pd.DataFrame, filter_expr: str) -> pd.DataFrame:
         return df
 
 
+def apply_value_labels(df: pd.DataFrame, value_mappings: Dict[str, Dict]) -> pd.DataFrame:
+    """
+    Apply human-readable labels to categorical columns based on value mappings.
+    
+    For columns with numeric codes (like tour_mode, trip_mode), creates a new
+    column with '_name' suffix containing the human-readable labels.
+    
+    Args:
+        df: Input dataframe
+        value_mappings: Dictionary of value mappings from data model
+    
+    Returns:
+        DataFrame with additional label columns
+    """
+    df = df.copy()
+    
+    for col in df.columns:
+        # Check if this column has a mapping
+        mapping_key = col
+        
+        # Handle both 'tour_mode' and 'trip_mode' using 'transportation_mode' mapping
+        if col in ['tour_mode', 'trip_mode']:
+            mapping_key = 'transportation_mode'
+        
+        if mapping_key not in value_mappings:
+            continue
+        
+        mapping_spec = value_mappings[mapping_key]
+        
+        # Only apply if column contains numeric codes
+        if 'values' not in mapping_spec:
+            continue
+        
+        values_map = mapping_spec['values']
+        
+        # Convert keys to integers for mapping
+        values_map = {int(k): v for k, v in values_map.items()}
+        
+        # Create labeled column
+        label_col = f"{col}_name"
+        df[label_col] = df[col].map(values_map)
+        
+        # Fill any unmapped values with original
+        df[label_col] = df[label_col].fillna(df[col].astype(str))
+        
+        logger.info(f"  ✓ Applied labels to '{col}' → '{label_col}'")
+    
+    return df
+
+
 def generate_summary_from_config(
     config: SummaryConfig,
     data: pd.DataFrame,
-    dataset_name: str
+    dataset_name: str,
+    value_mappings: Optional[Dict[str, Dict]] = None
 ) -> Optional[pd.DataFrame]:
     """
     Generate a summary from a configuration specification.
@@ -126,6 +187,7 @@ def generate_summary_from_config(
         config: SummaryConfig object with summary specification
         data: Input dataframe (should match config.data_source)
         dataset_name: Name of the dataset for labeling
+        value_mappings: Optional value mappings for applying labels
     
     Returns:
         Summary DataFrame or None if generation fails
@@ -138,6 +200,11 @@ def generate_summary_from_config(
     
     # Make a copy to avoid modifying original
     df = data.copy()
+    
+    # Apply value labels first (before any transformations)
+    if value_mappings is None:
+        value_mappings = load_value_mappings()
+    df = apply_value_labels(df, value_mappings)
     
     # Apply binning if specified
     if config.bins:
@@ -158,24 +225,57 @@ def generate_summary_from_config(
             logger.warning(f"  ⚠ Filter resulted in empty dataset for {config.name}")
             return None
     
-    # Validate group columns exist
+    # Check if we should use labeled columns for grouping
+    # If a column like 'trip_mode' exists and 'trip_mode_name' was created, use the name
     group_cols = [config.group_by] if isinstance(config.group_by, str) else config.group_by
-    missing_cols = [col for col in group_cols if col not in df.columns]
+    group_cols_with_labels = []
+    for col in group_cols:
+        label_col = f"{col}_name"
+        if label_col in df.columns:
+            group_cols_with_labels.append(label_col)
+        else:
+            group_cols_with_labels.append(col)
+    
+    # Validate group columns exist
+    missing_cols = [col for col in group_cols_with_labels if col not in df.columns]
     if missing_cols:
         logger.error(f"  ✗ Missing columns in {config.data_source}: {missing_cols}")
         return None
     
-    # Generate summary using existing utility
+    # Generate summary using existing utility (use labeled columns)
     try:
+        # Also update share_within if it uses a labeled column
+        share_within = config.share_within
+        if share_within:
+            share_cols = [share_within] if isinstance(share_within, str) else share_within
+            share_cols_with_labels = []
+            for col in share_cols:
+                label_col = f"{col}_name"
+                if label_col in df.columns:
+                    share_cols_with_labels.append(label_col)
+                else:
+                    share_cols_with_labels.append(col)
+            share_within = share_cols_with_labels if len(share_cols_with_labels) > 1 else share_cols_with_labels[0] if share_cols_with_labels else None
+        
         summary = calculate_weighted_summary(
             df,
-            group_cols=config.group_by,
+            group_cols=group_cols_with_labels,
             weight_col=config.weight_field,
             count_col_name=config.count_name,
             calculate_share=True,
-            share_group_cols=config.share_within,
+            share_group_cols=share_within,
             additional_cols={'dataset': dataset_name}
         )
+        
+        # Rename labeled columns back to original names (trip_mode_name -> trip_mode)
+        rename_dict = {}
+        for col in summary.columns:
+            if col.endswith('_name'):
+                original = col.replace('_name', '')
+                rename_dict[col] = original
+        if rename_dict:
+            summary = summary.rename(columns=rename_dict)
+            logger.info(f"  ✓ Renamed label columns: {list(rename_dict.keys())}")
         
         logger.info(f"  ✓ Generated {config.name}: {len(summary)} rows")
         return summary
