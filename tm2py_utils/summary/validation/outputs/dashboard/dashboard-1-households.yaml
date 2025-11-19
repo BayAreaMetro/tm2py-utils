@@ -26,7 +26,7 @@ layout:
       dataset: auto_ownership_by_income.csv
       x: num_vehicles
       y: share
-      columns: income_category_bin
+      columns: income_category
       groupBy: dataset
     description: 'Share: households by vehicle ownership and income category'
   - type: bar
@@ -35,7 +35,7 @@ layout:
       dataset: auto_ownership_by_income.csv
       x: num_vehicles
       y: households
-      columns: income_category_bin
+      columns: income_category
       groupBy: dataset
     description: 'Total: households by vehicle ownership and income category'
   household_characteristics:
