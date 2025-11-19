@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 VARIABLE_LABELS = {}
 CATEGORICAL_ORDER = {}
 DATASET_ORDER = []
-variable_labels_path = Path(__file__).parent / "variable_labels.yaml"
+variable_labels_path = Path(__file__).parent.parent / "data_model" / "variable_labels.yaml"
 if variable_labels_path.exists():
     with open(variable_labels_path, 'r') as f:
         config = yaml.safe_load(f) or {}
@@ -30,7 +30,7 @@ if variable_labels_path.exists():
         CATEGORICAL_ORDER = config.get('categorical_order', {})
 
 # Load dataset order from validation config
-validation_config_path = Path(__file__).parent / "validation_config.yaml"
+validation_config_path = Path(__file__).parent.parent / "validation_config.yaml"
 if validation_config_path.exists():
     with open(validation_config_path, 'r') as f:
         validation_config = yaml.safe_load(f) or {}
@@ -477,7 +477,7 @@ def main():
     )
     
     # Banner image
-    banner_path = Path(__file__).parent / "outputs" / "dashboard" / "validation-app-banner.PNG"
+    banner_path = Path(__file__).parent.parent / "outputs" / "dashboard" / "validation-app-banner.PNG"
     if banner_path.exists():
         st.image(str(banner_path), use_container_width=True)
     
@@ -545,7 +545,7 @@ def main():
     st.sidebar.markdown("---")
     
     # Get validation directory
-    validation_dir = Path(__file__).parent
+    validation_dir = Path(__file__).parent.parent
     outputs_dir = validation_dir / "outputs"
     data_dir = outputs_dir / "dashboard"  # CSVs are in outputs/dashboard folder
     

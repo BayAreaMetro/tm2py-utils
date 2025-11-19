@@ -18,7 +18,7 @@ input_directories:
     iteration: 1  # Use iteration 1 files
 
 # Output location
-output_directory: "C:\\GitHub\\tm2py-utils\\tm2py_utils\\summary\\validation"
+output_directory: "C:\\GitHub\\tm2py-utils\\tm2py_utils\\summary\\validation\\outputs"
 
 # Dataset display order in charts (uses display_name if specified, otherwise name)
 # Datasets will appear in this order in all dashboard charts
@@ -28,15 +28,9 @@ dataset_order:
 
 # Summary generation settings
 summary_config:
-  # Which summaries to generate
-  # Available: auto_ownership, work_location, cdap, tour_frequency, tour_mode, tour_time, trip_mode
-  enabled_summaries:
-    - "auto_ownership"
-    - "work_location"
-    - "tour_frequency"
-    - "tour_mode"
-    - "tour_time"
-    - "trip_mode"
+  # Which hardcoded Python summaries to generate (DEPRECATED - use custom_summaries instead)
+  # Leave empty to use only config-driven summaries below
+  enabled_summaries: []
   
   # Geographic aggregation levels
   geographic_levels:
@@ -80,6 +74,184 @@ binning_specs:
 
 # File specifications (optional - defaults will be used if not specified)
 # Note: System will automatically find highest iteration number (e.g., _1.csv, _2.csv, etc.)
+
+# Custom summaries (configuration-driven, no Python coding required!)
+# Define custom summaries by specifying data source, groupings, and aggregations
+# These replace the hardcoded Python summary functions
+custom_summaries:
+  # ==================== HOUSEHOLD SUMMARIES ====================
+  
+  # Auto ownership - regional
+  - name: "auto_ownership_regional"
+    description: "Regional auto ownership distribution"
+    data_source: "households"
+    group_by: "num_vehicles"
+    weight_field: "sample_rate"
+    count_name: "households"
+  
+  # Auto ownership by income
+  - name: "auto_ownership_by_income"
+    description: "Auto ownership by income category"
+    data_source: "households"
+    group_by: ["income_category", "num_vehicles"]
+    weight_field: "sample_rate"
+    count_name: "households"
+    share_within: "income_category"
+  
+  # Auto ownership by household size
+  - name: "auto_ownership_by_household_size"
+    description: "Auto ownership by household size"
+    data_source: "households"
+    group_by: ["num_persons", "num_vehicles"]
+    weight_field: "sample_rate"
+    count_name: "households"
+    share_within: "num_persons"
+  
+  # Household size distribution
+  - name: "household_size_regional"
+    description: "Regional household size distribution"
+    data_source: "households"
+    group_by: "num_persons"
+    weight_field: "sample_rate"
+    count_name: "households"
+  
+  # Income distribution
+  - name: "income_distribution"
+    description: "Regional income distribution"
+    data_source: "households"
+    group_by: "income_category"
+    weight_field: "sample_rate"
+    count_name: "households"
+  
+  # ==================== TOUR SUMMARIES ====================
+  
+  # Tour frequency by purpose
+  - name: "tour_frequency_by_purpose"
+    description: "Tour frequency by purpose"
+    data_source: "individual_tours"
+    group_by: "tour_purpose"
+    weight_field: "sample_rate"
+    count_name: "tours"
+  
+  # Tour mode choice
+  - name: "tour_mode_choice"
+    description: "Tour mode choice distribution"
+    data_source: "individual_tours"
+    group_by: "tour_mode"
+    weight_field: "sample_rate"
+    count_name: "tours"
+  
+  # Tour mode by purpose (cross-tab)
+  - name: "tour_mode_by_purpose"
+    description: "Tour mode by purpose cross-tabulation"
+    data_source: "individual_tours"
+    group_by: ["tour_purpose", "tour_mode"]
+    weight_field: "sample_rate"
+    count_name: "tours"
+    share_within: "tour_purpose"
+  
+  # Tour start time
+  - name: "tour_start_time"
+    description: "Tour departure time distribution"
+    data_source: "individual_tours"
+    group_by: "start_period"
+    weight_field: "sample_rate"
+    count_name: "tours"
+  
+  # Tour end time
+  - name: "tour_end_time"
+    description: "Tour arrival time distribution"
+    data_source: "individual_tours"
+    group_by: "end_period"
+    weight_field: "sample_rate"
+    count_name: "tours"
+  
+  # Tour distance
+  - name: "tour_distance"
+    description: "Tour distance distribution"
+    data_source: "individual_tours"
+    group_by: "tour_distance"
+    weight_field: "sample_rate"
+    count_name: "tours"
+    bins:
+      tour_distance:
+        breaks: [0, 5, 10, 20, 50, 999]
+        labels: ["0-5mi", "5-10mi", "10-20mi", "20-50mi", "50+mi"]
+  
+  # Tour duration
+  - name: "tour_duration"
+    description: "Tour duration distribution"
+    data_source: "individual_tours"
+    group_by: "tour_duration"
+    weight_field: "sample_rate"
+    count_name: "tours"
+    bins:
+      tour_duration:
+        breaks: [0, 60, 120, 240, 480, 9999]
+        labels: ["<1hr", "1-2hr", "2-4hr", "4-8hr", "8+hr"]
+  
+  # ==================== TRIP SUMMARIES ====================
+  
+  # Trip mode choice
+  - name: "trip_mode_choice"
+    description: "Trip mode choice distribution"
+    data_source: "individual_trips"
+    group_by: "trip_mode"
+    weight_field: "sample_rate"
+    count_name: "trips"
+  
+  # Trip purpose
+  - name: "trip_purpose"
+    description: "Trip purpose distribution"
+    data_source: "individual_trips"
+    group_by: "destination_purpose"
+    weight_field: "sample_rate"
+    count_name: "trips"
+  
+  # Trip mode by purpose (cross-tab)
+  - name: "trip_mode_by_purpose"
+    description: "Trip mode by purpose cross-tabulation"
+    data_source: "individual_trips"
+    group_by: ["destination_purpose", "trip_mode"]
+    weight_field: "sample_rate"
+    count_name: "trips"
+    share_within: "destination_purpose"
+  
+  # Trip departure time
+  - name: "trip_departure_time"
+    description: "Trip departure time distribution"
+    data_source: "individual_trips"
+    group_by: "depart_period"
+    weight_field: "sample_rate"
+    count_name: "trips"
+  
+  # Trip distance
+  - name: "trip_distance"
+    description: "Trip distance distribution"
+    data_source: "individual_trips"
+    group_by: "trip_distance"
+    weight_field: "sample_rate"
+    count_name: "trips"
+    bins:
+      trip_distance:
+        breaks: [0, 1, 3, 5, 10, 20, 999]
+        labels: ["0-1mi", "1-3mi", "3-5mi", "5-10mi", "10-20mi", "20+mi"]
+  
+  # Trip duration
+  - name: "trip_duration"
+    description: "Trip duration distribution"
+    data_source: "individual_trips"
+    group_by: "trip_duration"
+    weight_field: "sample_rate"
+    count_name: "trips"
+    bins:
+      trip_duration:
+        breaks: [0, 10, 20, 30, 60, 9999]
+        labels: ["0-10min", "10-20min", "20-30min", "30-60min", "60+min"]
+  
+  # ==================== WORKER SUMMARIES ====================
+  # Note: Worker summaries require custom column mappings
+  # and are still handled by worker_summary.py
 
 # Logging configuration
 logging:

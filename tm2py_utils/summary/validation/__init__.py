@@ -1,21 +1,14 @@
 """
-Validation Summary Package
+TM2.2 Validation System
 
-Modular summary generation functions organized by data level:
-- household_summary: Auto ownership, household size, income distribution
-- worker_summary: Work location, telecommuting, worker demographics  
-- tour_summary: Tour frequency, mode choice, timing patterns
-- trip_summary: Trip mode, purpose, distance, and generation patterns
+Organized validation framework for comparing multiple TM2.2 model runs.
 
-Each module provides:
-- Individual summary functions for specific analyses
-- generate_all_*_summaries() function for complete analysis at that level
+Structure:
+- summaries/: Summary generation code
+- data_model/: Data model configuration and column mappings
+- dashboard/: Interactive Streamlit dashboard
+- outputs/: Generated summary files and dashboard data
 """
-
-from . import household_summary
-from . import worker_summary
-from . import tour_summary
-from . import trip_summary
 
 __all__ = [
     'household_summary',
