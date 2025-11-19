@@ -10,23 +10,44 @@ input_directories:
     source_type: "model"
     description: "2023 TM2.2 Development Version 05"
     iteration: 1  # Use iteration 1 files
-    # available_tables: ["households", "persons", "individual_tours", "individual_trips"]  # Optional: specify which tables exist
+  
   - path: "A:\\2015-tm22-dev-sprint-04\\ctramp_output"
     name: "2015_sprint_04"
     display_name: "2015 TM2.2 Sprint 04"
     source_type: "model"
     description: "2015 TM2.2 Development Sprint 04"
     iteration: 1  # Use iteration 1 files
-    # available_tables: ["households", "persons", "individual_tours", "individual_trips"]  # Optional: specify which tables exist
-  
-  # Example: Survey/observed data with partial tables
-  # - path: "C:\\Data\\ACS_2019"
-  #   name: "acs_2019"
+
+# Pre-aggregated summary data (surveys, observed data, validation targets)
+# Use this for data that's already summarized (e.g., ACS tables, BATS summaries)
+observed_summaries:
+  # Example: ACS household data
+  # - name: "acs_2019"
   #   display_name: "ACS 2019"
-  #   source_type: "observed"
-  #   description: "American Community Survey 2019"
-  #   available_tables: ["households"]  # Only household data available from ACS
-  #   # Summaries will only be generated for tables listed in available_tables
+  #   summaries:
+  #     auto_ownership_regional:
+  #       file: "C:\\Data\\ACS_2019\\auto_ownership.csv"
+  #       columns:
+  #         num_vehicles: "Vehicles"
+  #         households: "Households"
+  #         share: "Percentage"
+  #     household_size_regional:
+  #       file: "C:\\Data\\ACS_2019\\household_size.csv"
+  #       columns:
+  #         household_size: "HH_Size"
+  #         households: "Count"
+  #         share: "Percent"
+  # 
+  # Example: BATS transit mode share
+  # - name: "bats_2018"
+  #   display_name: "BATS 2018"
+  #   summaries:
+  #     trip_mode_choice:
+  #       file: "C:\\Data\\BATS_2018\\mode_share.csv"
+  #       columns:
+  #         trip_mode: "Mode"
+  #         trips: "Trips"
+  #         share: "Share"
 
 # Output location
 output_directory: "C:\\GitHub\\tm2py-utils\\tm2py_utils\\summary\\validation\\outputs"

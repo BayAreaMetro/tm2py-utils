@@ -148,6 +148,16 @@ class SummaryConfig(BaseModel):
     comparison_mode: str = Field(default="survey_vs_model")  # or "scenario_vs_scenario"
 
 
+class ObservedSummary(BaseModel):
+    """Configuration for a pre-aggregated observed/survey summary."""
+    name: str
+    display_name: str
+    summaries: Dict[str, Dict[str, Any]]  # summary_name -> {file, columns}
+    
+    class Config:
+        arbitrary_types_allowed = True
+
+
 class RunConfig(BaseModel):
     """Main configuration for the summary run."""
     input_directories: List[InputDirectory]
@@ -157,6 +167,7 @@ class RunConfig(BaseModel):
     column_mapping: ColumnMapping = Field(default_factory=ColumnMapping)
     output_config: OutputConfig = Field(default_factory=OutputConfig)
     binning_specs: Dict[str, BinningSpec] = Field(default_factory=dict)
+    observed_summaries: List[ObservedSummary] = Field(default_factory=list)
     
     class Config:
         arbitrary_types_allowed = True
@@ -329,6 +340,55 @@ class DataLoader:
         # Cache the loaded data
         self.data_cache[input_dir.name] = loaded_data
         return loaded_data
+    
+    def load_observed_summaries(self, observed_config: ObservedSummary) -> Dict[str, pd.DataFrame]:
+        """
+        Load pre-aggregated summary data from survey/observed sources.
+        
+        Args:
+            observed_config: Configuration specifying summary files and column mappings
+            
+        Returns:
+            Dictionary mapping summary names to DataFrames with standardized columns
+        """
+        logger.info(f"Loading pre-aggregated summaries from {observed_config.name}: {observed_config.display_name}")
+        
+        loaded_summaries = {}
+        
+        for summary_name, summary_spec in observed_config.summaries.items():
+            file_path = Path(summary_spec['file'])
+            
+            if not file_path.exists():
+                logger.warning(f"  ⚠ Summary file not found: {file_path}")
+                continue
+            
+            try:
+                # Load the CSV
+                df = pd.read_csv(file_path)
+                
+                # Apply column renaming if specified
+                if 'columns' in summary_spec:
+                    column_map = summary_spec['columns']
+                    # Rename columns: {standard_name: csv_column_name} -> {csv_column_name: standard_name}
+                    reverse_map = {v: k for k, v in column_map.items() if v in df.columns}
+                    if reverse_map:
+                        df = df.rename(columns=reverse_map)
+                        logger.info(f"    → Mapped {len(reverse_map)} columns")
+                
+                # Add dataset identifier
+                df['dataset'] = observed_config.display_name
+                
+                # Store with dataset-specific key
+                summary_key = f"{summary_name}_{observed_config.name}"
+                loaded_summaries[summary_key] = df
+                
+                logger.info(f"  ✓ Loaded {summary_name}: {len(df):,} rows from {file_path.name}")
+                
+            except Exception as e:
+                logger.error(f"  ✗ Error loading {summary_name}: {e}")
+                continue
+        
+        return loaded_summaries
     
     def validate_data_consistency(self, data: Dict[str, pd.DataFrame]) -> bool:
         """Validate relationships between loaded data tables."""
@@ -766,11 +826,30 @@ def main():
             logger.error("No datasets successfully loaded. Exiting.")
             sys.exit(1)
         
-        # Generate summaries
+        # Generate summaries from model outputs
         summaries = summary_generator.generate_all_summaries(all_datasets)
         
         if not summaries:
-            logger.warning("No summaries generated")
+            logger.warning("No summaries generated from model outputs")
+        
+        # Load and merge observed summaries (pre-aggregated survey/ACS data)
+        if config.observed_summaries:
+            logger.info(f"Loading {len(config.observed_summaries)} observed datasets...")
+            for observed_config in config.observed_summaries:
+                try:
+                    observed_sums = data_loader.load_observed_summaries(observed_config)
+                    logger.info(f"Loaded {len(observed_sums)} summaries from {observed_config.display_name}")
+                    summaries.update(observed_sums)
+                    
+                    # Add to display name mapping for dashboards
+                    dataset_display_names[observed_config.name] = observed_config.display_name
+                    
+                except Exception as e:
+                    logger.error(f"Failed to load observed summaries from {observed_config.name}: {e}")
+                    continue
+        
+        if not summaries:
+            logger.error("No summaries available (neither model nor observed). Exiting.")
             sys.exit(1)
         
         # Save results with output configuration

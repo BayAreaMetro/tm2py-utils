@@ -50,20 +50,56 @@ datasets:
     source_type: "model"
     iteration: 1
   
-  # Partial dataset (e.g., ACS survey data with only household info)
-  acs_2019:
-    path: "C:/Data/ACS_2019"
-    name: "acs_2019"
-    display_name: "ACS 2019"
-    source_type: "observed"
-    available_tables: ["households"]  # Only load household data
 ```
 
-**For partial datasets:**
-- Use `available_tables` to specify which data tables exist
-- Valid table names: `households`, `persons`, `individual_tours`, `individual_trips`, `workplace_school`, `joint_tours`, `joint_trips`
-- Summaries requiring unavailable tables will be automatically skipped
-- Perfect for comparing model output against survey data (ACS, CTPP, BATS, etc.)
+### Loading Pre-Aggregated Observed Data (Survey/ACS)
+
+If you have **pre-aggregated summary tables** from surveys (ACS, BATS, CTPP) instead of raw records, use `observed_summaries`:
+
+```yaml
+observed_summaries:
+  # ACS 2019 household data
+  - name: "acs_2019"
+    display_name: "ACS 2019"
+    summaries:
+      # Auto ownership summary
+      auto_ownership_regional:
+        file: "C:\\Data\\ACS_2019\\auto_ownership.csv"
+        columns:
+          num_vehicles: "Vehicles"      # Map CSV column "Vehicles" to standard "num_vehicles"
+          households: "Households"
+          share: "Percentage"
+      
+      # Household size summary  
+      household_size_regional:
+        file: "C:\\Data\\ACS_2019\\household_size.csv"
+        columns:
+          household_size: "HH_Size"
+          households: "Count"
+          share: "Pct"
+  
+  # BATS 2018 travel survey
+  - name: "bats_2018"
+    display_name: "BATS 2018"
+    summaries:
+      trip_mode_choice:
+        file: "C:\\Data\\BATS_2018\\trip_modes.csv"
+        columns:
+          trip_mode: "Mode"
+          trips: "Count"
+          share: "Share"
+```
+
+**Key points:**
+- Each summary file is a CSV with columns matching the standard summary output
+- Use `columns` mapping to rename CSV columns to match expected names (e.g., `Vehicles` → `num_vehicles`)
+- Summary names (e.g., `auto_ownership_regional`) must match model-generated summary names to appear on same chart
+- The framework automatically adds the dataset identifier to enable model vs observed comparisons
+
+**Required CSV format:**
+- Pre-aggregated data (one row per category)
+- Standard columns: group_by columns (e.g., `num_vehicles`, `trip_mode`), count columns (e.g., `households`, `trips`), `share` column
+- No need for individual records or sample rates - data is already aggregated
 
 ### 2. Generate Summaries
 
