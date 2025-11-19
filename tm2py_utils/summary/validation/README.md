@@ -42,11 +42,28 @@ Edit `validation_config.yaml` to add a dataset (model output or validation/surve
 
 ```yaml
 datasets:
+  # Full model output with all tables
   my_new_dataset:
-    name: "2024 TM2.2 v06"          # Display name
-    path: "A:/path/to/ctramp_output"  # Path to model output or validation data
-    sample_rate: 0.01  # For model: sample rate; For survey: expansion factor
+    path: "A:/path/to/ctramp_output"
+    name: "2024_version_06"
+    display_name: "2024 TM2.2 v06"
+    source_type: "model"
+    iteration: 1
+  
+  # Partial dataset (e.g., ACS survey data with only household info)
+  acs_2019:
+    path: "C:/Data/ACS_2019"
+    name: "acs_2019"
+    display_name: "ACS 2019"
+    source_type: "observed"
+    available_tables: ["households"]  # Only load household data
 ```
+
+**For partial datasets:**
+- Use `available_tables` to specify which data tables exist
+- Valid table names: `households`, `persons`, `individual_tours`, `individual_trips`, `workplace_school`, `joint_tours`, `joint_trips`
+- Summaries requiring unavailable tables will be automatically skipped
+- Perfect for comparing model output against survey data (ACS, CTPP, BATS, etc.)
 
 ### 2. Generate Summaries
 

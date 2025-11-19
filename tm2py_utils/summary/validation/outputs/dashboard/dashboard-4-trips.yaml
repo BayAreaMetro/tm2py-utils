@@ -1,7 +1,7 @@
 header:
   tab: Trips
-  title: Trip Summary Statistics
-  description: Trip mode choice, purpose, distance, and duration (multi-dataset comparison)
+  title: Trip Pattern Statistics
+  description: Trip mode choice, purpose, distance, and duration (multi-run comparison)
 layout:
   trip_patterns:
   - type: bar

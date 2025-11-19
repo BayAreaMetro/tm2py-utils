@@ -10,12 +10,23 @@ input_directories:
     source_type: "model"
     description: "2023 TM2.2 Development Version 05"
     iteration: 1  # Use iteration 1 files
+    # available_tables: ["households", "persons", "individual_tours", "individual_trips"]  # Optional: specify which tables exist
   - path: "A:\\2015-tm22-dev-sprint-04\\ctramp_output"
     name: "2015_sprint_04"
     display_name: "2015 TM2.2 Sprint 04"
     source_type: "model"
     description: "2015 TM2.2 Development Sprint 04"
     iteration: 1  # Use iteration 1 files
+    # available_tables: ["households", "persons", "individual_tours", "individual_trips"]  # Optional: specify which tables exist
+  
+  # Example: Survey/observed data with partial tables
+  # - path: "C:\\Data\\ACS_2019"
+  #   name: "acs_2019"
+  #   display_name: "ACS 2019"
+  #   source_type: "observed"
+  #   description: "American Community Survey 2019"
+  #   available_tables: ["households"]  # Only household data available from ACS
+  #   # Summaries will only be generated for tables listed in available_tables
 
 # Output location
 output_directory: "C:\\GitHub\\tm2py-utils\\tm2py_utils\\summary\\validation\\outputs"

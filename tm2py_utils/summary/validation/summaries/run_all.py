@@ -99,6 +99,7 @@ class InputDirectory(BaseModel):
     description: str = ""
     iteration: Optional[int] = None  # Specific iteration to load (e.g., 1 for _1.csv), None = highest
     display_name: Optional[str] = None  # Human-readable label for dashboards (defaults to name)
+    available_tables: Optional[List[str]] = None  # Optional: limit which tables to load (e.g., ["households"] for ACS data)
     
     class Config:
         arbitrary_types_allowed = True
@@ -283,6 +284,11 @@ class DataLoader:
         
         # Load each file type
         for file_type, file_spec in self.file_specs.dict().items():
+            # Skip if available_tables is specified and this table is not in the list
+            if input_dir.available_tables is not None and file_type not in input_dir.available_tables:
+                logger.info(f"  ⊘ Skipping {file_type} (not in available_tables for {input_dir.name})")
+                continue
+            
             # Find the file with specified or highest iteration number
             file_path = self._find_iteration_file(input_dir.path, file_spec.filename, input_dir.iteration)
             
