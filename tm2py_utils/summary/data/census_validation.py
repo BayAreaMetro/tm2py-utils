@@ -47,7 +47,8 @@ for table_name, table_id in table_ids.items():
     table_variables = variables_df[variables_df['group'] == table_id]
     variable_dict = table_variables['label'].to_dict()
     table = table.rename(columns = variable_dict)
-    table = table.T
+    table = table.set_index('county').T
+    table['Bay Area'] = table.sum(axis = 1)
     table.to_csv(f'2023_{table_name}_acs1.csv', index = True)
 
 # IPUMS
