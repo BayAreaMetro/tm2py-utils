@@ -29,6 +29,10 @@ table_ids = {
 year = 2023
 
 variables = census.pull_acs_variables_dict(year = 2023, acs_type='acs1')
+variables_df = pd.DataFrame.from_dict(variables['variables'],orient= 'index')
+variables_df['label'] = variables_df['label'].str.replace("Estimate!!", "")
+variables_df['label'] = variables_df['label'].str.replace("!!", " ")
+
 
 #%%
 
@@ -40,8 +44,12 @@ for table_name, table_id in table_ids.items():
         geography_level = "county"
     )
     ## Rename column names from label to concept
+    table_variables = variables_df[variables_df['group'] == table_id]
+    variable_dict = table_variables['label'].to_dict()
+    table = table.rename(columns = variable_dict)
+    table = table.T
+    table.to_csv(f'2023_{table_name}_acs1.csv', index = True)
 
-    # print(table.columns)
-    # print(table.head())
-    table.T
-    table.to_csv(f'2023_{table_name}_acs1.csv', index = False)
+# IPUMS
+
+# %%
