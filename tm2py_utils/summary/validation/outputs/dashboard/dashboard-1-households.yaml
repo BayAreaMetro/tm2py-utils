@@ -25,7 +25,7 @@ layout:
     title: Households by Size - Share
     props:
       dataset: household_size_regional.csv
-      x: household_size
+      x: num_persons
       y: share
       groupBy: dataset
     description: 'Share: households by size'
@@ -33,7 +33,7 @@ layout:
     title: Households by Size - Total
     props:
       dataset: household_size_regional.csv
-      x: household_size
+      x: num_persons
       y: households
       groupBy: dataset
     description: 'Total: households by size'
