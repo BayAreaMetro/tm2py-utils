@@ -5,11 +5,13 @@ household_size_regional_2023 TM2.2 v05,household_size_regional_2023 TM2.2 v05.cs
 income_distribution_2023 TM2.2 v05,income_distribution_2023 TM2.2 v05.csv,5,4,Summary table: income_distribution_2023 TM2.2 v05
 tour_frequency_by_purpose_2023 TM2.2 v05,tour_frequency_by_purpose_2023 TM2.2 v05.csv,10,4,Summary table: tour_frequency_by_purpose_2023 TM2.2 v05
 tour_mode_choice_2023 TM2.2 v05,tour_mode_choice_2023 TM2.2 v05.csv,17,4,Summary table: tour_mode_choice_2023 TM2.2 v05
+tour_mode_choice_aggregated_2023 TM2.2 v05,tour_mode_choice_aggregated_2023 TM2.2 v05.csv,6,4,Summary table: tour_mode_choice_aggregated_2023 TM2.2 v05
 tour_mode_by_purpose_2023 TM2.2 v05,tour_mode_by_purpose_2023 TM2.2 v05.csv,142,5,Summary table: tour_mode_by_purpose_2023 TM2.2 v05
 tour_start_time_2023 TM2.2 v05,tour_start_time_2023 TM2.2 v05.csv,40,4,Summary table: tour_start_time_2023 TM2.2 v05
 tour_end_time_2023 TM2.2 v05,tour_end_time_2023 TM2.2 v05.csv,40,4,Summary table: tour_end_time_2023 TM2.2 v05
 tour_distance_2023 TM2.2 v05,tour_distance_2023 TM2.2 v05.csv,5,4,Summary table: tour_distance_2023 TM2.2 v05
 trip_mode_choice_2023 TM2.2 v05,trip_mode_choice_2023 TM2.2 v05.csv,17,4,Summary table: trip_mode_choice_2023 TM2.2 v05
+trip_mode_choice_aggregated_2023 TM2.2 v05,trip_mode_choice_aggregated_2023 TM2.2 v05.csv,6,4,Summary table: trip_mode_choice_aggregated_2023 TM2.2 v05
 trip_purpose_2023 TM2.2 v05,trip_purpose_2023 TM2.2 v05.csv,12,4,Summary table: trip_purpose_2023 TM2.2 v05
 trip_mode_by_purpose_2023 TM2.2 v05,trip_mode_by_purpose_2023 TM2.2 v05.csv,167,5,Summary table: trip_mode_by_purpose_2023 TM2.2 v05
 trip_distance_2023 TM2.2 v05,trip_distance_2023 TM2.2 v05.csv,6,4,Summary table: trip_distance_2023 TM2.2 v05
@@ -19,11 +21,13 @@ household_size_regional_2015 TM2.2 Sprint 04,household_size_regional_2015 TM2.2 
 income_distribution_2015 TM2.2 Sprint 04,income_distribution_2015 TM2.2 Sprint 04.csv,5,4,Summary table: income_distribution_2015 TM2.2 Sprint 04
 tour_frequency_by_purpose_2015 TM2.2 Sprint 04,tour_frequency_by_purpose_2015 TM2.2 Sprint 04.csv,10,4,Summary table: tour_frequency_by_purpose_2015 TM2.2 Sprint 04
 tour_mode_choice_2015 TM2.2 Sprint 04,tour_mode_choice_2015 TM2.2 Sprint 04.csv,17,4,Summary table: tour_mode_choice_2015 TM2.2 Sprint 04
+tour_mode_choice_aggregated_2015 TM2.2 Sprint 04,tour_mode_choice_aggregated_2015 TM2.2 Sprint 04.csv,6,4,Summary table: tour_mode_choice_aggregated_2015 TM2.2 Sprint 04
 tour_mode_by_purpose_2015 TM2.2 Sprint 04,tour_mode_by_purpose_2015 TM2.2 Sprint 04.csv,150,5,Summary table: tour_mode_by_purpose_2015 TM2.2 Sprint 04
 tour_start_time_2015 TM2.2 Sprint 04,tour_start_time_2015 TM2.2 Sprint 04.csv,40,4,Summary table: tour_start_time_2015 TM2.2 Sprint 04
 tour_end_time_2015 TM2.2 Sprint 04,tour_end_time_2015 TM2.2 Sprint 04.csv,40,4,Summary table: tour_end_time_2015 TM2.2 Sprint 04
 tour_distance_2015 TM2.2 Sprint 04,tour_distance_2015 TM2.2 Sprint 04.csv,5,4,Summary table: tour_distance_2015 TM2.2 Sprint 04
 trip_mode_choice_2015 TM2.2 Sprint 04,trip_mode_choice_2015 TM2.2 Sprint 04.csv,17,4,Summary table: trip_mode_choice_2015 TM2.2 Sprint 04
+trip_mode_choice_aggregated_2015 TM2.2 Sprint 04,trip_mode_choice_aggregated_2015 TM2.2 Sprint 04.csv,6,4,Summary table: trip_mode_choice_aggregated_2015 TM2.2 Sprint 04
 trip_purpose_2015 TM2.2 Sprint 04,trip_purpose_2015 TM2.2 Sprint 04.csv,12,4,Summary table: trip_purpose_2015 TM2.2 Sprint 04
 trip_mode_by_purpose_2015 TM2.2 Sprint 04,trip_mode_by_purpose_2015 TM2.2 Sprint 04.csv,177,5,Summary table: trip_mode_by_purpose_2015 TM2.2 Sprint 04
 trip_distance_2015 TM2.2 Sprint 04,trip_distance_2015 TM2.2 Sprint 04.csv,6,4,Summary table: trip_distance_2015 TM2.2 Sprint 04

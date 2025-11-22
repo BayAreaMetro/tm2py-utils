@@ -20,7 +20,7 @@ input_directories:
 
 # Pre-aggregated summary data (surveys, observed data, validation targets)
 # Use this for data that's already summarized (e.g., ACS tables, BATS summaries)
-observed_summaries:
+observed_summaries: []
   # Example: ACS household data
   # - name: "acs_2019"
   #   display_name: "ACS 2019"
@@ -181,6 +181,14 @@ custom_summaries:
     weight_field: "sample_rate"
     count_name: "tours"
   
+  # Tour mode choice (aggregated/simplified)
+  - name: "tour_mode_choice_aggregated"
+    description: "Tour mode choice (simplified categories)"
+    data_source: "individual_tours"
+    group_by: "tour_mode_agg"
+    weight_field: "sample_rate"
+    count_name: "tours"
+  
   # Tour mode by purpose (cross-tab)
   - name: "tour_mode_by_purpose"
     description: "Tour mode by purpose cross-tabulation"
@@ -237,6 +245,14 @@ custom_summaries:
     description: "Trip mode choice distribution"
     data_source: "individual_trips"
     group_by: "trip_mode"
+    weight_field: "sample_rate"
+    count_name: "trips"
+  
+  # Trip mode choice (aggregated/simplified)
+  - name: "trip_mode_choice_aggregated"
+    description: "Trip mode choice (simplified categories)"
+    data_source: "individual_trips"
+    group_by: "trip_mode_agg"
     weight_field: "sample_rate"
     count_name: "trips"
   
