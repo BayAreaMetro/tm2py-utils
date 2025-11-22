@@ -222,3 +222,9 @@ def get_enrollment_maz(write=False):
         OUT_FILE = r"E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-version-05\landuse\enrollment_maz_2023_v1.csv"
         enroll_maz.to_csv(OUT_FILE)        
     return enroll_maz
+
+def main():
+    enroll_maz = get_enrollment_maz()
+
+if __name__ == "__main__":
+    main()
