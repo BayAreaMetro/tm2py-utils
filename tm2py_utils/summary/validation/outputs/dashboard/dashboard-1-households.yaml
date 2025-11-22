@@ -1,0 +1,48 @@
+header:
+  tab: Households
+  title: Household Summary Statistics
+  description: Household demographics and auto ownership patterns (multi-run comparison)
+layout:
+  auto_ownership:
+  - type: bar
+    title: Households by Vehicle Ownership - Share
+    props:
+      dataset: auto_ownership_regional.csv
+      x: num_vehicles
+      y: share
+      groupBy: dataset
+    description: 'Share: households by number of vehicles owned'
+  - type: bar
+    title: Households by Vehicle Ownership - Total
+    props:
+      dataset: auto_ownership_regional.csv
+      x: num_vehicles
+      y: households
+      groupBy: dataset
+    description: 'Total: households by number of vehicles owned'
+  household_characteristics:
+  - type: bar
+    title: Auto Ownership by Household Size - Share
+    props:
+      dataset: auto_ownership_by_household_size.csv
+      x: num_vehicles
+      y: share
+      columns: num_persons
+      groupBy: dataset
+    description: 'Share: vehicle ownership by household size'
+  - type: bar
+    title: Households by Size - Share
+    props:
+      dataset: household_size_regional.csv
+      x: num_persons
+      y: share
+      groupBy: dataset
+    description: 'Share: households by size'
+  - type: bar
+    title: Households by Size - Total
+    props:
+      dataset: household_size_regional.csv
+      x: num_persons
+      y: households
+      groupBy: dataset
+    description: 'Total: households by size'

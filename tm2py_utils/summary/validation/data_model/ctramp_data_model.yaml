@@ -1,0 +1,1073 @@
+# Complete Data Model Configuration for Activity-Based Model Validation
+# This file defines the entire data model separate from code
+# Customize this for your specific ABM implementation
+
+# ==============================================================================
+# INPUT SCHEMA - Define what your actual CSV files look like
+# ==============================================================================
+input_schema:
+  # Person file schema
+  # Source: https://bayareametro.github.io/tm2py/ctramp-outputs/person/
+  persons:
+    file_pattern: "personData_{iteration}.csv"  # {iteration} will find highest number
+    columns:
+      # Required columns with their actual names in your files
+      required:
+        household_id: "hh_id"        # Household identifier (foreign key)
+        person_id: "person_id"       # Unique person identifier across all households
+        person_number: "person_num"  # Person number within household (1 to size)
+        age: "age"                   # Person's age in years
+        gender: "gender"             # Gender (1=Male, 2=Female)
+        person_type: "type"          # Person type (1-8: see person_type value mapping)
+      
+      # Optional columns your model might have
+      optional:
+        value_of_time: "value_of_time"           # Value of time in $/hour
+        transit_subsidy_choice: "transit_subsidy_choice"  # Transit subsidy selected (0/1)
+        transit_subsidy_percent: "transit_subsidy_percent"  # Percent subsidy (0-100)
+        transit_pass_choice: "transit_pass_choice"  # Transit pass type selected
+        reimb_pct: "reimb_pct"                   # Reimbursement percentage for work travel
+        naics_code: "naicsCode"                  # NAICS industry code for workplace
+        pre_telecommute_cdap: "preTelecommuteCdap"  # CDAP before telecommute choice
+        telecommute: "telecommute"               # Telecommute frequency choice
+        cdap: "cdap"                             # Coordinated Daily Activity Pattern
+        work_dc_logsum: "workDCLogsum"           # Work destination choice logsum
+        school_dc_logsum: "schoolDCLogsum"       # School destination choice logsum
+        imf_choice: "imf_choice"                 # Individual Maintenance Tour frequency
+        inmf_choice: "inmf_choice"               # Individual Non-Maintenance Tour frequency
+        free_parking_choice: "fp_choice"         # Free parking at work (0/1)
+        sample_rate: "sampleRate"                # Sampling expansion factor
+  
+  # Workplace and School Location file schema
+  # Source: https://bayareametro.github.io/tm2py/ctramp-outputs/workplace-school-location/
+  workplace_school_location:
+    file_pattern: "wsLocResults.csv"
+    columns:
+      required:
+        household_id: "HHID"                     # Household identifier
+        home_mgra: "HomeMGRA"                    # Home location MGRA
+        income: "Income"                         # Household income in dollars
+        person_id: "PersonID"                    # Person identifier
+        person_number: "PersonNum"               # Person number within household
+        person_type: "PersonType"                # Person type classification (1-8)
+        person_age: "PersonAge"                  # Person age in years
+        employment_category: "EmploymentCategory" # Employment status (1-4)
+        student_category: "StudentCategory"      # Student status (1-4)
+      optional:
+        work_segment: "WorkSegment"              # Work location choice market segment (1-4, -1 for non-workers)
+        school_segment: "SchoolSegment"          # School location choice market segment (1-3, -1 for non-students)
+        work_location: "WorkLocation"            # Chosen work location MGRA (0 if no work)
+        work_location_distance: "WorkLocationDistance"  # Home to work distance in miles
+        work_location_logsum: "WorkLocationLogsum"      # Work location choice logsum (-999.0 for non-workers)
+        school_location: "SchoolLocation"        # Chosen school location MGRA (0 if no school)
+        school_location_distance: "SchoolLocationDistance"  # Home to school distance in miles
+        school_location_logsum: "SchoolLocationLogsum"    # School location choice logsum (-999.0 for non-students)
+  
+  # Household file schema
+  # Source: https://bayareametro.github.io/tm2py/ctramp-outputs/household/
+  households:
+    file_pattern: "householdData_{iteration}.csv"
+    columns:
+      required:
+        household_id: "hh_id"              # Unique household identifier
+        home_mgra: "home_mgra"             # Home location MGRA (Micro Analysis Zone)
+        income_category: "income"          # Income category (1-4)
+        num_vehicles: "autos"              # Number of vehicles owned (0-6+)
+        num_persons: "size"                # Household size (1-15 persons)
+        num_workers: "workers"             # Number of workers (0 to size)
+        sample_rate: "sampleRate"          # Sample expansion factor
+      optional:
+        automated_vehicles: "automated_vehicles"  # Number of autonomous vehicles
+        transponder: "transponder"                # Has toll transponder (0/1)
+        pre_et_cdap_pattern: "pre_et_cdap_pattern"  # Pre-employment/transit CDAP
+        cdap_pattern: "cdap_pattern"              # Coordinated Daily Activity Pattern
+        jtf_choice: "jtf_choice"                  # Joint tour frequency choice
+  
+  # Tour file schema
+  # Source: https://bayareametro.github.io/tm2py/ctramp-outputs/individual-tours/
+  individual_tours:
+    file_pattern: "indivTourData_{iteration}.csv"
+    columns:
+      # Core identification and classification fields (9 required)
+      required:
+        household_id: "hh_id"                    # Household identifier
+        person_id: "person_id"                   # Unique person identifier
+        person_number: "person_num"              # Person number within household
+        person_type: "person_type"               # Person type classification (1-8)
+        tour_id: "tour_id"                       # Tour sequence number for this person
+        tour_category: "tour_category"           # MANDATORY, INDIVIDUAL_NON_MANDATORY, or AT_WORK
+        tour_purpose: "tour_purpose"             # Specific purpose (Work, School, Shop, etc.)
+        start_period: "start_period"             # Tour departure time period (1-48)
+        end_period: "end_period"                 # Tour arrival time period (1-48)
+      
+      # Spatial and travel attributes (11 optional)
+      optional:
+        origin_mgra: "orig_mgra"                 # Origin MGRA (home or workplace)
+        destination_mgra: "dest_mgra"            # Destination MGRA
+        tour_mode: "tour_mode"                   # Primary tour mode (1-17)
+        tour_distance: "tour_distance"           # Total round-trip distance in miles
+        tour_time: "tour_time"                   # Total round-trip time in minutes
+        num_ob_stops: "num_ob_stops"             # Number of outbound stops (0-3)
+        num_ib_stops: "num_ib_stops"             # Number of inbound stops (0-3)
+        atwork_freq: "atWork_freq"               # At-work subtour frequency (0-3)
+        dest_choice_logsum: "dcLogsum"           # Destination choice logsum
+        sample_rate: "sampleRate"                # Household sampling rate
+        av_available: "avAvailable"              # Autonomous vehicle available (0/1)
+        
+        # Mode choice utilities (17 optional fields: util_1 to util_17)
+        util_1: "util_1"                         # SOV_GP utility
+        util_2: "util_2"                         # SOV_PAY utility
+        util_3: "util_3"                         # SR2_GP utility
+        util_4: "util_4"                         # SR2_HOV utility
+        util_5: "util_5"                         # SR2_PAY utility
+        util_6: "util_6"                         # SR3_GP utility
+        util_7: "util_7"                         # SR3_HOV utility
+        util_8: "util_8"                         # SR3_PAY utility
+        util_9: "util_9"                         # WALK utility
+        util_10: "util_10"                       # BIKE utility
+        util_11: "util_11"                       # WLK_TRN utility
+        util_12: "util_12"                       # PNR_TRN utility
+        util_13: "util_13"                       # KNRPRV_TRN utility
+        util_14: "util_14"                       # KNRTNC_TRN utility
+        util_15: "util_15"                       # TAXI utility
+        util_16: "util_16"                       # TNC utility
+        util_17: "util_17"                       # SCHLBUS utility
+        
+        # Mode choice probabilities (17 optional fields: prob_1 to prob_17)
+        prob_1: "prob_1"                         # SOV_GP probability
+        prob_2: "prob_2"                         # SOV_PAY probability
+        prob_3: "prob_3"                         # SR2_GP probability
+        prob_4: "prob_4"                         # SR2_HOV probability
+        prob_5: "prob_5"                         # SR2_PAY probability
+        prob_6: "prob_6"                         # SR3_GP probability
+        prob_7: "prob_7"                         # SR3_HOV probability
+        prob_8: "prob_8"                         # SR3_PAY probability
+        prob_9: "prob_9"                         # WALK probability
+        prob_10: "prob_10"                       # BIKE probability
+        prob_11: "prob_11"                       # WLK_TRN probability
+        prob_12: "prob_12"                       # PNR_TRN probability
+        prob_13: "prob_13"                       # KNRPRV_TRN probability
+        prob_14: "prob_14"                       # KNRTNC_TRN probability
+        prob_15: "prob_15"                       # TAXI probability
+        prob_16: "prob_16"                       # TNC probability
+        prob_17: "prob_17"                       # SCHLBUS probability
+  
+  # Trip file schema
+  # Source: https://bayareametro.github.io/tm2py/ctramp-outputs/individual-trips/
+  individual_trips:
+    file_pattern: "indivTripData_{iteration}.csv"
+    columns:
+      # Core identification fields (4 required)
+      required:
+        household_id: "hh_id"                    # Household identifier
+        person_id: "person_id"                   # Person identifier
+        person_number: "person_num"              # Person number within household
+        tour_id: "tour_id"                       # Tour identifier within person
+      
+      # Trip sequencing and context (15 optional)
+      optional:
+        stop_id: "stop_id"                       # Stop/trip sequence ID (0-based, -1 for direct trips)
+        inbound: "inbound"                       # Trip direction (0=outbound, 1=inbound)
+        tour_purpose: "tour_purpose"             # Primary purpose of parent tour
+        origin_purpose: "orig_purpose"           # Purpose at trip origin
+        destination_purpose: "dest_purpose"      # Purpose at trip destination
+        origin_mgra: "orig_mgra"                 # Origin MGRA
+        destination_mgra: "dest_mgra"            # Destination MGRA
+        trip_distance: "trip_dist"               # Trip distance in miles
+        parking_mgra: "parking_mgra"             # Parking location MGRA (for auto modes)
+        stop_period: "stop_period"               # Trip departure time period (1-48)
+        trip_mode: "trip_mode"                   # Trip-specific transportation mode (1-17)
+        tour_mode: "tour_mode"                   # Parent tour transportation mode (1-17)
+        tranpath_rnum: "tranpath_rnum"           # Transit path choice random number (0.0-1.0, -999 for non-transit)
+        sample_rate: "sampleRate"                # Household sampling rate
+        av_available: "avAvailable"              # Autonomous vehicle availability (0/1)
+
+# ==============================================================================
+# INTERNAL SCHEMA - Standardized column names used within the code
+# ==============================================================================
+internal_schema:
+  # Households - all fields using standardized internal names
+  households:
+    - household_id        # Unique household identifier
+    - home_mgra           # Home location MGRA (Micro Analysis Zone)
+    - income_category     # Income category (1-4: low to high)
+    - num_vehicles        # Number of vehicles owned (0-6+)
+    - num_persons         # Household size (total members)
+    - num_workers         # Number of workers in household
+    - sample_rate         # Sample expansion factor
+    - automated_vehicles  # Number of autonomous vehicles (optional)
+    - transponder         # Has toll transponder 0/1 (optional)
+    - pre_et_cdap_pattern # Pre-employment/transit CDAP (optional)
+    - cdap_pattern        # Coordinated Daily Activity Pattern (optional)
+    - jtf_choice          # Joint tour frequency choice (optional)
+  
+  # Persons - all fields using standardized internal names
+  persons:
+    - household_id        # Unique household identifier (links to households)
+    - person_id           # Unique person identifier across all households
+    - person_number       # Person number within household (1, 2, 3...)
+    - age                 # Person age in years
+    - gender              # Gender (1=Male, 2=Female)
+    - person_type         # Person type classification (1-8, see value_mappings)
+    - value_of_time       # Value of time in $/hour (optional)
+    - transit_subsidy_choice     # Transit subsidy selected 0/1 (optional)
+    - transit_subsidy_percent    # Transit subsidy percentage 0-100 (optional)
+    - transit_pass_choice        # Transit pass type selected (optional)
+    - reimb_pct           # Reimbursement percentage for work travel (optional)
+    - naics_code          # NAICS industry code for workplace (optional)
+    - pre_telecommute_cdap  # CDAP before telecommute choice (optional)
+    - telecommute         # Telecommute frequency choice (optional)
+    - cdap                # Coordinated Daily Activity Pattern M/N/H (optional)
+    - work_dc_logsum      # Work destination choice logsum (optional)
+    - school_dc_logsum    # School destination choice logsum (optional)
+    - imf_choice          # Individual Maintenance Tour frequency (optional)
+    - inmf_choice         # Individual Non-Maintenance Tour frequency (optional)
+    - free_parking_choice # Free parking at work 0/1 (optional)
+    - sample_rate         # Sampling expansion factor (optional)
+  
+  workplace_school_location:
+    - household_id        # Household identifier (foreign key)
+    - home_mgra           # Home location MGRA
+    - income              # Household income in dollars
+    - person_id           # Person identifier (foreign key)
+    - person_number       # Person number within household
+    - person_type         # Person type classification (1-8)
+    - person_age          # Person age in years
+    - employment_category # Employment status category (1-4)
+    - student_category    # Student status category (1-4)
+    - work_segment        # Work location market segment (1-4, -1 for non-workers)
+    - school_segment      # School location market segment (1-3, -1 for non-students)
+    - work_location       # Chosen work location MGRA (0 if no work)
+    - work_location_distance   # Home to work distance miles (optional)
+    - work_location_logsum     # Work location choice logsum (optional)
+    - school_location     # Chosen school location MGRA (0 if no school)
+    - school_location_distance # Home to school distance miles (optional)
+    - school_location_logsum   # School location choice logsum (optional)
+  
+  tours:
+    - household_id        # Household identifier (foreign key)
+    - person_id           # Person identifier (foreign key)
+    - person_number       # Person number within household
+    - person_type         # Person type classification (1-8)
+    - tour_id             # Tour sequence number for this person
+    - tour_category       # Tour category (MANDATORY, INDIVIDUAL_NON_MANDATORY, AT_WORK)
+    - tour_purpose        # Specific tour purpose (Work, School, Shop, etc.)
+    - start_period        # Tour departure time period (1-48, 30-min intervals)
+    - end_period          # Tour arrival time period (1-48, 30-min intervals)
+    - origin_mgra         # Origin MGRA (home or workplace) (optional)
+    - destination_mgra    # Destination MGRA (optional)
+    - tour_mode           # Primary tour mode (1-17) (optional)
+    - tour_distance       # Total round-trip distance miles (optional)
+    - tour_time           # Total round-trip time minutes (optional)
+    - num_ob_stops        # Number of outbound stops 0-3 (optional)
+    - num_ib_stops        # Number of inbound stops 0-3 (optional)
+    - atwork_freq         # At-work subtour frequency 0-3 (optional)
+    - dest_choice_logsum  # Destination choice logsum (optional)
+    - sample_rate         # Household sampling rate (optional)
+    - av_available        # Autonomous vehicle available 0/1 (optional)
+    - util_1              # SOV_GP mode utility (optional)
+    - util_2              # SOV_PAY mode utility (optional)
+    - util_3              # SR2_GP mode utility (optional)
+    - util_4              # SR2_HOV mode utility (optional)
+    - util_5              # SR2_PAY mode utility (optional)
+    - util_6              # SR3_GP mode utility (optional)
+    - util_7              # SR3_HOV mode utility (optional)
+    - util_8              # SR3_PAY mode utility (optional)
+    - util_9              # WALK mode utility (optional)
+    - util_10             # BIKE mode utility (optional)
+    - util_11             # WLK_TRN mode utility (optional)
+    - util_12             # PNR_TRN mode utility (optional)
+    - util_13             # KNRPRV_TRN mode utility (optional)
+    - util_14             # KNRTNC_TRN mode utility (optional)
+    - util_15             # TAXI mode utility (optional)
+    - util_16             # TNC mode utility (optional)
+    - util_17             # SCHLBUS mode utility (optional)
+    - prob_1              # SOV_GP mode probability (optional)
+    - prob_2              # SOV_PAY mode probability (optional)
+    - prob_3              # SR2_GP mode probability (optional)
+    - prob_4              # SR2_HOV mode probability (optional)
+    - prob_5              # SR2_PAY mode probability (optional)
+    - prob_6              # SR3_GP mode probability (optional)
+    - prob_7              # SR3_HOV mode probability (optional)
+    - prob_8              # SR3_PAY mode probability (optional)
+    - prob_9              # WALK mode probability (optional)
+    - prob_10             # BIKE mode probability (optional)
+    - prob_11             # WLK_TRN mode probability (optional)
+    - prob_12             # PNR_TRN mode probability (optional)
+    - prob_13             # KNRPRV_TRN mode probability (optional)
+    - prob_14             # KNRTNC_TRN mode probability (optional)
+    - prob_15             # TAXI mode probability (optional)
+    - prob_16             # TNC mode probability (optional)
+    - prob_17             # SCHLBUS mode probability (optional)
+  
+  trips:
+    - household_id        # Household identifier (foreign key)
+    - person_id           # Person identifier (foreign key)
+    - person_number       # Person number within household
+    - tour_id             # Tour identifier (foreign key)
+    - stop_id             # Stop/trip sequence ID (0-based, -1 for direct trips) (optional)
+    - inbound             # Trip direction 0=outbound, 1=inbound (optional)
+    - tour_purpose        # Primary purpose of parent tour (optional)
+    - origin_purpose      # Purpose at trip origin (optional)
+    - destination_purpose # Purpose at trip destination (optional)
+    - origin_mgra         # Origin MGRA (optional)
+    - destination_mgra    # Destination MGRA (optional)
+    - trip_distance       # Trip distance miles (optional)
+    - parking_mgra        # Parking location MGRA for auto modes (optional)
+    - stop_period         # Trip departure time period 1-48 (optional)
+    - trip_mode           # Trip-specific mode 1-17 (optional)
+    - tour_mode           # Parent tour mode 1-17 (optional)
+    - tranpath_rnum       # Transit path choice random number (optional)
+    - sample_rate         # Household sampling rate (optional)
+    - av_available        # AV availability 0/1 (optional)
+
+# ==============================================================================
+# RELATIONSHIPS - How tables relate to each other
+# ==============================================================================
+relationships:
+  - parent: households
+    child: persons
+    parent_key: household_id
+    child_key: household_id
+    relationship_type: one_to_many
+    description: "Each household can have multiple persons"
+  
+  - parent: persons
+    child: tours
+    parent_key: person_id
+    child_key: person_id
+    relationship_type: one_to_many
+    description: "Each person can have multiple tours"
+  
+  - parent: tours
+    child: trips
+    parent_key: tour_id
+    child_key: tour_id
+    relationship_type: one_to_many
+    description: "Each tour consists of multiple trips"
+
+# ==============================================================================
+# WEIGHT FIELDS - Define expansion/sample weight fields for each table
+# Used for weighted summaries and population estimation
+# 
+# IMPORTANT: TM2 sampleRate field is the sampling PERCENTAGE (0.05 = 5% sample)
+# Expansion factor = 1 / sampleRate (e.g., 0.05 → 20.0, 0.5 → 2.0, 1.0 → 1.0)
+# The loader will automatically invert sampleRate to get expansion weights.
+# ==============================================================================
+weight_fields:
+  households:
+    field: "sample_rate"
+    description: "Household sampling rate from CSV - will be inverted to expansion factor (sampleRate=0.5 → weight=2.0)"
+    calculate_weighted: true
+    default_value: 1.0
+    invert: true  # Expansion factor = 1 / sampleRate
+  
+  persons:
+    field: "sample_rate"
+    description: "Person sampling rate - inherited from household, will be inverted"
+    calculate_weighted: true
+    default_value: 1.0
+    invert: true
+  
+  individual_tours:
+    field: "sample_rate"
+    description: "Tour sampling rate - inherited from household, will be inverted"
+    calculate_weighted: true
+    default_value: 1.0
+    invert: true
+  
+  individual_trips:
+    field: "sample_rate"
+    description: "Trip sampling rate - inherited from household, will be inverted"
+    calculate_weighted: true
+    default_value: 1.0
+    invert: true
+  
+  workplace_school_location:
+    field: null
+    description: "No weight field - uses household sample_rate when joined"
+    calculate_weighted: false
+    default_value: 1.0
+
+# ==============================================================================
+# VALUE MAPPINGS - Define valid values and their meanings
+# Source: https://bayareametro.github.io/tm2py/ctramp-outputs/data-dictionaries/
+# ==============================================================================
+value_mappings:
+  # Person Type Classification (from person.csv documentation)
+  # Source: https://bayareametro.github.io/tm2py/ctramp-outputs/person/#data-dictionary-person-types
+  person_type:
+    type: categorical
+    values:
+      1: "Full-time worker"
+      2: "Part-time worker"
+      3: "University student"
+      4: "Non-working adult"
+      5: "Retired adult"
+      6: "Driving-age student"
+      7: "School-age child"
+      8: "Preschool child"
+    text_values:
+      - "Full-time worker"
+      - "Part-time worker"
+      - "University student"
+      - "Non-working adult"
+      - "Retired adult"
+      - "Driving-age student"
+      - "School-age child"
+      - "Preschool child"
+  
+  # Income Category (household income quartiles)
+  income_category:
+    type: categorical
+    values:
+      1: "Low (Q1)"
+      2: "Medium-Low (Q2)"
+      3: "Medium-High (Q3)"
+      4: "High (Q4)"
+  
+  # Tour Purpose (from individual tours documentation)
+  # Source: https://bayareametro.github.io/tm2py/ctramp-outputs/individual-tours/#data-dictionary-tour-purposes
+  # Note: Actual model uses text values, not numeric codes
+  tour_purpose:
+    type: categorical
+    text_values:
+      - "Work"
+      - "School"
+      - "University"
+      - "Escort"
+      - "Maintenance"
+      - "Discretionary"
+      - "Shop"
+      - "Visiting"
+      - "Eating Out"
+      - "Work-Based"
+  
+  # Tour Category (high-level classification)
+  tour_category:
+    type: categorical
+    text_values:
+      - "MANDATORY"
+      - "INDIVIDUAL_NON_MANDATORY"
+      - "AT_WORK"
+  
+  # Transportation Mode (17-mode standardized dictionary)
+  # Source: https://bayareametro.github.io/tm2py/ctramp-outputs/data-dictionaries/#mode-dictionary
+  # Used for both tour_mode and trip_mode
+  transportation_mode:
+    type: categorical
+    values:
+      1: "SOV_GP - Single Occupant Vehicle (General Purpose)"
+      2: "SOV_PAY - Single Occupant Vehicle (Express/Toll)"
+      3: "SR2_GP - Shared Ride 2 (General Purpose)"
+      4: "SR2_HOV - Shared Ride 2 (HOV Lanes)"
+      5: "SR2_PAY - Shared Ride 2 (Express/Toll)"
+      6: "SR3_GP - Shared Ride 3+ (General Purpose)"
+      7: "SR3_HOV - Shared Ride 3+ (HOV Lanes)"
+      8: "SR3_PAY - Shared Ride 3+ (Express/Toll)"
+      9: "WALK - Walk"
+      10: "BIKE - Bicycle"
+      11: "WLK_TRN - Walk to Transit"
+      12: "PNR_TRN - Park-and-Ride to Transit"
+      13: "KNRPRV_TRN - Kiss-and-Ride Private to Transit"
+      14: "KNRTNC_TRN - Kiss-and-Ride TNC to Transit"
+      15: "TAXI - Taxi"
+      16: "TNC - Transportation Network Company"
+      17: "SCHLBUS - School Bus"
+
+# ==============================================================================
+# AGGREGATION SPECS - Simplify categorical variables by grouping values
+# ==============================================================================
+# Similar to binning for continuous variables, but for categorical variables
+# This allows you to reduce granular categories into broader groups for analysis
+aggregation_specs:
+  # Aggregate 17 transportation modes into simpler categories
+  # Applied to tour_mode and trip_mode columns
+  transportation_mode:
+    # Map from original value (or ID) to aggregated category
+    mapping:
+      1: "Auto - SOV"           # SOV_GP
+      2: "Auto - SOV"           # SOV_PAY
+      3: "Auto - Shared"        # SR2_GP
+      4: "Auto - Shared"        # SR2_HOV
+      5: "Auto - Shared"        # SR2_PAY
+      6: "Auto - Shared"        # SR3_GP
+      7: "Auto - Shared"        # SR3_HOV
+      8: "Auto - Shared"        # SR3_PAY
+      9: "Active"               # WALK
+      10: "Active"              # BIKE
+      11: "Transit"             # WLK_TRN
+      12: "Transit"             # PNR_TRN
+      13: "Transit"             # KNRPRV_TRN
+      14: "Transit"             # KNRTNC_TRN
+      15: "TNC/Taxi"            # TAXI
+      16: "TNC/Taxi"            # TNC
+      17: "School Bus"          # SCHLBUS
+    # Columns to apply this aggregation to
+    apply_to:
+      - tour_mode
+      - trip_mode
+  
+  # Alternative: More detailed mode aggregation (commented out by default)
+  # transportation_mode_detailed:
+  #   mapping:
+  #     1: "Auto - SOV (GP)"
+  #     2: "Auto - SOV (Toll)"
+  #     3: "Auto - HOV2 (GP)"
+  #     4: "Auto - HOV2 (HOV)"
+  #     5: "Auto - HOV2 (Toll)"
+  #     6: "Auto - HOV3+ (GP)"
+  #     7: "Auto - HOV3+ (HOV)"
+  #     8: "Auto - HOV3+ (Toll)"
+  #     9: "Walk"
+  #     10: "Bike"
+  #     11: "Transit - Walk Access"
+  #     12: "Transit - Drive Access"
+  #     13: "Transit - Private K&R"
+  #     14: "Transit - TNC Access"
+  #     15: "Taxi"
+  #     16: "TNC"
+  #     17: "School Bus"
+  #   apply_to:
+  #     - tour_mode
+  #     - trip_mode
+
+  
+  # CDAP Activity Pattern (Coordinated Daily Activity Pattern)
+  # Source: https://bayareametro.github.io/tm2py/ctramp-outputs/person/#data-dictionary-cdap-activity-patterns
+  cdap_pattern:
+    type: categorical
+    text_values:
+      - "M"  # Mandatory (work/school)
+      - "N"  # Non-mandatory
+      - "H"  # Home
+  
+  # Gender
+  gender:
+    type: categorical
+    values:
+      1: "Male"
+      2: "Female"
+  
+  # Binary choice fields
+  telecommute_choice:
+    type: categorical
+    values:
+      0: "No telecommute"
+      1: "Telecommute"
+  
+  transit_subsidy_choice:
+    type: categorical
+    values:
+      0: "No transit subsidy"
+      1: "Has transit subsidy"
+  
+  transit_pass_choice:
+    type: categorical
+    values:
+      0: "No transit pass"
+      1: "Has transit pass"
+  
+  free_parking_choice:
+    type: categorical
+    values:
+      -1: "Not Modeled"
+      0: "No free parking"
+      1: "Has free parking"
+  
+  av_available:
+    type: categorical
+    values:
+      0: "No"
+      1: "Yes"
+  
+  # Joint tour frequency (household coordination)
+  # Source: https://bayareametro.github.io/tm2py/ctramp-outputs/household/#joint-tour-frequency
+  joint_tour_frequency:
+    type: categorical
+    values:
+      0: "No joint tours"
+      1: "One joint tour"
+      2: "Two joint tours"
+      3: "Three or more joint tours"
+  
+  # Employment category classification
+  # Source: https://bayareametro.github.io/tm2py/ctramp-outputs/workplace-school-location/#employment-category-classification-employmentcategory
+  employment_category:
+    type: categorical
+    values:
+      1: "Full-time employed"
+      2: "Part-time employed"
+      3: "Not employed"
+      4: "Unemployed"
+  
+  # Student category classification
+  # Source: https://bayareametro.github.io/tm2py/ctramp-outputs/workplace-school-location/#student-category-classification-studentcategory
+  student_category:
+    type: categorical
+    values:
+      1: "Pre-K"
+      2: "K-12 student"
+      3: "University student"
+      4: "Non-student"
+  
+  # Work location market segments
+  # Source: https://bayareametro.github.io/tm2py/ctramp-outputs/workplace-school-location/#work-location-market-segments-worksegment
+  work_segment:
+    type: categorical
+    values:
+      -1: "Non-worker"
+      1: "Low-income worker"
+      2: "Mid-income worker"
+      3: "High-income worker"
+      4: "Very high-income worker"
+  
+  # School location market segments
+  # Source: https://bayareametro.github.io/tm2py/ctramp-outputs/workplace-school-location/#school-location-market-segments-schoolsegment
+  school_segment:
+    type: categorical
+    values:
+      -1: "Non-student"
+      1: "K-12 student"
+      2: "University undergraduate"
+      3: "University graduate"
+
+# ==============================================================================
+# SUMMARY DEFINITIONS - What summaries to create
+# ==============================================================================
+summary_definitions:
+  # Household summaries
+  auto_ownership:
+    description: "Vehicle ownership distribution by household"
+    input_tables: ["households"]
+    required_columns:
+      households: ["household_id", "num_vehicles", "sample_rate"]
+    optional_columns:
+      households: ["income_category"]
+    geographic_levels: ["regional"]
+    output_columns:
+      - "num_vehicles"
+      - "household_count"
+      - "percentage"
+  
+  household_size:
+    description: "Household size distribution"
+    input_tables: ["households"]
+    required_columns:
+      households: ["household_id", "num_persons", "sample_rate"]
+    optional_columns: {}
+    geographic_levels: ["regional"]
+    output_columns:
+      - "num_persons"
+      - "household_count"
+      - "percentage"
+  
+  income_distribution:
+    description: "Household income distribution"
+    input_tables: ["households"]
+    required_columns:
+      households: ["household_id", "income_category", "sample_rate"]
+    optional_columns: {}
+    geographic_levels: ["regional"]
+    output_columns:
+      - "income_category"
+      - "household_count"
+      - "percentage"
+  
+  # Worker/Person summaries
+  work_location:
+    description: "Work location patterns and commute flows"
+    input_tables: ["workplace_school_location"]
+    required_columns:
+      workplace_school_location: ["person_id", "person_type", "employment_category", "work_location", "work_location_distance"]
+    optional_columns:
+      workplace_school_location: ["home_mgra"]
+    geographic_levels: ["regional"]
+    output_columns:
+      - "employment_category"
+      - "worker_count"
+      - "avg_commute_distance"
+  
+  telecommute:
+    description: "Telecommute frequency patterns"
+    input_tables: ["persons"]
+    required_columns:
+      persons: ["person_id", "person_type"]
+    optional_columns:
+      persons: ["telecommute", "sample_rate"]
+    geographic_levels: ["regional"]
+    output_columns:
+      - "telecommute_choice"
+      - "worker_count"
+      - "percentage"
+  
+  worker_demographics:
+    description: "Worker demographics by person type"
+    input_tables: ["persons"]
+    required_columns:
+      persons: ["person_id", "person_type", "age", "gender"]
+    optional_columns:
+      persons: ["sample_rate"]
+    geographic_levels: ["regional"]
+    output_columns:
+      - "person_type"
+      - "age_group"
+      - "gender"
+      - "worker_count"
+  
+  # Tour summaries
+  tour_frequency:
+    description: "Daily tour frequency by purpose and person type"
+    input_tables: ["tours"]
+    required_columns:
+      tours: ["household_id", "person_id", "person_type", "tour_purpose"]
+    optional_columns:
+      tours: ["sample_rate"]
+    geographic_levels: ["regional"]
+    output_columns:
+      - "person_type"
+      - "tour_purpose"
+      - "tour_count"
+      - "tours_per_person"
+  
+  tour_mode:
+    description: "Tour mode choice patterns by purpose"
+    input_tables: ["tours"]
+    required_columns:
+      tours: ["tour_id", "tour_mode", "tour_purpose"]
+    optional_columns:
+      tours: ["sample_rate"]
+    geographic_levels: ["regional"]
+    output_columns:
+      - "tour_mode"
+      - "tour_purpose"
+      - "tour_count"
+      - "percentage"
+  
+  tour_timing:
+    description: "Tour start and end time patterns"
+    input_tables: ["tours"]
+    required_columns:
+      tours: ["tour_id", "start_period", "end_period", "tour_purpose"]
+    optional_columns:
+      tours: ["sample_rate"]
+    geographic_levels: ["regional"]
+    output_columns:
+      - "tour_purpose"
+      - "time_period"
+      - "tour_count"
+  
+  tour_length:
+    description: "Tour distance and duration patterns"
+    input_tables: ["tours"]
+    required_columns:
+      tours: ["tour_id", "tour_purpose"]
+    optional_columns:
+      tours: ["tour_distance", "tour_time", "sample_rate"]
+    geographic_levels: ["regional"]
+    output_columns:
+      - "tour_purpose"
+      - "avg_distance"
+      - "avg_duration"
+      - "tour_count"
+  
+  # Trip summaries
+  trip_mode:
+    description: "Trip mode choice patterns"
+    input_tables: ["trips"]
+    required_columns:
+      trips: ["household_id", "person_id", "trip_mode"]
+    optional_columns:
+      trips: ["tour_purpose", "sample_rate"]
+    geographic_levels: ["regional"]
+    output_columns:
+      - "trip_mode"
+      - "tour_purpose"
+      - "trip_count"
+      - "percentage"
+  
+  trip_purpose:
+    description: "Trip purpose patterns"
+    input_tables: ["trips"]
+    required_columns:
+      trips: ["household_id", "person_id"]
+    optional_columns:
+      trips: ["origin_purpose", "destination_purpose", "tour_purpose", "sample_rate"]
+    geographic_levels: ["regional"]
+    output_columns:
+      - "origin_purpose"
+      - "destination_purpose"
+      - "trip_count"
+  
+  trip_timing:
+    description: "Trip departure time patterns"
+    input_tables: ["trips"]
+    required_columns:
+      trips: ["household_id", "person_id"]
+    optional_columns:
+      trips: ["stop_period", "tour_purpose", "sample_rate"]
+    geographic_levels: ["regional"]
+    output_columns:
+      - "time_period"
+      - "tour_purpose"
+      - "trip_count"
+  
+  trip_length:
+    description: "Trip distance patterns"
+    input_tables: ["trips"]
+    required_columns:
+      trips: ["household_id", "person_id"]
+    optional_columns:
+      trips: ["trip_distance", "tour_purpose", "sample_rate"]
+    geographic_levels: ["regional"]
+    output_columns:
+      - "distance_bin"
+      - "tour_purpose"
+      - "trip_count"
+  
+  trip_generation:
+    description: "Trip generation by household"
+    input_tables: ["trips", "households"]
+    required_columns:
+      trips: ["household_id"]
+      households: ["household_id", "num_persons"]
+    optional_columns:
+      trips: ["sample_rate"]
+    geographic_levels: ["regional"]
+    output_columns:
+      - "household_size"
+      - "avg_trips_per_hh"
+      - "household_count"
+
+# ==============================================================================
+# OUTPUT CONFIGURATION - Customize output files
+# ==============================================================================
+output_configuration:
+  # Custom output filenames for each summary type
+  filenames:
+    auto_ownership_regional: "vehicle_ownership_regional.csv"
+    auto_ownership_county: "vehicle_ownership_county.csv"
+    work_location_regional: "work_commute_patterns.csv"
+    tour_frequency_regional: "daily_tour_frequency.csv"
+    tour_mode_regional: "mode_choice_summary.csv"
+    free_parking_regional: "free_parking_analysis.csv"
+  
+  # Rename columns in output files
+  column_renames:
+    household_count: "households"
+    worker_count: "workers"
+    tour_count: "tours"
+    trip_count: "trips"
+    percentage: "share_pct"
+    num_vehicles: "vehicles"
+    sample_rate: "sample_pct"
+
+# ==============================================================================
+# VALIDATION RULES - Data quality checks
+# Source: Based on documentation validation rules
+# ==============================================================================
+validation_rules:
+  households:
+    - column: household_id
+      rule: required
+      description: "Unique household identifier must be present"
+    - column: num_vehicles
+      rule: range
+      min: 0
+      max: 6
+      description: "Vehicles capped at 6 for model stability"
+    - column: num_persons
+      rule: range
+      min: 1
+      max: 15
+      description: "Household size 1-15 persons"
+    - column: num_workers
+      rule: relationship
+      constraint: "num_workers <= num_persons"
+      description: "Workers cannot exceed household size"
+    - column: automated_vehicles
+      rule: relationship
+      constraint: "automated_vehicles <= num_vehicles"
+      description: "AVs are subset of total vehicles"
+    - column: income_category
+      rule: in_set
+      allowed_values: [1, 2, 3, 4]
+      description: "Income must be in categories 1-4"
+    - column: transponder
+      rule: in_set
+      allowed_values: [0, 1]
+      description: "Transponder is binary 0/1"
+  
+  persons:
+    - column: age
+      rule: range
+      min: 0
+      max: 115
+      description: "Age in years, max 115+"
+    - column: person_type
+      rule: in_set
+      allowed_values: [1, 2, 3, 4, 5, 6, 7, 8]
+      description: "Person type 1-8 (FT worker to preschool)"
+    - column: gender
+      rule: in_set
+      allowed_values: [1, 2]
+      description: "Gender: 1=Male, 2=Female"
+    - column: sample_rate
+      rule: range
+      min: 0.0
+      max: 1.0
+      description: "Sample rate between 0 and 1"
+    - column: value_of_time
+      rule: range
+      min: 0.0
+      max: 100.0
+      description: "Value of time should be positive ($/hour)"
+    - column: person_type_age_consistency
+      rule: custom
+      description: "Age should be consistent with person type"
+      examples:
+        - "Type 8 (preschool) must be age 0-5"
+        - "Type 7 (school-age) must be age 6-15"
+        - "Type 6 (driving student) must be age 16-19"
+        - "Type 5 (retired) must be age 65+"
+  
+  tours:
+    - column: tour_mode
+      rule: in_set
+      allowed_values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+      description: "Tour mode must be in 17-mode dictionary"
+    - column: person_type
+      rule: in_set
+      allowed_values: [1, 2, 3, 4, 5, 6, 7, 8]
+      description: "Person type must be 1-8"
+    - column: start_period
+      rule: range
+      min: 1
+      max: 48
+      description: "Time periods are 1-48 (30-min intervals, starting 5:00 AM)"
+    - column: end_period
+      rule: range
+      min: 1
+      max: 48
+      description: "Time periods are 1-48 (30-min intervals, starting 5:00 AM)"
+    - column: temporal_consistency
+      rule: relationship
+      constraint: "end_period > start_period"
+      description: "Tour must end after it starts"
+    - column: tour_duration
+      rule: relationship
+      constraint: "(end_period - start_period) <= 24"
+      description: "Tour duration should not exceed 12 hours (24 periods)"
+    - column: num_ob_stops
+      rule: range
+      min: 0
+      max: 3
+      description: "Outbound stops capped at 3"
+    - column: num_ib_stops
+      rule: range
+      min: 0
+      max: 3
+      description: "Inbound stops capped at 3"
+    - column: atwork_freq
+      rule: range
+      min: 0
+      max: 3
+      description: "At-work subtours capped at 3"
+    - column: tour_distance
+      rule: range
+      min: 0.0
+      max: 500.0
+      description: "Tour distance should be reasonable (< 500 miles round-trip)"
+    - column: av_available
+      rule: in_set
+      allowed_values: [0, 1]
+      description: "AV availability is binary 0/1"
+    - column: mode_probabilities_sum
+      rule: relationship
+      constraint: "abs(prob_1 + prob_2 + prob_3 + prob_4 + prob_5 + prob_6 + prob_7 + prob_8 + prob_9 + prob_10 + prob_11 + prob_12 + prob_13 + prob_14 + prob_15 + prob_16 + prob_17 - 1.0) < 0.01"
+      description: "Mode probabilities should sum to 1.0 (when present)"
+  
+  workplace_school_location:
+    - column: employment_category
+      rule: in_set
+      allowed_values: [1, 2, 3, 4]
+      description: "Employment category must be 1-4"
+    - column: student_category
+      rule: in_set
+      allowed_values: [1, 2, 3, 4]
+      description: "Student category must be 1-4"
+    - column: work_segment
+      rule: in_set
+      allowed_values: [-1, 1, 2, 3, 4]
+      description: "Work segment must be -1 or 1-4"
+    - column: school_segment
+      rule: in_set
+      allowed_values: [-1, 1, 2, 3]
+      description: "School segment must be -1 or 1-3"
+    - column: work_employment_consistency
+      rule: relationship
+      constraint: "(employment_category.isin([1, 2])) == (work_location > 0)"
+      description: "Employed persons should have work locations"
+    - column: student_school_consistency
+      rule: relationship
+      constraint: "(student_category.isin([2, 3])) == (school_location > 0)"
+      description: "Students should have school locations"
+    - column: work_location_distance
+      rule: range
+      min: 0
+      max: 200
+      description: "Work distance should be reasonable (< 200 miles)"
+    - column: school_location_distance
+      rule: range
+      min: 0
+      max: 100
+      description: "School distance should be reasonable (< 100 miles)"
+    - column: work_distance_consistency
+      rule: relationship
+      constraint: "(work_location > 0) == (work_location_distance > 0)"
+      description: "Work locations should have positive distances"
+    - column: school_distance_consistency
+      rule: relationship
+      constraint: "(school_location > 0) == (school_location_distance > 0)"
+      description: "School locations should have positive distances"
+  
+  trips:
+    - column: stop_id
+      rule: in_set
+      allowed_values: [-1, 0, 1, 2, 3]
+      description: "Stop ID must be -1 (direct) or 0-3"
+    - column: inbound
+      rule: in_set
+      allowed_values: [0, 1]
+      description: "Inbound flag is binary: 0=outbound, 1=inbound"
+    - column: trip_mode
+      rule: in_set
+      allowed_values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+      description: "Trip mode must be in 17-mode dictionary"
+    - column: tour_mode
+      rule: in_set
+      allowed_values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+      description: "Tour mode must be in 17-mode dictionary"
+    - column: stop_period
+      rule: range
+      min: 1
+      max: 48
+      description: "Time periods are 1-48 (30-min intervals, starting 3:00 AM)"
+    - column: trip_distance
+      rule: range
+      min: 0.0
+      max: 200.0
+      description: "Trip distance should be reasonable (< 200 miles)"
+    - column: tranpath_rnum
+      rule: range
+      min: -999.0
+      max: 1.0
+      description: "Transit path random number 0-1, or -999 for non-transit"
+    - column: av_available
+      rule: in_set
+      allowed_values: [0, 1]
+      description: "AV availability is binary 0/1"
+    - column: same_mgra_check
+      rule: relationship
+      constraint: "(orig_mgra != dest_mgra) | (trip_distance <= 0.1)"
+      description: "Trips within same MGRA should have near-zero distance"
