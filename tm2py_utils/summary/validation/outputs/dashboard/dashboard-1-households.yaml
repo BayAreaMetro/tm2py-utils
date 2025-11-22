@@ -22,6 +22,15 @@ layout:
     description: 'Total: households by number of vehicles owned'
   household_characteristics:
   - type: bar
+    title: Auto Ownership by Household Size - Share
+    props:
+      dataset: auto_ownership_by_household_size.csv
+      x: num_vehicles
+      y: share
+      columns: num_persons
+      groupBy: dataset
+    description: 'Share: vehicle ownership by household size'
+  - type: bar
     title: Households by Size - Share
     props:
       dataset: household_size_regional.csv

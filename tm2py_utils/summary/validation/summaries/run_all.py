@@ -614,6 +614,9 @@ def _combine_multi_run_summaries(summaries: Dict[str, pd.DataFrame]) -> Dict[str
     
     The 'dataset' column in each df identifies the run.
     
+    Strategy: Extract base name by removing dataset suffix (everything after the last underscore
+    that matches a dataset pattern, or the entire suffix after finding a common pattern).
+    
     Args:
         summaries: Dictionary mapping summary name to DataFrame
         
@@ -621,52 +624,34 @@ def _combine_multi_run_summaries(summaries: Dict[str, pd.DataFrame]) -> Dict[str
         Dictionary of combined summaries by base name
     """
     from collections import defaultdict
-    
-    # Define known summary base names (patterns to match)
-    known_patterns = [
-        # Household summaries
-        'auto_ownership_regional',
-        'auto_ownership_by_income',
-        'household_size_regional',
-        'income_distribution',
-        # Worker summaries
-        'worker_type',
-        'work_from_home',
-        'worker_age',
-        'worker_gender',
-        'worker_income',
-        # Tour summaries
-        'tour_frequency_by_purpose',
-        'tour_mode_choice',
-        'tour_mode_by_purpose',
-        'tour_time_of_day',
-        'tour_start_time',
-        'tour_distance',
-        'tour_duration',
-        # Trip summaries
-        'trip_mode_choice',
-        'trip_purpose',
-        'trip_mode_by_purpose',
-        'trip_time_of_day',
-        'trip_distance',
-        'trip_duration',
-        'trip_generation',
-    ]
+    import re
     
     # Group summaries by base name
     grouped = defaultdict(list)
     
+    # Extract all unique summary names to find patterns
+    all_names = list(summaries.keys())
+    
+    # Find base names by looking for common prefixes across dataset-suffixed names
+    # Strategy: Remove everything after a dataset name pattern
     for name, df in summaries.items():
-        # Try to match against known patterns
-        base_name = None
-        for pattern in known_patterns:
-            if name.startswith(pattern):
-                base_name = pattern
-                break
+        # Try to find dataset name in the summary name
+        # Dataset names typically appear at the end: "summary_name_DatasetName"
+        # Split on underscores and try progressively shorter base names
+        parts = name.split('_')
         
-        # If no match, use the full name (single run case)
-        if base_name is None:
-            base_name = name
+        # Start with full name, then try removing parts from the end
+        base_name = name
+        for i in range(len(parts), 0, -1):
+            candidate = '_'.join(parts[:i])
+            
+            # Check if this candidate appears in multiple summaries with different suffixes
+            matches = [n for n in all_names if n.startswith(candidate + '_') or n == candidate]
+            
+            if len(matches) > 1:
+                # Found a base name that has multiple variants
+                base_name = candidate
+                break
         
         grouped[base_name].append(df)
     
