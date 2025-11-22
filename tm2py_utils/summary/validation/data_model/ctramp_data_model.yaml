@@ -474,6 +474,64 @@ value_mappings:
       15: "TAXI - Taxi"
       16: "TNC - Transportation Network Company"
       17: "SCHLBUS - School Bus"
+
+# ==============================================================================
+# AGGREGATION SPECS - Simplify categorical variables by grouping values
+# ==============================================================================
+# Similar to binning for continuous variables, but for categorical variables
+# This allows you to reduce granular categories into broader groups for analysis
+aggregation_specs:
+  # Aggregate 17 transportation modes into simpler categories
+  # Applied to tour_mode and trip_mode columns
+  transportation_mode:
+    # Map from original value (or ID) to aggregated category
+    mapping:
+      1: "Auto - SOV"           # SOV_GP
+      2: "Auto - SOV"           # SOV_PAY
+      3: "Auto - Shared"        # SR2_GP
+      4: "Auto - Shared"        # SR2_HOV
+      5: "Auto - Shared"        # SR2_PAY
+      6: "Auto - Shared"        # SR3_GP
+      7: "Auto - Shared"        # SR3_HOV
+      8: "Auto - Shared"        # SR3_PAY
+      9: "Active"               # WALK
+      10: "Active"              # BIKE
+      11: "Transit"             # WLK_TRN
+      12: "Transit"             # PNR_TRN
+      13: "Transit"             # KNRPRV_TRN
+      14: "Transit"             # KNRTNC_TRN
+      15: "TNC/Taxi"            # TAXI
+      16: "TNC/Taxi"            # TNC
+      17: "School Bus"          # SCHLBUS
+    # Columns to apply this aggregation to
+    apply_to:
+      - tour_mode
+      - trip_mode
+  
+  # Alternative: More detailed mode aggregation (commented out by default)
+  # transportation_mode_detailed:
+  #   mapping:
+  #     1: "Auto - SOV (GP)"
+  #     2: "Auto - SOV (Toll)"
+  #     3: "Auto - HOV2 (GP)"
+  #     4: "Auto - HOV2 (HOV)"
+  #     5: "Auto - HOV2 (Toll)"
+  #     6: "Auto - HOV3+ (GP)"
+  #     7: "Auto - HOV3+ (HOV)"
+  #     8: "Auto - HOV3+ (Toll)"
+  #     9: "Walk"
+  #     10: "Bike"
+  #     11: "Transit - Walk Access"
+  #     12: "Transit - Drive Access"
+  #     13: "Transit - Private K&R"
+  #     14: "Transit - TNC Access"
+  #     15: "Taxi"
+  #     16: "TNC"
+  #     17: "School Bus"
+  #   apply_to:
+  #     - tour_mode
+  #     - trip_mode
+
   
   # CDAP Activity Pattern (Coordinated Daily Activity Pattern)
   # Source: https://bayareametro.github.io/tm2py/ctramp-outputs/person/#data-dictionary-cdap-activity-patterns

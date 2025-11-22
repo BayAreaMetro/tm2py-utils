@@ -102,6 +102,7 @@ class DataModel:
         self._load_input_schema()
         self._load_summary_definitions()
         self._load_value_mappings()
+        self._load_aggregation_specs()
         self._load_weight_fields()
         self._load_output_configuration()
         
@@ -143,6 +144,20 @@ class DataModel:
         for field_name, mapping_config in value_mappings.items():
             self.value_mappings[field_name] = ValueMapping(**mapping_config)
             logger.debug(f"  Loaded value mapping: {field_name}")
+    
+    def _load_aggregation_specs(self):
+        """Load aggregation specifications for grouping categorical variables."""
+        aggregation_specs = self.config.get('aggregation_specs', {})
+        self.aggregation_specs = {}
+        
+        for spec_name, spec_config in aggregation_specs.items():
+            # Convert to format expected by run_all.py AggregationSpec
+            self.aggregation_specs[spec_name] = {
+                'mapping': spec_config.get('mapping', {}),
+                'apply_to': spec_config.get('apply_to', [])
+            }
+            logger.debug(f"  Loaded aggregation spec: {spec_name} "
+                        f"(applies to {len(spec_config.get('apply_to', []))} columns)")
     
     def _load_weight_fields(self):
         """Load weight field definitions for each table."""

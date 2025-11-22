@@ -138,6 +138,16 @@ def create_bar_chart(
         fig.add_annotation(text="No data available", showarrow=False)
         return fig
     
+    # Validate required columns exist
+    if x not in df.columns:
+        raise ValueError(f"Column '{x}' not found in DataFrame. Available columns: {list(df.columns)}")
+    if y not in df.columns:
+        raise ValueError(f"Column '{y}' not found in DataFrame. Available columns: {list(df.columns)}")
+    if color_col and color_col not in df.columns:
+        raise ValueError(f"Color column '{color_col}' not found in DataFrame. Available columns: {list(df.columns)}")
+    if facet_col and facet_col not in df.columns:
+        raise ValueError(f"Facet column '{facet_col}' not found in DataFrame. Available columns: {list(df.columns)}")
+    
     # Use MTC categorical palette by default
     if color_palette is None:
         color_palette = MTC_PALETTE_CATEGORICAL

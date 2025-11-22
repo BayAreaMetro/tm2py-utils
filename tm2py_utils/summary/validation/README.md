@@ -353,6 +353,64 @@ value_mappings:
 - Single source of truth for categorical mappings
 - Easy to update labels without touching code
 
+### Aggregating Categorical Variables (Simplifying Mode Choice)
+
+**Problem:** The 17-mode transportation dictionary is too detailed for high-level analysis. You want to see "Auto" vs "Transit" vs "Active" instead of 17 separate categories.
+
+**Solution:** Use `aggregation_specs` in `data_model/ctramp_data_model.yaml` to group detailed categories into broader groups:
+
+```yaml
+aggregation_specs:
+  # Aggregate 17 transportation modes into simpler categories
+  transportation_mode:
+    mapping:
+      1: "Auto - SOV"           # SOV_GP
+      2: "Auto - SOV"           # SOV_PAY
+      3: "Auto - Shared"        # SR2_GP
+      4: "Auto - Shared"        # SR2_HOV
+      5: "Auto - Shared"        # SR2_PAY
+      6: "Auto - Shared"        # SR3_GP
+      7: "Auto - Shared"        # SR3_HOV
+      8: "Auto - Shared"        # SR3_PAY
+      9: "Active"               # WALK
+      10: "Active"              # BIKE
+      11: "Transit"             # WLK_TRN
+      12: "Transit"             # PNR_TRN
+      13: "Transit"             # KNRPRV_TRN
+      14: "Transit"             # KNRTNC_TRN
+      15: "TNC/Taxi"            # TAXI
+      16: "TNC/Taxi"            # TNC
+      17: "School Bus"          # SCHLBUS
+    apply_to:
+      - tour_mode
+      - trip_mode
+```
+
+**How it works:**
+1. Aggregation specs are defined in the data model YAML
+2. Each spec has a `mapping` (value → aggregated category) and `apply_to` (which columns)
+3. System automatically creates new columns with `_agg` suffix (e.g., `tour_mode_agg`, `trip_mode_agg`)
+4. Use the aggregated columns in your summary configurations
+
+**Using aggregated modes in summaries:**
+
+```yaml
+custom_summaries:
+  - name: "tour_mode_choice_aggregated"
+    description: "Tour mode choice (simplified categories)"
+    data_source: "individual_tours"
+    group_by: "tour_mode_agg"  # Use the _agg column
+    weight_field: "sample_rate"
+    count_name: "tours"
+```
+
+**Benefits:**
+- Reduces visual clutter in dashboards
+- Easier to compare high-level mode shares
+- No Python coding required
+- Can define multiple aggregation levels (detailed vs high-level)
+- Original detailed data still available if needed
+
 ### Filter Data Before Summarizing
 
 Use the `filter` field in your summary configuration:

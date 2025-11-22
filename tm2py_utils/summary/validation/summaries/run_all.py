@@ -140,6 +140,15 @@ class BinningSpec(BaseModel):
         arbitrary_types_allowed = True
 
 
+class AggregationSpec(BaseModel):
+    """Specification for aggregating categorical variables into broader groups."""
+    mapping: Dict[Union[int, str], str]  # Original value -> Aggregated category
+    apply_to: List[str]  # List of column names to apply this aggregation to
+    
+    class Config:
+        arbitrary_types_allowed = True
+
+
 class SummaryConfig(BaseModel):
     """Configuration for summary generation."""
     enabled_summaries: List[SummaryType] = Field(default_factory=lambda: list(SummaryType))
@@ -167,6 +176,7 @@ class RunConfig(BaseModel):
     column_mapping: ColumnMapping = Field(default_factory=ColumnMapping)
     output_config: OutputConfig = Field(default_factory=OutputConfig)
     binning_specs: Dict[str, BinningSpec] = Field(default_factory=dict)
+    aggregation_specs: Dict[str, AggregationSpec] = Field(default_factory=dict)
     observed_summaries: List[ObservedSummary] = Field(default_factory=list)
     
     class Config:
@@ -176,11 +186,12 @@ class RunConfig(BaseModel):
 class DataLoader:
     """Handles loading and validation of CTRAMP output files."""
     
-    def __init__(self, file_specs: CTRAMPFileSpecs, column_mapping: ColumnMapping = None, data_model_path: Optional[Path] = None, binning_specs: Optional[Dict[str, BinningSpec]] = None):
+    def __init__(self, file_specs: CTRAMPFileSpecs, column_mapping: ColumnMapping = None, data_model_path: Optional[Path] = None, binning_specs: Optional[Dict[str, BinningSpec]] = None, aggregation_specs: Optional[Dict[str, AggregationSpec]] = None):
         self.file_specs = file_specs
         self.column_mapping = column_mapping or ColumnMapping()
         self.data_cache: Dict[str, Dict[str, pd.DataFrame]] = {}
         self.binning_specs = binning_specs or {}
+        self.aggregation_specs = aggregation_specs or {}
         
         # Load data model for column mapping
         if data_model_path is None:
@@ -192,6 +203,15 @@ class DataLoader:
             try:
                 self.data_model = load_data_model(data_model_path)
                 logger.info(f"  ✓ Loaded data model from {data_model_path.name}")
+                
+                # Use aggregation specs from data model if not provided explicitly
+                if not self.aggregation_specs and hasattr(self.data_model, 'aggregation_specs'):
+                    self.aggregation_specs = {
+                        name: AggregationSpec(**spec) 
+                        for name, spec in self.data_model.aggregation_specs.items()
+                    }
+                    if self.aggregation_specs:
+                        logger.info(f"  ✓ Loaded {len(self.aggregation_specs)} aggregation specs from data model")
             except Exception as e:
                 logger.warning(f"  ⚠ Could not load data model: {e}")
         else:
@@ -284,6 +304,52 @@ class DataLoader:
         
         return df
     
+    def _apply_aggregation_specs(self, df: pd.DataFrame, file_type: str) -> pd.DataFrame:
+        """
+        Apply aggregation specifications to categorical variables in the dataframe.
+        Groups detailed categories into broader categories for easier analysis.
+        
+        Args:
+            df: Input dataframe
+            file_type: Type of file (households, persons, tours, trips, etc.)
+            
+        Returns:
+            DataFrame with aggregated columns added
+        """
+        if not self.aggregation_specs:
+            return df
+        
+        for spec_name, agg_spec in self.aggregation_specs.items():
+            for col_name in agg_spec.apply_to:
+                # Check if this column exists in the dataframe
+                if col_name in df.columns:
+                    try:
+                        # Create aggregated version with '_agg' suffix
+                        agg_col_name = f'{col_name}_agg'
+                        
+                        # Convert mapping keys to match column dtype
+                        if pd.api.types.is_integer_dtype(df[col_name]):
+                            # Ensure mapping keys are integers
+                            mapping = {int(k): v for k, v in agg_spec.mapping.items()}
+                        else:
+                            # Keep as strings
+                            mapping = {str(k): v for k, v in agg_spec.mapping.items()}
+                        
+                        # Apply mapping
+                        df[agg_col_name] = df[col_name].map(mapping)
+                        
+                        # Warn about unmapped values
+                        unmapped = df[agg_col_name].isna() & df[col_name].notna()
+                        if unmapped.any():
+                            unmapped_values = df.loc[unmapped, col_name].unique()
+                            logger.warning(f"    ⚠ '{col_name}' has unmapped values: {unmapped_values[:5].tolist()}")
+                        
+                        logger.info(f"    → Aggregated '{col_name}' into {df[agg_col_name].nunique()} categories ({agg_col_name})")
+                    except Exception as e:
+                        logger.warning(f"    ⚠ Could not aggregate '{col_name}': {e}")
+        
+        return df
+    
     def load_directory(self, input_dir: InputDirectory) -> Dict[str, pd.DataFrame]:
         """Load all available files from a directory."""
         logger.info(f"Loading data from {input_dir.name}: {input_dir.path}")
@@ -325,6 +391,9 @@ class DataLoader:
                     
                     # Apply binning specs to continuous variables
                     df = self._apply_binning_specs(df, file_type)
+                    
+                    # Apply aggregation specs to categorical variables
+                    df = self._apply_aggregation_specs(df, file_type)
                     
                     loaded_data[file_type] = df
                     logger.info(f"  ✓ Loaded {file_type}: {len(df):,} records from {file_path.name}")
@@ -791,7 +860,12 @@ def main():
         logger.info(f"Enabled summaries: {[s.value for s in config.summary_config.enabled_summaries]}")
         
         # Initialize components
-        data_loader = DataLoader(config.file_specs, config.column_mapping, binning_specs=config.binning_specs)
+        data_loader = DataLoader(
+            config.file_specs, 
+            config.column_mapping, 
+            binning_specs=config.binning_specs,
+            aggregation_specs=config.aggregation_specs
+        )
         
         # Create display name mapping for dashboards
         dataset_display_names = {
