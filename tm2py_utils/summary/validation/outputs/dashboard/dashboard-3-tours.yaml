@@ -38,21 +38,37 @@ layout:
     description: 'Total: tour distance distribution'
   mode_choice:
   - type: bar
-    title: Tours by Mode - Share
+    title: Tours by Mode (Aggregated) - Share
+    props:
+      dataset: tour_mode_choice_aggregated.csv
+      x: tour_mode_agg
+      y: share
+      groupBy: dataset
+    description: 'Share: tour mode distribution (simplified categories)'
+  - type: bar
+    title: Tours by Mode (Aggregated) - Total
+    props:
+      dataset: tour_mode_choice_aggregated.csv
+      x: tour_mode_agg
+      y: tours
+      groupBy: dataset
+    description: 'Total: tour mode distribution (simplified categories)'
+  - type: bar
+    title: Tours by Mode (Detailed) - Share
     props:
       dataset: tour_mode_choice.csv
       x: tour_mode
       y: share
       groupBy: dataset
-    description: 'Share: tour mode distribution'
+    description: 'Share: tour mode distribution (all 17 modes)'
   - type: bar
-    title: Tours by Mode - Total
+    title: Tours by Mode (Detailed) - Total
     props:
       dataset: tour_mode_choice.csv
       x: tour_mode
       y: tours
       groupBy: dataset
-    description: 'Total: tour mode distribution'
+    description: 'Total: tour mode distribution (all 17 modes)'
   - type: bar
     title: Tour Mode by Purpose - Share
     props:

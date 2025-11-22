@@ -5,21 +5,37 @@ header:
 layout:
   trip_patterns:
   - type: bar
-    title: Trips by Mode - Share
+    title: Trips by Mode (Aggregated) - Share
+    props:
+      dataset: trip_mode_choice_aggregated.csv
+      x: trip_mode_agg
+      y: share
+      groupBy: dataset
+    description: 'Share: trip mode distribution (simplified categories)'
+  - type: bar
+    title: Trips by Mode (Aggregated) - Total
+    props:
+      dataset: trip_mode_choice_aggregated.csv
+      x: trip_mode_agg
+      y: trips
+      groupBy: dataset
+    description: 'Total: trip mode distribution (simplified categories)'
+  - type: bar
+    title: Trips by Mode (Detailed) - Share
     props:
       dataset: trip_mode_choice.csv
       x: trip_mode
       y: share
       groupBy: dataset
-    description: 'Share: trip mode distribution'
+    description: 'Share: trip mode distribution (all 17 modes)'
   - type: bar
-    title: Trips by Mode - Total
+    title: Trips by Mode (Detailed) - Total
     props:
       dataset: trip_mode_choice.csv
       x: trip_mode
       y: trips
       groupBy: dataset
-    description: 'Total: trip mode distribution'
+    description: 'Total: trip mode distribution (all 17 modes)'
   - type: bar
     title: Trips by Purpose - Share
     props:
