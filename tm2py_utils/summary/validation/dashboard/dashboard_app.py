@@ -138,15 +138,24 @@ def create_bar_chart(
         fig.add_annotation(text="No data available", showarrow=False)
         return fig
     
-    # Validate required columns exist
+    # Validate required columns exist and show helpful error with st.error
+    import streamlit as st
     if x not in df.columns:
-        raise ValueError(f"Column '{x}' not found in DataFrame. Available columns: {list(df.columns)}")
+        error_msg = f"❌ Column '{x}' not found in DataFrame. Available columns: {list(df.columns)}"
+        st.error(error_msg)
+        raise ValueError(error_msg)
     if y not in df.columns:
-        raise ValueError(f"Column '{y}' not found in DataFrame. Available columns: {list(df.columns)}")
+        error_msg = f"❌ Column '{y}' not found in DataFrame. Available columns: {list(df.columns)}"
+        st.error(error_msg)
+        raise ValueError(error_msg)
     if color_col and color_col not in df.columns:
-        raise ValueError(f"Color column '{color_col}' not found in DataFrame. Available columns: {list(df.columns)}")
+        error_msg = f"❌ Color column '{color_col}' not found in DataFrame. Available columns: {list(df.columns)}"
+        st.error(error_msg)
+        raise ValueError(error_msg)
     if facet_col and facet_col not in df.columns:
-        raise ValueError(f"Facet column '{facet_col}' not found in DataFrame. Available columns: {list(df.columns)}")
+        error_msg = f"❌ Facet column '{facet_col}' not found in DataFrame. Available columns: {list(df.columns)}"
+        st.error(error_msg)
+        raise ValueError(error_msg)
     
     # Use MTC categorical palette by default
     if color_palette is None:
