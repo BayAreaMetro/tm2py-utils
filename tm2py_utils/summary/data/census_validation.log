@@ -1,0 +1,42 @@
+2025-11-24 13:17:20,369 - __main__ - INFO - ============================================================
+2025-11-24 13:17:20,371 - __main__ - INFO - Starting Census Validation Script
+2025-11-24 13:17:20,371 - __main__ - INFO - ============================================================
+2025-11-24 13:17:20,372 - __main__ - INFO - Phase 1: Pulling ACS tabular data
+2025-11-24 13:17:20,373 - __main__ - INFO - Starting ACS data pull for year 2023
+2025-11-24 13:17:20,373 - __main__ - INFO - Processing 5 tables: ['HouseholdSizeByVehicle', 'CommuteMode', 'CommuteModeByIncome', 'CommuteModeByOccupation', 'CommuteModeByVehicle']
+2025-11-24 13:17:22,314 - __main__ - INFO - Retrieved 36724 variables from ACS
+2025-11-24 13:17:22,492 - __main__ - INFO - Processing table: HouseholdSizeByVehicle (ID: B08201)
+2025-11-24 13:17:23,132 - __main__ - INFO -   Retrieved 9 rows for HouseholdSizeByVehicle
+2025-11-24 13:17:23,165 - __main__ - INFO -   Saved to 2023_HouseholdSizeByVehicle_acs1.csv
+2025-11-24 13:17:23,166 - __main__ - INFO - Processing table: CommuteMode (ID: ['B08006_001E', 'B08006_002E', 'B08006_003E', 'B08006_004E', 'B08006_005E', 'B08006_006E', 'B08006_007E', 'B08006_008E', 'B08006_009E', 'B08006_010E', 'B08006_011E', 'B08006_012E', 'B08006_013E', 'B08006_014E', 'B08006_015E', 'B08006_016E', 'B08006_017E'])
+2025-11-24 13:17:23,784 - __main__ - INFO -   Retrieved 9 rows for CommuteMode
+2025-11-24 13:17:23,804 - __main__ - INFO -   Saved to 2023_CommuteMode_acs1.csv
+2025-11-24 13:17:23,804 - __main__ - INFO - Processing table: CommuteModeByIncome (ID: B08119)
+2025-11-24 13:17:24,573 - __main__ - INFO -   Retrieved 9 rows for CommuteModeByIncome
+2025-11-24 13:17:24,612 - __main__ - INFO -   Saved to 2023_CommuteModeByIncome_acs1.csv
+2025-11-24 13:17:24,613 - __main__ - INFO - Processing table: CommuteModeByOccupation (ID: B08124)
+2025-11-24 13:17:25,338 - __main__ - INFO -   Retrieved 9 rows for CommuteModeByOccupation
+2025-11-24 13:17:25,370 - __main__ - INFO -   Saved to 2023_CommuteModeByOccupation_acs1.csv
+2025-11-24 13:17:25,370 - __main__ - INFO - Processing table: CommuteModeByVehicle (ID: B08141)
+2025-11-24 13:17:26,003 - __main__ - INFO -   Retrieved 9 rows for CommuteModeByVehicle
+2025-11-24 13:17:26,029 - __main__ - INFO -   Saved to 2023_CommuteModeByVehicle_acs1.csv
+2025-11-24 13:17:26,029 - __main__ - INFO - Completed ACS data pull. Processed 5/5 tables
+2025-11-24 13:17:26,048 - __main__ - INFO - Phase 2: Pulling PUMS microdata
+2025-11-24 13:17:26,048 - __main__ - INFO - Starting PUMS data pull
+2025-11-24 13:17:26,048 - __main__ - INFO - Bay Area PUMAs: 58 areas across 9 counties
+2025-11-24 13:17:26,049 - __main__ - INFO - Requesting PUMS data from Census API
+2025-11-24 13:19:40,934 - __main__ - INFO - Retrieved 1620291 records from PUMS API
+2025-11-24 13:19:41,437 - __main__ - INFO - Created DataFrame with 1620290 total records
+2025-11-24 13:19:41,672 - __main__ - INFO - Filtered to 64207 Bay Area records
+2025-11-24 13:19:41,688 - __main__ - INFO - Converting columns to numeric types
+2025-11-24 13:19:41,858 - __main__ - INFO - Null values after conversion: {'HINCP': 0, 'VEH': 0, 'WGTP': 0, 'ADJINC': 0}
+2025-11-24 13:19:41,860 - __main__ - INFO - Calculated adjusted income
+2025-11-24 13:19:42,043 - __main__ - INFO - Phase 3: Aggregating and saving results
+2025-11-24 13:19:42,043 - __main__ - INFO - Aggregating vehicles by income
+2025-11-24 13:19:42,046 - __main__ - INFO - Created income bins: ['0 to 30k', '30-60k', '60-100k', '100-150k', '150k+']
+2025-11-24 13:19:42,063 - __main__ - INFO - Valid records for aggregation: 64207
+2025-11-24 13:19:42,075 - __main__ - INFO - Pivot table shape: (5, 8)
+2025-11-24 13:19:42,094 - __main__ - INFO - Saved vehicle aggregation to 2023_VehiclesByIncome_pums_acs1.csv
+2025-11-24 13:19:42,097 - __main__ - INFO - ============================================================
+2025-11-24 13:19:42,097 - __main__ - INFO - Census Validation Script Completed Successfully
+2025-11-24 13:19:42,097 - __main__ - INFO - ============================================================

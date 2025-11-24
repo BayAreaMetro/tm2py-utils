@@ -1,64 +1,621 @@
-,Alameda,Contra Costa,Marin,Napa,San Francisco,San Mateo,Santa Clara,Solano,Sonoma,Bay Area
-Total:,826474,560043,121331,67861,460397,377888,981842,207335,244909,3848080
-"Total: $1 to $9,999 or loss",57449,44292,10567,7752,25436,23065,64160,17187,19502,269410
-"Total: $10,000 to $14,999",28134,22499,5101,2837,16591,9687,37927,8693,10331,141800
-"Total: $15,000 to $24,999",55318,48402,8371,5656,25891,21844,62507,16870,20226,265085
-"Total: $25,000 to $34,999",64452,45597,7506,5338,25318,25871,64724,21174,25231,285211
-"Total: $35,000 to $49,999",99980,60377,12165,7806,43901,43177,95266,32600,35768,431040
-"Total: $50,000 to $64,999",82111,56651,12332,9747,38867,37365,93236,26823,30202,387334
-"Total: $65,000 to $74,999",43157,34027,4750,4370,23835,18731,46561,13000,15259,203690
-"Total: $75,000 or more",395873,248198,60539,24355,260558,198148,517461,70988,88390,1864510
-"Total: Car, truck, or van - drove alone:",452339,341353,67085,47032,136951,228231,644818,154819,170305,2242933
-"Total: Car, truck, or van - drove alone: $1 to $9,999 or loss",26962,26302,4973,5221,6063,12250,37953,12624,12651,144999
-"Total: Car, truck, or van - drove alone: $10,000 to $14,999",15594,13774,2989,1700,4182,5652,22011,5628,7021,78551
-"Total: Car, truck, or van - drove alone: $15,000 to $24,999",30622,29776,4441,3420,6408,12765,41263,12812,13787,155294
-"Total: Car, truck, or van - drove alone: $25,000 to $34,999",35985,30230,3386,3240,7533,16763,42267,15204,16582,171190
-"Total: Car, truck, or van - drove alone: $35,000 to $49,999",63753,38659,7745,5432,14253,25169,64560,25539,25048,270158
-"Total: Car, truck, or van - drove alone: $50,000 to $64,999",50314,38787,8936,7890,14824,24585,66686,19850,22267,254139
-"Total: Car, truck, or van - drove alone: $65,000 to $74,999",26353,22426,3354,3048,8792,11585,32715,9676,11065,129014
-"Total: Car, truck, or van - drove alone: $75,000 or more",202756,141399,31261,17081,74896,119462,337363,53486,61884,1039588
-"Total: Car, truck, or van - carpooled:",75395,60347,8672,6472,32319,38693,101704,19941,25176,368719
-"Total: Car, truck, or van - carpooled: $1 to $9,999 or loss",6140,6308,1483,708,2871,3814,8909,2136,2536,34905
-"Total: Car, truck, or van - carpooled: $10,000 to $14,999",2876,3341,768,390,825,494,7045,1296,1120,18155
-"Total: Car, truck, or van - carpooled: $15,000 to $24,999",8380,9280,855,459,1897,2628,7893,2490,3270,37152
-"Total: Car, truck, or van - carpooled: $25,000 to $34,999",9358,7041,733,864,3497,2272,9700,2673,3463,39601
-"Total: Car, truck, or van - carpooled: $35,000 to $49,999",12736,9106,1120,1479,3415,6858,13816,2723,5790,57043
-"Total: Car, truck, or van - carpooled: $50,000 to $64,999",8619,5172,486,608,3030,4420,11022,2708,2680,38745
-"Total: Car, truck, or van - carpooled: $65,000 to $74,999",4083,3640,357,372,1550,2728,4163,1557,2079,20529
-"Total: Car, truck, or van - carpooled: $75,000 or more",23203,16459,2870,1592,15234,15479,39156,4358,4238,122589
-Total: Public transportation (excluding taxicab):,74554,35857,4750,576,101330,20563,28329,3991,1842,271792
-"Total: Public transportation (excluding taxicab): $1 to $9,999 or loss",5778,2305,0,95,6885,1892,2075,372,353,19755
-"Total: Public transportation (excluding taxicab): $10,000 to $14,999",2455,794,295,0,4708,279,1298,175,282,10286
-"Total: Public transportation (excluding taxicab): $15,000 to $24,999",4536,2584,337,42,7532,1195,2536,0,52,18814
-"Total: Public transportation (excluding taxicab): $25,000 to $34,999",6122,2115,167,0,7355,3055,2584,105,100,21603
-"Total: Public transportation (excluding taxicab): $35,000 to $49,999",6371,4435,535,99,12273,2936,2867,496,223,30235
-"Total: Public transportation (excluding taxicab): $50,000 to $64,999",7411,3344,385,37,8603,1605,2262,1354,125,25126
-"Total: Public transportation (excluding taxicab): $65,000 to $74,999",3066,1678,9,0,4996,928,1189,0,0,11866
-"Total: Public transportation (excluding taxicab): $75,000 or more",38815,18602,3022,303,48978,8673,13518,1489,707,134107
-Total: Walked:,26933,10578,5084,3707,47388,9126,20095,2780,6378,132069
-"Total: Walked: $1 to $9,999 or loss",7858,983,1721,996,3805,1478,3725,384,430,21380
-"Total: Walked: $10,000 to $14,999",1399,1493,40,392,2287,734,1128,231,312,8016
-"Total: Walked: $15,000 to $24,999",2248,1172,532,691,3746,769,2646,445,851,13100
-"Total: Walked: $25,000 to $34,999",2275,944,534,411,2134,292,1823,380,1293,10086
-"Total: Walked: $35,000 to $49,999",2686,1237,315,401,4606,1269,3133,148,965,14760
-"Total: Walked: $50,000 to $64,999",1745,1099,168,230,4442,858,1437,535,942,11456
-"Total: Walked: $65,000 to $74,999",1423,351,0,173,2557,828,587,139,314,6372
-"Total: Walked: $75,000 or more",7299,3299,1774,413,23811,2898,5616,518,1271,46899
-"Total: Taxicab, motorcycle, bicycle, or other means:",28971,12537,3865,1371,30067,11398,26259,2757,4311,121536
-"Total: Taxicab, motorcycle, bicycle, or other means: $1 to $9,999 or loss",2301,1855,773,176,1923,1103,2811,587,332,11861
-"Total: Taxicab, motorcycle, bicycle, or other means: $10,000 to $14,999",1694,394,0,0,1541,776,1291,129,333,6158
-"Total: Taxicab, motorcycle, bicycle, or other means: $15,000 to $24,999",2496,1594,269,292,1073,1478,1879,164,347,9592
-"Total: Taxicab, motorcycle, bicycle, or other means: $25,000 to $34,999",3476,1638,245,223,1364,248,1324,621,685,9824
-"Total: Taxicab, motorcycle, bicycle, or other means: $35,000 to $49,999",3454,771,488,44,3039,2177,2207,379,645,13204
-"Total: Taxicab, motorcycle, bicycle, or other means: $50,000 to $64,999",2447,1164,199,32,2481,1162,2128,186,559,10358
-"Total: Taxicab, motorcycle, bicycle, or other means: $65,000 to $74,999",1120,352,115,0,1339,245,1544,321,392,5428
-"Total: Taxicab, motorcycle, bicycle, or other means: $75,000 or more",11983,4769,1776,604,17307,4209,13075,370,1018,55111
-Total: Worked from home:,168282,99371,31875,8703,112342,69877,160637,23047,36897,711031
-"Total: Worked from home: $1 to $9,999 or loss",8410,6539,1617,556,3889,2528,8687,1084,3200,36510
-"Total: Worked from home: $10,000 to $14,999",4116,2703,1009,355,3048,1752,5154,1234,1263,20634
-"Total: Worked from home: $15,000 to $24,999",7036,3996,1937,752,5235,3009,6290,959,1919,31133
-"Total: Worked from home: $25,000 to $34,999",7236,3629,2441,600,3435,3241,7026,2191,3108,32907
-"Total: Worked from home: $35,000 to $49,999",10980,6169,1962,351,6315,4768,8683,3315,3097,45640
-"Total: Worked from home: $50,000 to $64,999",11575,7085,2158,950,5487,4735,9701,2190,3629,47510
-"Total: Worked from home: $65,000 to $74,999",7112,5580,915,777,4601,2417,6363,1307,1409,30481
-"Total: Worked from home: $75,000 or more",111817,63670,19836,4362,80332,47427,108733,10767,19272,466216
+,county,grouping,universe,share,dataset
+1,Alameda,"Total: $1 to $9,999 or loss",57449,2.317031953414949,2023 ACS 1 Year
+2,Alameda,"Total: $10,000 to $14,999",28134,1.1346999421639399,2023 ACS 1 Year
+3,Alameda,"Total: $15,000 to $24,999",55318,2.231084502759111,2023 ACS 1 Year
+4,Alameda,"Total: $25,000 to $34,999",64452,2.5994768135476733,2023 ACS 1 Year
+5,Alameda,"Total: $35,000 to $49,999",99980,4.032391420258431,2023 ACS 1 Year
+6,Alameda,"Total: $50,000 to $64,999",82111,3.311699258940189,2023 ACS 1 Year
+7,Alameda,"Total: $65,000 to $74,999",43157,1.740607286698271,2023 ACS 1 Year
+8,Alameda,"Total: $75,000 or more",395873,15.96634215555077,2023 ACS 1 Year
+9,Alameda,"Total: Car, truck, or van - drove alone:",452339,18.243727772037193,2023 ACS 1 Year
+10,Alameda,"Total: Car, truck, or van - drove alone: $1 to $9,999 or loss",26962,1.0874308609022587,2023 ACS 1 Year
+11,Alameda,"Total: Car, truck, or van - drove alone: $10,000 to $14,999",15594,0.628936905456191,2023 ACS 1 Year
+12,Alameda,"Total: Car, truck, or van - drove alone: $15,000 to $24,999",30622,1.2350459098935154,2023 ACS 1 Year
+13,Alameda,"Total: Car, truck, or van - drove alone: $25,000 to $34,999",35985,1.4513463218443652,2023 ACS 1 Year
+14,Alameda,"Total: Car, truck, or van - drove alone: $35,000 to $49,999",63753,2.5712847591091794,2023 ACS 1 Year
+15,Alameda,"Total: Car, truck, or van - drove alone: $50,000 to $64,999",50314,2.0292632718431958,2023 ACS 1 Year
+16,Alameda,"Total: Car, truck, or van - drove alone: $65,000 to $74,999",26353,1.0628686847176478,2023 ACS 1 Year
+17,Alameda,"Total: Car, truck, or van - drove alone: $75,000 or more",202756,8.17755105827084,2023 ACS 1 Year
+18,Alameda,"Total: Car, truck, or van - carpooled:",75395,3.040829677239292,2023 ACS 1 Year
+19,Alameda,"Total: Car, truck, or van - carpooled: $1 to $9,999 or loss",6140,0.24763836087604288,2023 ACS 1 Year
+20,Alameda,"Total: Car, truck, or van - carpooled: $10,000 to $14,999",2876,0.11599477620187286,2023 ACS 1 Year
+21,Alameda,"Total: Car, truck, or van - carpooled: $15,000 to $24,999",8380,0.33798199741713997,2023 ACS 1 Year
+22,Alameda,"Total: Car, truck, or van - carpooled: $25,000 to $34,999",9358,0.3774266744426725,2023 ACS 1 Year
+23,Alameda,"Total: Car, truck, or van - carpooled: $35,000 to $49,999",12736,0.5136681049050948,2023 ACS 1 Year
+24,Alameda,"Total: Car, truck, or van - carpooled: $50,000 to $64,999",8619,0.34762134078023027,2023 ACS 1 Year
+25,Alameda,"Total: Car, truck, or van - carpooled: $65,000 to $74,999",4083,0.16467547678450864,2023 ACS 1 Year
+26,Alameda,"Total: Car, truck, or van - carpooled: $75,000 or more",23203,0.9358229458317302,2023 ACS 1 Year
+27,Alameda,Total: Public transportation (excluding taxicab):,74554,3.006910481555782,2023 ACS 1 Year
+28,Alameda,"Total: Public transportation (excluding taxicab): $1 to $9,999 or loss",5778,0.233038183899312,2023 ACS 1 Year
+29,Alameda,"Total: Public transportation (excluding taxicab): $10,000 to $14,999",2455,0.09901501236981845,2023 ACS 1 Year
+30,Alameda,"Total: Public transportation (excluding taxicab): $15,000 to $24,999",4536,0.18294586399572157,2023 ACS 1 Year
+31,Alameda,"Total: Public transportation (excluding taxicab): $25,000 to $34,999",6122,0.24691238522526623,2023 ACS 1 Year
+32,Alameda,"Total: Public transportation (excluding taxicab): $35,000 to $49,999",6371,0.2569550483943435,2023 ACS 1 Year
+33,Alameda,"Total: Public transportation (excluding taxicab): $50,000 to $64,999",7411,0.29890030821699576,2023 ACS 1 Year
+34,Alameda,"Total: Public transportation (excluding taxicab): $65,000 to $74,999",3066,0.12365785251562662,2023 ACS 1 Year
+35,Alameda,"Total: Public transportation (excluding taxicab): $75,000 or more",38815,1.5654858269386978,2023 ACS 1 Year
+36,Alameda,Total: Walked:,26933,1.0862612334648962,2023 ACS 1 Year
+37,Alameda,"Total: Walked: $1 to $9,999 or loss",7858,0.31692870354461644,2023 ACS 1 Year
+38,Alameda,"Total: Walked: $10,000 to $14,999",1399,0.05642444085758697,2023 ACS 1 Year
+39,Alameda,"Total: Walked: $15,000 to $24,999",2248,0.09066629238588672,2023 ACS 1 Year
+40,Alameda,"Total: Walked: $25,000 to $34,999",2275,0.09175525586205172,2023 ACS 1 Year
+41,Alameda,"Total: Walked: $35,000 to $49,999",2686,0.10833169988811908,2023 ACS 1 Year
+42,Alameda,"Total: Walked: $50,000 to $64,999",1745,0.07037930614473857,2023 ACS 1 Year
+43,Alameda,"Total: Walked: $65,000 to $74,999",1423,0.05739240839195586,2023 ACS 1 Year
+44,Alameda,"Total: Walked: $75,000 or more",7299,0.2943831263899409,2023 ACS 1 Year
+45,Alameda,"Total: Taxicab, motorcycle, bicycle, or other means:",28971,1.168457809925055,2023 ACS 1 Year
+46,Alameda,"Total: Taxicab, motorcycle, bicycle, or other means: $1 to $9,999 or loss",2301,0.09280388735761802,2023 ACS 1 Year
+47,Alameda,"Total: Taxicab, motorcycle, bicycle, or other means: $10,000 to $14,999",1694,0.06832237513420467,2023 ACS 1 Year
+48,Alameda,"Total: Taxicab, motorcycle, bicycle, or other means: $15,000 to $24,999",2496,0.10066862357436532,2023 ACS 1 Year
+49,Alameda,"Total: Taxicab, motorcycle, bicycle, or other means: $25,000 to $34,999",3476,0.14019396456109529,2023 ACS 1 Year
+50,Alameda,"Total: Taxicab, motorcycle, bicycle, or other means: $35,000 to $49,999",3454,0.1393066609879238,2023 ACS 1 Year
+51,Alameda,"Total: Taxicab, motorcycle, bicycle, or other means: $50,000 to $64,999",2447,0.09869235652502882,2023 ACS 1 Year
+52,Alameda,"Total: Taxicab, motorcycle, bicycle, or other means: $65,000 to $74,999",1120,0.04517181827054854,2023 ACS 1 Year
+53,Alameda,"Total: Taxicab, motorcycle, bicycle, or other means: $75,000 or more",11983,0.48329812351427065,2023 ACS 1 Year
+54,Alameda,Total: Worked from home:,168282,6.787146359111115,2023 ACS 1 Year
+55,Alameda,"Total: Worked from home: $1 to $9,999 or loss",8410,0.3391919568351011,2023 ACS 1 Year
+56,Alameda,"Total: Worked from home: $10,000 to $14,999",4116,0.1660064321442659,2023 ACS 1 Year
+57,Alameda,"Total: Worked from home: $15,000 to $24,999",7036,0.2837758154924817,2023 ACS 1 Year
+58,Alameda,"Total: Worked from home: $25,000 to $34,999",7236,0.2918422116122225,2023 ACS 1 Year
+59,Alameda,"Total: Worked from home: $35,000 to $49,999",10980,0.44284514697377053,2023 ACS 1 Year
+60,Alameda,"Total: Worked from home: $50,000 to $64,999",11575,0.46684267542999935,2023 ACS 1 Year
+61,Alameda,"Total: Worked from home: $65,000 to $74,999",7112,0.2868410460179832,2023 ACS 1 Year
+62,Alameda,"Total: Worked from home: $75,000 or more",111817,4.50980107460529,2023 ACS 1 Year
+64,Contra Costa,"Total: $1 to $9,999 or loss",44292,2.6362261469208614,2023 ACS 1 Year
+65,Contra Costa,"Total: $10,000 to $14,999",22499,1.3391233649320975,2023 ACS 1 Year
+66,Contra Costa,"Total: $15,000 to $24,999",48402,2.880850220429503,2023 ACS 1 Year
+67,Contra Costa,"Total: $25,000 to $34,999",45597,2.7138987542028024,2023 ACS 1 Year
+68,Contra Costa,"Total: $35,000 to $49,999",60377,3.5935931110051667,2023 ACS 1 Year
+69,Contra Costa,"Total: $50,000 to $64,999",56651,3.371824425386384,2023 ACS 1 Year
+70,Contra Costa,"Total: $65,000 to $74,999",34027,2.025261155542223,2023 ACS 1 Year
+71,Contra Costa,"Total: $75,000 or more",248198,14.772556154914296,2023 ACS 1 Year
+72,Contra Costa,"Total: Car, truck, or van - drove alone:",341353,20.31707089158035,2023 ACS 1 Year
+73,Contra Costa,"Total: Car, truck, or van - drove alone: $1 to $9,999 or loss",26302,1.5654750319767115,2023 ACS 1 Year
+74,Contra Costa,"Total: Car, truck, or van - drove alone: $10,000 to $14,999",13774,0.8198180020700792,2023 ACS 1 Year
+75,Contra Costa,"Total: Car, truck, or van - drove alone: $15,000 to $24,999",29776,1.7722448692927744,2023 ACS 1 Year
+76,Contra Costa,"Total: Car, truck, or van - drove alone: $25,000 to $34,999",30230,1.7992666039333884,2023 ACS 1 Year
+77,Contra Costa,"Total: Car, truck, or van - drove alone: $35,000 to $49,999",38659,2.300954271963641,2023 ACS 1 Year
+78,Contra Costa,"Total: Car, truck, or van - drove alone: $50,000 to $64,999",38787,2.308572734593594,2023 ACS 1 Year
+79,Contra Costa,"Total: Car, truck, or van - drove alone: $65,000 to $74,999",22426,1.3347784604634525,2023 ACS 1 Year
+80,Contra Costa,"Total: Car, truck, or van - drove alone: $75,000 or more",141399,8.415960917286707,2023 ACS 1 Year
+81,Contra Costa,"Total: Car, truck, or van - carpooled:",60347,3.591807533826272,2023 ACS 1 Year
+82,Contra Costa,"Total: Car, truck, or van - carpooled: $1 to $9,999 or loss",6308,0.37544736148236235,2023 ACS 1 Year
+83,Contra Costa,"Total: Car, truck, or van - carpooled: $10,000 to $14,999",3341,0.1988537784896279,2023 ACS 1 Year
+84,Contra Costa,"Total: Car, truck, or van - carpooled: $15,000 to $24,999",9280,0.5523385406715794,2023 ACS 1 Year
+85,Contra Costa,"Total: Car, truck, or van - carpooled: $25,000 to $34,999",7041,0.4190749638867015,2023 ACS 1 Year
+86,Contra Costa,"Total: Car, truck, or van - carpooled: $35,000 to $49,999",9106,0.5419821930339873,2023 ACS 1 Year
+87,Contra Costa,"Total: Car, truck, or van - carpooled: $50,000 to $64,999",5172,0.3078335056415311,2023 ACS 1 Year
+88,Contra Costa,"Total: Car, truck, or van - carpooled: $65,000 to $74,999",3640,0.2166500310392833,2023 ACS 1 Year
+89,Contra Costa,"Total: Car, truck, or van - carpooled: $75,000 or more",16459,0.9796271595811988,2023 ACS 1 Year
+90,Contra Costa,Total: Public transportation (excluding taxicab):,35857,2.13418136345483,2023 ACS 1 Year
+91,Contra Costa,"Total: Public transportation (excluding taxicab): $1 to $9,999 or loss",2305,0.13719184657844727,2023 ACS 1 Year
+92,Contra Costa,"Total: Public transportation (excluding taxicab): $10,000 to $14,999",794,0.04725827600142608,2023 ACS 1 Year
+93,Contra Costa,"Total: Public transportation (excluding taxicab): $15,000 to $24,999",2584,0.15379771434217254,2023 ACS 1 Year
+94,Contra Costa,"Total: Public transportation (excluding taxicab): $25,000 to $34,999",2115,0.12588319111211105,2023 ACS 1 Year
+95,Contra Costa,"Total: Public transportation (excluding taxicab): $35,000 to $49,999",4435,0.2639678262800059,2023 ACS 1 Year
+96,Contra Costa,"Total: Public transportation (excluding taxicab): $50,000 to $64,999",3344,0.19903233620751742,2023 ACS 1 Year
+97,Contra Costa,"Total: Public transportation (excluding taxicab): $65,000 to $74,999",1678,0.09987328353953774,2023 ACS 1 Year
+98,Contra Costa,"Total: Public transportation (excluding taxicab): $75,000 or more",18602,1.107176889393612,2023 ACS 1 Year
+99,Contra Costa,Total: Walked:,10578,0.6295945132784447,2023 ACS 1 Year
+100,Contra Costa,"Total: Walked: $1 to $9,999 or loss",983,0.05850741222846579,2023 ACS 1 Year
+101,Contra Costa,"Total: Walked: $10,000 to $14,999",1493,0.08886222426968406,2023 ACS 1 Year
+102,Contra Costa,"Total: Walked: $15,000 to $24,999",1172,0.0697565484555055,2023 ACS 1 Year
+103,Contra Costa,"Total: Walked: $25,000 to $34,999",944,0.05618616189590204,2023 ACS 1 Year
+104,Contra Costa,"Total: Walked: $35,000 to $49,999",1237,0.07362529900977842,2023 ACS 1 Year
+105,Contra Costa,"Total: Walked: $50,000 to $64,999",1099,0.06541164398686053,2023 ACS 1 Year
+106,Contra Costa,"Total: Walked: $65,000 to $74,999",351,0.020891252993073747,2023 ACS 1 Year
+107,Contra Costa,"Total: Walked: $75,000 or more",3299,0.1963539704391746,2023 ACS 1 Year
+108,Contra Costa,"Total: Taxicab, motorcycle, bicycle, or other means:",12537,0.7461927030603007,2023 ACS 1 Year
+109,Contra Costa,"Total: Taxicab, motorcycle, bicycle, or other means: $1 to $9,999 or loss",1855,0.11040818889501937,2023 ACS 1 Year
+110,Contra Costa,"Total: Taxicab, motorcycle, bicycle, or other means: $10,000 to $14,999",394,0.02345058028282352,2023 ACS 1 Year
+111,Contra Costa,"Total: Taxicab, motorcycle, bicycle, or other means: $15,000 to $24,999",1594,0.09487366743863121,2023 ACS 1 Year
+112,Contra Costa,"Total: Taxicab, motorcycle, bicycle, or other means: $25,000 to $34,999",1638,0.09749251396767748,2023 ACS 1 Year
+113,Contra Costa,"Total: Taxicab, motorcycle, bicycle, or other means: $35,000 to $49,999",771,0.04588933349760643,2023 ACS 1 Year
+114,Contra Costa,"Total: Taxicab, motorcycle, bicycle, or other means: $50,000 to $64,999",1164,0.06928039454113345,2023 ACS 1 Year
+115,Contra Costa,"Total: Taxicab, motorcycle, bicycle, or other means: $65,000 to $74,999",352,0.020950772232370254,2023 ACS 1 Year
+116,Contra Costa,"Total: Taxicab, motorcycle, bicycle, or other means: $75,000 or more",4769,0.28384725220503904,2023 ACS 1 Year
+117,Contra Costa,Total: Worked from home:,99371,5.914486328133138,2023 ACS 1 Year
+118,Contra Costa,"Total: Worked from home: $1 to $9,999 or loss",6539,0.38919630575985537,2023 ACS 1 Year
+119,Contra Costa,"Total: Worked from home: $10,000 to $14,999",2703,0.1608805038184568,2023 ACS 1 Year
+120,Contra Costa,"Total: Worked from home: $15,000 to $24,999",3996,0.2378388802288396,2023 ACS 1 Year
+121,Contra Costa,"Total: Worked from home: $25,000 to $34,999",3629,0.21599531940702174,2023 ACS 1 Year
+122,Contra Costa,"Total: Worked from home: $35,000 to $49,999",6169,0.367174187220148,2023 ACS 1 Year
+123,Contra Costa,"Total: Worked from home: $50,000 to $64,999",7085,0.4216938104157479,2023 ACS 1 Year
+124,Contra Costa,"Total: Worked from home: $65,000 to $74,999",5580,0.3321173552745057,2023 ACS 1 Year
+125,Contra Costa,"Total: Worked from home: $75,000 or more",63670,3.7895899660085623,2023 ACS 1 Year
+127,Marin,"Total: $1 to $9,999 or loss",10567,2.9030778064413325,2023 ACS 1 Year
+128,Marin,"Total: $10,000 to $14,999",5101,1.4014005763847106,2023 ACS 1 Year
+129,Marin,"Total: $15,000 to $24,999",8371,2.2997695010618333,2023 ACS 1 Year
+130,Marin,"Total: $25,000 to $34,999",7506,2.062127568387304,2023 ACS 1 Year
+131,Marin,"Total: $35,000 to $49,999",12165,3.3420972381337,2023 ACS 1 Year
+132,Marin,"Total: $50,000 to $64,999",12332,3.387977241320575,2023 ACS 1 Year
+133,Marin,"Total: $65,000 to $74,999",4750,1.3049701505248728,2023 ACS 1 Year
+134,Marin,"Total: $75,000 or more",60539,16.631913251079002,2023 ACS 1 Year
+135,Marin,"Total: Car, truck, or van - drove alone:",67085,18.430299483781283,2023 ACS 1 Year
+136,Marin,"Total: Car, truck, or van - drove alone: $1 to $9,999 or loss",4973,1.3662350649600405,2023 ACS 1 Year
+137,Marin,"Total: Car, truck, or van - drove alone: $10,000 to $14,999",2989,0.8211696378776514,2023 ACS 1 Year
+138,Marin,"Total: Car, truck, or van - drove alone: $15,000 to $24,999",4441,1.2200784081012546,2023 ACS 1 Year
+139,Marin,"Total: Car, truck, or van - drove alone: $25,000 to $34,999",3386,0.9302376694057304,2023 ACS 1 Year
+140,Marin,"Total: Car, truck, or van - drove alone: $35,000 to $49,999",7745,2.127788171750556,2023 ACS 1 Year
+141,Marin,"Total: Car, truck, or van - drove alone: $50,000 to $64,999",8936,2.454992266334792,2023 ACS 1 Year
+142,Marin,"Total: Car, truck, or van - drove alone: $65,000 to $74,999",3354,0.9214462915495627,2023 ACS 1 Year
+143,Marin,"Total: Car, truck, or van - drove alone: $75,000 or more",31261,8.588351973801695,2023 ACS 1 Year
+144,Marin,"Total: Car, truck, or van - carpooled:",8672,2.3824633990214097,2023 ACS 1 Year
+145,Marin,"Total: Car, truck, or van - carpooled: $1 to $9,999 or loss",1483,0.4074254175217655,2023 ACS 1 Year
+146,Marin,"Total: Car, truck, or van - carpooled: $10,000 to $14,999",768,0.21099306854802155,2023 ACS 1 Year
+147,Marin,"Total: Car, truck, or van - carpooled: $15,000 to $24,999",855,0.23489462709447706,2023 ACS 1 Year
+148,Marin,"Total: Car, truck, or van - carpooled: $25,000 to $34,999",733,0.20137749901783827,2023 ACS 1 Year
+149,Marin,"Total: Car, truck, or van - carpooled: $35,000 to $49,999",1120,0.30769822496586474,2023 ACS 1 Year
+150,Marin,"Total: Car, truck, or van - carpooled: $50,000 to $64,999",486,0.13351905119054489,2023 ACS 1 Year
+151,Marin,"Total: Car, truck, or van - carpooled: $65,000 to $74,999",357,0.09807880920786939,2023 ACS 1 Year
+152,Marin,"Total: Car, truck, or van - carpooled: $75,000 or more",2870,0.7884767014750284,2023 ACS 1 Year
+153,Marin,Total: Public transportation (excluding taxicab):,4750,1.3049701505248728,2023 ACS 1 Year
+154,Marin,"Total: Public transportation (excluding taxicab): $1 to $9,999 or loss",0,0.0,2023 ACS 1 Year
+155,Marin,"Total: Public transportation (excluding taxicab): $10,000 to $14,999",295,0.08104551461154473,2023 ACS 1 Year
+156,Marin,"Total: Public transportation (excluding taxicab): $15,000 to $24,999",337,0.09258419804776465,2023 ACS 1 Year
+157,Marin,"Total: Public transportation (excluding taxicab): $25,000 to $34,999",167,0.04588000318687447,2023 ACS 1 Year
+158,Marin,"Total: Public transportation (excluding taxicab): $35,000 to $49,999",535,0.14698084853280144,2023 ACS 1 Year
+159,Marin,"Total: Public transportation (excluding taxicab): $50,000 to $64,999",385,0.105771264832016,2023 ACS 1 Year
+160,Marin,"Total: Public transportation (excluding taxicab): $65,000 to $74,999",9,0.002472575022047127,2023 ACS 1 Year
+161,Marin,"Total: Public transportation (excluding taxicab): $75,000 or more",3022,0.8302357462918244,2023 ACS 1 Year
+162,Marin,Total: Walked:,5084,1.3967301568986217,2023 ACS 1 Year
+163,Marin,"Total: Walked: $1 to $9,999 or loss",1721,0.4728112903270118,2023 ACS 1 Year
+164,Marin,"Total: Walked: $10,000 to $14,999",40,0.010989222320209454,2023 ACS 1 Year
+165,Marin,"Total: Walked: $15,000 to $24,999",532,0.14615665685878573,2023 ACS 1 Year
+166,Marin,"Total: Walked: $25,000 to $34,999",534,0.1467061179747962,2023 ACS 1 Year
+167,Marin,"Total: Walked: $35,000 to $49,999",315,0.08654012577164945,2023 ACS 1 Year
+168,Marin,"Total: Walked: $50,000 to $64,999",168,0.04615473374487971,2023 ACS 1 Year
+169,Marin,"Total: Walked: $65,000 to $74,999",0,0.0,2023 ACS 1 Year
+170,Marin,"Total: Walked: $75,000 or more",1774,0.4873720099012893,2023 ACS 1 Year
+171,Marin,"Total: Taxicab, motorcycle, bicycle, or other means:",3865,1.0618336066902385,2023 ACS 1 Year
+172,Marin,"Total: Taxicab, motorcycle, bicycle, or other means: $1 to $9,999 or loss",773,0.2123667213380477,2023 ACS 1 Year
+173,Marin,"Total: Taxicab, motorcycle, bicycle, or other means: $10,000 to $14,999",0,0.0,2023 ACS 1 Year
+174,Marin,"Total: Taxicab, motorcycle, bicycle, or other means: $15,000 to $24,999",269,0.07390252010340857,2023 ACS 1 Year
+175,Marin,"Total: Taxicab, motorcycle, bicycle, or other means: $25,000 to $34,999",245,0.06730898671128291,2023 ACS 1 Year
+176,Marin,"Total: Taxicab, motorcycle, bicycle, or other means: $35,000 to $49,999",488,0.13406851230655534,2023 ACS 1 Year
+177,Marin,"Total: Taxicab, motorcycle, bicycle, or other means: $50,000 to $64,999",199,0.05467138104304203,2023 ACS 1 Year
+178,Marin,"Total: Taxicab, motorcycle, bicycle, or other means: $65,000 to $74,999",115,0.03159401417060218,2023 ACS 1 Year
+179,Marin,"Total: Taxicab, motorcycle, bicycle, or other means: $75,000 or more",1776,0.48792147101729977,2023 ACS 1 Year
+180,Marin,Total: Worked from home:,31875,8.75703653641691,2023 ACS 1 Year
+181,Marin,"Total: Worked from home: $1 to $9,999 or loss",1617,0.4442393122944672,2023 ACS 1 Year
+182,Marin,"Total: Worked from home: $10,000 to $14,999",1009,0.2772031330272835,2023 ACS 1 Year
+183,Marin,"Total: Worked from home: $15,000 to $24,999",1937,0.5321530908561428,2023 ACS 1 Year
+184,Marin,"Total: Worked from home: $25,000 to $34,999",2441,0.6706172920907819,2023 ACS 1 Year
+185,Marin,"Total: Worked from home: $35,000 to $49,999",1962,0.5390213548062737,2023 ACS 1 Year
+186,Marin,"Total: Worked from home: $50,000 to $64,999",2158,0.5928685441753001,2023 ACS 1 Year
+187,Marin,"Total: Worked from home: $65,000 to $74,999",915,0.25137846057479124,2023 ACS 1 Year
+188,Marin,"Total: Worked from home: $75,000 or more",19836,5.449555348591868,2023 ACS 1 Year
+190,Napa,"Total: $1 to $9,999 or loss",7752,3.8077835575662013,2023 ACS 1 Year
+191,Napa,"Total: $10,000 to $14,999",2837,1.3935348236345864,2023 ACS 1 Year
+192,Napa,"Total: $15,000 to $24,999",5656,2.778228044581325,2023 ACS 1 Year
+193,Napa,"Total: $25,000 to $34,999",5338,2.6220263970960245,2023 ACS 1 Year
+194,Napa,"Total: $35,000 to $49,999",7806,3.8343083656297434,2023 ACS 1 Year
+195,Napa,"Total: $50,000 to $64,999",9747,4.787727855469268,2023 ACS 1 Year
+196,Napa,"Total: $65,000 to $74,999",4370,2.1465446525495744,2023 ACS 1 Year
+197,Napa,"Total: $75,000 or more",24355,11.96317963680661,2023 ACS 1 Year
+198,Napa,"Total: Car, truck, or van - drove alone:",47032,23.10212542304613,2023 ACS 1 Year
+199,Napa,"Total: Car, truck, or van - drove alone: $1 to $9,999 or loss",5221,2.564555979625018,2023 ACS 1 Year
+200,Napa,"Total: Car, truck, or van - drove alone: $10,000 to $14,999",1700,0.8350402538522372,2023 ACS 1 Year
+201,Napa,"Total: Car, truck, or van - drove alone: $15,000 to $24,999",3420,1.6799045106909711,2023 ACS 1 Year
+202,Napa,"Total: Car, truck, or van - drove alone: $25,000 to $34,999",3240,1.591488483812499,2023 ACS 1 Year
+203,Napa,"Total: Car, truck, or van - drove alone: $35,000 to $49,999",5432,2.6681992111325603,2023 ACS 1 Year
+204,Napa,"Total: Car, truck, or van - drove alone: $50,000 to $64,999",7890,3.87556917817303,2023 ACS 1 Year
+205,Napa,"Total: Car, truck, or van - drove alone: $65,000 to $74,999",3048,1.4971780551421288,2023 ACS 1 Year
+206,Napa,"Total: Car, truck, or van - drove alone: $75,000 or more",17081,8.390189750617685,2023 ACS 1 Year
+207,Napa,"Total: Car, truck, or van - carpooled:",6472,3.1790473664303995,2023 ACS 1 Year
+208,Napa,"Total: Car, truck, or van - carpooled: $1 to $9,999 or loss",708,0.34776970572199056,2023 ACS 1 Year
+209,Napa,"Total: Car, truck, or van - carpooled: $10,000 to $14,999",390,0.1915680582366897,2023 ACS 1 Year
+210,Napa,"Total: Car, truck, or van - carpooled: $15,000 to $24,999",459,0.22546086854010405,2023 ACS 1 Year
+211,Napa,"Total: Car, truck, or van - carpooled: $25,000 to $34,999",864,0.4243969290166664,2023 ACS 1 Year
+212,Napa,"Total: Car, truck, or van - carpooled: $35,000 to $49,999",1479,0.7264850208514463,2023 ACS 1 Year
+213,Napa,"Total: Car, truck, or van - carpooled: $50,000 to $64,999",608,0.298649690789506,2023 ACS 1 Year
+214,Napa,"Total: Car, truck, or van - carpooled: $65,000 to $74,999",372,0.18272645554884248,2023 ACS 1 Year
+215,Napa,"Total: Car, truck, or van - carpooled: $75,000 or more",1592,0.7819906377251539,2023 ACS 1 Year
+216,Napa,Total: Public transportation (excluding taxicab):,576,0.28293128601111095,2023 ACS 1 Year
+217,Napa,"Total: Public transportation (excluding taxicab): $1 to $9,999 or loss",95,0.04666401418586032,2023 ACS 1 Year
+218,Napa,"Total: Public transportation (excluding taxicab): $10,000 to $14,999",0,0.0,2023 ACS 1 Year
+219,Napa,"Total: Public transportation (excluding taxicab): $15,000 to $24,999",42,0.020630406271643507,2023 ACS 1 Year
+220,Napa,"Total: Public transportation (excluding taxicab): $25,000 to $34,999",0,0.0,2023 ACS 1 Year
+221,Napa,"Total: Public transportation (excluding taxicab): $35,000 to $49,999",99,0.048628814783159696,2023 ACS 1 Year
+222,Napa,"Total: Public transportation (excluding taxicab): $50,000 to $64,999",37,0.01817440552501928,2023 ACS 1 Year
+223,Napa,"Total: Public transportation (excluding taxicab): $65,000 to $74,999",0,0.0,2023 ACS 1 Year
+224,Napa,"Total: Public transportation (excluding taxicab): $75,000 or more",303,0.14883364524542816,2023 ACS 1 Year
+225,Napa,Total: Walked:,3707,1.820878953547202,2023 ACS 1 Year
+226,Napa,"Total: Walked: $1 to $9,999 or loss",996,0.489235348727546,2023 ACS 1 Year
+227,Napa,"Total: Walked: $10,000 to $14,999",392,0.1925504585353394,2023 ACS 1 Year
+228,Napa,"Total: Walked: $15,000 to $24,999",691,0.3394193031834682,2023 ACS 1 Year
+229,Napa,"Total: Walked: $25,000 to $34,999",411,0.20188326137251145,2023 ACS 1 Year
+230,Napa,"Total: Walked: $35,000 to $49,999",401,0.19697125987926298,2023 ACS 1 Year
+231,Napa,"Total: Walked: $50,000 to $64,999",230,0.11297603434471445,2023 ACS 1 Year
+232,Napa,"Total: Walked: $65,000 to $74,999",173,0.08497762583319826,2023 ACS 1 Year
+233,Napa,"Total: Walked: $75,000 or more",413,0.20286566167116116,2023 ACS 1 Year
+234,Napa,"Total: Taxicab, motorcycle, bicycle, or other means:",1371,0.673435404724363,2023 ACS 1 Year
+235,Napa,"Total: Taxicab, motorcycle, bicycle, or other means: $1 to $9,999 or loss",176,0.08645122628117279,2023 ACS 1 Year
+236,Napa,"Total: Taxicab, motorcycle, bicycle, or other means: $10,000 to $14,999",0,0.0,2023 ACS 1 Year
+237,Napa,"Total: Taxicab, motorcycle, bicycle, or other means: $15,000 to $24,999",292,0.14343044360285484,2023 ACS 1 Year
+238,Napa,"Total: Taxicab, motorcycle, bicycle, or other means: $25,000 to $34,999",223,0.10953763329944052,2023 ACS 1 Year
+239,Napa,"Total: Taxicab, motorcycle, bicycle, or other means: $35,000 to $49,999",44,0.021612806570293196,2023 ACS 1 Year
+240,Napa,"Total: Taxicab, motorcycle, bicycle, or other means: $50,000 to $64,999",32,0.015718404778395055,2023 ACS 1 Year
+241,Napa,"Total: Taxicab, motorcycle, bicycle, or other means: $65,000 to $74,999",0,0.0,2023 ACS 1 Year
+242,Napa,"Total: Taxicab, motorcycle, bicycle, or other means: $75,000 or more",604,0.2966848901922066,2023 ACS 1 Year
+243,Napa,Total: Worked from home:,8703,4.27491489957413,2023 ACS 1 Year
+244,Napa,"Total: Worked from home: $1 to $9,999 or loss",556,0.273107283024614,2023 ACS 1 Year
+245,Napa,"Total: Worked from home: $10,000 to $14,999",355,0.1743760530103201,2023 ACS 1 Year
+246,Napa,"Total: Worked from home: $15,000 to $24,999",752,0.36938251229228375,2023 ACS 1 Year
+247,Napa,"Total: Worked from home: $25,000 to $34,999",600,0.29472008959490725,2023 ACS 1 Year
+248,Napa,"Total: Worked from home: $35,000 to $49,999",351,0.17241125241302074,2023 ACS 1 Year
+249,Napa,"Total: Worked from home: $50,000 to $64,999",950,0.4666401418586031,2023 ACS 1 Year
+250,Napa,"Total: Worked from home: $65,000 to $74,999",777,0.3816625160254049,2023 ACS 1 Year
+251,Napa,"Total: Worked from home: $75,000 or more",4362,2.1426150513549755,2023 ACS 1 Year
+253,San Francisco,"Total: $1 to $9,999 or loss",25436,1.8415990257683406,2023 ACS 1 Year
+254,San Francisco,"Total: $10,000 to $14,999",16591,1.201209680630702,2023 ACS 1 Year
+255,San Francisco,"Total: $15,000 to $24,999",25891,1.8745416093791518,2023 ACS 1 Year
+256,San Francisco,"Total: $25,000 to $34,999",25318,1.833055674414328,2023 ACS 1 Year
+257,San Francisco,"Total: $35,000 to $49,999",43901,3.178488710105988,2023 ACS 1 Year
+258,San Francisco,"Total: $50,000 to $64,999",38867,2.8140206531898917,2023 ACS 1 Year
+259,San Francisco,"Total: $65,000 to $74,999",23835,1.7256845722278817,2023 ACS 1 Year
+260,San Francisco,"Total: $75,000 or more",260558,18.86473340761705,2023 ACS 1 Year
+261,San Francisco,"Total: Car, truck, or van - drove alone:",136951,9.915428061723542,2023 ACS 1 Year
+262,San Francisco,"Total: Car, truck, or van - drove alone: $1 to $9,999 or loss",6063,0.4389689767743925,2023 ACS 1 Year
+263,San Francisco,"Total: Car, truck, or van - drove alone: $10,000 to $14,999",4182,0.30278216408881903,2023 ACS 1 Year
+264,San Francisco,"Total: Car, truck, or van - drove alone: $15,000 to $24,999",6408,0.46394741929248023,2023 ACS 1 Year
+265,San Francisco,"Total: Car, truck, or van - drove alone: $25,000 to $34,999",7533,0.5453988622862443,2023 ACS 1 Year
+266,San Francisco,"Total: Car, truck, or van - drove alone: $35,000 to $49,999",14253,1.031935481768995,2023 ACS 1 Year
+267,San Francisco,"Total: Car, truck, or van - drove alone: $50,000 to $64,999",14824,1.0732766141684966,2023 ACS 1 Year
+268,San Francisco,"Total: Car, truck, or van - drove alone: $65,000 to $74,999",8792,0.6365520771565989,2023 ACS 1 Year
+269,San Francisco,"Total: Car, truck, or van - drove alone: $75,000 or more",74896,5.422566466187515,2023 ACS 1 Year
+270,San Francisco,"Total: Car, truck, or van - carpooled:",32319,2.3399370543248543,2023 ACS 1 Year
+271,San Francisco,"Total: Car, truck, or van - carpooled: $1 to $9,999 or loss",2871,0.20786408252008592,2023 ACS 1 Year
+272,San Francisco,"Total: Car, truck, or van - carpooled: $10,000 to $14,999",825,0.05973105819542699,2023 ACS 1 Year
+273,San Francisco,"Total: Car, truck, or van - carpooled: $15,000 to $24,999",1897,0.1373452332081515,2023 ACS 1 Year
+274,San Francisco,"Total: Car, truck, or van - carpooled: $25,000 to $34,999",3497,0.2531872854659493,2023 ACS 1 Year
+275,San Francisco,"Total: Car, truck, or van - carpooled: $35,000 to $49,999",3415,0.2472503802877372,2023 ACS 1 Year
+276,San Francisco,"Total: Car, truck, or van - carpooled: $50,000 to $64,999",3030,0.21937588646320458,2023 ACS 1 Year
+277,San Francisco,"Total: Car, truck, or van - carpooled: $65,000 to $74,999",1550,0.11222198812474163,2023 ACS 1 Year
+278,San Francisco,"Total: Car, truck, or van - carpooled: $75,000 or more",15234,1.1029611400595571,2023 ACS 1 Year
+279,San Francisco,Total: Public transportation (excluding taxicab):,101330,7.3364219720516575,2023 ACS 1 Year
+280,San Francisco,"Total: Public transportation (excluding taxicab): $1 to $9,999 or loss",6885,0.4984828311218361,2023 ACS 1 Year
+281,San Francisco,"Total: Public transportation (excluding taxicab): $10,000 to $14,999",4708,0.34086523876857,2023 ACS 1 Year
+282,San Francisco,"Total: Public transportation (excluding taxicab): $15,000 to $24,999",7532,0.5453264610035831,2023 ACS 1 Year
+283,San Francisco,"Total: Public transportation (excluding taxicab): $25,000 to $34,999",7355,0.5325114339725643,2023 ACS 1 Year
+284,San Francisco,"Total: Public transportation (excluding taxicab): $35,000 to $49,999",12273,0.8885809420999702,2023 ACS 1 Year
+285,San Francisco,"Total: Public transportation (excluding taxicab): $50,000 to $64,999",8603,0.6228682347336465,2023 ACS 1 Year
+286,San Francisco,"Total: Public transportation (excluding taxicab): $65,000 to $74,999",4996,0.36171680817497365,2023 ACS 1 Year
+287,San Francisco,"Total: Public transportation (excluding taxicab): $75,000 or more",48978,3.5460700221765133,2023 ACS 1 Year
+288,San Francisco,Total: Walked:,47388,3.4309519827453263,2023 ACS 1 Year
+289,San Francisco,"Total: Walked: $1 to $9,999 or loss",3805,0.27548688052557535,2023 ACS 1 Year
+290,San Francisco,"Total: Walked: $10,000 to $14,999",2287,0.16558173344598973,2023 ACS 1 Year
+291,San Francisco,"Total: Walked: $15,000 to $24,999",3746,0.2712152048485691,2023 ACS 1 Year
+292,San Francisco,"Total: Walked: $25,000 to $34,999",2134,0.1545043371988378,2023 ACS 1 Year
+293,San Francisco,"Total: Walked: $35,000 to $49,999",4606,0.3334803079371354,2023 ACS 1 Year
+294,San Francisco,"Total: Walked: $50,000 to $64,999",4442,0.32160649758071114,2023 ACS 1 Year
+295,San Francisco,"Total: Walked: $65,000 to $74,999",2557,0.1851300797644931,2023 ACS 1 Year
+296,San Francisco,"Total: Walked: $75,000 or more",23811,1.7239469414440145,2023 ACS 1 Year
+297,San Francisco,"Total: Taxicab, motorcycle, bicycle, or other means:",30067,2.176889365772004,2023 ACS 1 Year
+298,San Francisco,"Total: Taxicab, motorcycle, bicycle, or other means: $1 to $9,999 or loss",1923,0.13922766655734073,2023 ACS 1 Year
+299,San Francisco,"Total: Taxicab, motorcycle, bicycle, or other means: $10,000 to $14,999",1541,0.11157037658079151,2023 ACS 1 Year
+300,San Francisco,"Total: Taxicab, motorcycle, bicycle, or other means: $15,000 to $24,999",1073,0.07768657629538565,2023 ACS 1 Year
+301,San Francisco,"Total: Taxicab, motorcycle, bicycle, or other means: $25,000 to $34,999",1364,0.09875534954977261,2023 ACS 1 Year
+302,San Francisco,"Total: Taxicab, motorcycle, bicycle, or other means: $35,000 to $49,999",3039,0.22002749800715468,2023 ACS 1 Year
+303,San Francisco,"Total: Taxicab, motorcycle, bicycle, or other means: $50,000 to $64,999",2481,0.17962758228224773,2023 ACS 1 Year
+304,San Francisco,"Total: Taxicab, motorcycle, bicycle, or other means: $65,000 to $74,999",1339,0.09694531748324453,2023 ACS 1 Year
+305,San Francisco,"Total: Taxicab, motorcycle, bicycle, or other means: $75,000 or more",17307,1.2530489990160665,2023 ACS 1 Year
+306,San Francisco,Total: Worked from home:,112342,8.13370489671595,2023 ACS 1 Year
+307,San Francisco,"Total: Worked from home: $1 to $9,999 or loss",3889,0.2815685882691098,2023 ACS 1 Year
+308,San Francisco,"Total: Worked from home: $10,000 to $14,999",3048,0.22067910955110479,2023 ACS 1 Year
+309,San Francisco,"Total: Worked from home: $15,000 to $24,999",5235,0.3790207147309822,2023 ACS 1 Year
+310,San Francisco,"Total: Worked from home: $25,000 to $34,999",3435,0.24869840594095965,2023 ACS 1 Year
+311,San Francisco,"Total: Worked from home: $35,000 to $49,999",6315,0.4572141000049957,2023 ACS 1 Year
+312,San Francisco,"Total: Worked from home: $50,000 to $64,999",5487,0.3972658379615853,2023 ACS 1 Year
+313,San Francisco,"Total: Worked from home: $65,000 to $74,999",4601,0.33311830152382976,2023 ACS 1 Year
+314,San Francisco,"Total: Worked from home: $75,000 or more",80332,5.816139838733383,2023 ACS 1 Year
+316,San Mateo,"Total: $1 to $9,999 or loss",23065,2.0345534479351906,2023 ACS 1 Year
+317,San Mateo,"Total: $10,000 to $14,999",9687,0.8544859852654754,2023 ACS 1 Year
+318,San Mateo,"Total: $15,000 to $24,999",21844,1.926849578005476,2023 ACS 1 Year
+319,San Mateo,"Total: $25,000 to $34,999",25871,2.282069466790866,2023 ACS 1 Year
+320,San Mateo,"Total: $35,000 to $49,999",43177,3.808624072035453,2023 ACS 1 Year
+321,San Mateo,"Total: $50,000 to $64,999",37365,3.2959501227877044,2023 ACS 1 Year
+322,San Mateo,"Total: $65,000 to $74,999",18731,1.6522532249414288,2023 ACS 1 Year
+323,San Mateo,"Total: $75,000 or more",198148,17.47854743557174,2023 ACS 1 Year
+324,San Mateo,"Total: Car, truck, or van - drove alone:",228231,20.132155559319163,2023 ACS 1 Year
+325,San Mateo,"Total: Car, truck, or van - drove alone: $1 to $9,999 or loss",12250,1.080567081604426,2023 ACS 1 Year
+326,San Mateo,"Total: Car, truck, or van - drove alone: $10,000 to $14,999",5652,0.4985604200186298,2023 ACS 1 Year
+327,San Mateo,"Total: Car, truck, or van - drove alone: $15,000 to $24,999",12765,1.125995003810653,2023 ACS 1 Year
+328,San Mateo,"Total: Car, truck, or van - drove alone: $25,000 to $34,999",16763,1.4786568154232647,2023 ACS 1 Year
+329,San Mateo,"Total: Car, truck, or van - drove alone: $35,000 to $49,999",25169,2.220146357298106,2023 ACS 1 Year
+330,San Mateo,"Total: Car, truck, or van - drove alone: $50,000 to $64,999",24585,2.1686319756118215,2023 ACS 1 Year
+331,San Mateo,"Total: Car, truck, or van - drove alone: $65,000 to $74,999",11585,1.0219077257459,2023 ACS 1 Year
+332,San Mateo,"Total: Car, truck, or van - drove alone: $75,000 or more",119462,10.537690179806363,2023 ACS 1 Year
+333,San Mateo,"Total: Car, truck, or van - carpooled:",38693,3.4130924153893925,2023 ACS 1 Year
+334,San Mateo,"Total: Car, truck, or van - carpooled: $1 to $9,999 or loss",3814,0.33643125299912496,2023 ACS 1 Year
+335,San Mateo,"Total: Car, truck, or van - carpooled: $10,000 to $14,999",494,0.04357552149490502,2023 ACS 1 Year
+336,San Mateo,"Total: Car, truck, or van - carpooled: $15,000 to $24,999",2628,0.23181471758828015,2023 ACS 1 Year
+337,San Mateo,"Total: Car, truck, or van - carpooled: $25,000 to $34,999",2272,0.2004121150534903,2023 ACS 1 Year
+338,San Mateo,"Total: Car, truck, or van - carpooled: $35,000 to $49,999",6858,0.6049411465831146,2023 ACS 1 Year
+339,San Mateo,"Total: Car, truck, or van - carpooled: $50,000 to $64,999",4420,0.3898862449544133,2023 ACS 1 Year
+340,San Mateo,"Total: Car, truck, or van - carpooled: $65,000 to $74,999",2728,0.24063567335647953,2023 ACS 1 Year
+341,San Mateo,"Total: Car, truck, or van - carpooled: $75,000 or more",15479,1.3653957433595845,2023 ACS 1 Year
+342,San Mateo,Total: Public transportation (excluding taxicab):,20563,1.8138531346148419,2023 ACS 1 Year
+343,San Mateo,"Total: Public transportation (excluding taxicab): $1 to $9,999 or loss",1892,0.16689248313433258,2023 ACS 1 Year
+344,San Mateo,"Total: Public transportation (excluding taxicab): $10,000 to $14,999",279,0.024610466593276318,2023 ACS 1 Year
+345,San Mateo,"Total: Public transportation (excluding taxicab): $15,000 to $24,999",1195,0.10541042142998278,2023 ACS 1 Year
+346,San Mateo,"Total: Public transportation (excluding taxicab): $25,000 to $34,999",3055,0.26948019871849155,2023 ACS 1 Year
+347,San Mateo,"Total: Public transportation (excluding taxicab): $35,000 to $49,999",2936,0.25898326135433425,2023 ACS 1 Year
+348,San Mateo,"Total: Public transportation (excluding taxicab): $50,000 to $64,999",1605,0.1415763400796003,2023 ACS 1 Year
+349,San Mateo,"Total: Public transportation (excluding taxicab): $65,000 to $74,999",928,0.08185846952889039,2023 ACS 1 Year
+350,San Mateo,"Total: Public transportation (excluding taxicab): $75,000 or more",8673,0.7650414937759336,2023 ACS 1 Year
+351,San Mateo,Total: Walked:,9126,0.8050004234058769,2023 ACS 1 Year
+352,San Mateo,"Total: Walked: $1 to $9,999 or loss",1478,0.13037372625398708,2023 ACS 1 Year
+353,San Mateo,"Total: Walked: $10,000 to $14,999",734,0.06474581533858356,2023 ACS 1 Year
+354,San Mateo,"Total: Walked: $15,000 to $24,999",769,0.06783314985745335,2023 ACS 1 Year
+355,San Mateo,"Total: Walked: $25,000 to $34,999",292,0.025757190843142236,2023 ACS 1 Year
+356,San Mateo,"Total: Walked: $35,000 to $49,999",1269,0.11193792869845035,2023 ACS 1 Year
+357,San Mateo,"Total: Walked: $50,000 to $64,999",858,0.07568380049115082,2023 ACS 1 Year
+358,San Mateo,"Total: Walked: $65,000 to $74,999",828,0.07303751376069101,2023 ACS 1 Year
+359,San Mateo,"Total: Walked: $75,000 or more",2898,0.2556312981624185,2023 ACS 1 Year
+360,San Mateo,"Total: Taxicab, motorcycle, bicycle, or other means:",11398,1.005412538459367,2023 ACS 1 Year
+361,San Mateo,"Total: Taxicab, motorcycle, bicycle, or other means: $1 to $9,999 or loss",1103,0.09729514212323934,2023 ACS 1 Year
+362,San Mateo,"Total: Taxicab, motorcycle, bicycle, or other means: $10,000 to $14,999",776,0.06845061676122731,2023 ACS 1 Year
+363,San Mateo,"Total: Taxicab, motorcycle, bicycle, or other means: $15,000 to $24,999",1478,0.13037372625398708,2023 ACS 1 Year
+364,San Mateo,"Total: Taxicab, motorcycle, bicycle, or other means: $25,000 to $34,999",248,0.021875970305134503,2023 ACS 1 Year
+365,San Mateo,"Total: Taxicab, motorcycle, bicycle, or other means: $35,000 to $49,999",2177,0.19203220707370083,2023 ACS 1 Year
+366,San Mateo,"Total: Taxicab, motorcycle, bicycle, or other means: $50,000 to $64,999",1162,0.10249950602647699,2023 ACS 1 Year
+367,San Mateo,"Total: Taxicab, motorcycle, bicycle, or other means: $65,000 to $74,999",245,0.02161134163208852,2023 ACS 1 Year
+368,San Mateo,"Total: Taxicab, motorcycle, bicycle, or other means: $75,000 or more",4209,0.3712740282835126,2023 ACS 1 Year
+369,San Mateo,Total: Worked from home:,69877,6.163819262144692,2023 ACS 1 Year
+370,San Mateo,"Total: Worked from home: $1 to $9,999 or loss",2528,0.22299376182008074,2023 ACS 1 Year
+371,San Mateo,"Total: Worked from home: $10,000 to $14,999",1752,0.15454314505885342,2023 ACS 1 Year
+372,San Mateo,"Total: Worked from home: $15,000 to $24,999",3009,0.2654225590651198,2023 ACS 1 Year
+373,San Mateo,"Total: Worked from home: $25,000 to $34,999",3241,0.2858871764473424,2023 ACS 1 Year
+374,San Mateo,"Total: Worked from home: $35,000 to $49,999",4768,0.4205831710277472,2023 ACS 1 Year
+375,San Mateo,"Total: Worked from home: $50,000 to $64,999",4735,0.4176722556242414,2023 ACS 1 Year
+376,San Mateo,"Total: Worked from home: $65,000 to $74,999",2417,0.2132025009173794,2023 ACS 1 Year
+377,San Mateo,"Total: Worked from home: $75,000 or more",47427,4.183514692183928,2023 ACS 1 Year
+379,Santa Clara,"Total: $1 to $9,999 or loss",64160,2.1782187629645775,2023 ACS 1 Year
+380,Santa Clara,"Total: $10,000 to $14,999",37927,1.2876138251707845,2023 ACS 1 Year
+381,Santa Clara,"Total: $15,000 to $24,999",62507,2.122099753999795,2023 ACS 1 Year
+382,Santa Clara,"Total: $25,000 to $34,999",64724,2.197366446604104,2023 ACS 1 Year
+383,Santa Clara,"Total: $35,000 to $49,999",95266,3.234261045395627,2023 ACS 1 Year
+384,Santa Clara,"Total: $50,000 to $64,999",93236,3.1653429642108066,2023 ACS 1 Year
+385,Santa Clara,"Total: $65,000 to $74,999",46561,1.5807363438652384,2023 ACS 1 Year
+386,Santa Clara,"Total: $75,000 or more",517461,17.567694191122403,2023 ACS 1 Year
+387,Santa Clara,"Total: Car, truck, or van - drove alone:",644818,21.891438065730874,2023 ACS 1 Year
+388,Santa Clara,"Total: Car, truck, or van - drove alone: $1 to $9,999 or loss",37953,1.2884965198066491,2023 ACS 1 Year
+389,Santa Clara,"Total: Car, truck, or van - drove alone: $10,000 to $14,999",22011,0.7472689088468409,2023 ACS 1 Year
+390,Santa Clara,"Total: Car, truck, or van - drove alone: $15,000 to $24,999",41263,1.4008703369109625,2023 ACS 1 Year
+391,Santa Clara,"Total: Car, truck, or van - drove alone: $25,000 to $34,999",42267,1.4349559297728147,2023 ACS 1 Year
+392,Santa Clara,"Total: Car, truck, or van - drove alone: $35,000 to $49,999",64560,2.191798680439419,2023 ACS 1 Year
+393,Santa Clara,"Total: Car, truck, or van - drove alone: $50,000 to $64,999",66686,2.2639759418182015,2023 ACS 1 Year
+394,Santa Clara,"Total: Car, truck, or van - drove alone: $65,000 to $74,999",32715,1.1106675004735995,2023 ACS 1 Year
+395,Santa Clara,"Total: Car, truck, or van - drove alone: $75,000 or more",337363,11.453404247662387,2023 ACS 1 Year
+396,Santa Clara,"Total: Car, truck, or van - carpooled:",101704,3.452829817153201,2023 ACS 1 Year
+397,Santa Clara,"Total: Car, truck, or van - carpooled: $1 to $9,999 or loss",8909,0.30245871195840746,2023 ACS 1 Year
+398,Santa Clara,"Total: Car, truck, or van - carpooled: $10,000 to $14,999",7045,0.23917629652564604,2023 ACS 1 Year
+399,Santa Clara,"Total: Car, truck, or van - carpooled: $15,000 to $24,999",7893,0.26796572157231,2023 ACS 1 Year
+400,Santa Clara,"Total: Car, truck, or van - carpooled: $25,000 to $34,999",9700,0.3293129987649065,2023 ACS 1 Year
+401,Santa Clara,"Total: Car, truck, or van - carpooled: $35,000 to $49,999",13816,0.4690503495810256,2023 ACS 1 Year
+402,Santa Clara,"Total: Car, truck, or van - carpooled: $50,000 to $64,999",11022,0.3741946260192577,2023 ACS 1 Year
+403,Santa Clara,"Total: Car, truck, or van - carpooled: $65,000 to $74,999",4163,0.14133299111941297,2023 ACS 1 Year
+404,Santa Clara,"Total: Car, truck, or van - carpooled: $75,000 or more",39156,1.3293381216122349,2023 ACS 1 Year
+405,Santa Clara,Total: Public transportation (excluding taxicab):,28329,0.9617637053619624,2023 ACS 1 Year
+406,Santa Clara,"Total: Public transportation (excluding taxicab): $1 to $9,999 or loss",2075,0.07044582190074031,2023 ACS 1 Year
+407,Santa Clara,"Total: Public transportation (excluding taxicab): $10,000 to $14,999",1298,0.04406683220586068,2023 ACS 1 Year
+408,Santa Clara,"Total: Public transportation (excluding taxicab): $15,000 to $24,999",2536,0.08609667679049514,2023 ACS 1 Year
+409,Santa Clara,"Total: Public transportation (excluding taxicab): $25,000 to $34,999",2584,0.08772626688747612,2023 ACS 1 Year
+410,Santa Clara,"Total: Public transportation (excluding taxicab): $35,000 to $49,999",2867,0.0973340585009265,2023 ACS 1 Year
+411,Santa Clara,"Total: Public transportation (excluding taxicab): $50,000 to $64,999",2262,0.07679443332022871,2023 ACS 1 Year
+412,Santa Clara,"Total: Public transportation (excluding taxicab): $65,000 to $74,999",1189,0.040366304693966376,2023 ACS 1 Year
+413,Santa Clara,"Total: Public transportation (excluding taxicab): $75,000 or more",13518,0.45893331106226865,2023 ACS 1 Year
+414,Santa Clara,Total: Walked:,20095,0.6822211041423502,2023 ACS 1 Year
+415,Santa Clara,"Total: Walked: $1 to $9,999 or loss",3725,0.1264629814844615,2023 ACS 1 Year
+416,Santa Clara,"Total: Walked: $10,000 to $14,999",1128,0.03829536727905304,2023 ACS 1 Year
+417,Santa Clara,"Total: Walked: $15,000 to $24,999",2646,0.08983115409607656,2023 ACS 1 Year
+418,Santa Clara,"Total: Walked: $25,000 to $34,999",1823,0.061890473891590164,2023 ACS 1 Year
+419,Santa Clara,"Total: Walked: $35,000 to $49,999",3133,0.10636470362169609,2023 ACS 1 Year
+420,Santa Clara,"Total: Walked: $50,000 to $64,999",1437,0.04878585352836811,2023 ACS 1 Year
+421,Santa Clara,"Total: Walked: $65,000 to $74,999",587,0.01992852889432991,2023 ACS 1 Year
+422,Santa Clara,"Total: Walked: $75,000 or more",5616,0.19066204134677472,2023 ACS 1 Year
+423,Santa Clara,"Total: Taxicab, motorcycle, bicycle, or other means:",26259,0.8914876324296578,2023 ACS 1 Year
+424,Santa Clara,"Total: Taxicab, motorcycle, bicycle, or other means: $1 to $9,999 or loss",2811,0.09543287005444868,2023 ACS 1 Year
+425,Santa Clara,"Total: Taxicab, motorcycle, bicycle, or other means: $10,000 to $14,999",1291,0.04382918365005096,2023 ACS 1 Year
+426,Santa Clara,"Total: Taxicab, motorcycle, bicycle, or other means: $15,000 to $24,999",1879,0.06379166233806798,2023 ACS 1 Year
+427,Santa Clara,"Total: Taxicab, motorcycle, bicycle, or other means: $25,000 to $34,999",1324,0.04494952684172538,2023 ACS 1 Year
+428,Santa Clara,"Total: Taxicab, motorcycle, bicycle, or other means: $35,000 to $49,999",2207,0.07492719466743801,2023 ACS 1 Year
+429,Santa Clara,"Total: Taxicab, motorcycle, bicycle, or other means: $50,000 to $64,999",2128,0.07224516096615681,2023 ACS 1 Year
+430,Santa Clara,"Total: Taxicab, motorcycle, bicycle, or other means: $65,000 to $74,999",1544,0.05241848145288821,2023 ACS 1 Year
+431,Santa Clara,"Total: Taxicab, motorcycle, bicycle, or other means: $75,000 or more",13075,0.44389355245888173,2023 ACS 1 Year
+432,Santa Clara,Total: Worked from home:,160637,5.453593008515288,2023 ACS 1 Year
+433,Santa Clara,"Total: Worked from home: $1 to $9,999 or loss",8687,0.2949218577598704,2023 ACS 1 Year
+434,Santa Clara,"Total: Worked from home: $10,000 to $14,999",5154,0.1749772366633328,2023 ACS 1 Year
+435,Santa Clara,"Total: Worked from home: $15,000 to $24,999",6290,0.21354420229188265,2023 ACS 1 Year
+436,Santa Clara,"Total: Worked from home: $25,000 to $34,999",7026,0.23853125044559104,2023 ACS 1 Year
+437,Santa Clara,"Total: Worked from home: $35,000 to $49,999",8683,0.29478605858512197,2023 ACS 1 Year
+438,Santa Clara,"Total: Worked from home: $50,000 to $64,999",9701,0.32934694855859364,2023 ACS 1 Year
+439,Santa Clara,"Total: Worked from home: $65,000 to $74,999",6363,0.21602253723104126,2023 ACS 1 Year
+440,Santa Clara,"Total: Worked from home: $75,000 or more",108733,3.6914629169798534,2023 ACS 1 Year
+442,Solano,"Total: $1 to $9,999 or loss",17187,2.7631610678370753,2023 ACS 1 Year
+443,Solano,"Total: $10,000 to $14,999",8693,1.397577189893972,2023 ACS 1 Year
+444,Solano,"Total: $15,000 to $24,999",16870,2.7121968472922244,2023 ACS 1 Year
+445,Solano,"Total: $25,000 to $34,999",21174,3.4041526997371405,2023 ACS 1 Year
+446,Solano,"Total: $35,000 to $49,999",32600,5.241115425117162,2023 ACS 1 Year
+447,Solano,"Total: $50,000 to $64,999",26823,4.312344756071092,2023 ACS 1 Year
+448,Solano,"Total: $65,000 to $74,999",13000,2.090015353574328,2023 ACS 1 Year
+449,Solano,"Total: $75,000 or more",70988,11.412769993810338,2023 ACS 1 Year
+450,Solano,"Total: Car, truck, or van - drove alone:",154819,24.890314386540304,2023 ACS 1 Year
+451,Solano,"Total: Car, truck, or van - drove alone: $1 to $9,999 or loss",12624,2.029565678732486,2023 ACS 1 Year
+452,Solano,"Total: Car, truck, or van - drove alone: $10,000 to $14,999",5628,0.9048158776858707,2023 ACS 1 Year
+453,Solano,"Total: Car, truck, or van - drove alone: $15,000 to $24,999",12812,2.059790516153407,2023 ACS 1 Year
+454,Solano,"Total: Car, truck, or van - drove alone: $25,000 to $34,999",15204,2.4443533412110834,2023 ACS 1 Year
+455,Solano,"Total: Car, truck, or van - drove alone: $35,000 to $49,999",25539,4.105915547302674,2023 ACS 1 Year
+456,Solano,"Total: Car, truck, or van - drove alone: $50,000 to $64,999",19850,3.191292674496186,2023 ACS 1 Year
+457,Solano,"Total: Car, truck, or van - drove alone: $65,000 to $74,999",9676,1.5556145047065537,2023 ACS 1 Year
+458,Solano,"Total: Car, truck, or van - drove alone: $75,000 or more",53486,8.59896624625204,2023 ACS 1 Year
+459,Solano,"Total: Car, truck, or van - carpooled:",19941,3.2059227819712057,2023 ACS 1 Year
+460,Solano,"Total: Car, truck, or van - carpooled: $1 to $9,999 or loss",2136,0.34340559963344347,2023 ACS 1 Year
+461,Solano,"Total: Car, truck, or van - carpooled: $10,000 to $14,999",1296,0.20835845371017916,2023 ACS 1 Year
+462,Solano,"Total: Car, truck, or van - carpooled: $15,000 to $24,999",2490,0.4003183254153906,2023 ACS 1 Year
+463,Solano,"Total: Car, truck, or van - carpooled: $25,000 to $34,999",2673,0.42973931077724453,2023 ACS 1 Year
+464,Solano,"Total: Car, truck, or van - carpooled: $35,000 to $49,999",2723,0.437777831367915,2023 ACS 1 Year
+465,Solano,"Total: Car, truck, or van - carpooled: $50,000 to $64,999",2708,0.4353662751907139,2023 ACS 1 Year
+466,Solano,"Total: Car, truck, or van - carpooled: $65,000 to $74,999",1557,0.25031953119347916,2023 ACS 1 Year
+467,Solano,"Total: Car, truck, or van - carpooled: $75,000 or more",4358,0.7006374546828402,2023 ACS 1 Year
+468,Solano,Total: Public transportation (excluding taxicab):,3991,0.6416347135473187,2023 ACS 1 Year
+469,Solano,"Total: Public transportation (excluding taxicab): $1 to $9,999 or loss",372,0.05980659319458847,2023 ACS 1 Year
+470,Solano,"Total: Public transportation (excluding taxicab): $10,000 to $14,999",175,0.028134822067346726,2023 ACS 1 Year
+471,Solano,"Total: Public transportation (excluding taxicab): $15,000 to $24,999",0,0.0,2023 ACS 1 Year
+472,Solano,"Total: Public transportation (excluding taxicab): $25,000 to $34,999",105,0.016880893240408035,2023 ACS 1 Year
+473,Solano,"Total: Public transportation (excluding taxicab): $35,000 to $49,999",496,0.07974212425945129,2023 ACS 1 Year
+474,Solano,"Total: Public transportation (excluding taxicab): $50,000 to $64,999",1354,0.21768313759535696,2023 ACS 1 Year
+475,Solano,"Total: Public transportation (excluding taxicab): $65,000 to $74,999",0,0.0,2023 ACS 1 Year
+476,Solano,"Total: Public transportation (excluding taxicab): $75,000 or more",1489,0.2393871431901673,2023 ACS 1 Year
+477,Solano,Total: Walked:,2780,0.44694174484127935,2023 ACS 1 Year
+478,Solano,"Total: Walked: $1 to $9,999 or loss",384,0.06173583813634939,2023 ACS 1 Year
+479,Solano,"Total: Walked: $10,000 to $14,999",231,0.03713796512889768,2023 ACS 1 Year
+480,Solano,"Total: Walked: $15,000 to $24,999",445,0.07154283325696739,2023 ACS 1 Year
+481,Solano,"Total: Walked: $25,000 to $34,999",380,0.06109275648909575,2023 ACS 1 Year
+482,Solano,"Total: Walked: $35,000 to $49,999",148,0.02379402094838466,2023 ACS 1 Year
+483,Solano,"Total: Walked: $50,000 to $64,999",535,0.08601217032017427,2023 ACS 1 Year
+484,Solano,"Total: Walked: $65,000 to $74,999",139,0.02234708724206397,2023 ACS 1 Year
+485,Solano,"Total: Walked: $75,000 or more",518,0.08327907331934631,2023 ACS 1 Year
+486,Solano,"Total: Taxicab, motorcycle, bicycle, or other means:",2757,0.44324402536957097,2023 ACS 1 Year
+487,Solano,"Total: Taxicab, motorcycle, bicycle, or other means: $1 to $9,999 or loss",587,0.09437223173447158,2023 ACS 1 Year
+488,Solano,"Total: Taxicab, motorcycle, bicycle, or other means: $10,000 to $14,999",129,0.020739383123929873,2023 ACS 1 Year
+489,Solano,"Total: Taxicab, motorcycle, bicycle, or other means: $15,000 to $24,999",164,0.026366347537399214,2023 ACS 1 Year
+490,Solano,"Total: Taxicab, motorcycle, bicycle, or other means: $25,000 to $34,999",621,0.09983842573612753,2023 ACS 1 Year
+491,Solano,"Total: Taxicab, motorcycle, bicycle, or other means: $35,000 to $49,999",379,0.060931986077282334,2023 ACS 1 Year
+492,Solano,"Total: Taxicab, motorcycle, bicycle, or other means: $50,000 to $64,999",186,0.029903296597294234,2023 ACS 1 Year
+493,Solano,"Total: Taxicab, motorcycle, bicycle, or other means: $65,000 to $74,999",321,0.05160730219210456,2023 ACS 1 Year
+494,Solano,"Total: Taxicab, motorcycle, bicycle, or other means: $75,000 or more",370,0.05948505237096164,2023 ACS 1 Year
+495,Solano,Total: Worked from home:,23047,3.705275681063657,2023 ACS 1 Year
+496,Solano,"Total: Worked from home: $1 to $9,999 or loss",1084,0.17427512640573628,2023 ACS 1 Year
+497,Solano,"Total: Worked from home: $10,000 to $14,999",1234,0.19839068817774774,2023 ACS 1 Year
+498,Solano,"Total: Worked from home: $15,000 to $24,999",959,0.15417882492906007,2023 ACS 1 Year
+499,Solano,"Total: Worked from home: $25,000 to $34,999",2191,0.352247972283181,2023 ACS 1 Year
+500,Solano,"Total: Worked from home: $35,000 to $49,999",3315,0.5329539151614537,2023 ACS 1 Year
+501,Solano,"Total: Worked from home: $50,000 to $64,999",2190,0.3520872018713676,2023 ACS 1 Year
+502,Solano,"Total: Worked from home: $65,000 to $74,999",1307,0.21012692824012666,2023 ACS 1 Year
+503,Solano,"Total: Worked from home: $75,000 or more",10767,1.7310150239949842,2023 ACS 1 Year
+505,Sonoma,"Total: $1 to $9,999 or loss",19502,2.6543192233305706,2023 ACS 1 Year
+506,Sonoma,"Total: $10,000 to $14,999",10331,1.406100497191474,2023 ACS 1 Year
+507,Sonoma,"Total: $15,000 to $24,999",20226,2.752859225263261,2023 ACS 1 Year
+508,Sonoma,"Total: $25,000 to $34,999",25231,3.4340646253642513,2023 ACS 1 Year
+509,Sonoma,"Total: $35,000 to $49,999",35768,4.868202747415026,2023 ACS 1 Year
+510,Sonoma,"Total: $50,000 to $64,999",30202,4.110642456313705,2023 ACS 1 Year
+511,Sonoma,"Total: $65,000 to $74,999",15259,2.0768258142139873,2023 ACS 1 Year
+512,Sonoma,"Total: $75,000 or more",88390,12.03031874424106,2023 ACS 1 Year
+513,Sonoma,"Total: Car, truck, or van - drove alone:",170305,23.17935777506475,2023 ACS 1 Year
+514,Sonoma,"Total: Car, truck, or van - drove alone: $1 to $9,999 or loss",12651,1.7218640392962286,2023 ACS 1 Year
+515,Sonoma,"Total: Car, truck, or van - drove alone: $10,000 to $14,999",7021,0.9555930297920181,2023 ACS 1 Year
+516,Sonoma,"Total: Car, truck, or van - drove alone: $15,000 to $24,999",13787,1.8764792909475219,2023 ACS 1 Year
+517,Sonoma,"Total: Car, truck, or van - drove alone: $25,000 to $34,999",16582,2.256892696198724,2023 ACS 1 Year
+518,Sonoma,"Total: Car, truck, or van - drove alone: $35,000 to $49,999",25048,3.409157414930988,2023 ACS 1 Year
+519,Sonoma,"Total: Car, truck, or van - drove alone: $50,000 to $64,999",22267,3.030649479330418,2023 ACS 1 Year
+520,Sonoma,"Total: Car, truck, or van - drove alone: $65,000 to $74,999",11065,1.506001548874616,2023 ACS 1 Year
+521,Sonoma,"Total: Car, truck, or van - drove alone: $75,000 or more",61884,8.422720275694237,2023 ACS 1 Year
+522,Sonoma,"Total: Car, truck, or van - carpooled:",25176,3.4265788517367675,2023 ACS 1 Year
+523,Sonoma,"Total: Car, truck, or van - carpooled: $1 to $9,999 or loss",2536,0.3451622167145076,2023 ACS 1 Year
+524,Sonoma,"Total: Car, truck, or van - carpooled: $10,000 to $14,999",1120,0.15243757205057115,2023 ACS 1 Year
+525,Sonoma,"Total: Car, truck, or van - carpooled: $15,000 to $24,999",3270,0.44506326839764976,2023 ACS 1 Year
+526,Sonoma,"Total: Car, truck, or van - carpooled: $25,000 to $34,999",3463,0.4713315285813643,2023 ACS 1 Year
+527,Sonoma,"Total: Car, truck, or van - carpooled: $35,000 to $49,999",5790,0.7880478055114348,2023 ACS 1 Year
+528,Sonoma,"Total: Car, truck, or van - carpooled: $50,000 to $64,999",2680,0.3647613331210096,2023 ACS 1 Year
+529,Sonoma,"Total: Car, truck, or van - carpooled: $65,000 to $74,999",2079,0.2829622431188727,2023 ACS 1 Year
+530,Sonoma,"Total: Car, truck, or van - carpooled: $75,000 or more",4238,0.5768128842413577,2023 ACS 1 Year
+531,Sonoma,Total: Public transportation (excluding taxicab):,1842,0.2507053640331715,2023 ACS 1 Year
+532,Sonoma,"Total: Public transportation (excluding taxicab): $1 to $9,999 or loss",353,0.04804505619093895,2023 ACS 1 Year
+533,Sonoma,"Total: Public transportation (excluding taxicab): $10,000 to $14,999",282,0.038381602962733095,2023 ACS 1 Year
+534,Sonoma,"Total: Public transportation (excluding taxicab): $15,000 to $24,999",52,0.007077458702347946,2023 ACS 1 Year
+535,Sonoma,"Total: Public transportation (excluding taxicab): $25,000 to $34,999",100,0.013610497504515283,2023 ACS 1 Year
+536,Sonoma,"Total: Public transportation (excluding taxicab): $35,000 to $49,999",223,0.030351409435069077,2023 ACS 1 Year
+537,Sonoma,"Total: Public transportation (excluding taxicab): $50,000 to $64,999",125,0.017013121880644102,2023 ACS 1 Year
+538,Sonoma,"Total: Public transportation (excluding taxicab): $65,000 to $74,999",0,0.0,2023 ACS 1 Year
+539,Sonoma,"Total: Public transportation (excluding taxicab): $75,000 or more",707,0.09622621735692305,2023 ACS 1 Year
+540,Sonoma,Total: Walked:,6378,0.8680775308379848,2023 ACS 1 Year
+541,Sonoma,"Total: Walked: $1 to $9,999 or loss",430,0.05852513926941571,2023 ACS 1 Year
+542,Sonoma,"Total: Walked: $10,000 to $14,999",312,0.04246475221408768,2023 ACS 1 Year
+543,Sonoma,"Total: Walked: $15,000 to $24,999",851,0.11582533376342506,2023 ACS 1 Year
+544,Sonoma,"Total: Walked: $25,000 to $34,999",1293,0.1759837327333826,2023 ACS 1 Year
+545,Sonoma,"Total: Walked: $35,000 to $49,999",965,0.13134130091857246,2023 ACS 1 Year
+546,Sonoma,"Total: Walked: $50,000 to $64,999",942,0.12821088649253395,2023 ACS 1 Year
+547,Sonoma,"Total: Walked: $65,000 to $74,999",314,0.04273696216417799,2023 ACS 1 Year
+548,Sonoma,"Total: Walked: $75,000 or more",1271,0.17298942328238923,2023 ACS 1 Year
+549,Sonoma,"Total: Taxicab, motorcycle, bicycle, or other means:",4311,0.5867485474196539,2023 ACS 1 Year
+550,Sonoma,"Total: Taxicab, motorcycle, bicycle, or other means: $1 to $9,999 or loss",332,0.04518685171499074,2023 ACS 1 Year
+551,Sonoma,"Total: Taxicab, motorcycle, bicycle, or other means: $10,000 to $14,999",333,0.04532295669003589,2023 ACS 1 Year
+552,Sonoma,"Total: Taxicab, motorcycle, bicycle, or other means: $15,000 to $24,999",347,0.04722842634066803,2023 ACS 1 Year
+553,Sonoma,"Total: Taxicab, motorcycle, bicycle, or other means: $25,000 to $34,999",685,0.0932319079059297,2023 ACS 1 Year
+554,Sonoma,"Total: Taxicab, motorcycle, bicycle, or other means: $35,000 to $49,999",645,0.08778770890412357,2023 ACS 1 Year
+555,Sonoma,"Total: Taxicab, motorcycle, bicycle, or other means: $50,000 to $64,999",559,0.07608268105024042,2023 ACS 1 Year
+556,Sonoma,"Total: Taxicab, motorcycle, bicycle, or other means: $65,000 to $74,999",392,0.0533531502176999,2023 ACS 1 Year
+557,Sonoma,"Total: Taxicab, motorcycle, bicycle, or other means: $75,000 or more",1018,0.13855486459596555,2023 ACS 1 Year
+558,Sonoma,Total: Worked from home:,36897,5.021865264241003,2023 ACS 1 Year
+559,Sonoma,"Total: Worked from home: $1 to $9,999 or loss",3200,0.43553592014448905,2023 ACS 1 Year
+560,Sonoma,"Total: Worked from home: $10,000 to $14,999",1263,0.17190058348202802,2023 ACS 1 Year
+561,Sonoma,"Total: Worked from home: $15,000 to $24,999",1919,0.26118544711164826,2023 ACS 1 Year
+562,Sonoma,"Total: Worked from home: $25,000 to $34,999",3108,0.42301426244033496,2023 ACS 1 Year
+563,Sonoma,"Total: Worked from home: $35,000 to $49,999",3097,0.42151710771483836,2023 ACS 1 Year
+564,Sonoma,"Total: Worked from home: $50,000 to $64,999",3629,0.49392495443885964,2023 ACS 1 Year
+565,Sonoma,"Total: Worked from home: $65,000 to $74,999",1409,0.19177190983862033,2023 ACS 1 Year
+566,Sonoma,"Total: Worked from home: $75,000 or more",19272,2.623015079070185,2023 ACS 1 Year
+568,Bay Area,"Total: $1 to $9,999 or loss",269410,2.3337179407219533,2023 ACS 1 Year
+569,Bay Area,"Total: $10,000 to $14,999",141800,1.2283181915829886,2023 ACS 1 Year
+570,Bay Area,"Total: $15,000 to $24,999",265085,2.296253369645815,2023 ACS 1 Year
+571,Bay Area,"Total: $25,000 to $34,999",285211,2.470591394496303,2023 ACS 1 Year
+572,Bay Area,"Total: $35,000 to $49,999",431040,3.733810107897965,2023 ACS 1 Year
+573,Bay Area,"Total: $50,000 to $64,999",387334,3.3552143753075128,2023 ACS 1 Year
+574,Bay Area,"Total: $65,000 to $74,999",203690,1.7644297069360997,2023 ACS 1 Year
+575,Bay Area,"Total: $75,000 or more",1864510,16.150998246744695,2023 ACS 1 Year
+576,Bay Area,"Total: Car, truck, or van - drove alone:",2242933,19.429022612142504,2023 ACS 1 Year
+577,Bay Area,"Total: Car, truck, or van - drove alone: $1 to $9,999 or loss",144999,1.2560289806864722,2023 ACS 1 Year
+578,Bay Area,"Total: Car, truck, or van - drove alone: $10,000 to $14,999",78551,0.6804345716998261,2023 ACS 1 Year
+579,Bay Area,"Total: Car, truck, or van - drove alone: $15,000 to $24,999",155294,1.3452076533405404,2023 ACS 1 Year
+580,Bay Area,"Total: Car, truck, or van - drove alone: $25,000 to $34,999",171190,1.4829040283292794,2023 ACS 1 Year
+581,Bay Area,"Total: Car, truck, or van - drove alone: $35,000 to $49,999",270158,2.3401973624941963,2023 ACS 1 Year
+582,Bay Area,"Total: Car, truck, or van - drove alone: $50,000 to $64,999",254139,2.2014355210910375,2023 ACS 1 Year
+583,Bay Area,"Total: Car, truck, or van - drove alone: $65,000 to $74,999",129014,1.1175616584547792,2023 ACS 1 Year
+584,Bay Area,"Total: Car, truck, or van - drove alone: $75,000 or more",1039588,9.005252836046376,2023 ACS 1 Year
+585,Bay Area,"Total: Car, truck, or van - carpooled:",368719,3.1939651289300985,2023 ACS 1 Year
+586,Bay Area,"Total: Car, truck, or van - carpooled: $1 to $9,999 or loss",34905,0.3023585788237251,2023 ACS 1 Year
+587,Bay Area,"Total: Car, truck, or van - carpooled: $10,000 to $14,999",18155,0.15726457523405613,2023 ACS 1 Year
+588,Bay Area,"Total: Car, truck, or van - carpooled: $15,000 to $24,999",37152,0.321822831126172,2023 ACS 1 Year
+589,Bay Area,"Total: Car, truck, or van - carpooled: $25,000 to $34,999",39601,0.3430368738002675,2023 ACS 1 Year
+590,Bay Area,"Total: Car, truck, or van - carpooled: $35,000 to $49,999",57043,0.4941252087621186,2023 ACS 1 Year
+591,Bay Area,"Total: Car, truck, or van - carpooled: $50,000 to $64,999",38745,0.3356219205421925,2023 ACS 1 Year
+592,Bay Area,"Total: Car, truck, or van - carpooled: $65,000 to $74,999",20529,0.17782894326521279,2023 ACS 1 Year
+593,Bay Area,"Total: Car, truck, or van - carpooled: $75,000 or more",122589,1.061906197376354,2023 ACS 1 Year
+594,Bay Area,Total: Public transportation (excluding taxicab):,271792,2.3543516073816897,2023 ACS 1 Year
+595,Bay Area,"Total: Public transportation (excluding taxicab): $1 to $9,999 or loss",19755,0.1711243009500842,2023 ACS 1 Year
+596,Bay Area,"Total: Public transportation (excluding taxicab): $10,000 to $14,999",10286,0.08910071169691551,2023 ACS 1 Year
+597,Bay Area,"Total: Public transportation (excluding taxicab): $15,000 to $24,999",18814,0.16297304976334517,2023 ACS 1 Year
+598,Bay Area,"Total: Public transportation (excluding taxicab): $25,000 to $34,999",21603,0.18713228415209662,2023 ACS 1 Year
+599,Bay Area,"Total: Public transportation (excluding taxicab): $35,000 to $49,999",30235,0.2619055043900681,2023 ACS 1 Year
+600,Bay Area,"Total: Public transportation (excluding taxicab): $50,000 to $64,999",25126,0.21764966771307595,2023 ACS 1 Year
+601,Bay Area,"Total: Public transportation (excluding taxicab): $65,000 to $74,999",11866,0.10278719084149325,2023 ACS 1 Year
+602,Bay Area,"Total: Public transportation (excluding taxicab): $75,000 or more",134107,1.161678897874611,2023 ACS 1 Year
+603,Bay Area,Total: Walked:,132069,1.1440250722438203,2023 ACS 1 Year
+604,Bay Area,"Total: Walked: $1 to $9,999 or loss",21380,0.18520058488042523,2023 ACS 1 Year
+605,Bay Area,"Total: Walked: $10,000 to $14,999",8016,0.06943722583730068,2023 ACS 1 Year
+606,Bay Area,"Total: Walked: $15,000 to $24,999",13100,0.11347650429997991,2023 ACS 1 Year
+607,Bay Area,"Total: Walked: $25,000 to $34,999",10086,0.08736824598241201,2023 ACS 1 Year
+608,Bay Area,"Total: Walked: $35,000 to $49,999",14760,0.12785596973035904,2023 ACS 1 Year
+609,Bay Area,"Total: Walked: $50,000 to $64,999",11456,0.09923563612676105,2023 ACS 1 Year
+610,Bay Area,"Total: Walked: $65,000 to $74,999",6372,0.055196357664081826,2023 ACS 1 Year
+611,Bay Area,"Total: Walked: $75,000 or more",46899,0.4062545477225006,2023 ACS 1 Year
+612,Bay Area,"Total: Taxicab, motorcycle, bicycle, or other means:",121536,1.0527847653894928,2023 ACS 1 Year
+613,Bay Area,"Total: Taxicab, motorcycle, bicycle, or other means: $1 to $9,999 or loss",11861,0.10274387919863065,2023 ACS 1 Year
+614,Bay Area,"Total: Taxicab, motorcycle, bicycle, or other means: $10,000 to $14,999",6158,0.05334261934956307,2023 ACS 1 Year
+615,Bay Area,"Total: Taxicab, motorcycle, bicycle, or other means: $15,000 to $24,999",9592,0.08308905566758834,2023 ACS 1 Year
+616,Bay Area,"Total: Taxicab, motorcycle, bicycle, or other means: $25,000 to $34,999",9824,0.08509871589641241,2023 ACS 1 Year
+617,Bay Area,"Total: Taxicab, motorcycle, bicycle, or other means: $35,000 to $49,999",13204,0.11437738647152172,2023 ACS 1 Year
+618,Bay Area,"Total: Taxicab, motorcycle, bicycle, or other means: $50,000 to $64,999",10358,0.08972439935413679,2023 ACS 1 Year
+619,Bay Area,"Total: Taxicab, motorcycle, bicycle, or other means: $65,000 to $74,999",5428,0.04701911949162526,2023 ACS 1 Year
+620,Bay Area,"Total: Taxicab, motorcycle, bicycle, or other means: $75,000 or more",55111,0.47738958996001474,2023 ACS 1 Year
+621,Bay Area,Total: Worked from home:,711031,6.1591841472457265,2023 ACS 1 Year
+622,Bay Area,"Total: Worked from home: $1 to $9,999 or loss",36510,0.3162616161826158,2023 ACS 1 Year
+623,Bay Area,"Total: Worked from home: $10,000 to $14,999",20634,0.1787384877653271,2023 ACS 1 Year
+624,Bay Area,"Total: Worked from home: $15,000 to $24,999",31133,0.2696842754481889,2023 ACS 1 Year
+625,Bay Area,"Total: Worked from home: $25,000 to $34,999",32907,0.285051246335835,2023 ACS 1 Year
+626,Bay Area,"Total: Worked from home: $35,000 to $49,999",45640,0.395348676049701,2023 ACS 1 Year
+627,Bay Area,"Total: Worked from home: $50,000 to $64,999",47510,0.41154723048030883,2023 ACS 1 Year
+628,Bay Area,"Total: Worked from home: $65,000 to $74,999",30481,0.26403643721890746,2023 ACS 1 Year
+629,Bay Area,"Total: Worked from home: $75,000 or more",466216,4.038516177764842,2023 ACS 1 Year

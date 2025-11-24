@@ -1,50 +1,481 @@
-,Alameda,Contra Costa,Marin,Napa,San Francisco,San Mateo,Santa Clara,Solano,Sonoma,Bay Area
-Total:,826474,560086,121331,67918,460397,377939,981958,207335,244909,3848347
-"Total: Management, business, science, and arts occupations",453494,273454,73133,27239,300696,215346,585814,79255,103731,2112162
-Total: Service occupations,112450,92139,17336,12363,59916,61373,131878,36997,44802,569254
-Total: Sales and office occupations,127871,101891,19802,13022,62175,58381,138959,41683,49562,613346
-"Total: Natural resources, construction, and maintenance occupations",50264,45738,5359,6177,12805,16881,50203,21474,23739,232640
-"Total: Production, transportation, and material moving occupations",80174,46803,5162,9117,24461,25807,74680,26056,22778,315038
-Total: Military specific occupations,2221,61,539,0,344,151,424,1870,297,5907
-"Total: Car, truck, or van - drove alone:",452339,341396,67085,47032,136951,228231,644885,154819,170305,2243043
-"Total: Car, truck, or van - drove alone: Management, business, science, and arts occupations",217450,153866,37502,18536,84517,124966,368792,54878,68781,1129288
-"Total: Car, truck, or van - drove alone: Service occupations",66794,56509,10960,8688,16296,37174,86361,28888,31548,343218
-"Total: Car, truck, or van - drove alone: Sales and office occupations",72639,61900,11358,8496,17077,36707,96879,31367,34180,370603
-"Total: Car, truck, or van - drove alone: Natural resources, construction, and maintenance occupations",38510,34697,3492,4125,7352,11715,38735,17615,17862,174103
-"Total: Car, truck, or van - drove alone: Production, transportation, and material moving occupations",55771,34363,3234,7187,11709,17589,53694,20263,17788,221598
-"Total: Car, truck, or van - drove alone: Military specific occupations",1175,61,539,0,0,80,424,1808,146,4233
-"Total: Car, truck, or van - carpooled:",75395,60347,8672,6472,32319,38693,101704,19941,25176,368719
-"Total: Car, truck, or van - carpooled: Management, business, science, and arts occupations",29480,21581,4647,1869,17586,19301,46538,6392,5826,153220
-"Total: Car, truck, or van - carpooled: Service occupations",14279,16960,2015,1685,6078,8678,20972,3825,7640,82132
-"Total: Car, truck, or van - carpooled: Sales and office occupations",13217,9746,733,1234,5245,5257,15860,3692,4214,59198
-"Total: Car, truck, or van - carpooled: Natural resources, construction, and maintenance occupations",6253,6453,908,1066,804,2618,6958,2698,4162,31920
-"Total: Car, truck, or van - carpooled: Production, transportation, and material moving occupations",11675,5607,369,618,2555,2839,11376,3334,3254,41627
-"Total: Car, truck, or van - carpooled: Military specific occupations",491,0,0,0,51,0,0,0,80,622
-Total: Public transportation (excluding taxicab):,74554,35857,4750,576,101330,20563,28329,3991,1842,271792
-"Total: Public transportation (excluding taxicab): Management, business, science, and arts occupations",47761,17023,3005,382,59469,10149,17093,2112,809,157803
-Total: Public transportation (excluding taxicab): Service occupations,10918,6411,521,124,18359,4992,4634,565,97,46621
-Total: Public transportation (excluding taxicab): Sales and office occupations,10347,8292,963,0,15937,3068,2824,1010,557,42998
-"Total: Public transportation (excluding taxicab): Natural resources, construction, and maintenance occupations",1910,1689,0,70,2000,909,1295,95,17,7985
-"Total: Public transportation (excluding taxicab): Production, transportation, and material moving occupations",3618,2442,261,0,5272,1445,2483,209,362,16092
-Total: Public transportation (excluding taxicab): Military specific occupations,0,0,0,0,293,0,0,0,0,293
-Total: Walked:,26933,10578,5084,3707,47388,9126,20095,2780,6378,132069
-"Total: Walked: Management, business, science, and arts occupations",13688,3286,2336,909,28119,4030,9955,838,1884,65045
-Total: Walked: Service occupations,5477,4032,1070,961,9173,2100,4484,975,1752,30024
-Total: Walked: Sales and office occupations,4695,2094,1188,1235,7319,1386,3696,708,1736,24057
-"Total: Walked: Natural resources, construction, and maintenance occupations",715,656,165,510,787,482,555,0,704,4574
-"Total: Walked: Production, transportation, and material moving occupations",1924,510,325,92,1990,1057,1405,259,266,7828
-Total: Walked: Military specific occupations,434,0,0,0,0,71,0,0,36,541
-"Total: Taxicab, motorcycle, bicycle, or other means:",28971,12537,3865,1371,30067,11398,26259,2757,4311,121536
-"Total: Taxicab, motorcycle, bicycle, or other means: Management, business, science, and arts occupations",15256,5449,2031,293,20570,5776,18708,885,2184,71152
-"Total: Taxicab, motorcycle, bicycle, or other means: Service occupations",5088,2150,1015,235,3855,3154,3619,682,829,20627
-"Total: Taxicab, motorcycle, bicycle, or other means: Sales and office occupations",5623,2567,663,133,4481,1690,2579,533,945,19214
-"Total: Taxicab, motorcycle, bicycle, or other means: Natural resources, construction, and maintenance occupations",918,1181,75,330,425,117,163,242,142,3593
-"Total: Taxicab, motorcycle, bicycle, or other means: Production, transportation, and material moving occupations",2086,1190,81,380,736,661,1190,415,211,6950
-"Total: Taxicab, motorcycle, bicycle, or other means: Military specific occupations",0,0,0,0,0,0,0,0,0,0
-Total: Worked from home:,168282,99371,31875,8760,112342,69928,160686,23047,36897,711188
-"Total: Worked from home: Management, business, science, and arts occupations",129859,72249,23612,5250,90435,51124,124728,14150,24247,535654
-Total: Worked from home: Service occupations,9894,6077,1755,670,6155,5275,11808,2062,2936,46632
-Total: Worked from home: Sales and office occupations,21350,17292,4897,1924,12116,10273,17121,4373,7930,97276
-"Total: Worked from home: Natural resources, construction, and maintenance occupations",1958,1062,719,76,1437,1040,2497,824,852,10465
-"Total: Worked from home: Production, transportation, and material moving occupations",5100,2691,892,840,2199,2216,4532,1576,897,20943
-Total: Worked from home: Military specific occupations,121,0,0,0,0,0,0,62,35,218
+,county,grouping,universe,share,dataset
+1,Alameda,"Total: Management, business, science, and arts occupations",453494,18.290311209628697,2023 ACS 1 Year
+2,Alameda,Total: Service occupations,112450,4.535331218324271,2023 ACS 1 Year
+3,Alameda,Total: Sales and office occupations,127871,5.157290691136886,2023 ACS 1 Year
+4,Alameda,"Total: Natural resources, construction, and maintenance occupations",50264,2.0272466728132605,2023 ACS 1 Year
+5,Alameda,"Total: Production, transportation, and material moving occupations",80174,3.2335762125204988,2023 ACS 1 Year
+6,Alameda,Total: Military specific occupations,2221,0.0895773289097217,2023 ACS 1 Year
+7,Alameda,"Total: Car, truck, or van - drove alone:",452339,18.243727772037193,2023 ACS 1 Year
+8,Alameda,"Total: Car, truck, or van - drove alone: Management, business, science, and arts occupations",217450,8.770189181188197,2023 ACS 1 Year
+9,Alameda,"Total: Car, truck, or van - drove alone: Service occupations",66794,2.6939343121098385,2023 ACS 1 Year
+10,Alameda,"Total: Car, truck, or van - drove alone: Sales and office occupations",72639,2.929674738709264,2023 ACS 1 Year
+11,Alameda,"Total: Car, truck, or van - drove alone: Natural resources, construction, and maintenance occupations",38510,1.5531845728560931,2023 ACS 1 Year
+12,Alameda,"Total: Car, truck, or van - drove alone: Production, transportation, and material moving occupations",55771,2.249354889970324,2023 ACS 1 Year
+13,Alameda,"Total: Car, truck, or van - drove alone: Military specific occupations",1175,0.04739007720347726,2023 ACS 1 Year
+14,Alameda,"Total: Car, truck, or van - carpooled:",75395,3.040829677239292,2023 ACS 1 Year
+15,Alameda,"Total: Car, truck, or van - carpooled: Management, business, science, and arts occupations",29480,1.1889867880497955,2023 ACS 1 Year
+16,Alameda,"Total: Car, truck, or van - carpooled: Service occupations",14279,0.5759003509688952,2023 ACS 1 Year
+17,Alameda,"Total: Car, truck, or van - carpooled: Sales and office occupations",13217,0.5330677875730714,2023 ACS 1 Year
+18,Alameda,"Total: Car, truck, or van - carpooled: Natural resources, construction, and maintenance occupations",6253,0.2521958746836965,2023 ACS 1 Year
+19,Alameda,"Total: Car, truck, or van - carpooled: Production, transportation, and material moving occupations",11675,0.4708758734898698,2023 ACS 1 Year
+20,Alameda,"Total: Car, truck, or van - carpooled: Military specific occupations",491,0.01980300247396369,2023 ACS 1 Year
+21,Alameda,Total: Public transportation (excluding taxicab):,74554,3.006910481555782,2023 ACS 1 Year
+22,Alameda,"Total: Public transportation (excluding taxicab): Management, business, science, and arts occupations",47761,1.9262957253747042,2023 ACS 1 Year
+23,Alameda,Total: Public transportation (excluding taxicab): Service occupations,10918,0.44034456417665085,2023 ACS 1 Year
+24,Alameda,Total: Public transportation (excluding taxicab): Sales and office occupations,10347,0.4173150032547908,2023 ACS 1 Year
+25,Alameda,"Total: Public transportation (excluding taxicab): Natural resources, construction, and maintenance occupations",1910,0.07703408294352473,2023 ACS 1 Year
+26,Alameda,"Total: Public transportation (excluding taxicab): Production, transportation, and material moving occupations",3618,0.14592110580611126,2023 ACS 1 Year
+27,Alameda,Total: Public transportation (excluding taxicab): Military specific occupations,0,0.0,2023 ACS 1 Year
+28,Alameda,Total: Walked:,26933,1.0862612334648962,2023 ACS 1 Year
+29,Alameda,"Total: Walked: Management, business, science, and arts occupations",13688,0.5520641504350611,2023 ACS 1 Year
+30,Alameda,Total: Walked: Service occupations,5477,0.22089825773910207,2023 ACS 1 Year
+31,Alameda,Total: Walked: Sales and office occupations,4695,0.18935864891091553,2023 ACS 1 Year
+32,Alameda,"Total: Walked: Natural resources, construction, and maintenance occupations",715,0.0288373661280734,2023 ACS 1 Year
+33,Alameda,"Total: Walked: Production, transportation, and material moving occupations",1924,0.07759873067190659,2023 ACS 1 Year
+34,Alameda,Total: Walked: Military specific occupations,434,0.01750407957983756,2023 ACS 1 Year
+35,Alameda,"Total: Taxicab, motorcycle, bicycle, or other means:",28971,1.168457809925055,2023 ACS 1 Year
+36,Alameda,"Total: Taxicab, motorcycle, bicycle, or other means: Management, business, science, and arts occupations",15256,0.6153046960138291,2023 ACS 1 Year
+37,Alameda,"Total: Taxicab, motorcycle, bicycle, or other means: Service occupations",5088,0.20520911728620622,2023 ACS 1 Year
+38,Alameda,"Total: Taxicab, motorcycle, bicycle, or other means: Sales and office occupations",5623,0.2267867269065129,2023 ACS 1 Year
+39,Alameda,"Total: Taxicab, motorcycle, bicycle, or other means: Natural resources, construction, and maintenance occupations",918,0.037024758189610325,2023 ACS 1 Year
+40,Alameda,"Total: Taxicab, motorcycle, bicycle, or other means: Production, transportation, and material moving occupations",2086,0.08413251152889666,2023 ACS 1 Year
+41,Alameda,"Total: Taxicab, motorcycle, bicycle, or other means: Military specific occupations",0,0.0,2023 ACS 1 Year
+42,Alameda,Total: Worked from home:,168282,6.787146359111115,2023 ACS 1 Year
+43,Alameda,"Total: Worked from home: Management, business, science, and arts occupations",129859,5.237470668567109,2023 ACS 1 Year
+44,Alameda,Total: Worked from home: Service occupations,9894,0.39904461604357794,2023 ACS 1 Year
+45,Alameda,Total: Worked from home: Sales and office occupations,21350,0.8610877857823316,2023 ACS 1 Year
+46,Alameda,"Total: Worked from home: Natural resources, construction, and maintenance occupations",1958,0.07897001801226253,2023 ACS 1 Year
+47,Alameda,"Total: Worked from home: Production, transportation, and material moving occupations",5100,0.20569310105339067,2023 ACS 1 Year
+48,Alameda,Total: Worked from home: Military specific occupations,121,0.004880169652443191,2023 ACS 1 Year
+50,Contra Costa,"Total: Management, business, science, and arts occupations",273454,16.274524507545866,2023 ACS 1 Year
+51,Contra Costa,Total: Service occupations,92139,5.483622158025732,2023 ACS 1 Year
+52,Contra Costa,Total: Sales and office occupations,101891,6.064009217632054,2023 ACS 1 Year
+53,Contra Costa,"Total: Natural resources, construction, and maintenance occupations",45738,2.7220819659837954,2023 ACS 1 Year
+54,Contra Costa,"Total: Production, transportation, and material moving occupations",46803,2.785465089289859,2023 ACS 1 Year
+55,Contra Costa,Total: Military specific occupations,61,0.003630394856028062,2023 ACS 1 Year
+56,Contra Costa,"Total: Car, truck, or van - drove alone:",341396,20.318070201123874,2023 ACS 1 Year
+57,Contra Costa,"Total: Car, truck, or van - drove alone: Management, business, science, and arts occupations",153866,9.157284178977276,2023 ACS 1 Year
+58,Contra Costa,"Total: Car, truck, or van - drove alone: Service occupations",56509,3.3631144740867174,2023 ACS 1 Year
+59,Contra Costa,"Total: Car, truck, or van - drove alone: Sales and office occupations",61900,3.6839580588219194,2023 ACS 1 Year
+60,Contra Costa,"Total: Car, truck, or van - drove alone: Natural resources, construction, and maintenance occupations",34697,2.064980497042716,2023 ACS 1 Year
+61,Contra Costa,"Total: Car, truck, or van - drove alone: Production, transportation, and material moving occupations",34363,2.045102597339218,2023 ACS 1 Year
+62,Contra Costa,"Total: Car, truck, or van - drove alone: Military specific occupations",61,0.003630394856028062,2023 ACS 1 Year
+63,Contra Costa,"Total: Car, truck, or van - carpooled:",60347,3.591531776667631,2023 ACS 1 Year
+64,Contra Costa,"Total: Car, truck, or van - carpooled: Management, business, science, and arts occupations",21581,1.2843860883269116,2023 ACS 1 Year
+65,Contra Costa,"Total: Car, truck, or van - carpooled: Service occupations",16960,1.0093687993153433,2023 ACS 1 Year
+66,Contra Costa,"Total: Car, truck, or van - carpooled: Sales and office occupations",9746,0.5800299715876966,2023 ACS 1 Year
+67,Contra Costa,"Total: Car, truck, or van - carpooled: Natural resources, construction, and maintenance occupations",6453,0.38404816403195224,2023 ACS 1 Year
+68,Contra Costa,"Total: Car, truck, or van - carpooled: Production, transportation, and material moving occupations",5607,0.33369875340572697,2023 ACS 1 Year
+69,Contra Costa,"Total: Car, truck, or van - carpooled: Military specific occupations",0,0.0,2023 ACS 1 Year
+70,Contra Costa,Total: Public transportation (excluding taxicab):,35857,2.13401751397702,2023 ACS 1 Year
+71,Contra Costa,"Total: Public transportation (excluding taxicab): Management, business, science, and arts occupations",17023,1.0131182235109133,2023 ACS 1 Year
+72,Contra Costa,Total: Public transportation (excluding taxicab): Service occupations,6411,0.3815485479015722,2023 ACS 1 Year
+73,Contra Costa,Total: Public transportation (excluding taxicab): Sales and office occupations,8292,0.4934956417407326,2023 ACS 1 Year
+74,Contra Costa,"Total: Public transportation (excluding taxicab): Natural resources, construction, and maintenance occupations",1689,0.10052027724313767,2023 ACS 1 Year
+75,Contra Costa,"Total: Public transportation (excluding taxicab): Production, transportation, and material moving occupations",2442,0.14533482358066438,2023 ACS 1 Year
+76,Contra Costa,Total: Public transportation (excluding taxicab): Military specific occupations,0,0.0,2023 ACS 1 Year
+77,Contra Costa,Total: Walked:,10578,0.6295461768371285,2023 ACS 1 Year
+78,Contra Costa,"Total: Walked: Management, business, science, and arts occupations",3286,0.19556520486734777,2023 ACS 1 Year
+79,Contra Costa,Total: Walked: Service occupations,4032,0.23996314851647782,2023 ACS 1 Year
+80,Contra Costa,Total: Walked: Sales and office occupations,2094,0.12462371850037315,2023 ACS 1 Year
+81,Contra Costa,"Total: Walked: Natural resources, construction, and maintenance occupations",656,0.039041623369744406,2023 ACS 1 Year
+82,Contra Costa,"Total: Walked: Production, transportation, and material moving occupations",510,0.030352481583185438,2023 ACS 1 Year
+83,Contra Costa,Total: Walked: Military specific occupations,0,0.0,2023 ACS 1 Year
+84,Contra Costa,"Total: Taxicab, motorcycle, bicycle, or other means:",12537,0.7461354149184233,2023 ACS 1 Year
+85,Contra Costa,"Total: Taxicab, motorcycle, bicycle, or other means: Management, business, science, and arts occupations",5449,0.3242954355819166,2023 ACS 1 Year
+86,Contra Costa,"Total: Taxicab, motorcycle, bicycle, or other means: Service occupations",2150,0.12795654000754647,2023 ACS 1 Year
+87,Contra Costa,"Total: Taxicab, motorcycle, bicycle, or other means: Sales and office occupations",2567,0.1527741573020334,2023 ACS 1 Year
+88,Contra Costa,"Total: Taxicab, motorcycle, bicycle, or other means: Natural resources, construction, and maintenance occupations",1181,0.07028682499949412,2023 ACS 1 Year
+89,Contra Costa,"Total: Taxicab, motorcycle, bicycle, or other means: Production, transportation, and material moving occupations",1190,0.07082245702743269,2023 ACS 1 Year
+90,Contra Costa,"Total: Taxicab, motorcycle, bicycle, or other means: Military specific occupations",0,0.0,2023 ACS 1 Year
+91,Contra Costa,Total: Worked from home:,99371,5.914032249809256,2023 ACS 1 Year
+92,Contra Costa,"Total: Worked from home: Management, business, science, and arts occupations",72249,4.2998753762815,2023 ACS 1 Year
+93,Contra Costa,Total: Worked from home: Service occupations,6077,0.3616706481980743,2023 ACS 1 Year
+94,Contra Costa,Total: Worked from home: Sales and office occupations,17292,1.0291276696792993,2023 ACS 1 Year
+95,Contra Costa,"Total: Worked from home: Natural resources, construction, and maintenance occupations",1062,0.06320457929675086,2023 ACS 1 Year
+96,Contra Costa,"Total: Worked from home: Production, transportation, and material moving occupations",2691,0.1601539763536314,2023 ACS 1 Year
+97,Contra Costa,Total: Worked from home: Military specific occupations,0,0.0,2023 ACS 1 Year
+99,Marin,"Total: Management, business, science, and arts occupations",73133,20.09186989859695,2023 ACS 1 Year
+100,Marin,Total: Service occupations,17336,4.762728953578778,2023 ACS 1 Year
+101,Marin,Total: Sales and office occupations,19802,5.4402145096196906,2023 ACS 1 Year
+102,Marin,"Total: Natural resources, construction, and maintenance occupations",5359,1.4722810603500618,2023 ACS 1 Year
+103,Marin,"Total: Production, transportation, and material moving occupations",5162,1.41815914042303,2023 ACS 1 Year
+104,Marin,Total: Military specific occupations,539,0.1480797707648224,2023 ACS 1 Year
+105,Marin,"Total: Car, truck, or van - drove alone:",67085,18.430299483781283,2023 ACS 1 Year
+106,Marin,"Total: Car, truck, or van - drove alone: Management, business, science, and arts occupations",37502,10.302945386312375,2023 ACS 1 Year
+107,Marin,"Total: Car, truck, or van - drove alone: Service occupations",10960,3.0110469157373907,2023 ACS 1 Year
+108,Marin,"Total: Car, truck, or van - drove alone: Sales and office occupations",11358,3.1203896778234745,2023 ACS 1 Year
+109,Marin,"Total: Car, truck, or van - drove alone: Natural resources, construction, and maintenance occupations",3492,0.9593591085542854,2023 ACS 1 Year
+110,Marin,"Total: Car, truck, or van - drove alone: Production, transportation, and material moving occupations",3234,0.8884786245889345,2023 ACS 1 Year
+111,Marin,"Total: Car, truck, or van - drove alone: Military specific occupations",539,0.1480797707648224,2023 ACS 1 Year
+112,Marin,"Total: Car, truck, or van - carpooled:",8672,2.3824633990214097,2023 ACS 1 Year
+113,Marin,"Total: Car, truck, or van - carpooled: Management, business, science, and arts occupations",4647,1.2766729030503334,2023 ACS 1 Year
+114,Marin,"Total: Car, truck, or van - carpooled: Service occupations",2015,0.5535820743805513,2023 ACS 1 Year
+115,Marin,"Total: Car, truck, or van - carpooled: Sales and office occupations",733,0.20137749901783827,2023 ACS 1 Year
+116,Marin,"Total: Car, truck, or van - carpooled: Natural resources, construction, and maintenance occupations",908,0.24945534666875463,2023 ACS 1 Year
+117,Marin,"Total: Car, truck, or van - carpooled: Production, transportation, and material moving occupations",369,0.10137557590393222,2023 ACS 1 Year
+118,Marin,"Total: Car, truck, or van - carpooled: Military specific occupations",0,0.0,2023 ACS 1 Year
+119,Marin,Total: Public transportation (excluding taxicab):,4750,1.3049701505248728,2023 ACS 1 Year
+120,Marin,"Total: Public transportation (excluding taxicab): Management, business, science, and arts occupations",3005,0.8255653268057352,2023 ACS 1 Year
+121,Marin,Total: Public transportation (excluding taxicab): Service occupations,521,0.14313462072072816,2023 ACS 1 Year
+122,Marin,Total: Public transportation (excluding taxicab): Sales and office occupations,963,0.2645655273590426,2023 ACS 1 Year
+123,Marin,"Total: Public transportation (excluding taxicab): Natural resources, construction, and maintenance occupations",0,0.0,2023 ACS 1 Year
+124,Marin,"Total: Public transportation (excluding taxicab): Production, transportation, and material moving occupations",261,0.0717046756393667,2023 ACS 1 Year
+125,Marin,Total: Public transportation (excluding taxicab): Military specific occupations,0,0.0,2023 ACS 1 Year
+126,Marin,Total: Walked:,5084,1.3967301568986217,2023 ACS 1 Year
+127,Marin,"Total: Walked: Management, business, science, and arts occupations",2336,0.6417705835002322,2023 ACS 1 Year
+128,Marin,Total: Walked: Service occupations,1070,0.2939616970656029,2023 ACS 1 Year
+129,Marin,Total: Walked: Sales and office occupations,1188,0.3263799029102208,2023 ACS 1 Year
+130,Marin,"Total: Walked: Natural resources, construction, and maintenance occupations",165,0.045330542070864,2023 ACS 1 Year
+131,Marin,"Total: Walked: Production, transportation, and material moving occupations",325,0.08928743135170182,2023 ACS 1 Year
+132,Marin,Total: Walked: Military specific occupations,0,0.0,2023 ACS 1 Year
+133,Marin,"Total: Taxicab, motorcycle, bicycle, or other means:",3865,1.0618336066902385,2023 ACS 1 Year
+134,Marin,"Total: Taxicab, motorcycle, bicycle, or other means: Management, business, science, and arts occupations",2031,0.5579777633086351,2023 ACS 1 Year
+135,Marin,"Total: Taxicab, motorcycle, bicycle, or other means: Service occupations",1015,0.2788515163753149,2023 ACS 1 Year
+136,Marin,"Total: Taxicab, motorcycle, bicycle, or other means: Sales and office occupations",663,0.18214635995747172,2023 ACS 1 Year
+137,Marin,"Total: Taxicab, motorcycle, bicycle, or other means: Natural resources, construction, and maintenance occupations",75,0.020604791850392726,2023 ACS 1 Year
+138,Marin,"Total: Taxicab, motorcycle, bicycle, or other means: Production, transportation, and material moving occupations",81,0.022253175198424145,2023 ACS 1 Year
+139,Marin,"Total: Taxicab, motorcycle, bicycle, or other means: Military specific occupations",0,0.0,2023 ACS 1 Year
+140,Marin,Total: Worked from home:,31875,8.75703653641691,2023 ACS 1 Year
+141,Marin,"Total: Worked from home: Management, business, science, and arts occupations",23612,6.4869379356196415,2023 ACS 1 Year
+142,Marin,Total: Worked from home: Service occupations,1755,0.4821521292991899,2023 ACS 1 Year
+143,Marin,Total: Worked from home: Sales and office occupations,4897,1.3453555425516426,2023 ACS 1 Year
+144,Marin,"Total: Worked from home: Natural resources, construction, and maintenance occupations",719,0.19753127120576494,2023 ACS 1 Year
+145,Marin,"Total: Worked from home: Production, transportation, and material moving occupations",892,0.24505965774067084,2023 ACS 1 Year
+146,Marin,Total: Worked from home: Military specific occupations,0,0.0,2023 ACS 1 Year
+148,Napa,"Total: Management, business, science, and arts occupations",27239,13.368571905336829,2023 ACS 1 Year
+149,Napa,Total: Service occupations,12363,6.067610942607262,2023 ACS 1 Year
+150,Napa,Total: Sales and office occupations,13022,6.391040175898387,2023 ACS 1 Year
+151,Napa,"Total: Natural resources, construction, and maintenance occupations",6177,3.0315969257045263,2023 ACS 1 Year
+152,Napa,"Total: Production, transportation, and material moving occupations",9117,4.474513383786331,2023 ACS 1 Year
+153,Napa,Total: Military specific occupations,0,0.0,2023 ACS 1 Year
+154,Napa,"Total: Car, truck, or van - drove alone:",47032,23.082737026021576,2023 ACS 1 Year
+155,Napa,"Total: Car, truck, or van - drove alone: Management, business, science, and arts occupations",18536,9.097244716668138,2023 ACS 1 Year
+156,Napa,"Total: Car, truck, or van - drove alone: Service occupations",8688,4.263965370005006,2023 ACS 1 Year
+157,Napa,"Total: Car, truck, or van - drove alone: Sales and office occupations",8496,4.169734091109867,2023 ACS 1 Year
+158,Napa,"Total: Car, truck, or van - drove alone: Natural resources, construction, and maintenance occupations",4125,2.024500132512736,2023 ACS 1 Year
+159,Napa,"Total: Car, truck, or van - drove alone: Production, transportation, and material moving occupations",7187,3.5272927157258263,2023 ACS 1 Year
+160,Napa,"Total: Car, truck, or van - drove alone: Military specific occupations",0,0.0,2023 ACS 1 Year
+161,Napa,"Total: Car, truck, or van - carpooled:",6472,3.1763793594236187,2023 ACS 1 Year
+162,Napa,"Total: Car, truck, or van - carpooled: Management, business, science, and arts occupations",1869,0.9172826054948615,2023 ACS 1 Year
+163,Napa,"Total: Car, truck, or van - carpooled: Service occupations",1685,0.8269776298870206,2023 ACS 1 Year
+164,Napa,"Total: Car, truck, or van - carpooled: Sales and office occupations",1234,0.6056322820656281,2023 ACS 1 Year
+165,Napa,"Total: Car, truck, or van - carpooled: Natural resources, construction, and maintenance occupations",1066,0.5231799130323822,2023 ACS 1 Year
+166,Napa,"Total: Car, truck, or van - carpooled: Production, transportation, and material moving occupations",618,0.30330692894372624,2023 ACS 1 Year
+167,Napa,"Total: Car, truck, or van - carpooled: Military specific occupations",0,0.0,2023 ACS 1 Year
+168,Napa,Total: Public transportation (excluding taxicab):,576,0.28269383668541476,2023 ACS 1 Year
+169,Napa,"Total: Public transportation (excluding taxicab): Management, business, science, and arts occupations",382,0.18748098196845214,2023 ACS 1 Year
+170,Napa,Total: Public transportation (excluding taxicab): Service occupations,124,0.06085770095311012,2023 ACS 1 Year
+171,Napa,Total: Public transportation (excluding taxicab): Sales and office occupations,0,0.0,2023 ACS 1 Year
+172,Napa,"Total: Public transportation (excluding taxicab): Natural resources, construction, and maintenance occupations",70,0.03435515376385249,2023 ACS 1 Year
+173,Napa,"Total: Public transportation (excluding taxicab): Production, transportation, and material moving occupations",0,0.0,2023 ACS 1 Year
+174,Napa,Total: Public transportation (excluding taxicab): Military specific occupations,0,0.0,2023 ACS 1 Year
+175,Napa,Total: Walked:,3707,1.8193507857514453,2023 ACS 1 Year
+176,Napa,"Total: Walked: Management, business, science, and arts occupations",909,0.44612621101917016,2023 ACS 1 Year
+177,Napa,Total: Walked: Service occupations,961,0.4716471823866034,2023 ACS 1 Year
+178,Napa,Total: Walked: Sales and office occupations,1235,0.6061230699765403,2023 ACS 1 Year
+179,Napa,"Total: Walked: Natural resources, construction, and maintenance occupations",510,0.250301834565211,2023 ACS 1 Year
+180,Napa,"Total: Walked: Production, transportation, and material moving occupations",92,0.045152487803920414,2023 ACS 1 Year
+181,Napa,Total: Walked: Military specific occupations,0,0.0,2023 ACS 1 Year
+182,Napa,"Total: Taxicab, motorcycle, bicycle, or other means:",1371,0.6728702258605966,2023 ACS 1 Year
+183,Napa,"Total: Taxicab, motorcycle, bicycle, or other means: Management, business, science, and arts occupations",293,0.14380085789726826,2023 ACS 1 Year
+184,Napa,"Total: Taxicab, motorcycle, bicycle, or other means: Service occupations",235,0.11533515906436193,2023 ACS 1 Year
+185,Napa,"Total: Taxicab, motorcycle, bicycle, or other means: Sales and office occupations",133,0.06527479215131973,2023 ACS 1 Year
+186,Napa,"Total: Taxicab, motorcycle, bicycle, or other means: Natural resources, construction, and maintenance occupations",330,0.1619600106010189,2023 ACS 1 Year
+187,Napa,"Total: Taxicab, motorcycle, bicycle, or other means: Production, transportation, and material moving occupations",380,0.1864994061466278,2023 ACS 1 Year
+188,Napa,"Total: Taxicab, motorcycle, bicycle, or other means: Military specific occupations",0,0.0,2023 ACS 1 Year
+189,Napa,Total: Worked from home:,8760,4.299302099590683,2023 ACS 1 Year
+190,Napa,"Total: Worked from home: Management, business, science, and arts occupations",5250,2.5766365322889366,2023 ACS 1 Year
+191,Napa,Total: Worked from home: Service occupations,670,0.32882790031115955,2023 ACS 1 Year
+192,Napa,Total: Worked from home: Sales and office occupations,1924,0.9442759405950312,2023 ACS 1 Year
+193,Napa,"Total: Worked from home: Natural resources, construction, and maintenance occupations",76,0.03729988122932556,2023 ACS 1 Year
+194,Napa,"Total: Worked from home: Production, transportation, and material moving occupations",840,0.4122618451662298,2023 ACS 1 Year
+195,Napa,Total: Worked from home: Military specific occupations,0,0.0,2023 ACS 1 Year
+197,San Francisco,"Total: Management, business, science, and arts occupations",300696,21.77077609106923,2023 ACS 1 Year
+198,San Francisco,Total: Service occupations,59916,4.337995251923883,2023 ACS 1 Year
+199,San Francisco,Total: Sales and office occupations,62175,4.501549749455362,2023 ACS 1 Year
+200,San Francisco,"Total: Natural resources, construction, and maintenance occupations",12805,0.9270984244756881,2023 ACS 1 Year
+201,San Francisco,"Total: Production, transportation, and material moving occupations",24461,1.7710077751737452,2023 ACS 1 Year
+202,San Francisco,Total: Military specific occupations,344,0.024906041235426526,2023 ACS 1 Year
+203,San Francisco,"Total: Car, truck, or van - drove alone:",136951,9.915428061723542,2023 ACS 1 Year
+204,San Francisco,"Total: Car, truck, or van - drove alone: Management, business, science, and arts occupations",84517,6.1191392066701855,2023 ACS 1 Year
+205,San Francisco,"Total: Car, truck, or van - drove alone: Service occupations",16296,1.1798513022456707,2023 ACS 1 Year
+206,San Francisco,"Total: Car, truck, or van - drove alone: Sales and office occupations",17077,1.236396704004008,2023 ACS 1 Year
+207,San Francisco,"Total: Car, truck, or van - drove alone: Natural resources, construction, and maintenance occupations",7352,0.5322942301245809,2023 ACS 1 Year
+208,San Francisco,"Total: Car, truck, or van - drove alone: Production, transportation, and material moving occupations",11709,0.8477466186790966,2023 ACS 1 Year
+209,San Francisco,"Total: Car, truck, or van - drove alone: Military specific occupations",0,0.0,2023 ACS 1 Year
+210,San Francisco,"Total: Car, truck, or van - carpooled:",32319,2.3399370543248543,2023 ACS 1 Year
+211,San Francisco,"Total: Car, truck, or van - carpooled: Management, business, science, and arts occupations",17586,1.2732489568785201,2023 ACS 1 Year
+212,San Francisco,"Total: Car, truck, or van - carpooled: Service occupations",6078,0.44005499601430936,2023 ACS 1 Year
+213,San Francisco,"Total: Car, truck, or van - carpooled: Sales and office occupations",5245,0.3797447275575934,2023 ACS 1 Year
+214,San Francisco,"Total: Car, truck, or van - carpooled: Natural resources, construction, and maintenance occupations",804,0.05821063125954339,2023 ACS 1 Year
+215,San Francisco,"Total: Car, truck, or van - carpooled: Production, transportation, and material moving occupations",2555,0.18498527719917085,2023 ACS 1 Year
+216,San Francisco,"Total: Car, truck, or van - carpooled: Military specific occupations",51,0.003692465415717305,2023 ACS 1 Year
+217,San Francisco,Total: Public transportation (excluding taxicab):,101330,7.3364219720516575,2023 ACS 1 Year
+218,San Francisco,"Total: Public transportation (excluding taxicab): Management, business, science, and arts occupations",59469,4.305631878574361,2023 ACS 1 Year
+219,San Francisco,Total: Public transportation (excluding taxicab): Service occupations,18359,1.3292151483755688,2023 ACS 1 Year
+220,San Francisco,Total: Public transportation (excluding taxicab): Sales and office occupations,15937,1.153859241770327,2023 ACS 1 Year
+221,San Francisco,"Total: Public transportation (excluding taxicab): Natural resources, construction, and maintenance occupations",2000,0.14480256532224725,2023 ACS 1 Year
+222,San Francisco,"Total: Public transportation (excluding taxicab): Production, transportation, and material moving occupations",5272,0.38169956218944373,2023 ACS 1 Year
+223,San Francisco,Total: Public transportation (excluding taxicab): Military specific occupations,293,0.021213575819709223,2023 ACS 1 Year
+224,San Francisco,Total: Walked:,47388,3.4309519827453263,2023 ACS 1 Year
+225,San Francisco,"Total: Walked: Management, business, science, and arts occupations",28119,2.0358516671481355,2023 ACS 1 Year
+226,San Francisco,Total: Walked: Service occupations,9173,0.664136965850487,2023 ACS 1 Year
+227,San Francisco,Total: Walked: Sales and office occupations,7319,0.5299049877967638,2023 ACS 1 Year
+228,San Francisco,"Total: Walked: Natural resources, construction, and maintenance occupations",787,0.056979809454304295,2023 ACS 1 Year
+229,San Francisco,"Total: Walked: Production, transportation, and material moving occupations",1990,0.144078552495636,2023 ACS 1 Year
+230,San Francisco,Total: Walked: Military specific occupations,0,0.0,2023 ACS 1 Year
+231,San Francisco,"Total: Taxicab, motorcycle, bicycle, or other means:",30067,2.176889365772004,2023 ACS 1 Year
+232,San Francisco,"Total: Taxicab, motorcycle, bicycle, or other means: Management, business, science, and arts occupations",20570,1.489294384339313,2023 ACS 1 Year
+233,San Francisco,"Total: Taxicab, motorcycle, bicycle, or other means: Service occupations",3855,0.27910694465863156,2023 ACS 1 Year
+234,San Francisco,"Total: Taxicab, motorcycle, bicycle, or other means: Sales and office occupations",4481,0.32443014760449496,2023 ACS 1 Year
+235,San Francisco,"Total: Taxicab, motorcycle, bicycle, or other means: Natural resources, construction, and maintenance occupations",425,0.030770545130977538,2023 ACS 1 Year
+236,San Francisco,"Total: Taxicab, motorcycle, bicycle, or other means: Production, transportation, and material moving occupations",736,0.053287344038586995,2023 ACS 1 Year
+237,San Francisco,"Total: Taxicab, motorcycle, bicycle, or other means: Military specific occupations",0,0.0,2023 ACS 1 Year
+238,San Francisco,Total: Worked from home:,112342,8.13370489671595,2023 ACS 1 Year
+239,San Francisco,"Total: Worked from home: Management, business, science, and arts occupations",90435,6.547609997458714,2023 ACS 1 Year
+240,San Francisco,Total: Worked from home: Service occupations,6155,0.4456298947792159,2023 ACS 1 Year
+241,San Francisco,Total: Worked from home: Sales and office occupations,12116,0.8772139407221738,2023 ACS 1 Year
+242,San Francisco,"Total: Worked from home: Natural resources, construction, and maintenance occupations",1437,0.10404064318403465,2023 ACS 1 Year
+243,San Francisco,"Total: Worked from home: Production, transportation, and material moving occupations",2199,0.15921042057181087,2023 ACS 1 Year
+244,San Francisco,Total: Worked from home: Military specific occupations,0,0.0,2023 ACS 1 Year
+246,San Mateo,"Total: Management, business, science, and arts occupations",215346,18.993012099836218,2023 ACS 1 Year
+247,San Mateo,Total: Service occupations,61373,5.412954647884094,2023 ACS 1 Year
+248,San Mateo,Total: Sales and office occupations,58381,5.149067265705136,2023 ACS 1 Year
+249,San Mateo,"Total: Natural resources, construction, and maintenance occupations",16881,1.4888646051346912,2023 ACS 1 Year
+250,San Mateo,"Total: Production, transportation, and material moving occupations",25807,2.276116868947987,2023 ACS 1 Year
+251,San Mateo,Total: Military specific occupations,151,0.013317845825208124,2023 ACS 1 Year
+252,San Mateo,"Total: Car, truck, or van - drove alone:",228231,20.129438877702484,2023 ACS 1 Year
+253,San Mateo,"Total: Car, truck, or van - drove alone: Management, business, science, and arts occupations",124966,11.021708088695089,2023 ACS 1 Year
+254,San Mateo,"Total: Car, truck, or van - drove alone: Service occupations",37174,3.2786596073264027,2023 ACS 1 Year
+255,San Mateo,"Total: Car, truck, or van - drove alone: Sales and office occupations",36707,3.237471302688176,2023 ACS 1 Year
+256,San Mateo,"Total: Car, truck, or van - drove alone: Natural resources, construction, and maintenance occupations",11715,1.0332355221345244,2023 ACS 1 Year
+257,San Mateo,"Total: Car, truck, or van - drove alone: Production, transportation, and material moving occupations",17589,1.5513085445005677,2023 ACS 1 Year
+258,San Mateo,"Total: Car, truck, or van - drove alone: Military specific occupations",80,0.0070558123577261584,2023 ACS 1 Year
+259,San Mateo,"Total: Car, truck, or van - carpooled:",38693,3.4126318444687285,2023 ACS 1 Year
+260,San Mateo,"Total: Car, truck, or van - carpooled: Management, business, science, and arts occupations",19301,1.7023029289559073,2023 ACS 1 Year
+261,San Mateo,"Total: Car, truck, or van - carpooled: Service occupations",8678,0.765379245504345,2023 ACS 1 Year
+262,San Mateo,"Total: Car, truck, or van - carpooled: Sales and office occupations",5257,0.4636550695570802,2023 ACS 1 Year
+263,San Mateo,"Total: Car, truck, or van - carpooled: Natural resources, construction, and maintenance occupations",2618,0.23090145940658854,2023 ACS 1 Year
+264,San Mateo,"Total: Car, truck, or van - carpooled: Production, transportation, and material moving occupations",2839,0.25039314104480703,2023 ACS 1 Year
+265,San Mateo,"Total: Car, truck, or van - carpooled: Military specific occupations",0,0.0,2023 ACS 1 Year
+266,San Mateo,Total: Public transportation (excluding taxicab):,20563,1.8136083688990376,2023 ACS 1 Year
+267,San Mateo,"Total: Public transportation (excluding taxicab): Management, business, science, and arts occupations",10149,0.8951179952320347,2023 ACS 1 Year
+268,San Mateo,Total: Public transportation (excluding taxicab): Service occupations,4992,0.4402826911221123,2023 ACS 1 Year
+269,San Mateo,Total: Public transportation (excluding taxicab): Sales and office occupations,3068,0.2705904039187982,2023 ACS 1 Year
+270,San Mateo,"Total: Public transportation (excluding taxicab): Natural resources, construction, and maintenance occupations",909,0.08017166791466349,2023 ACS 1 Year
+271,San Mateo,"Total: Public transportation (excluding taxicab): Production, transportation, and material moving occupations",1445,0.12744561071142874,2023 ACS 1 Year
+272,San Mateo,Total: Public transportation (excluding taxicab): Military specific occupations,0,0.0,2023 ACS 1 Year
+273,San Mateo,Total: Walked:,9126,0.8048917947076115,2023 ACS 1 Year
+274,San Mateo,"Total: Walked: Management, business, science, and arts occupations",4030,0.3554365475204552,2023 ACS 1 Year
+275,San Mateo,Total: Walked: Service occupations,2100,0.18521507439031168,2023 ACS 1 Year
+276,San Mateo,Total: Walked: Sales and office occupations,1386,0.12224194909760569,2023 ACS 1 Year
+277,San Mateo,"Total: Walked: Natural resources, construction, and maintenance occupations",482,0.04251126945530011,2023 ACS 1 Year
+278,San Mateo,"Total: Walked: Production, transportation, and material moving occupations",1057,0.09322492077645687,2023 ACS 1 Year
+279,San Mateo,Total: Walked: Military specific occupations,71,0.006262033467481966,2023 ACS 1 Year
+280,San Mateo,"Total: Taxicab, motorcycle, bicycle, or other means:",11398,1.0052768656670346,2023 ACS 1 Year
+281,San Mateo,"Total: Taxicab, motorcycle, bicycle, or other means: Management, business, science, and arts occupations",5776,0.5094296522278287,2023 ACS 1 Year
+282,San Mateo,"Total: Taxicab, motorcycle, bicycle, or other means: Service occupations",3154,0.2781754022033538,2023 ACS 1 Year
+283,San Mateo,"Total: Taxicab, motorcycle, bicycle, or other means: Sales and office occupations",1690,0.1490540360569651,2023 ACS 1 Year
+284,San Mateo,"Total: Taxicab, motorcycle, bicycle, or other means: Natural resources, construction, and maintenance occupations",117,0.010319125573174508,2023 ACS 1 Year
+285,San Mateo,"Total: Taxicab, motorcycle, bicycle, or other means: Production, transportation, and material moving occupations",661,0.058298649605712384,2023 ACS 1 Year
+286,San Mateo,"Total: Taxicab, motorcycle, bicycle, or other means: Military specific occupations",0,0.0,2023 ACS 1 Year
+287,San Mateo,Total: Worked from home:,69928,6.167485581888435,2023 ACS 1 Year
+288,San Mateo,"Total: Worked from home: Management, business, science, and arts occupations",51124,4.5090168872049015,2023 ACS 1 Year
+289,San Mateo,Total: Worked from home: Service occupations,5275,0.4652426273375686,2023 ACS 1 Year
+290,San Mateo,Total: Worked from home: Sales and office occupations,10273,0.9060545043865104,2023 ACS 1 Year
+291,San Mateo,"Total: Worked from home: Natural resources, construction, and maintenance occupations",1040,0.09172556065044006,2023 ACS 1 Year
+292,San Mateo,"Total: Worked from home: Production, transportation, and material moving occupations",2216,0.1954460023090146,2023 ACS 1 Year
+293,San Mateo,Total: Worked from home: Military specific occupations,0,0.0,2023 ACS 1 Year
+295,Santa Clara,"Total: Management, business, science, and arts occupations",585814,19.885915011979467,2023 ACS 1 Year
+296,Santa Clara,Total: Service occupations,131878,4.476701990648616,2023 ACS 1 Year
+297,Santa Clara,Total: Sales and office occupations,138959,4.717072081154862,2023 ACS 1 Year
+298,Santa Clara,"Total: Natural resources, construction, and maintenance occupations",50203,1.7041801516290243,2023 ACS 1 Year
+299,Santa Clara,"Total: Production, transportation, and material moving occupations",74680,2.5350710858645007,2023 ACS 1 Year
+300,Santa Clara,Total: Military specific occupations,424,0.014393012056863259,2023 ACS 1 Year
+301,Santa Clara,"Total: Car, truck, or van - drove alone:",644885,21.89112636860911,2023 ACS 1 Year
+302,Santa Clara,"Total: Car, truck, or van - drove alone: Management, business, science, and arts occupations",368792,12.518933260553574,2023 ACS 1 Year
+303,Santa Clara,"Total: Car, truck, or van - drove alone: Service occupations",86361,2.931591778874453,2023 ACS 1 Year
+304,Santa Clara,"Total: Car, truck, or van - drove alone: Sales and office occupations",96879,3.28863352607749,2023 ACS 1 Year
+305,Santa Clara,"Total: Car, truck, or van - drove alone: Natural resources, construction, and maintenance occupations",38735,1.3148899104306566,2023 ACS 1 Year
+306,Santa Clara,"Total: Car, truck, or van - drove alone: Production, transportation, and material moving occupations",53694,1.8226848806160754,2023 ACS 1 Year
+307,Santa Clara,"Total: Car, truck, or van - drove alone: Military specific occupations",424,0.014393012056863259,2023 ACS 1 Year
+308,Santa Clara,"Total: Car, truck, or van - carpooled:",101704,3.4524219297906154,2023 ACS 1 Year
+309,Santa Clara,"Total: Car, truck, or van - carpooled: Management, business, science, and arts occupations",46538,1.5797688563733547,2023 ACS 1 Year
+310,Santa Clara,"Total: Car, truck, or van - carpooled: Service occupations",20972,0.7119109642842837,2023 ACS 1 Year
+311,Santa Clara,"Total: Car, truck, or van - carpooled: Sales and office occupations",15860,0.5383801208062531,2023 ACS 1 Year
+312,Santa Clara,"Total: Car, truck, or van - carpooled: Natural resources, construction, and maintenance occupations",6958,0.23619475917843058,2023 ACS 1 Year
+313,Santa Clara,"Total: Car, truck, or van - carpooled: Production, transportation, and material moving occupations",11376,0.3861672291482935,2023 ACS 1 Year
+314,Santa Clara,"Total: Car, truck, or van - carpooled: Military specific occupations",0,0.0,2023 ACS 1 Year
+315,Santa Clara,Total: Public transportation (excluding taxicab):,28329,0.961650090940753,2023 ACS 1 Year
+316,Santa Clara,"Total: Public transportation (excluding taxicab): Management, business, science, and arts occupations",17093,0.5802352714338767,2023 ACS 1 Year
+317,Santa Clara,Total: Public transportation (excluding taxicab): Service occupations,4634,0.15730475913090647,2023 ACS 1 Year
+318,Santa Clara,Total: Public transportation (excluding taxicab): Sales and office occupations,2824,0.09586289162401379,2023 ACS 1 Year
+319,Santa Clara,"Total: Public transportation (excluding taxicab): Natural resources, construction, and maintenance occupations",1295,0.043959789183108305,2023 ACS 1 Year
+320,Santa Clara,"Total: Public transportation (excluding taxicab): Production, transportation, and material moving occupations",2483,0.08428737956884781,2023 ACS 1 Year
+321,Santa Clara,Total: Public transportation (excluding taxicab): Military specific occupations,0,0.0,2023 ACS 1 Year
+322,Santa Clara,Total: Walked:,20095,0.6821405124591208,2023 ACS 1 Year
+323,Santa Clara,"Total: Walked: Management, business, science, and arts occupations",9955,0.3379302712879098,2023 ACS 1 Year
+324,Santa Clara,Total: Walked: Service occupations,4484,0.1522128916579596,2023 ACS 1 Year
+325,Santa Clara,Total: Walked: Sales and office occupations,3696,0.12546361453341182,2023 ACS 1 Year
+326,Santa Clara,"Total: Walked: Natural resources, construction, and maintenance occupations",555,0.01883990964990356,2023 ACS 1 Year
+327,Santa Clara,"Total: Walked: Production, transportation, and material moving occupations",1405,0.04769382532993604,2023 ACS 1 Year
+328,Santa Clara,Total: Walked: Military specific occupations,0,0.0,2023 ACS 1 Year
+329,Santa Clara,"Total: Taxicab, motorcycle, bicycle, or other means:",26259,0.8913823198140858,2023 ACS 1 Year
+330,Santa Clara,"Total: Taxicab, motorcycle, bicycle, or other means: Management, business, science, and arts occupations",18708,0.6350577112259383,2023 ACS 1 Year
+331,Santa Clara,"Total: Taxicab, motorcycle, bicycle, or other means: Service occupations",3619,0.12284978923063239,2023 ACS 1 Year
+332,Santa Clara,"Total: Taxicab, motorcycle, bicycle, or other means: Sales and office occupations",2579,0.08754617475153384,2023 ACS 1 Year
+333,Santa Clara,"Total: Taxicab, motorcycle, bicycle, or other means: Natural resources, construction, and maintenance occupations",163,0.00553316265393564,2023 ACS 1 Year
+334,Santa Clara,"Total: Taxicab, motorcycle, bicycle, or other means: Production, transportation, and material moving occupations",1190,0.04039548195204547,2023 ACS 1 Year
+335,Santa Clara,"Total: Taxicab, motorcycle, bicycle, or other means: Military specific occupations",0,0.0,2023 ACS 1 Year
+336,Santa Clara,Total: Worked from home:,160686,5.454612111719646,2023 ACS 1 Year
+337,Santa Clara,"Total: Worked from home: Management, business, science, and arts occupations",124728,4.233989641104813,2023 ACS 1 Year
+338,Santa Clara,Total: Worked from home: Service occupations,11808,0.4008318074703806,2023 ACS 1 Year
+339,Santa Clara,Total: Worked from home: Sales and office occupations,17121,0.58118575336216,2023 ACS 1 Year
+340,Santa Clara,"Total: Worked from home: Natural resources, construction, and maintenance occupations",2497,0.08476262053298954,2023 ACS 1 Year
+341,Santa Clara,"Total: Worked from home: Production, transportation, and material moving occupations",4532,0.1538422892493026,2023 ACS 1 Year
+342,Santa Clara,Total: Worked from home: Military specific occupations,0,0.0,2023 ACS 1 Year
+344,Solano,"Total: Management, business, science, and arts occupations",79255,12.741858988271797,2023 ACS 1 Year
+345,Solano,Total: Service occupations,36997,5.948022925860725,2023 ACS 1 Year
+346,Solano,Total: Sales and office occupations,41683,6.701393075618363,2023 ACS 1 Year
+347,Solano,"Total: Natural resources, construction, and maintenance occupations",21474,3.4523838232811634,2023 ACS 1 Year
+348,Solano,"Total: Production, transportation, and material moving occupations",26056,4.189033850210207,2023 ACS 1 Year
+349,Solano,Total: Military specific occupations,1870,0.3006406700910764,2023 ACS 1 Year
+350,Solano,"Total: Car, truck, or van - drove alone:",154819,24.890314386540304,2023 ACS 1 Year
+351,Solano,"Total: Car, truck, or van - drove alone: Management, business, science, and arts occupations",54878,8.822758659496307,2023 ACS 1 Year
+352,Solano,"Total: Car, truck, or van - drove alone: Service occupations",28888,4.644335656465784,2023 ACS 1 Year
+353,Solano,"Total: Car, truck, or van - drove alone: Sales and office occupations",31367,5.042885507351228,2023 ACS 1 Year
+354,Solano,"Total: Car, truck, or van - drove alone: Natural resources, construction, and maintenance occupations",17615,2.8319708040932143,2023 ACS 1 Year
+355,Solano,"Total: Car, truck, or van - drove alone: Production, transportation, and material moving occupations",20263,3.2576908545751238,2023 ACS 1 Year
+356,Solano,"Total: Car, truck, or van - drove alone: Military specific occupations",1808,0.29067290455864503,2023 ACS 1 Year
+357,Solano,"Total: Car, truck, or van - carpooled:",19941,3.2059227819712057,2023 ACS 1 Year
+358,Solano,"Total: Car, truck, or van - carpooled: Management, business, science, and arts occupations",6392,1.0276444723113158,2023 ACS 1 Year
+359,Solano,"Total: Car, truck, or van - carpooled: Service occupations",3825,0.6149468251862927,2023 ACS 1 Year
+360,Solano,"Total: Car, truck, or van - carpooled: Sales and office occupations",3692,0.5935643604151092,2023 ACS 1 Year
+361,Solano,"Total: Car, truck, or van - carpooled: Natural resources, construction, and maintenance occupations",2698,0.4337585710725798,2023 ACS 1 Year
+362,Solano,"Total: Car, truck, or van - carpooled: Production, transportation, and material moving occupations",3334,0.5360085529859085,2023 ACS 1 Year
+363,Solano,"Total: Car, truck, or van - carpooled: Military specific occupations",0,0.0,2023 ACS 1 Year
+364,Solano,Total: Public transportation (excluding taxicab):,3991,0.6416347135473187,2023 ACS 1 Year
+365,Solano,"Total: Public transportation (excluding taxicab): Management, business, science, and arts occupations",2112,0.33954710974992164,2023 ACS 1 Year
+366,Solano,Total: Public transportation (excluding taxicab): Service occupations,565,0.09083528267457656,2023 ACS 1 Year
+367,Solano,Total: Public transportation (excluding taxicab): Sales and office occupations,1010,0.16237811593154397,2023 ACS 1 Year
+368,Solano,"Total: Public transportation (excluding taxicab): Natural resources, construction, and maintenance occupations",95,0.015273189122273937,2023 ACS 1 Year
+369,Solano,"Total: Public transportation (excluding taxicab): Production, transportation, and material moving occupations",209,0.033601016069002655,2023 ACS 1 Year
+370,Solano,Total: Public transportation (excluding taxicab): Military specific occupations,0,0.0,2023 ACS 1 Year
+371,Solano,Total: Walked:,2780,0.44694174484127935,2023 ACS 1 Year
+372,Solano,"Total: Walked: Management, business, science, and arts occupations",838,0.13472560509963746,2023 ACS 1 Year
+373,Solano,Total: Walked: Service occupations,975,0.15675115151807462,2023 ACS 1 Year
+374,Solano,Total: Walked: Sales and office occupations,708,0.11382545156389418,2023 ACS 1 Year
+375,Solano,"Total: Walked: Natural resources, construction, and maintenance occupations",0,0.0,2023 ACS 1 Year
+376,Solano,"Total: Walked: Production, transportation, and material moving occupations",259,0.041639536659673154,2023 ACS 1 Year
+377,Solano,Total: Walked: Military specific occupations,0,0.0,2023 ACS 1 Year
+378,Solano,"Total: Taxicab, motorcycle, bicycle, or other means:",2757,0.44324402536957097,2023 ACS 1 Year
+379,Solano,"Total: Taxicab, motorcycle, bicycle, or other means: Management, business, science, and arts occupations",885,0.14228181445486773,2023 ACS 1 Year
+380,Solano,"Total: Taxicab, motorcycle, bicycle, or other means: Service occupations",682,0.10964542085674552,2023 ACS 1 Year
+381,Solano,"Total: Taxicab, motorcycle, bicycle, or other means: Sales and office occupations",533,0.08569062949654745,2023 ACS 1 Year
+382,Solano,"Total: Taxicab, motorcycle, bicycle, or other means: Natural resources, construction, and maintenance occupations",242,0.03890643965884519,2023 ACS 1 Year
+383,Solano,"Total: Taxicab, motorcycle, bicycle, or other means: Production, transportation, and material moving occupations",415,0.0667197209025651,2023 ACS 1 Year
+384,Solano,"Total: Taxicab, motorcycle, bicycle, or other means: Military specific occupations",0,0.0,2023 ACS 1 Year
+385,Solano,Total: Worked from home:,23047,3.705275681063657,2023 ACS 1 Year
+386,Solano,"Total: Worked from home: Management, business, science, and arts occupations",14150,2.27490132715975,2023 ACS 1 Year
+387,Solano,Total: Worked from home: Service occupations,2062,0.33150858915925113,2023 ACS 1 Year
+388,Solano,Total: Worked from home: Sales and office occupations,4373,0.7030490108600412,2023 ACS 1 Year
+389,Solano,"Total: Worked from home: Natural resources, construction, and maintenance occupations",824,0.13247481933424973,2023 ACS 1 Year
+390,Solano,"Total: Worked from home: Production, transportation, and material moving occupations",1576,0.2533741690179339,2023 ACS 1 Year
+391,Solano,Total: Worked from home: Military specific occupations,62,0.009967765532431411,2023 ACS 1 Year
+393,Sonoma,"Total: Management, business, science, and arts occupations",103731,14.118305166408748,2023 ACS 1 Year
+394,Sonoma,Total: Service occupations,44802,6.097775091972936,2023 ACS 1 Year
+395,Sonoma,Total: Sales and office occupations,49562,6.745634773187864,2023 ACS 1 Year
+396,Sonoma,"Total: Natural resources, construction, and maintenance occupations",23739,3.230996002596883,2023 ACS 1 Year
+397,Sonoma,"Total: Production, transportation, and material moving occupations",22778,3.100199121578491,2023 ACS 1 Year
+398,Sonoma,Total: Military specific occupations,297,0.04042317758841039,2023 ACS 1 Year
+399,Sonoma,"Total: Car, truck, or van - drove alone:",170305,23.17935777506475,2023 ACS 1 Year
+400,Sonoma,"Total: Car, truck, or van - drove alone: Management, business, science, and arts occupations",68781,9.361436288580656,2023 ACS 1 Year
+401,Sonoma,"Total: Car, truck, or van - drove alone: Service occupations",31548,4.293839752724481,2023 ACS 1 Year
+402,Sonoma,"Total: Car, truck, or van - drove alone: Sales and office occupations",34180,4.652068047043324,2023 ACS 1 Year
+403,Sonoma,"Total: Car, truck, or van - drove alone: Natural resources, construction, and maintenance occupations",17862,2.4311070642565196,2023 ACS 1 Year
+404,Sonoma,"Total: Car, truck, or van - drove alone: Production, transportation, and material moving occupations",17788,2.4210352961031782,2023 ACS 1 Year
+405,Sonoma,"Total: Car, truck, or van - drove alone: Military specific occupations",146,0.019871326356592313,2023 ACS 1 Year
+406,Sonoma,"Total: Car, truck, or van - carpooled:",25176,3.4265788517367675,2023 ACS 1 Year
+407,Sonoma,"Total: Car, truck, or van - carpooled: Management, business, science, and arts occupations",5826,0.7929475846130604,2023 ACS 1 Year
+408,Sonoma,"Total: Car, truck, or van - carpooled: Service occupations",7640,1.0398420093449676,2023 ACS 1 Year
+409,Sonoma,"Total: Car, truck, or van - carpooled: Sales and office occupations",4214,0.573546364840274,2023 ACS 1 Year
+410,Sonoma,"Total: Car, truck, or van - carpooled: Natural resources, construction, and maintenance occupations",4162,0.5664689061379261,2023 ACS 1 Year
+411,Sonoma,"Total: Car, truck, or van - carpooled: Production, transportation, and material moving occupations",3254,0.44288558879692724,2023 ACS 1 Year
+412,Sonoma,"Total: Car, truck, or van - carpooled: Military specific occupations",80,0.010888398003612226,2023 ACS 1 Year
+413,Sonoma,Total: Public transportation (excluding taxicab):,1842,0.2507053640331715,2023 ACS 1 Year
+414,Sonoma,"Total: Public transportation (excluding taxicab): Management, business, science, and arts occupations",809,0.11010892481152863,2023 ACS 1 Year
+415,Sonoma,Total: Public transportation (excluding taxicab): Service occupations,97,0.013202182579379823,2023 ACS 1 Year
+416,Sonoma,Total: Public transportation (excluding taxicab): Sales and office occupations,557,0.07581047110015013,2023 ACS 1 Year
+417,Sonoma,"Total: Public transportation (excluding taxicab): Natural resources, construction, and maintenance occupations",17,0.002313784575767598,2023 ACS 1 Year
+418,Sonoma,"Total: Public transportation (excluding taxicab): Production, transportation, and material moving occupations",362,0.04927000096634532,2023 ACS 1 Year
+419,Sonoma,Total: Public transportation (excluding taxicab): Military specific occupations,0,0.0,2023 ACS 1 Year
+420,Sonoma,Total: Walked:,6378,0.8680775308379848,2023 ACS 1 Year
+421,Sonoma,"Total: Walked: Management, business, science, and arts occupations",1884,0.2564217729850679,2023 ACS 1 Year
+422,Sonoma,Total: Walked: Service occupations,1752,0.23845591627910775,2023 ACS 1 Year
+423,Sonoma,Total: Walked: Sales and office occupations,1736,0.23627823667838532,2023 ACS 1 Year
+424,Sonoma,"Total: Walked: Natural resources, construction, and maintenance occupations",704,0.09581790243178759,2023 ACS 1 Year
+425,Sonoma,"Total: Walked: Production, transportation, and material moving occupations",266,0.036203923362010657,2023 ACS 1 Year
+426,Sonoma,Total: Walked: Military specific occupations,36,0.004899779101625502,2023 ACS 1 Year
+427,Sonoma,"Total: Taxicab, motorcycle, bicycle, or other means:",4311,0.5867485474196539,2023 ACS 1 Year
+428,Sonoma,"Total: Taxicab, motorcycle, bicycle, or other means: Management, business, science, and arts occupations",2184,0.29725326549861375,2023 ACS 1 Year
+429,Sonoma,"Total: Taxicab, motorcycle, bicycle, or other means: Service occupations",829,0.1128310243124317,2023 ACS 1 Year
+430,Sonoma,"Total: Taxicab, motorcycle, bicycle, or other means: Sales and office occupations",945,0.12861920141766942,2023 ACS 1 Year
+431,Sonoma,"Total: Taxicab, motorcycle, bicycle, or other means: Natural resources, construction, and maintenance occupations",142,0.0193269064564117,2023 ACS 1 Year
+432,Sonoma,"Total: Taxicab, motorcycle, bicycle, or other means: Production, transportation, and material moving occupations",211,0.028718149734527246,2023 ACS 1 Year
+433,Sonoma,"Total: Taxicab, motorcycle, bicycle, or other means: Military specific occupations",0,0.0,2023 ACS 1 Year
+434,Sonoma,Total: Worked from home:,36897,5.021865264241003,2023 ACS 1 Year
+435,Sonoma,"Total: Worked from home: Management, business, science, and arts occupations",24247,3.3001373299198207,2023 ACS 1 Year
+436,Sonoma,Total: Worked from home: Service occupations,2936,0.3996042067325687,2023 ACS 1 Year
+437,Sonoma,Total: Worked from home: Sales and office occupations,7930,1.079312452108062,2023 ACS 1 Year
+438,Sonoma,"Total: Worked from home: Natural resources, construction, and maintenance occupations",852,0.1159614387384702,2023 ACS 1 Year
+439,Sonoma,"Total: Worked from home: Production, transportation, and material moving occupations",897,0.12208616261550208,2023 ACS 1 Year
+440,Sonoma,Total: Worked from home: Military specific occupations,35,0.0047636741265803485,2023 ACS 1 Year
+442,Bay Area,"Total: Management, business, science, and arts occupations",2112162,18.294971841156734,2023 ACS 1 Year
+443,Bay Area,Total: Service occupations,569254,4.930723069757829,2023 ACS 1 Year
+444,Bay Area,Total: Sales and office occupations,613346,5.31263596205505,2023 ACS 1 Year
+445,Bay Area,"Total: Natural resources, construction, and maintenance occupations",232640,2.015064303366268,2023 ACS 1 Year
+446,Bay Area,"Total: Production, transportation, and material moving occupations",315038,2.728773332203844,2023 ACS 1 Year
+447,Bay Area,Total: Military specific occupations,5907,0.05116482479360619,2023 ACS 1 Year
+448,Bay Area,"Total: Car, truck, or van - drove alone:",2243043,19.428627408079365,2023 ACS 1 Year
+449,Bay Area,"Total: Car, truck, or van - drove alone: Management, business, science, and arts occupations",1129288,9.781585011261546,2023 ACS 1 Year
+450,Bay Area,"Total: Car, truck, or van - drove alone: Service occupations",343218,2.972860815305896,2023 ACS 1 Year
+451,Bay Area,"Total: Car, truck, or van - drove alone: Sales and office occupations",370603,3.210062224984736,2023 ACS 1 Year
+452,Bay Area,"Total: Car, truck, or van - drove alone: Natural resources, construction, and maintenance occupations",174103,1.5080327562284102,2023 ACS 1 Year
+453,Bay Area,"Total: Car, truck, or van - drove alone: Production, transportation, and material moving occupations",221598,1.9194215074680117,2023 ACS 1 Year
+454,Bay Area,"Total: Car, truck, or van - drove alone: Military specific occupations",4233,0.036665092830766036,2023 ACS 1 Year
+455,Bay Area,"Total: Car, truck, or van - carpooled:",368719,3.193743530230858,2023 ACS 1 Year
+456,Bay Area,"Total: Car, truck, or van - carpooled: Management, business, science, and arts occupations",153220,1.3271498992511157,2023 ACS 1 Year
+457,Bay Area,"Total: Car, truck, or van - carpooled: Service occupations",82132,0.7114050093022624,2023 ACS 1 Year
+458,Bay Area,"Total: Car, truck, or van - carpooled: Sales and office occupations",59198,0.512756949065837,2023 ACS 1 Year
+459,Bay Area,"Total: Car, truck, or van - carpooled: Natural resources, construction, and maintenance occupations",31920,0.27648234423766876,2023 ACS 1 Year
+460,Bay Area,"Total: Car, truck, or van - carpooled: Production, transportation, and material moving occupations",41627,0.36056173382147366,2023 ACS 1 Year
+461,Bay Area,"Total: Car, truck, or van - carpooled: Military specific occupations",622,0.00538759455250094,2023 ACS 1 Year
+462,Bay Area,Total: Public transportation (excluding taxicab):,271792,2.3541882614362306,2023 ACS 1 Year
+463,Bay Area,"Total: Public transportation (excluding taxicab): Management, business, science, and arts occupations",157803,1.3668465967336105,2023 ACS 1 Year
+464,Bay Area,Total: Public transportation (excluding taxicab): Service occupations,46621,0.4038184013378558,2023 ACS 1 Year
+465,Bay Area,Total: Public transportation (excluding taxicab): Sales and office occupations,42998,0.3724369623286743,2023 ACS 1 Year
+466,Bay Area,"Total: Public transportation (excluding taxicab): Natural resources, construction, and maintenance occupations",7985,0.06916389469729904,2023 ACS 1 Year
+467,Bay Area,"Total: Public transportation (excluding taxicab): Production, transportation, and material moving occupations",16092,0.13938452015891498,2023 ACS 1 Year
+468,Bay Area,Total: Public transportation (excluding taxicab): Military specific occupations,293,0.0025378861798758443,2023 ACS 1 Year
+469,Bay Area,Total: Walked:,132069,1.1439456992833548,2023 ACS 1 Year
+470,Bay Area,"Total: Walked: Management, business, science, and arts occupations",65045,0.5634020702048611,2023 ACS 1 Year
+471,Bay Area,Total: Walked: Service occupations,30024,0.26005970875287493,2023 ACS 1 Year
+472,Bay Area,Total: Walked: Sales and office occupations,24057,0.20837518030468663,2023 ACS 1 Year
+473,Bay Area,"Total: Walked: Natural resources, construction, and maintenance occupations",4574,0.03961874193430755,2023 ACS 1 Year
+474,Bay Area,"Total: Walked: Production, transportation, and material moving occupations",7828,0.06780400346780925,2023 ACS 1 Year
+475,Bay Area,Total: Walked: Military specific occupations,541,0.004685994618815126,2023 ACS 1 Year
+476,Bay Area,"Total: Taxicab, motorcycle, bicycle, or other means:",121536,1.0527117227214697,2023 ACS 1 Year
+477,Bay Area,"Total: Taxicab, motorcycle, bicycle, or other means: Management, business, science, and arts occupations",71152,0.6162992405137409,2023 ACS 1 Year
+478,Bay Area,"Total: Taxicab, motorcycle, bicycle, or other means: Service occupations",20627,0.17866545471774417,2023 ACS 1 Year
+479,Bay Area,"Total: Taxicab, motorcycle, bicycle, or other means: Sales and office occupations",19214,0.1664264336523361,2023 ACS 1 Year
+480,Bay Area,"Total: Taxicab, motorcycle, bicycle, or other means: Natural resources, construction, and maintenance occupations",3593,0.031121587181890478,2023 ACS 1 Year
+481,Bay Area,"Total: Taxicab, motorcycle, bicycle, or other means: Production, transportation, and material moving occupations",6950,0.06019900665575809,2023 ACS 1 Year
+482,Bay Area,"Total: Taxicab, motorcycle, bicycle, or other means: Military specific occupations",0,0.0,2023 ACS 1 Year
+483,Bay Area,Total: Worked from home:,711188,6.160116711582055,2023 ACS 1 Year
+484,Bay Area,"Total: Worked from home: Management, business, science, and arts occupations",535654,4.6396890231918615,2023 ACS 1 Year
+485,Bay Area,Total: Worked from home: Service occupations,46632,0.4039136803411958,2023 ACS 1 Year
+486,Bay Area,Total: Worked from home: Sales and office occupations,97276,0.8425782117187804,2023 ACS 1 Year
+487,Bay Area,"Total: Worked from home: Natural resources, construction, and maintenance occupations",10465,0.09064497908669185,2023 ACS 1 Year
+488,Bay Area,"Total: Worked from home: Production, transportation, and material moving occupations",20943,0.18140256063187649,2023 ACS 1 Year
+489,Bay Area,Total: Worked from home: Military specific occupations,218,0.0018882566116482393,2023 ACS 1 Year
