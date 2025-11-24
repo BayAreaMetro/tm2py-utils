@@ -1,0 +1,151 @@
+,county,grouping,universe,share,dataset
+1,Alameda,"Total: Car, truck, or van:",527734,39.50474408159446,2023 ACS 1 Year
+2,Alameda,"Total: Car, truck, or van: Drove alone",452339,33.86087770188079,2023 ACS 1 Year
+3,Alameda,"Total: Car, truck, or van: Carpooled:",75395,5.643866379713671,2023 ACS 1 Year
+4,Alameda,"Total: Car, truck, or van: Carpooled: In 2-person carpool",56385,4.220829044633668,2023 ACS 1 Year
+5,Alameda,"Total: Car, truck, or van: Carpooled: In 3-person carpool",13838,1.0358753625900627,2023 ACS 1 Year
+6,Alameda,"Total: Car, truck, or van: Carpooled: In 4-or-more-person carpool",5172,0.38716197248994105,2023 ACS 1 Year
+7,Alameda,Total: Public transportation (excluding taxicab):,74554,5.58091138766726,2023 ACS 1 Year
+8,Alameda,Total: Public transportation (excluding taxicab): Bus,25253,1.890371479367456,2023 ACS 1 Year
+9,Alameda,Total: Public transportation (excluding taxicab): Subway or elevated rail,35648,2.6685131468138863,2023 ACS 1 Year
+10,Alameda,Total: Public transportation (excluding taxicab): Long-distance train or commuter rail,8638,0.6466173856086834,2023 ACS 1 Year
+11,Alameda,"Total: Public transportation (excluding taxicab): Light rail, streetcar or trolley (carro público in Puerto Rico)",1288,0.09641620660615702,2023 ACS 1 Year
+12,Alameda,Total: Public transportation (excluding taxicab): Ferryboat,3727,0.27899316927107704,2023 ACS 1 Year
+13,Alameda,Total: Bicycle,14465,1.0828108917376251,2023 ACS 1 Year
+14,Alameda,Total: Walked,26933,2.0161317488537476,2023 ACS 1 Year
+15,Alameda,"Total: Taxicab, motorcycle, or other means",14506,1.0858800411715168,2023 ACS 1 Year
+17,Contra Costa,"Total: Car, truck, or van:",401743,41.906636541346174,2023 ACS 1 Year
+18,Contra Costa,"Total: Car, truck, or van: Drove alone",341396,35.61171716413084,2023 ACS 1 Year
+19,Contra Costa,"Total: Car, truck, or van: Carpooled:",60347,6.294919377215328,2023 ACS 1 Year
+20,Contra Costa,"Total: Car, truck, or van: Carpooled: In 2-person carpool",43121,4.498039976550651,2023 ACS 1 Year
+21,Contra Costa,"Total: Car, truck, or van: Carpooled: In 3-person carpool",11522,1.2018834584034832,2023 ACS 1 Year
+22,Contra Costa,"Total: Car, truck, or van: Carpooled: In 4-or-more-person carpool",5704,0.5949959422611932,2023 ACS 1 Year
+23,Contra Costa,Total: Public transportation (excluding taxicab):,35857,3.7403172338112913,2023 ACS 1 Year
+24,Contra Costa,Total: Public transportation (excluding taxicab): Bus,7968,0.8311584270577117,2023 ACS 1 Year
+25,Contra Costa,Total: Public transportation (excluding taxicab): Subway or elevated rail,19058,1.9879790791749334,2023 ACS 1 Year
+26,Contra Costa,Total: Public transportation (excluding taxicab): Long-distance train or commuter rail,7052,0.7356085878025832,2023 ACS 1 Year
+27,Contra Costa,"Total: Public transportation (excluding taxicab): Light rail, streetcar or trolley (carro público in Puerto Rico)",929,0.09690589592577989,2023 ACS 1 Year
+28,Contra Costa,Total: Public transportation (excluding taxicab): Ferryboat,850,0.088665243850283,2023 ACS 1 Year
+29,Contra Costa,Total: Bicycle,2297,0.23960478249894124,2023 ACS 1 Year
+30,Contra Costa,Total: Walked,10578,1.1034128817038749,2023 ACS 1 Year
+31,Contra Costa,"Total: Taxicab, motorcycle, or other means",10240,1.0681554082669387,2023 ACS 1 Year
+33,Marin,"Total: Car, truck, or van:",75757,42.40882245920452,2023 ACS 1 Year
+34,Marin,"Total: Car, truck, or van: Drove alone",67085,37.55423069387298,2023 ACS 1 Year
+35,Marin,"Total: Car, truck, or van: Carpooled:",8672,4.854591765331541,2023 ACS 1 Year
+36,Marin,"Total: Car, truck, or van: Carpooled: In 2-person carpool",7098,3.9734654463011165,2023 ACS 1 Year
+37,Marin,"Total: Car, truck, or van: Carpooled: In 3-person carpool",1431,0.8010748173650181,2023 ACS 1 Year
+38,Marin,"Total: Car, truck, or van: Carpooled: In 4-or-more-person carpool",143,0.08005150166540712,2023 ACS 1 Year
+39,Marin,Total: Public transportation (excluding taxicab):,4750,2.6590533769977887,2023 ACS 1 Year
+40,Marin,Total: Public transportation (excluding taxicab): Bus,2332,1.3054552579281775,2023 ACS 1 Year
+41,Marin,Total: Public transportation (excluding taxicab): Subway or elevated rail,49,0.027430234836398244,2023 ACS 1 Year
+42,Marin,Total: Public transportation (excluding taxicab): Long-distance train or commuter rail,105,0.058779074649424806,2023 ACS 1 Year
+43,Marin,"Total: Public transportation (excluding taxicab): Light rail, streetcar or trolley (carro público in Puerto Rico)",0,0.0,2023 ACS 1 Year
+44,Marin,Total: Public transportation (excluding taxicab): Ferryboat,2264,1.2673888095837882,2023 ACS 1 Year
+45,Marin,Total: Bicycle,1831,1.0249951017437793,2023 ACS 1 Year
+46,Marin,Total: Walked,5084,2.846026814454054,2023 ACS 1 Year
+47,Marin,"Total: Taxicab, motorcycle, or other means",2034,1.1386346460660006,2023 ACS 1 Year
+49,Napa,"Total: Car, truck, or van:",53504,44.6946788071172,2023 ACS 1 Year
+50,Napa,"Total: Car, truck, or van: Drove alone",47032,39.28828001002422,2023 ACS 1 Year
+51,Napa,"Total: Car, truck, or van: Carpooled:",6472,5.406398797092975,2023 ACS 1 Year
+52,Napa,"Total: Car, truck, or van: Carpooled: In 2-person carpool",2615,2.184445743881046,2023 ACS 1 Year
+53,Napa,"Total: Car, truck, or van: Carpooled: In 3-person carpool",982,0.8203157630941442,2023 ACS 1 Year
+54,Napa,"Total: Car, truck, or van: Carpooled: In 4-or-more-person carpool",2875,2.4016372901177845,2023 ACS 1 Year
+55,Napa,Total: Public transportation (excluding taxicab):,576,0.4811628101244675,2023 ACS 1 Year
+56,Napa,Total: Public transportation (excluding taxicab): Bus,236,0.19714309581488598,2023 ACS 1 Year
+57,Napa,Total: Public transportation (excluding taxicab): Subway or elevated rail,0,0.0,2023 ACS 1 Year
+58,Napa,Total: Public transportation (excluding taxicab): Long-distance train or commuter rail,0,0.0,2023 ACS 1 Year
+59,Napa,"Total: Public transportation (excluding taxicab): Light rail, streetcar or trolley (carro público in Puerto Rico)",0,0.0,2023 ACS 1 Year
+60,Napa,Total: Public transportation (excluding taxicab): Ferryboat,340,0.28401971430958145,2023 ACS 1 Year
+61,Napa,Total: Bicycle,462,0.3859326706206666,2023 ACS 1 Year
+62,Napa,Total: Walked,3707,3.0966502380753487,2023 ACS 1 Year
+63,Napa,"Total: Taxicab, motorcycle, or other means",909,0.7593350597276752,2023 ACS 1 Year
+65,San Francisco,"Total: Car, truck, or van:",169270,26.002574603594,2023 ACS 1 Year
+66,San Francisco,"Total: Car, truck, or van: Drove alone",136951,21.037860191036817,2023 ACS 1 Year
+67,San Francisco,"Total: Car, truck, or van: Carpooled:",32319,4.964714412557184,2023 ACS 1 Year
+68,San Francisco,"Total: Car, truck, or van: Carpooled: In 2-person carpool",25356,3.895086439704197,2023 ACS 1 Year
+69,San Francisco,"Total: Car, truck, or van: Carpooled: In 3-person carpool",4018,0.6172289523083871,2023 ACS 1 Year
+70,San Francisco,"Total: Car, truck, or van: Carpooled: In 4-or-more-person carpool",2945,0.4523990205445993,2023 ACS 1 Year
+71,San Francisco,Total: Public transportation (excluding taxicab):,101330,15.565905857991256,2023 ACS 1 Year
+72,San Francisco,Total: Public transportation (excluding taxicab): Bus,64337,9.883190419279417,2023 ACS 1 Year
+73,San Francisco,Total: Public transportation (excluding taxicab): Subway or elevated rail,24141,3.708443040735882,2023 ACS 1 Year
+74,San Francisco,Total: Public transportation (excluding taxicab): Long-distance train or commuter rail,5353,0.8223062672241902,2023 ACS 1 Year
+75,San Francisco,"Total: Public transportation (excluding taxicab): Light rail, streetcar or trolley (carro público in Puerto Rico)",7398,1.13645091816263,2023 ACS 1 Year
+76,San Francisco,Total: Public transportation (excluding taxicab): Ferryboat,101,0.015515212589135664,2023 ACS 1 Year
+77,San Francisco,Total: Bicycle,16235,2.493955211728886,2023 ACS 1 Year
+78,San Francisco,Total: Walked,47388,7.27955340766298,2023 ACS 1 Year
+79,San Francisco,"Total: Taxicab, motorcycle, or other means",13832,2.1248160448804407,2023 ACS 1 Year
+81,San Mateo,"Total: Car, truck, or van:",266924,42.08889750879467,2023 ACS 1 Year
+82,San Mateo,"Total: Car, truck, or van: Drove alone",228231,35.98773870963164,2023 ACS 1 Year
+83,San Mateo,"Total: Car, truck, or van: Carpooled:",38693,6.101158799163028,2023 ACS 1 Year
+84,San Mateo,"Total: Car, truck, or van: Carpooled: In 2-person carpool",27279,4.301385544733368,2023 ACS 1 Year
+85,San Mateo,"Total: Car, truck, or van: Carpooled: In 3-person carpool",5910,0.9318959114840797,2023 ACS 1 Year
+86,San Mateo,"Total: Car, truck, or van: Carpooled: In 4-or-more-person carpool",5504,0.8678773429455795,2023 ACS 1 Year
+87,San Mateo,Total: Public transportation (excluding taxicab):,20563,3.24239858339207,2023 ACS 1 Year
+88,San Mateo,Total: Public transportation (excluding taxicab): Bus,10333,1.6293198736658199,2023 ACS 1 Year
+89,San Mateo,Total: Public transportation (excluding taxicab): Subway or elevated rail,5553,0.8756037219071225,2023 ACS 1 Year
+90,San Mateo,Total: Public transportation (excluding taxicab): Long-distance train or commuter rail,4131,0.651381050819075,2023 ACS 1 Year
+91,San Mateo,"Total: Public transportation (excluding taxicab): Light rail, streetcar or trolley (carro público in Puerto Rico)",502,0.07915596405499291,2023 ACS 1 Year
+92,San Mateo,Total: Public transportation (excluding taxicab): Ferryboat,44,0.006937972945059139,2023 ACS 1 Year
+93,San Mateo,Total: Bicycle,4372,0.6893822208136035,2023 ACS 1 Year
+94,San Mateo,Total: Walked,9126,1.438998661286584,2023 ACS 1 Year
+95,San Mateo,"Total: Taxicab, motorcycle, or other means",7026,1.107868134363307,2023 ACS 1 Year
+97,Santa Clara,"Total: Car, truck, or van:",746589,43.971472895245526,2023 ACS 1 Year
+98,Santa Clara,"Total: Car, truck, or van: Drove alone",644885,37.981464096109654,2023 ACS 1 Year
+99,Santa Clara,"Total: Car, truck, or van: Carpooled:",101704,5.990008799135871,2023 ACS 1 Year
+100,Santa Clara,"Total: Car, truck, or van: Carpooled: In 2-person carpool",73452,4.326065113605443,2023 ACS 1 Year
+101,Santa Clara,"Total: Car, truck, or van: Carpooled: In 3-person carpool",15815,0.9314480173673975,2023 ACS 1 Year
+102,Santa Clara,"Total: Car, truck, or van: Carpooled: In 4-or-more-person carpool",12437,0.7324956681630302,2023 ACS 1 Year
+103,Santa Clara,Total: Public transportation (excluding taxicab):,28329,1.6684787153968386,2023 ACS 1 Year
+104,Santa Clara,Total: Public transportation (excluding taxicab): Bus,16852,0.9925236793345168,2023 ACS 1 Year
+105,Santa Clara,Total: Public transportation (excluding taxicab): Subway or elevated rail,2364,0.13923130654799415,2023 ACS 1 Year
+106,Santa Clara,Total: Public transportation (excluding taxicab): Long-distance train or commuter rail,5682,0.3346498662460672,2023 ACS 1 Year
+107,Santa Clara,"Total: Public transportation (excluding taxicab): Light rail, streetcar or trolley (carro público in Puerto Rico)",3262,0.19212035615886502,2023 ACS 1 Year
+108,Santa Clara,Total: Public transportation (excluding taxicab): Ferryboat,169,0.00995350710939552,2023 ACS 1 Year
+109,Santa Clara,Total: Bicycle,15477,0.9115410031486064,2023 ACS 1 Year
+110,Santa Clara,Total: Walked,20095,1.183525002149722,2023 ACS 1 Year
+111,Santa Clara,"Total: Taxicab, motorcycle, or other means",10782,0.63502197428108,2023 ACS 1 Year
+113,Solano,"Total: Car, truck, or van:",174760,45.63162567235887,2023 ACS 1 Year
+114,Solano,"Total: Car, truck, or van: Drove alone",154819,40.4248263616899,2023 ACS 1 Year
+115,Solano,"Total: Car, truck, or van: Carpooled:",19941,5.2067993106689645,2023 ACS 1 Year
+116,Solano,"Total: Car, truck, or van: Carpooled: In 2-person carpool",15972,4.1704527651574494,2023 ACS 1 Year
+117,Solano,"Total: Car, truck, or van: Carpooled: In 3-person carpool",2394,0.6250979163402789,2023 ACS 1 Year
+118,Solano,"Total: Car, truck, or van: Carpooled: In 4-or-more-person carpool",1575,0.4112486291712361,2023 ACS 1 Year
+119,Solano,Total: Public transportation (excluding taxicab):,3991,1.0420909708078752,2023 ACS 1 Year
+120,Solano,Total: Public transportation (excluding taxicab): Bus,1144,0.2987101154107264,2023 ACS 1 Year
+121,Solano,Total: Public transportation (excluding taxicab): Subway or elevated rail,244,0.06371089874144864,2023 ACS 1 Year
+122,Solano,Total: Public transportation (excluding taxicab): Long-distance train or commuter rail,1055,0.2754713039845423,2023 ACS 1 Year
+123,Solano,"Total: Public transportation (excluding taxicab): Light rail, streetcar or trolley (carro público in Puerto Rico)",0,0.0,2023 ACS 1 Year
+124,Solano,Total: Public transportation (excluding taxicab): Ferryboat,1548,0.4041986526711578,2023 ACS 1 Year
+125,Solano,Total: Bicycle,267,0.0697164342785524,2023 ACS 1 Year
+126,Solano,Total: Walked,2780,0.7258864692673246,2023 ACS 1 Year
+127,Solano,"Total: Taxicab, motorcycle, or other means",2490,0.6501644994516685,2023 ACS 1 Year
+129,Sonoma,"Total: Car, truck, or van:",195481,45.40673757464966,2023 ACS 1 Year
+130,Sonoma,"Total: Car, truck, or van: Drove alone",170305,39.5588033755235,2023 ACS 1 Year
+131,Sonoma,"Total: Car, truck, or van: Carpooled:",25176,5.847934199126155,2023 ACS 1 Year
+132,Sonoma,"Total: Car, truck, or van: Carpooled: In 2-person carpool",15555,3.613148096099751,2023 ACS 1 Year
+133,Sonoma,"Total: Car, truck, or van: Carpooled: In 3-person carpool",7315,1.699143575890047,2023 ACS 1 Year
+134,Sonoma,"Total: Car, truck, or van: Carpooled: In 4-or-more-person carpool",2306,0.5356425271363566,2023 ACS 1 Year
+135,Sonoma,Total: Public transportation (excluding taxicab):,1842,0.42786363182357706,2023 ACS 1 Year
+136,Sonoma,Total: Public transportation (excluding taxicab): Bus,1041,0.2418056681478522,2023 ACS 1 Year
+137,Sonoma,Total: Public transportation (excluding taxicab): Subway or elevated rail,0,0.0,2023 ACS 1 Year
+138,Sonoma,Total: Public transportation (excluding taxicab): Long-distance train or commuter rail,539,0.12520005296031925,2023 ACS 1 Year
+139,Sonoma,"Total: Public transportation (excluding taxicab): Light rail, streetcar or trolley (carro público in Puerto Rico)",242,0.056212268676061695,2023 ACS 1 Year
+140,Sonoma,Total: Public transportation (excluding taxicab): Ferryboat,20,0.004645642039343942,2023 ACS 1 Year
+141,Sonoma,Total: Bicycle,1638,0.3804780830222689,2023 ACS 1 Year
+142,Sonoma,Total: Walked,6378,1.4814952463467832,2023 ACS 1 Year
+143,Sonoma,"Total: Taxicab, motorcycle, or other means",2673,0.6208900585583179,2023 ACS 1 Year
+145,Bay Area,"Total: Car, truck, or van:",2611762,40.87627820438499,2023 ACS 1 Year
+146,Bay Area,"Total: Car, truck, or van: Drove alone",2243043,35.105514856406636,2023 ACS 1 Year
+147,Bay Area,"Total: Car, truck, or van: Carpooled:",368719,5.770763347978349,2023 ACS 1 Year
+148,Bay Area,"Total: Car, truck, or van: Carpooled: In 2-person carpool",266833,4.176161511696189,2023 ACS 1 Year
+149,Bay Area,"Total: Car, truck, or van: Carpooled: In 3-person carpool",63225,0.9895245774585284,2023 ACS 1 Year
+150,Bay Area,"Total: Car, truck, or van: Carpooled: In 4-or-more-person carpool",38661,0.6050772588236325,2023 ACS 1 Year
+151,Bay Area,Total: Public transportation (excluding taxicab):,271792,4.2537740443908,2023 ACS 1 Year
+152,Bay Area,Total: Public transportation (excluding taxicab): Bus,129496,2.026721624081765,2023 ACS 1 Year
+153,Bay Area,Total: Public transportation (excluding taxicab): Subway or elevated rail,87057,1.3625154786841773,2023 ACS 1 Year
+154,Bay Area,Total: Public transportation (excluding taxicab): Long-distance train or commuter rail,32555,0.5095132086858425,2023 ACS 1 Year
+155,Bay Area,"Total: Public transportation (excluding taxicab): Light rail, streetcar or trolley (carro público in Puerto Rico)",13621,0.21318013870403502,2023 ACS 1 Year
+156,Bay Area,Total: Public transportation (excluding taxicab): Ferryboat,9063,0.14184359423498052,2023 ACS 1 Year
+157,Bay Area,Total: Bicycle,57044,0.8927867140615942,2023 ACS 1 Year
+158,Bay Area,Total: Walked,132069,2.0669912442921374,2023 ACS 1 Year
+159,Bay Area,"Total: Taxicab, motorcycle, or other means",64492,1.009354196116337,2023 ACS 1 Year
