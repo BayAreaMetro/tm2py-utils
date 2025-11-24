@@ -32,15 +32,25 @@ def load_public_schools():
     # Filter to Bay Area
     pubschls = pubschls[pubschls["CountyName"].isin(BAY_AREA_COUNTIES)]
 
-    # Derive enrollment cols
-    pubschls["publicEnrollGradeKto8"] = pubschls[
-        ["GradeTK", "GradeKG", "Grade1", "Grade2", "Grade3", "Grade4", "Grade5", "Grade6", "Grade7", "Grade8"]
-    ].sum(axis=1)
-    pubschls["publicEnrollGrade9to12"] = pubschls[["Grade9", "Grad10", "Grade11", "Grade12"]].sum(axis=1) 
+    # Derive enrollment cols, ensuring adult school enrollment is tabulated seperately
+    pubschls["publicEnrollGradeKto8"] = pubschls.apply(
+        lambda row: row[["GradeTK", "GradeKG", "Grade1", "Grade2", "Grade3", "Grade4", "Grade5", "Grade6", "Grade7", "Grade8"]].sum() if row["SchoolLevel"] != "Adult Education" else 0,
+        axis=1
+    )
+
+    pubschls["publicEnrollGrade9to12"] = pubschls.apply(
+        lambda row: row[["Grade9", "Grad10", "Grade11", "Grade12"]].sum() if row["SchoolLevel"] != "Adult Education" else 0,
+        axis=1
+    )
+
+    pubschls["AdultSchEnrl"] = pubschls.apply(
+        lambda row: row["EnrollTotal"] if row["SchoolLevel"] == "Adult Education" else 0,
+        axis=1
+    )
 
     # Reduce to necessary cols
     pubschls = pubschls[[#"CDSCode", 
-                        "publicEnrollGradeKto8", "publicEnrollGrade9to12", "geometry"]]
+                        "publicEnrollGradeKto8", "publicEnrollGrade9to12", "AdultSchEnrl", "geometry"]]
     
     return pubschls
 
