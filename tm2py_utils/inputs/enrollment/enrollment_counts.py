@@ -2,6 +2,7 @@ from pathlib import Path
 import pandas as pd
 import geopandas as gpd
 import os
+import sys
 
 RAW_DATA_DIR = Path(r"E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-version-05\landuse\raw_data\enrollment")
 MAZ_TAZ_DIR = Path(__file__).parent.parent / "maz_taz" / "shapefiles"
@@ -123,21 +124,24 @@ def load_colleges():
     return colleges
 
 
-def load_maz_shp():
+def load_maz_shp(use_maz_orig=False):
     """
-    Load MAZ shapefile.  Currently hard coded to version2_5.
-    
+    Loads the MAZ shapefile. Uses the original MAZ file if use_maz_orig is True, otherwise loads the default version 2.5 shapefile.
     Returns:
-        gpd.GeoDataFrame: MAZ polygons with MAZ/TAZ ids
+        GeoDataFrame: MAZ polygons with MAZ_NODE, TAZ_NODE, and geometry columns.
     """
     print(f"Loading maz shapefile...")
-    maz_shp = os.path.join(MAZ_TAZ_DIR, "mazs_TM2_2_5.shp")
-    maz = gpd.read_file(maz_shp).to_crs(ANALYSIS_CRS)
+    if use_maz_orig == True:
+        maz = gpd.read_file(r"M:\Data\GIS layers\TM2_maz_taz_v2.2\mazs_TM2_v2_2.shp").to_crs(ANALYSIS_CRS)
+        maz = maz.rename(columns={"maz": "MAZ_NODE", "taz": "TAZ_NODE"})
+    else:
+        maz_shp = os.path.join(MAZ_TAZ_DIR, "mazs_TM2_2_5.shp")
+        maz = gpd.read_file(maz_shp).to_crs(ANALYSIS_CRS)
+
     maz = maz[["MAZ_NODE", "TAZ_NODE", "geometry"]]
 
     return maz
 
-maz = load_maz_shp()
 
 
 def spatil_join_schools_to_maz(schools, maz): # This is copied from job_counts and should be standardized to join any point features to maz
@@ -198,7 +202,7 @@ def summarize_enrollment_by_maz(schools_maz, maz):
 
     return enrollment_maz
 
-def get_enrollment_maz(write=False):
+def get_enrollment_maz(write=False, use_maz_orig=False):
     """
     Loads public, private, and college data, spatially joins to MAZ, summarizes enrollment by MAZ, and merges results.
     Optionally writes output to CSV.
@@ -209,7 +213,7 @@ def get_enrollment_maz(write=False):
     pubschls = load_public_schools()
     prvschls = load_private_schools()
     colleges = load_colleges()
-    maz = load_maz_shp()
+    maz = load_maz_shp(use_maz_orig=use_maz_orig)
 
     # Spatial join schools to maz
     pubschls_maz = spatil_join_schools_to_maz(pubschls, maz=maz)
@@ -233,12 +237,17 @@ def get_enrollment_maz(write=False):
     enroll_maz["EnrollGrade9to12"] = enroll_maz["publicEnrollGrade9to12"] + enroll_maz["privateEnrollGrade9to12"]
 
     if write==True:
-        OUT_FILE = r"E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-version-05\landuse\enrollment_maz_2023_v1.csv"
+        if use_maz_orig:
+            OUT_FILE = r"E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-version-05\landuse\enrollment_maz_v2_2_2023.csv"
+        else:
+            OUT_FILE = r"E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-version-05\landuse\enrollment_maz_v2_5_2023.csv"
         enroll_maz.to_csv(OUT_FILE)        
     return enroll_maz
 
 def main():
-    enroll_maz = get_enrollment_maz()
+    use_maz_orig = "--use-maz-orig" in sys.argv
+    write = "--write" in sys.argv
+    enroll_maz = get_enrollment_maz(write=write, use_maz_orig=use_maz_orig)
 
 if __name__ == "__main__":
     main()
