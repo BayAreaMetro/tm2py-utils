@@ -228,6 +228,10 @@ def get_enrollment_maz(write=False):
         college_enroll_maz, on=["MAZ_NODE", "TAZ_NODE"], how="left"
     ).fillna(0)
 
+    # Add public + private enroll cols EnrollGradeKto8, EnrollGrade9to12
+    enroll_maz["EnrollGradeKto8"] = enroll_maz["publicEnrollGradeKto8"] + enroll_maz["privateEnrollGradeKto8"]
+    enroll_maz["EnrollGrade9to12"] = enroll_maz["publicEnrollGrade9to12"] + enroll_maz["privateEnrollGrade9to12"]
+
     if write==True:
         OUT_FILE = r"E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-version-05\landuse\enrollment_maz_2023_v1.csv"
         enroll_maz.to_csv(OUT_FILE)        
