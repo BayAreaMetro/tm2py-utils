@@ -1,178 +1,3 @@
-# %%
-# from mtcpy import census
-# from mtcpy import credentials
-# from mtcpy import constants
-# import pandas as pd
-# import requests
-# import logging
-#from ipumspy import IpumsApiClient, MicrodataExtract, save_extract_as_json
-
-# Pull ACS 1-year 2023 Census Data
-# Include the following variables:
-# Auto Ownership Totals/Shares by Region and County
-# Auto Ownership:
-# - By Region and County
-# - By Region and Income Quartile - do this with iPUMS 
-# - By Household Size
-# Commute Mode to Work (with and without working at home)
-# - By Region and County
-# - By Household Income
-# - By Auto Ownership
-# - By Worker Industry
-
-
-# logging.basicConfig(
-#     level = logging.INFO,
-#     format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-#     handlers=[
-#         logging.FileHandler('census_validation.log'),
-#         logging.StreamHandler()
-#     ]
-# )
-# logger = logging.getLogger(__name__)
-
-# table_ids = {
-#     'HouseholdSizeByVehicle': 'B08201',
-#     'CommuteMode': ['B08006_001E', 'B08006_002E', 'B08006_003E', 'B08006_004E','B08006_005E', 'B08006_006E', 'B08006_007E', 'B08006_008E', 
-#                      'B08006_009E', 'B08006_010E', 'B08006_011E', 'B08006_012E','B08006_013E', 'B08006_014E', 'B08006_015E', 'B08006_016E','B08006_017E'],
-#     'CommuteModewoWFH' : ['B08006_001E', 'B08006_002E', 'B08006_003E', 'B08006_004E','B08006_005E', 'B08006_006E', 'B08006_007E', 'B08006_008E', 
-#                      'B08006_009E', 'B08006_010E', 'B08006_011E', 'B08006_012E','B08006_013E', 'B08006_014E', 'B08006_015E', 'B08006_016E'],
-#     'CommuteModeByIncome': 'B08119',
-#     'CommuteModeByOccupation': 'B08124',
-#     'CommuteModeByVehicle': 'B08141'
-# }
-# year = 2023
-
-# variables = census.pull_acs_variables_dict(year = 2023, acs_type='acs1')
-# variables_df = pd.DataFrame.from_dict(variables['variables'],orient= 'index')
-# variables_df['label'] = variables_df['label'].str.replace("Estimate!!", "")
-# variables_df['label'] = variables_df['label'].str.replace("!!", " ")
-
-
-# #%%
-# logger.info(f"Starting 1-Year ACS Data Pull for year {year}")
-# logger.info(f"Processing {len(table_ids)} tables: {list(table_ids.key())}")
-
-# for table_name, table_id in table_ids.items():
-#     logger.info(f"Processing table: {table_name}")
-#     if type(table_id) is list:
-#         logger.debug(f"Using variables list with {len(table_id)} variables")
-#         table = census.pull_acs_data(
-#             year = 2023,
-#             acs_type = 'acs1',
-#             variable_list= table_id,
-#             geography_level='county'
-#         )
-#         table_variables = variables_df.loc[table_id]
-#     else:
-#         logger.debug(f"Using table ID: {table_id}")
-#         table = census.pull_acs_data(
-#             year = 2023,
-#             acs_type = 'acs1',
-#             table_id = table_id,
-#             geography_level = "county"
-#         )
-#         table_variables = variables_df[variables_df['group'] == table_id]
-    
-#     logger.info(f"Retrieved {len(table)} rows for {table_name}")
-#     variable_dict = table_variables['label'].to_dict()
-#     variable_share = dict(zip(table_variables['label'],map(lambda x: "share_" + x, table_variables['label'])))
-   
-#     ## Rename column names from label to concept
-#     table = table.rename(columns = variable_dict)
-#     table = table.set_index('county').T
-#     table['Bay Area'] = table.sum(axis = 1)
-
-#     table = table.unstack().reset_index()
-#     table = table.rename(columns = {'level_1': 'grouping', 0:'universe'})
-    
-#     table = table[table['grouping'] != 'Total:']
-    
-#     table['share'] = table.groupby('county')['universe'].transform(lambda x: (x/x.sum())*100)
-#     table['dataset'] = '2023 ACS 1 Year'
-#     table.to_csv(f'2023_{table_name}_acs1.csv', index = True)
-
-# logger.info(f"Completed ACS data pull")
-# #%%
-# # Pulling Household and Vehicle information from PUMS
-# logger.info("Starting PUMS data pull")
-# url = "https://api.census.gov/data/2023/acs/acs1/pums"
-# api_key = census.get_census_creds
-
-# county_to_puma = {
-#         'Alameda': ['00101','00111', '00112', '00113', '00114', '00115', '00116', '00117', '00118', '00119'],
-#         'Contra Costa': ['01301', '01305', '01308', '01309', '01310', '01311', '01312', '01313', '01314'],
-#         'Marin': ['04103', '04104'],
-#         'Napa': ['05500'],
-#         'San Francisco': ['07507', '07508', '07509', '07510', '07511', '07512', '07513', '07514'],
-#         'San Mateo': ['08101','08102', '08103', '08104', '08105', '08106'],
-#         'Santa Clara': ['08505','08506','08507','08508', '08510', '08511', '08512', '08515', '08516', '08517', '08518', '08519', '08520', '08521','08522'],
-#         'Solano':['09501', '09502', '09503'],
-#         'Sonoma':['09702', '09704', '09705', '09706']
-# }
-
-# puma_to_county = {puma: county for county, pumas in county_to_puma.items() for puma in pumas}
-
-# bay_area_puma = set(puma_to_county.keys())
-# logger.info(f"Bay Area PUMAs : {len(bay_area_puma)} area across {len(county_to_puma)} counties")
-
-# #%%
-# params = {
-#     "get": "SERIALNO,HINCP,VEH,WGTP,ADJINC,PUMA",
-#     "for": f"public use microdata area:*",
-#     "in": 'state:06',
-#     "ucgid": 'H'
-# }
-# logger.info("Requesting PUMS data from Census API")
-# response = requests.get(url, params)
-# response.raise_for_status()
-# data = response.json()
-# logger.info(f"Retreived {len(data)} records from PUMS API")
-# # %%
-
-# puma_table = pd.DataFrame(data[1:], columns = data[0])
-# logger.info(f"Created DataFrame with {len(puma_table)} total records")
-
-# puma_table = puma_table[puma_table['PUMA'].isin(bay_area_puma)]
-# logger.info(f"Filtered to {len(puma_table)} Bay Area records")
-    
-# puma_table['county'] = puma_table['PUMA'].map(puma_to_county )
-
-# # Convert to numeric
-# logger.info("Converting columns to numeric types")
-# puma_table['HINCP'] = pd.to_numeric(puma_table['HINCP'], errors='coerce')
-# puma_table['WGTP'] = pd.to_numeric(puma_table['WGTP'], errors='coerce')
-# puma_table['ADJINC'] = pd.to_numeric(puma_table['HINCP'], errors='coerce')
-
-# puma_table['adjusted_income'] = ( puma_table['HINCP'] * puma_table['ADJINC'] / 1000000).round(0)
-# logger.info("Calculated adjusted income")
-
-# # %%
-# ## Aggregate PUMA up
-# # Create income bins
-# logger.info("Aggregating vehicles by income")
-# income_bins = [0, 30000, 60000, 100000, 150000, float('inf')]
-# income_labels = ['0 to 30k', '30-60k', '60-100k', '100-150k', '150k+']
-# puma_table['income_bin'] = pd.cut(puma_table['adjusted_income'], 
-#                          bins = income_bins,
-#                          labels = income_labels,
-#                          right = False)
-# logger.info(f"Created income bins: {income_labels}")
-
-# ## Number of vehicles by income
-# veh_by_income = puma_table[puma_table['income_bin'].notna() & puma_table['VEH'].notna()]
-
-# pivot =veh_by_income.pivot_table(
-#     values = 'WGTP',
-#     index = 'income_bin',
-#     columns = 'VEH',
-#     aggfunc = 'sum',
-#     fill_value=0
-# )
-
-# pivot = pivot.unstack().reset_index().rename(columns = {0:'household'})
-# pivot.to_csv("2023_VehiclesByIncome_pums_acs1.csv", index= False)
-
 import logging
 from pathlib import Path
 from mtcpy import census
@@ -192,9 +17,15 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# %%
+
 def pull_acs_tables(table_ids: dict, year: int = 2023) -> dict:
-    """Pull ACS data for specified table IDs and process into summaries."""
+    """Pull 1-Year ACS data for specified table IDs and process into summaries.
+    
+    Args:
+        table_ids: Dictionary of table name and table ids/variables
+        year: Year to pull the census data from 
+
+    """
     logger.info(f"Starting ACS data pull for year {year}")
     logger.info(f"Processing {len(table_ids)} tables: {list(table_ids.keys())}")
     
@@ -258,9 +89,12 @@ def pull_acs_tables(table_ids: dict, year: int = 2023) -> dict:
     logger.info(f"Completed ACS data pull. Processed {len(results)}/{len(table_ids)} tables")
     return results
 
-# %%
 def pull_pums_data(year: int = 2023) -> pd.DataFrame:
-    """Pull PUMS household and vehicle data from Census API."""
+    """Pull PUMS household and vehicle data from Census API. 
+    
+    Args:
+        year: year to pull PUMS data
+    """
     logger.info("Starting PUMS data pull")
     
     county_to_puma = {
@@ -324,9 +158,15 @@ def pull_pums_data(year: int = 2023) -> pd.DataFrame:
     
     return puma_table
 
-# %%
+
 def aggregate_vehicles_by_income(puma_table: pd.DataFrame, output_file: str = None) -> pd.DataFrame:
-    """Aggregate vehicle ownership by income bin."""
+    """Aggregate vehicle ownership by income bin.
+    
+    Args:
+        puma_table: Retrieved and processed PUMA table
+        output_file: Name of output file
+
+    """
     logger.info("Aggregating vehicles by income")
     
     # Create income bins
@@ -373,7 +213,7 @@ def aggregate_vehicles_by_income(puma_table: pd.DataFrame, output_file: str = No
     
     return pivot
 
-# %%
+
 def main():
     """Main execution function."""
     logger.info("=" * 60)
@@ -417,4 +257,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-# %%
+
