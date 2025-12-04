@@ -1,31 +1,291 @@
-,Alameda,Contra Costa,Marin,Napa,San Francisco,San Mateo,Santa Clara,Solano,Sonoma,Bay Area
-Total:,608534,416172,101608,51167,372027,265124,665549,157766,192765,2830712
-Total: No vehicle available,66589,20544,4136,2839,115112,13792,39177,8484,8223,278896
-Total: 1 vehicle available,209193,122178,32863,13612,163438,87455,217368,41211,58846,946164
-Total: 2 vehicles available,208803,156754,43411,20390,70754,100042,250244,57659,72836,980893
-Total: 3 vehicles available,78038,72177,16097,8406,14842,41492,99869,29578,33514,394013
-Total: 4 or more vehicles available,45911,44519,5101,5920,7881,22343,58891,20834,19346,230746
-Total: 1-person household:,162846,91727,28440,12300,146930,69876,151634,38918,53236,755907
-Total: 1-person household: No vehicle available,39939,8874,3423,1799,72928,7878,21649,4614,4547,165651
-Total: 1-person household: 1 vehicle available,101436,63449,20232,8373,67647,50099,109929,24350,38367,483882
-Total: 1-person household: 2 vehicles available,16379,14796,4312,1594,5430,8790,14982,7038,8211,81532
-Total: 1-person household: 3 vehicles available,3828,3280,349,477,366,2007,3701,2159,1373,17540
-Total: 1-person household: 4 or more vehicles available,1264,1328,124,57,559,1102,1373,757,738,7302
-Total: 2-person household:,191889,136730,36739,18809,121777,86182,217571,50271,70246,930214
-Total: 2-person household: No vehicle available,16556,5950,292,390,29841,3310,8082,1815,2147,68383
-Total: 2-person household: 1 vehicle available,62424,32791,6559,3794,59948,22068,66642,10109,12594,276929
-Total: 2-person household: 2 vehicles available,87734,68916,22656,10701,29206,45020,111458,27080,38946,441717
-Total: 2-person household: 3 vehicles available,18917,22205,5866,2848,2368,11877,24389,7560,12535,108565
-Total: 2-person household: 4 or more vehicles available,6258,6868,1366,1076,414,3907,7000,3707,4024,34620
-Total: 3-person household:,104708,74349,16389,7956,46767,43193,120053,27249,27110,467774
-Total: 3-person household: No vehicle available,4274,3046,291,85,6276,839,4264,1346,602,21023
-Total: 3-person household: 1 vehicle available,25277,12892,3118,649,19534,8537,20620,3548,4137,98312
-Total: 3-person household: 2 vehicles available,42666,30028,6057,3692,16264,19962,52610,10153,10744,192176
-Total: 3-person household: 3 vehicles available,23140,18908,5702,2371,4157,9884,30875,8014,8627,111678
-Total: 3-person household: 4 or more vehicles available,9351,9475,1221,1159,536,3971,11684,4188,3000,44585
-Total: 4-or-more-person household:,149091,113366,20040,12102,56553,65873,176291,41328,42173,676817
-Total: 4-or-more-person household: No vehicle available,5820,2674,130,565,6067,1765,5182,709,927,23839
-Total: 4-or-more-person household: 1 vehicle available,20056,13046,2954,796,16309,6751,20177,3204,3748,87041
-Total: 4-or-more-person household: 2 vehicles available,62024,43014,10386,4403,19854,26270,71194,13388,14935,265468
-Total: 4-or-more-person household: 3 vehicles available,32153,27784,4180,2710,7951,17724,40904,11845,10979,156230
-Total: 4-or-more-person household: 4 or more vehicles available,29038,26848,2390,3628,6372,13363,38834,12182,11584,144239
+,county,grouping,universe,share,dataset
+1,Alameda,Total: No vehicle available,66589,3.647509150406277,2023 ACS 1 Year
+2,Alameda,Total: 1 vehicle available,209193,11.458850286097407,2023 ACS 1 Year
+3,Alameda,Total: 2 vehicles available,208803,11.437487469886646,2023 ACS 1 Year
+4,Alameda,Total: 3 vehicles available,78038,4.274644747321705,2023 ACS 1 Year
+5,Alameda,Total: 4 or more vehicles available,45911,2.5148416796212976,2023 ACS 1 Year
+6,Alameda,Total: 1-person household:,162846,8.920126073481514,2023 ACS 1 Year
+7,Alameda,Total: 1-person household: No vehicle available,39939,2.187716709337523,2023 ACS 1 Year
+8,Alameda,Total: 1-person household: 1 vehicle available,101436,5.5563041670637965,2023 ACS 1 Year
+9,Alameda,Total: 1-person household: 2 vehicles available,16379,0.8971835044001925,2023 ACS 1 Year
+10,Alameda,Total: 1-person household: 3 vehicles available,3828,0.20968425757640496,2023 ACS 1 Year
+11,Alameda,Total: 1-person household: 4 or more vehicles available,1264,0.0692374351035987,2023 ACS 1 Year
+12,Alameda,Total: 2-person household:,191889,10.510998563761433,2023 ACS 1 Year
+13,Alameda,Total: 2-person household: No vehicle available,16556,0.9068789363727691,2023 ACS 1 Year
+14,Alameda,Total: 2-person household: 1 vehicle available,62424,3.4193652285657,2023 ACS 1 Year
+15,Alameda,Total: 2-person household: 2 vehicles available,87734,4.805757224192349,2023 ACS 1 Year
+16,Alameda,Total: 2-person household: 3 vehicles available,18917,1.0362061391256145,2023 ACS 1 Year
+17,Alameda,Total: 2-person household: 4 or more vehicles available,6258,0.34279103550500056,2023 ACS 1 Year
+18,Alameda,Total: 3-person household:,104708,5.735532717426909,2023 ACS 1 Year
+19,Alameda,Total: 3-person household: No vehicle available,4274,0.23411455508922535,2023 ACS 1 Year
+20,Alameda,Total: 3-person household: 1 vehicle available,25277,1.3845843727165066,2023 ACS 1 Year
+21,Alameda,Total: 3-person household: 2 vehicles available,42666,2.3370920934573913,2023 ACS 1 Year
+22,Alameda,Total: 3-person household: 3 vehicles available,23140,1.267527095171894,2023 ACS 1 Year
+23,Alameda,Total: 3-person household: 4 or more vehicles available,9351,0.512214600991892,2023 ACS 1 Year
+24,Alameda,Total: 4-or-more-person household:,149091,8.166675978663477,2023 ACS 1 Year
+25,Alameda,Total: 4-or-more-person household: No vehicle available,5820,0.31879894960675986,2023 ACS 1 Year
+26,Alameda,Total: 4-or-more-person household: 1 vehicle available,20056,1.0985965177514048,2023 ACS 1 Year
+27,Alameda,Total: 4-or-more-person household: 2 vehicles available,62024,3.397454647836714,2023 ACS 1 Year
+28,Alameda,Total: 4-or-more-person household: 3 vehicles available,32153,1.7612272554477921,2023 ACS 1 Year
+29,Alameda,Total: 4-or-more-person household: 4 or more vehicles available,29038,1.5905986080208063,2023 ACS 1 Year
+31,Contra Costa,Total: No vehicle available,20544,1.6454735061464971,2023 ACS 1 Year
+32,Contra Costa,Total: 1 vehicle available,122178,9.785857770344954,2023 ACS 1 Year
+33,Contra Costa,Total: 2 vehicles available,156754,12.55522556378933,2023 ACS 1 Year
+34,Contra Costa,Total: 3 vehicles available,72177,5.7810232307795815,2023 ACS 1 Year
+35,Contra Costa,Total: 4 or more vehicles available,44519,3.565753262272971,2023 ACS 1 Year
+36,Contra Costa,Total: 1-person household:,91727,7.3468822185698865,2023 ACS 1 Year
+37,Contra Costa,Total: 1-person household: No vehicle available,8874,0.7107638188056862,2023 ACS 1 Year
+38,Contra Costa,Total: 1-person household: 1 vehicle available,63449,5.0819532949517665,2023 ACS 1 Year
+39,Contra Costa,Total: 1-person household: 2 vehicles available,14796,1.1850869352094806,2023 ACS 1 Year
+40,Contra Costa,Total: 1-person household: 3 vehicles available,3280,0.26271189155765723,2023 ACS 1 Year
+41,Contra Costa,Total: 1-person household: 4 or more vehicles available,1328,0.10636627804529537,2023 ACS 1 Year
+42,Contra Costa,Total: 2-person household:,136730,10.95140150386539,2023 ACS 1 Year
+43,Contra Costa,Total: 2-person household: No vehicle available,5950,0.47656577889270146,2023 ACS 1 Year
+44,Contra Costa,Total: 2-person household: 1 vehicle available,32791,2.626398059776567,2023 ACS 1 Year
+45,Contra Costa,Total: 2-person household: 2 vehicles available,68916,5.519833145910826,2023 ACS 1 Year
+46,Contra Costa,Total: 2-person household: 3 vehicles available,22205,1.778511448792006,2023 ACS 1 Year
+47,Contra Costa,Total: 2-person household: 4 or more vehicles available,6868,0.5500930704932896,2023 ACS 1 Year
+48,Contra Costa,Total: 3-person household:,74349,5.954989763847641,2023 ACS 1 Year
+49,Contra Costa,Total: 3-person household: No vehicle available,3046,0.2439696407575073,2023 ACS 1 Year
+50,Contra Costa,Total: 3-person household: 1 vehicle available,12892,1.0325858859638164,2023 ACS 1 Year
+51,Contra Costa,Total: 3-person household: 2 vehicles available,30028,2.405095329174796,2023 ACS 1 Year
+52,Contra Costa,Total: 3-person household: 3 vehicles available,18908,1.5144379407232267,2023 ACS 1 Year
+53,Contra Costa,Total: 3-person household: 4 or more vehicles available,9475,0.7589009672282934,2023 ACS 1 Year
+54,Contra Costa,Total: 4-or-more-person household:,113366,9.08005984705042,2023 ACS 1 Year
+55,Contra Costa,Total: 4-or-more-person household: No vehicle available,2674,0.21417426769060227,2023 ACS 1 Year
+56,Contra Costa,Total: 4-or-more-person household: 1 vehicle available,13046,1.0449205296528037,2023 ACS 1 Year
+57,Contra Costa,Total: 4-or-more-person household: 2 vehicles available,43014,3.4452101534942283,2023 ACS 1 Year
+58,Contra Costa,Total: 4-or-more-person household: 3 vehicles available,27784,2.225361949706692,2023 ACS 1 Year
+59,Contra Costa,Total: 4-or-more-person household: 4 or more vehicles available,26848,2.1503929465060923,2023 ACS 1 Year
+61,Marin,Total: No vehicle available,4136,1.356848542109545,2023 ACS 1 Year
+62,Marin,Total: 1 vehicle available,32863,10.78097525129255,2023 ACS 1 Year
+63,Marin,Total: 2 vehicles available,43411,14.241332703461671,2023 ACS 1 Year
+64,Marin,Total: 3 vehicles available,16097,5.280752171745007,2023 ACS 1 Year
+65,Marin,Total: 4 or more vehicles available,5101,1.6734246647245623,2023 ACS 1 Year
+66,Marin,Total: 1-person household:,28440,9.329974017793873,2023 ACS 1 Year
+67,Marin,Total: 1-person household: No vehicle available,3423,1.1229430753483978,2023 ACS 1 Year
+68,Marin,Total: 1-person household: 1 vehicle available,20232,6.637272655696402,2023 ACS 1 Year
+69,Marin,Total: 1-person household: 2 vehicles available,4312,1.414586777943994,2023 ACS 1 Year
+70,Marin,Total: 1-person household: 3 vehicles available,349,0.11449229719444663,2023 ACS 1 Year
+71,Marin,Total: 1-person household: 4 or more vehicles available,124,0.040679211610634335,2023 ACS 1 Year
+72,Marin,Total: 2-person household:,36739,12.052528672283023,2023 ACS 1 Year
+73,Marin,Total: 2-person household: No vehicle available,292,0.09579298217988086,2023 ACS 1 Year
+74,Marin,Total: 2-person household: 1 vehicle available,6559,2.151733459307666,2023 ACS 1 Year
+75,Marin,Total: 2-person household: 2 vehicles available,22656,7.432485631052672,2023 ACS 1 Year
+76,Marin,Total: 2-person household: 3 vehicles available,5866,1.924389155709524,2023 ACS 1 Year
+77,Marin,Total: 2-person household: 4 or more vehicles available,1366,0.4481274440332782,2023 ACS 1 Year
+78,Marin,Total: 3-person household:,16389,5.376545153924888,2023 ACS 1 Year
+79,Marin,Total: 3-person household: No vehicle available,291,0.09546492402173057,2023 ACS 1 Year
+80,Marin,Total: 3-person household: 1 vehicle available,3118,1.0228853371125632,2023 ACS 1 Year
+81,Marin,Total: 3-person household: 2 vehicles available,6057,1.987048263916227,2023 ACS 1 Year
+82,Marin,Total: 3-person household: 3 vehicles available,5702,1.8705876177728786,2023 ACS 1 Year
+83,Marin,Total: 3-person household: 4 or more vehicles available,1221,0.400559011101488,2023 ACS 1 Year
+84,Marin,Total: 4-or-more-person household:,20040,6.574285489331548,2023 ACS 1 Year
+85,Marin,Total: 4-or-more-person household: No vehicle available,130,0.042647560559535995,2023 ACS 1 Year
+86,Marin,Total: 4-or-more-person household: 1 vehicle available,2954,0.9690837991759179,2023 ACS 1 Year
+87,Marin,Total: 4-or-more-person household: 2 vehicles available,10386,3.407212030548776,2023 ACS 1 Year
+88,Marin,Total: 4-or-more-person household: 3 vehicles available,4180,1.3712831010681574,2023 ACS 1 Year
+89,Marin,Total: 4-or-more-person household: 4 or more vehicles available,2390,0.7840589979791618,2023 ACS 1 Year
+91,Napa,Total: No vehicle available,2839,1.8494993517957539,2023 ACS 1 Year
+92,Napa,Total: 1 vehicle available,13612,8.867694672998873,2023 ACS 1 Year
+93,Napa,Total: 2 vehicles available,20390,13.283301085986409,2023 ACS 1 Year
+94,Napa,Total: 3 vehicles available,8406,5.476185822893662,2023 ACS 1 Year
+95,Napa,Total: 4 or more vehicles available,5920,3.856652399658634,2023 ACS 1 Year
+96,Napa,Total: 1-person household:,12300,8.012977114155607,2023 ACS 1 Year
+97,Napa,Total: 1-person household: No vehicle available,1799,1.1719793356395072,2023 ACS 1 Year
+98,Napa,Total: 1-person household: 1 vehicle available,8373,5.454687591611781,2023 ACS 1 Year
+99,Napa,Total: 1-person household: 2 vehicles available,1594,1.038429717070247,2023 ACS 1 Year
+100,Napa,Total: 1-person household: 3 vehicles available,477,0.31074716125627844,2023 ACS 1 Year
+101,Napa,Total: 1-person household: 4 or more vehicles available,57,0.03713330857779428,2023 ACS 1 Year
+102,Napa,Total: 2-person household:,18809,12.253340369118117,2023 ACS 1 Year
+103,Napa,Total: 2-person household: No vehicle available,390,0.2540700060585925,2023 ACS 1 Year
+104,Napa,Total: 2-person household: 1 vehicle available,3794,2.471645135862307,2023 ACS 1 Year
+105,Napa,Total: 2-person household: 2 vehicles available,10701,6.97129008931538,2023 ACS 1 Year
+106,Napa,Total: 2-person household: 3 vehicles available,2848,1.8553625057817213,2023 ACS 1 Year
+107,Napa,Total: 2-person household: 4 or more vehicles available,1076,0.7009726321001166,2023 ACS 1 Year
+108,Napa,Total: 3-person household:,7956,5.183028123595286,2023 ACS 1 Year
+109,Napa,Total: 3-person household: No vehicle available,85,0.05537423208969323,2023 ACS 1 Year
+110,Napa,Total: 3-person household: 1 vehicle available,649,0.4227985485436577,2023 ACS 1 Year
+111,Napa,Total: 3-person household: 2 vehicles available,3692,2.4051960573546753,2023 ACS 1 Year
+112,Napa,Total: 3-person household: 3 vehicles available,2371,1.5446153445254427,2023 ACS 1 Year
+113,Napa,Total: 3-person household: 4 or more vehicles available,1159,0.755043941081817,2023 ACS 1 Year
+114,Napa,Total: 4-or-more-person household:,12102,7.883987726464323,2023 ACS 1 Year
+115,Napa,Total: 4-or-more-person household: No vehicle available,565,0.3680757780079609,2023 ACS 1 Year
+116,Napa,Total: 4-or-more-person household: 1 vehicle available,796,0.5185633969811272,2023 ACS 1 Year
+117,Napa,Total: 4-or-more-person household: 2 vehicles available,4403,2.868385222246109,2023 ACS 1 Year
+118,Napa,Total: 4-or-more-person household: 3 vehicles available,2710,1.7654608113302193,2023 ACS 1 Year
+119,Napa,Total: 4-or-more-person household: 4 or more vehicles available,3628,2.3635025178989064,2023 ACS 1 Year
+121,San Francisco,Total: No vehicle available,115112,10.313946747592691,2023 ACS 1 Year
+122,San Francisco,Total: 1 vehicle available,163438,14.643919213748823,2023 ACS 1 Year
+123,San Francisco,Total: 2 vehicles available,70754,6.3395040324134175,2023 ACS 1 Year
+124,San Francisco,Total: 3 vehicles available,14842,1.329831795362523,2023 ACS 1 Year
+125,San Francisco,Total: 4 or more vehicles available,7881,0.7061315442158769,2023 ACS 1 Year
+126,San Francisco,Total: 1-person household:,146930,13.164815098545715,2023 ACS 1 Year
+127,San Francisco,Total: 1-person household: No vehicle available,72928,6.534292761905274,2023 ACS 1 Year
+128,San Francisco,Total: 1-person household: 1 vehicle available,67647,6.06111921984157,2023 ACS 1 Year
+129,San Francisco,Total: 1-person household: 2 vehicles available,5430,0.4865238275716548,2023 ACS 1 Year
+130,San Francisco,Total: 1-person household: 3 vehicles available,366,0.03279331876449827,2023 ACS 1 Year
+131,San Francisco,Total: 1-person household: 4 or more vehicles available,559,0.05008597046271731,2023 ACS 1 Year
+132,San Francisco,Total: 2-person household:,121777,10.91112562618663,2023 ACS 1 Year
+133,San Francisco,Total: 2-person household: No vehicle available,29841,2.673730670085773,2023 ACS 1 Year
+134,San Francisco,Total: 2-person household: 1 vehicle available,59948,5.371294735776346,2023 ACS 1 Year
+135,San Francisco,Total: 2-person household: 2 vehicles available,29206,2.616835158021685,2023 ACS 1 Year
+136,San Francisco,Total: 2-person household: 3 vehicles available,2368,0.2121709804216719,2023 ACS 1 Year
+137,San Francisco,Total: 2-person household: 4 or more vehicles available,414,0.03709408188115379,2023 ACS 1 Year
+138,San Francisco,Total: 3-person household:,46767,4.1902872640964235,2023 ACS 1 Year
+139,San Francisco,Total: 3-person household: No vehicle available,6276,0.5623247775027082,2023 ACS 1 Year
+140,San Francisco,Total: 3-person household: 1 vehicle available,19534,1.7502313900155992,2023 ACS 1 Year
+141,San Francisco,Total: 3-person household: 2 vehicles available,16264,1.4572419026934424,2023 ACS 1 Year
+142,San Francisco,Total: 3-person household: 3 vehicles available,4157,0.37246400574868666,2023 ACS 1 Year
+143,San Francisco,Total: 3-person household: 4 or more vehicles available,536,0.048025188135986545,2023 ACS 1 Year
+144,San Francisco,Total: 4-or-more-person household:,56553,5.067105344504565,2023 ACS 1 Year
+145,San Francisco,Total: 4-or-more-person household: No vehicle available,6067,0.5435985380989373,2023 ACS 1 Year
+146,San Francisco,Total: 4-or-more-person household: 1 vehicle available,16309,1.461273868115307,2023 ACS 1 Year
+147,San Francisco,Total: 4-or-more-person household: 2 vehicles available,19854,1.778903144126636,2023 ACS 1 Year
+148,San Francisco,Total: 4-or-more-person household: 3 vehicles available,7951,0.712403490427666,2023 ACS 1 Year
+149,San Francisco,Total: 4-or-more-person household: 4 or more vehicles available,6372,0.5709263037360192,2023 ACS 1 Year
+151,San Mateo,Total: No vehicle available,13792,1.7340313714840354,2023 ACS 1 Year
+152,San Mateo,Total: 1 vehicle available,87455,10.995483874212319,2023 ACS 1 Year
+153,San Mateo,Total: 2 vehicles available,100042,12.578013809890216,2023 ACS 1 Year
+154,San Mateo,Total: 3 vehicles available,41492,5.216678485035932,2023 ACS 1 Year
+155,San Mateo,Total: 4 or more vehicles available,22343,2.8091257927108324,2023 ACS 1 Year
+156,San Mateo,Total: 1-person household:,69876,8.785323094099365,2023 ACS 1 Year
+157,San Mateo,Total: 1-person household: No vehicle available,7878,0.990479926374074,2023 ACS 1 Year
+158,San Mateo,Total: 1-person household: 1 vehicle available,50099,6.298813636889405,2023 ACS 1 Year
+159,San Mateo,Total: 1-person household: 2 vehicles available,8790,1.1051432537227863,2023 ACS 1 Year
+160,San Mateo,Total: 1-person household: 3 vehicles available,2007,0.2523347565667386,2023 ACS 1 Year
+161,San Mateo,Total: 1-person household: 4 or more vehicles available,1102,0.1385515205463607,2023 ACS 1 Year
+162,San Mateo,Total: 2-person household:,86182,10.835432979788076,2023 ACS 1 Year
+163,San Mateo,Total: 2-person household: No vehicle available,3310,0.4161574709695589,2023 ACS 1 Year
+164,San Mateo,Total: 2-person household: 1 vehicle available,22068,2.7745507762405515,2023 ACS 1 Year
+165,San Mateo,Total: 2-person household: 2 vehicles available,45020,5.660244514516478,2023 ACS 1 Year
+166,San Mateo,Total: 2-person household: 3 vehicles available,11877,1.4932635295182632,2023 ACS 1 Year
+167,San Mateo,Total: 2-person household: 4 or more vehicles available,3907,0.4912166885432226,2023 ACS 1 Year
+168,San Mateo,Total: 3-person household:,43193,5.430540677821195,2023 ACS 1 Year
+169,San Mateo,Total: 3-person household: No vehicle available,839,0.10548523206751054,2023 ACS 1 Year
+170,San Mateo,Total: 3-person household: 1 vehicle available,8537,1.073334238570128,2023 ACS 1 Year
+171,San Mateo,Total: 3-person household: 2 vehicles available,19962,2.509769013744512,2023 ACS 1 Year
+172,San Mateo,Total: 3-person household: 3 vehicles available,9884,1.2426889556081935,2023 ACS 1 Year
+173,San Mateo,Total: 3-person household: 4 or more vehicles available,3971,0.4992632378308515,2023 ACS 1 Year
+174,San Mateo,Total: 4-or-more-person household:,65873,8.2820365816247,2023 ACS 1 Year
+175,San Mateo,Total: 4-or-more-person household: No vehicle available,1765,0.22190874207289168,2023 ACS 1 Year
+176,San Mateo,Total: 4-or-more-person household: 1 vehicle available,6751,0.8487852225122333,2023 ACS 1 Year
+177,San Mateo,Total: 4-or-more-person household: 2 vehicles available,26270,3.302857027906439,2023 ACS 1 Year
+178,San Mateo,Total: 4-or-more-person household: 3 vehicles available,17724,2.2283912433427377,2023 ACS 1 Year
+179,San Mateo,Total: 4-or-more-person household: 4 or more vehicles available,13363,1.6800943457903974,2023 ACS 1 Year
+181,Santa Clara,Total: No vehicle available,39177,1.962139526916876,2023 ACS 1 Year
+182,Santa Clara,Total: 1 vehicle available,217368,10.886651471191453,2023 ACS 1 Year
+183,Santa Clara,Total: 2 vehicles available,250244,12.533211929800311,2023 ACS 1 Year
+184,Santa Clara,Total: 3 vehicles available,99869,5.001835577345419,2023 ACS 1 Year
+185,Santa Clara,Total: 4 or more vehicles available,58891,2.949494828079275,2023 ACS 1 Year
+186,Santa Clara,Total: 1-person household:,151634,7.594432065357572,2023 ACS 1 Year
+187,Santa Clara,Total: 1-person household: No vehicle available,21649,1.0842677749246612,2023 ACS 1 Year
+188,Santa Clara,Total: 1-person household: 1 vehicle available,109929,5.505680272977647,2023 ACS 1 Year
+189,Santa Clara,Total: 1-person household: 2 vehicles available,14982,0.7503579751453312,2023 ACS 1 Year
+190,Santa Clara,Total: 1-person household: 3 vehicles available,3701,0.1853607573096296,2023 ACS 1 Year
+191,Santa Clara,Total: 1-person household: 4 or more vehicles available,1373,0.068765285000303,2023 ACS 1 Year
+192,Santa Clara,Total: 2-person household:,217571,10.896818516242481,2023 ACS 1 Year
+193,Santa Clara,Total: 2-person household: No vehicle available,8082,0.4047786113419148,2023 ACS 1 Year
+194,Santa Clara,Total: 2-person household: 1 vehicle available,66642,3.3376956467517793,2023 ACS 1 Year
+195,Santa Clara,Total: 2-person household: 2 vehicles available,111458,5.582258656637854,2023 ACS 1 Year
+196,Santa Clara,Total: 2-person household: 3 vehicles available,24389,1.2214978411306556,2023 ACS 1 Year
+197,Santa Clara,Total: 2-person household: 4 or more vehicles available,7000,0.3505877603802775,2023 ACS 1 Year
+198,Santa Clara,Total: 3-person household:,120053,6.012730342419066,2023 ACS 1 Year
+199,Santa Clara,Total: 3-person household: No vehicle available,4264,0.21355803003735765,2023 ACS 1 Year
+200,Santa Clara,Total: 3-person household: 1 vehicle available,20620,1.0327313741487603,2023 ACS 1 Year
+201,Santa Clara,Total: 3-person household: 2 vehicles available,52610,2.6349174390866286,2023 ACS 1 Year
+202,Santa Clara,Total: 3-person household: 3 vehicles available,30875,1.546342443105867,2023 ACS 1 Year
+203,Santa Clara,Total: 3-person household: 4 or more vehicles available,11684,0.5851810560404518,2023 ACS 1 Year
+204,Santa Clara,Total: 4-or-more-person household:,176291,8.829352409314216,2023 ACS 1 Year
+205,Santa Clara,Total: 4-or-more-person household: No vehicle available,5182,0.2595351106129426,2023 ACS 1 Year
+206,Santa Clara,Total: 4-or-more-person household: 1 vehicle available,20177,1.0105441773132657,2023 ACS 1 Year
+207,Santa Clara,Total: 4-or-more-person household: 2 vehicles available,71194,3.5656778589304974,2023 ACS 1 Year
+208,Santa Clara,Total: 4-or-more-person household: 3 vehicles available,40904,2.0486345357992675,2023 ACS 1 Year
+209,Santa Clara,Total: 4-or-more-person household: 4 or more vehicles available,38834,1.9449607266582427,2023 ACS 1 Year
+211,Solano,Total: No vehicle available,8484,1.7925281746383885,2023 ACS 1 Year
+212,Solano,Total: 1 vehicle available,41211,8.707199269804647,2023 ACS 1 Year
+213,Solano,Total: 2 vehicles available,57659,12.182388262785814,2023 ACS 1 Year
+214,Solano,Total: 3 vehicles available,29578,6.249339739445339,2023 ACS 1 Year
+215,Solano,Total: 4 or more vehicles available,20834,4.401877886659145,2023 ACS 1 Year
+216,Solano,Total: 1-person household:,38918,8.222726485216503,2023 ACS 1 Year
+217,Solano,Total: 1-person household: No vehicle available,4614,0.9748615037460542,2023 ACS 1 Year
+218,Solano,Total: 1-person household: 1 vehicle available,24350,5.144750241919467,2023 ACS 1 Year
+219,Solano,Total: 1-person household: 2 vehicles available,7038,1.4870124107855938,2023 ACS 1 Year
+220,Solano,Total: 1-person household: 3 vehicles available,2159,0.4561608120042764,2023 ACS 1 Year
+221,Solano,Total: 1-person household: 4 or more vehicles available,757,0.15994151676111035,2023 ACS 1 Year
+222,Solano,Total: 2-person household:,50271,10.621426669878174,2023 ACS 1 Year
+223,Solano,Total: 2-person household: No vehicle available,1815,0.38347933014718,2023 ACS 1 Year
+224,Solano,Total: 2-person household: 1 vehicle available,10109,2.1358636630621723,2023 ACS 1 Year
+225,Solano,Total: 2-person household: 2 vehicles available,27080,5.721553862471424,2023 ACS 1 Year
+226,Solano,Total: 2-person household: 3 vehicles available,7560,1.5973023338361876,2023 ACS 1 Year
+227,Solano,Total: 2-person household: 4 or more vehicles available,3707,0.78322748036121,2023 ACS 1 Year
+228,Solano,Total: 3-person household:,27249,5.757260753267497,2023 ACS 1 Year
+229,Solano,Total: 3-person household: No vehicle available,1346,0.2843874261036387,2023 ACS 1 Year
+230,Solano,Total: 3-person household: 1 vehicle available,3548,0.7496334233400521,2023 ACS 1 Year
+231,Solano,Total: 3-person household: 2 vehicles available,10153,2.145160131671801,2023 ACS 1 Year
+232,Solano,Total: 3-person household: 3 vehicles available,8014,1.6932249872173555,2023 ACS 1 Year
+233,Solano,Total: 3-person household: 4 or more vehicles available,4188,0.8848547849346501,2023 ACS 1 Year
+234,Solano,Total: 4-or-more-person household:,41328,8.73191942497116,2023 ACS 1 Year
+235,Solano,Total: 4-or-more-person household: No vehicle available,709,0.1497999146415155,2023 ACS 1 Year
+236,Solano,Total: 4-or-more-person household: 1 vehicle available,3204,0.6769519414829558,2023 ACS 1 Year
+237,Solano,Total: 4-or-more-person household: 2 vehicles available,13388,2.8286618578569946,2023 ACS 1 Year
+238,Solano,Total: 4-or-more-person household: 3 vehicles available,11845,2.502651606387519,2023 ACS 1 Year
+239,Solano,Total: 4-or-more-person household: 4 or more vehicles available,12182,2.573854104602175,2023 ACS 1 Year
+241,Sonoma,Total: No vehicle available,8223,1.4219386299380072,2023 ACS 1 Year
+242,Sonoma,Total: 1 vehicle available,58846,10.175775339575823,2023 ACS 1 Year
+243,Sonoma,Total: 2 vehicles available,72836,12.594955861627716,2023 ACS 1 Year
+244,Sonoma,Total: 3 vehicles available,33514,5.79531208120423,2023 ACS 1 Year
+245,Sonoma,Total: 4 or more vehicles available,19346,3.3453514209875586,2023 ACS 1 Year
+246,Sonoma,Total: 1-person household:,53236,9.205682221011767,2023 ACS 1 Year
+247,Sonoma,Total: 1-person household: No vehicle available,4547,0.7862769001979958,2023 ACS 1 Year
+248,Sonoma,Total: 1-person household: 1 vehicle available,38367,6.634503151505719,2023 ACS 1 Year
+249,Sonoma,Total: 1-person household: 2 vehicles available,8211,1.4198635644437527,2023 ACS 1 Year
+250,Sonoma,Total: 1-person household: 3 vehicles available,1373,0.23742207696763762,2023 ACS 1 Year
+251,Sonoma,Total: 1-person household: 4 or more vehicles available,738,0.12761652789666172,2023 ACS 1 Year
+252,Sonoma,Total: 2-person household:,70246,12.147087559117752,2023 ACS 1 Year
+253,Sonoma,Total: 2-person household: No vehicle available,2147,0.3712638013470633,2023 ACS 1 Year
+254,Sonoma,Total: 2-person household: 1 vehicle available,12594,2.177781236220268,2023 ACS 1 Year
+255,Sonoma,Total: 2-person household: 2 vehicles available,38946,6.734625061603507,2023 ACS 1 Year
+256,Sonoma,Total: 2-person household: 3 vehicles available,12535,2.167578830873516,2023 ACS 1 Year
+257,Sonoma,Total: 2-person household: 4 or more vehicles available,4024,0.6958386290733968,2023 ACS 1 Year
+258,Sonoma,Total: 3-person household:,27110,4.687918795770325,2023 ACS 1 Year
+259,Sonoma,Total: 3-person household: No vehicle available,602,0.10409911896177558,2023 ACS 1 Year
+260,Sonoma,Total: 3-person household: 1 vehicle available,4137,0.715378829144295,2023 ACS 1 Year
+261,Sonoma,Total: 3-person household: 2 vehicles available,10744,1.8578753058560076,2023 ACS 1 Year
+262,Sonoma,Total: 3-person household: 3 vehicles available,8627,1.491799168244581,2023 ACS 1 Year
+263,Sonoma,Total: 3-person household: 4 or more vehicles available,3000,0.5187663735636656,2023 ACS 1 Year
+264,Sonoma,Total: 4-or-more-person household:,42173,7.29264475743349,2023 ACS 1 Year
+265,Sonoma,Total: 4-or-more-person household: No vehicle available,927,0.16029880943117267,2023 ACS 1 Year
+266,Sonoma,Total: 4-or-more-person household: 1 vehicle available,3748,0.6481121227055395,2023 ACS 1 Year
+267,Sonoma,Total: 4-or-more-person household: 2 vehicles available,14935,2.5825919297244484,2023 ACS 1 Year
+268,Sonoma,Total: 4-or-more-person household: 3 vehicles available,10979,1.898512005118495,2023 ACS 1 Year
+269,Sonoma,Total: 4-or-more-person household: 4 or more vehicles available,11584,2.003129890453834,2023 ACS 1 Year
+271,Bay Area,Total: No vehicle available,278896,3.284167846581826,2023 ACS 1 Year
+272,Bay Area,Total: 1 vehicle available,946164,11.141649168124486,2023 ACS 1 Year
+273,Bay Area,Total: 2 vehicles available,980893,11.550603994095244,2023 ACS 1 Year
+274,Bay Area,Total: 3 vehicles available,394013,4.63973963676512,2023 ACS 1 Year
+275,Bay Area,Total: 4 or more vehicles available,230746,2.7171726877666584,2023 ACS 1 Year
+276,Bay Area,Total: 1-person household:,755907,8.90125876457937,2023 ACS 1 Year
+277,Bay Area,Total: 1-person household: No vehicle available,165651,1.9506399803300372,2023 ACS 1 Year
+278,Bay Area,Total: 1-person household: 1 vehicle available,483882,5.698001068282467,2023 ACS 1 Year
+279,Bay Area,Total: 1-person household: 2 vehicles available,81532,0.9600882510595685,2023 ACS 1 Year
+280,Bay Area,Total: 1-person household: 3 vehicles available,17540,0.20654403085395712,2023 ACS 1 Year
+281,Bay Area,Total: 1-person household: 4 or more vehicles available,7302,0.08598543405334065,2023 ACS 1 Year
+282,Bay Area,Total: 2-person household:,930214,10.95382834189184,2023 ACS 1 Year
+283,Bay Area,Total: 2-person household: No vehicle available,68383,0.8052508815214453,2023 ACS 1 Year
+284,Bay Area,Total: 2-person household: 1 vehicle available,276929,3.2610052406131977,2023 ACS 1 Year
+285,Bay Area,Total: 2-person household: 2 vehicles available,441717,5.201482877806008,2023 ACS 1 Year
+286,Bay Area,Total: 2-person household: 3 vehicles available,108565,1.2784180564230248,2023 ACS 1 Year
+287,Bay Area,Total: 2-person household: 4 or more vehicles available,34620,0.40767128552816395,2023 ACS 1 Year
+288,Bay Area,Total: 3-person household:,467774,5.508319697188081,2023 ACS 1 Year
+289,Bay Area,Total: 3-person household: No vehicle available,21023,0.24755844701497953,2023 ACS 1 Year
+290,Bay Area,Total: 3-person household: 1 vehicle available,98312,1.1576828256165468,2023 ACS 1 Year
+291,Bay Area,Total: 3-person household: 2 vehicles available,192176,2.2629877806949863,2023 ACS 1 Year
+292,Bay Area,Total: 3-person household: 3 vehicles available,111678,1.3150755004394654,2023 ACS 1 Year
+293,Bay Area,Total: 3-person household: 4 or more vehicles available,44585,0.5250151434221025,2023 ACS 1 Year
+294,Bay Area,Total: 4-or-more-person household:,676817,7.969926529674042,2023 ACS 1 Year
+295,Bay Area,Total: 4-or-more-person household: No vehicle available,23839,0.280718537715364,2023 ACS 1 Year
+296,Bay Area,Total: 4-or-more-person household: 1 vehicle available,87041,1.024960033612274,2023 ACS 1 Year
+297,Bay Area,Total: 4-or-more-person household: 2 vehicles available,265468,3.12604508453468,2023 ACS 1 Year
+298,Bay Area,Total: 4-or-more-person household: 3 vehicles available,156230,1.8397020490486728,2023 ACS 1 Year
+299,Bay Area,Total: 4-or-more-person household: 4 or more vehicles available,144239,1.6985008247630513,2023 ACS 1 Year
