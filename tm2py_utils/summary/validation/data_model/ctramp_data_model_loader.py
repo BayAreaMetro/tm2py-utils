@@ -100,6 +100,7 @@ class DataModel:
         
         # Load schemas
         self._load_input_schema()
+        self._load_geography_lookup_config()
         self._load_summary_definitions()
         self._load_value_mappings()
         self._load_aggregation_specs()
@@ -126,6 +127,22 @@ class DataModel:
             
             logger.debug(f"  Loaded schema for {table_name}: "
                         f"{len(required)} required, {len(optional)} optional columns")
+    
+    def _load_geography_lookup_config(self):
+        """Load geography lookup table configuration."""
+        input_schema = self.config.get('input_schema', {})
+        geo_config = input_schema.get('geography_lookup', {})
+        
+        self.geography_lookup_config = {
+            'file_path': geo_config.get('file_path'),
+            'columns': geo_config.get('columns', {})
+        }
+        
+        # Cache for loaded geography data
+        self._geography_df = None
+        
+        if self.geography_lookup_config['file_path']:
+            logger.debug(f"  Configured geography lookup: {self.geography_lookup_config['file_path']}")
     
     def _load_summary_definitions(self):
         """Load summary definitions."""
@@ -248,6 +265,111 @@ class DataModel:
     def has_weights(self, table_name: str) -> bool:
         """Check if table has weight field configured."""
         return self.get_weight_field(table_name) is not None
+    
+    # Geography methods
+    def load_geography_lookup(self, workspace_root: Optional[Path] = None) -> Optional[pd.DataFrame]:
+        """
+        Load geography lookup table (MAZ to county, district, etc.).
+        
+        Args:
+            workspace_root: Root directory for relative paths. If None, uses config_path parent.
+        
+        Returns:
+            DataFrame with geography lookup data, or None if not configured
+        """
+        if self._geography_df is not None:
+            return self._geography_df
+        
+        file_path = self.geography_lookup_config.get('file_path')
+        if not file_path:
+            logger.debug("No geography lookup configured")
+            return None
+        
+        # Resolve path relative to workspace root
+        if workspace_root is None:
+            # Try to find workspace root by going up from config file
+            workspace_root = self.config_path.parent.parent.parent.parent.parent
+        
+        full_path = workspace_root / file_path
+        
+        if not full_path.exists():
+            logger.warning(f"Geography lookup file not found: {full_path}")
+            return None
+        
+        try:
+            # Load only needed columns for efficiency
+            columns_config = self.geography_lookup_config.get('columns', {})
+            usecols = list(columns_config.values()) if columns_config else None
+            
+            self._geography_df = pd.read_csv(full_path, usecols=usecols)
+            
+            # Rename to internal names
+            if columns_config:
+                rename_map = {v: k for k, v in columns_config.items()}
+                self._geography_df = self._geography_df.rename(columns=rename_map)
+            
+            logger.info(f"  ✓ Loaded geography lookup: {len(self._geography_df)} MAZs")
+            return self._geography_df
+            
+        except Exception as e:
+            logger.error(f"Error loading geography lookup: {e}")
+            return None
+    
+    def join_geography(self, df: pd.DataFrame, join_col: str = 'home_mgra', 
+                       geography_cols: Optional[List[str]] = None,
+                       workspace_root: Optional[Path] = None) -> pd.DataFrame:
+        """
+        Join geography lookup data to a DataFrame.
+        
+        Args:
+            df: DataFrame to join geography to
+            join_col: Column in df to join on (default: 'home_mgra')
+            geography_cols: List of geography columns to add (default: ['county_name', 'district_name'])
+            workspace_root: Root directory for relative paths
+            
+        Returns:
+            DataFrame with geography columns added
+        """
+        geo_df = self.load_geography_lookup(workspace_root)
+        
+        if geo_df is None:
+            logger.warning("Cannot join geography - lookup table not available")
+            return df
+        
+        if join_col not in df.columns:
+            logger.warning(f"Cannot join geography - column '{join_col}' not in DataFrame")
+            return df
+        
+        # Default geography columns to add
+        if geography_cols is None:
+            geography_cols = ['county_name', 'district_name']
+        
+        # Filter to columns that exist in geo_df
+        available_cols = [c for c in geography_cols if c in geo_df.columns]
+        if not available_cols:
+            logger.warning(f"No requested geography columns found in lookup: {geography_cols}")
+            return df
+        
+        # Prepare join DataFrame (maz_node + requested geography columns)
+        if 'maz_node' not in geo_df.columns:
+            logger.warning("Geography lookup missing 'maz_node' column")
+            return df
+        
+        join_df = geo_df[['maz_node'] + available_cols].drop_duplicates()
+        
+        # Perform left join
+        result = df.merge(join_df, left_on=join_col, right_on='maz_node', how='left')
+        
+        # Drop the duplicate maz_node column if it was added
+        if 'maz_node' in result.columns and 'maz_node' != join_col:
+            result = result.drop(columns=['maz_node'])
+        
+        # Log join stats
+        matched = result[available_cols[0]].notna().sum()
+        total = len(result)
+        logger.info(f"  ✓ Joined geography: {matched}/{total} records matched ({matched/total*100:.1f}%)")
+        
+        return result
     
     def should_calculate_weighted(self, table_name: str) -> bool:
         """Check if weighted calculations should be performed for this table."""

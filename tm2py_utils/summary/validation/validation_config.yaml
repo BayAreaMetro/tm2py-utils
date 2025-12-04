@@ -143,6 +143,26 @@ custom_summaries:
     count_name: "households"
     share_within: "num_persons"
   
+  # Auto ownership by household size (ACS-comparable categories: 1, 2, 3, 4+)
+  # Uses aggregated household sizes matching ACS reporting categories
+  - name: "auto_ownership_by_household_size_acs"
+    description: "Auto ownership by household size (ACS categories)"
+    data_source: "households"
+    group_by: ["num_persons_agg", "num_vehicles"]
+    weight_field: "sample_rate"
+    count_name: "households"
+    share_within: "num_persons_agg"
+  
+  # Auto ownership by household size and county (ACS-comparable)
+  # Groups by county for county-level comparison with ACS data
+  - name: "auto_ownership_by_household_size_county"
+    description: "Auto ownership by household size and county (ACS categories)"
+    data_source: "households"
+    group_by: ["county_name", "num_persons_agg", "num_vehicles"]
+    weight_field: "sample_rate"
+    count_name: "households"
+    share_within: ["county_name", "num_persons_agg"]
+  
   # Household size distribution
   - name: "household_size_regional"
     description: "Regional household size distribution"

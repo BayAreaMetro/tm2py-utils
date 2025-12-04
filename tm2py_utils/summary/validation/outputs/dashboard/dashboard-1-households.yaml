@@ -5,13 +5,13 @@ header:
 layout:
   auto_ownership:
   - type: bar
-    title: Households by Vehicle Ownership - Share
+    title: Households by Vehicle Ownership - Share (with ACS Observed)
     props:
       dataset: auto_ownership_regional.csv
       x: num_vehicles
       y: share
       groupBy: dataset
-    description: 'Share: households by number of vehicles owned'
+    description: 'Share: households by number of vehicles owned (2015 model, 2023 model vs ACS 2023 observed)'
   - type: bar
     title: Households by Vehicle Ownership - Total
     props:
@@ -20,21 +20,30 @@ layout:
       y: households
       groupBy: dataset
     description: 'Total: households by number of vehicles owned'
-  household_characteristics:
   - type: bar
-    title: Auto Ownership by Household Size - Share
+    title: Auto Ownership by Household Size (ACS Validation)
     props:
-      dataset: auto_ownership_by_household_size.csv
-      x: num_vehicles
+      dataset: auto_ownership_by_household_size_acs.csv
+      x: num_persons_agg
       y: share
-      columns: num_persons
+      groupBy: [num_vehicles, dataset]
+      subChartType: stacked
+    description: 'Model vs ACS validation: Vehicle ownership by household size (1,2,3,4+ categories)'
+  - type: bar
+    title: County-Level Auto Ownership (0-Vehicle Households)
+    props:
+      dataset: auto_ownership_by_household_size_county.csv
+      x: county
+      y: share
       groupBy: dataset
-    description: 'Share: vehicle ownership by household size'
+      filter: num_vehicles == 0 AND num_persons_agg == "1"
+    description: 'County comparison: 1-person households with 0 vehicles (model vs ACS)'
+  household_characteristics:
   - type: bar
     title: Households by Size - Share
     props:
       dataset: household_size_regional.csv
-      x: num_persons
+      x: household_size
       y: share
       groupBy: dataset
     description: 'Share: households by size'
@@ -42,7 +51,7 @@ layout:
     title: Households by Size - Total
     props:
       dataset: household_size_regional.csv
-      x: num_persons
+      x: household_size
       y: households
       groupBy: dataset
     description: 'Total: households by size'

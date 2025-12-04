@@ -182,6 +182,20 @@ input_schema:
         sample_rate: "sampleRate"                # Household sampling rate
         av_available: "avAvailable"              # Autonomous vehicle availability (0/1)
 
+  # Geography lookup table (MAZ to county, district, etc.)
+  # This is a static reference file, not model output
+  geography_lookup:
+    # Path relative to workspace root (not model output directory)
+    file_path: "tm2py_utils/inputs/maz_taz/mazs_tazs_county_tract_PUMA_2.5.csv"
+    columns:
+      maz_node: "MAZ_SEQ"            # MAZ identifier (joins to home_mgra in households) - using MAZ_SEQ not MAZ_NODE
+      taz_node: "TAZ_NODE"           # TAZ identifier
+      taz_seq: "TAZ_SEQ"             # TAZ sequence number
+      county_id: "COUNTY"            # County ID (1-9)
+      county_name: "county_name"     # County name (San Francisco, Alameda, etc.)
+      district_id: "DistID"          # Planning district ID
+      district_name: "DistName"      # Planning district name
+
 # ==============================================================================
 # INTERNAL SCHEMA - Standardized column names used within the code
 # ==============================================================================
@@ -507,6 +521,29 @@ aggregation_specs:
     apply_to:
       - tour_mode
       - trip_mode
+  
+  # Aggregate household size to match ACS categories (1, 2, 3, 4+)
+  # ACS reports household size as 1-person, 2-person, 3-person, and 4-or-more-person
+  # Model data has granular sizes 1-11+, this maps them to ACS-comparable categories
+  household_size_acs:
+    mapping:
+      1: "1"
+      2: "2"
+      3: "3"
+      4: "4+"
+      5: "4+"
+      6: "4+"
+      7: "4+"
+      8: "4+"
+      9: "4+"
+      10: "4+"
+      11: "4+"
+      12: "4+"
+      13: "4+"
+      14: "4+"
+      15: "4+"
+    apply_to:
+      - num_persons
   
   # Alternative: More detailed mode aggregation (commented out by default)
   # transportation_mode_detailed:
