@@ -8,7 +8,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('census_validation.log'),
+        logging.FileHandler('census_ctpp.log'),
         logging.StreamHandler()
     ]
 )
