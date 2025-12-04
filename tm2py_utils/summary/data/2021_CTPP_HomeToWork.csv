@@ -1,0 +1,82 @@
+origin_name,destination_name,Total Workers,Total Workers_MOE,destination_geoid,geoid,origin_geoid
+"Alameda County, California","Alameda County, California","558,420","+/-4,502",C2300US06001,C4300US0600106001,C0300US06001
+"Alameda County, California","Contra Costa County, California","36,865","+/-1,524",C2300US06013,C4300US0600106013,C0300US06001
+"Alameda County, California","Marin County, California","3,380",+/-536,C2300US06041,C4300US0600106041,C0300US06001
+"Alameda County, California","Napa County, California",600,+/-197,C2300US06055,C4300US0600106055,C0300US06001
+"Alameda County, California","San Francisco County, California","95,555","+/-2,669",C2300US06075,C4300US0600106075,C0300US06001
+"Alameda County, California","San Mateo County, California","38,550","+/-1,430",C2300US06081,C4300US0600106081,C0300US06001
+"Alameda County, California","Santa Clara County, California","72,780","+/-1,819",C2300US06085,C4300US0600106085,C0300US06001
+"Alameda County, California","Solano County, California","1,715",+/-325,C2300US06095,C4300US0600106095,C0300US06001
+"Alameda County, California","Sonoma County, California",530,+/-180,C2300US06097,C4300US0600106097,C0300US06001
+"Contra Costa County, California","Alameda County, California","98,655","+/-2,418",C2300US06001,C4300US0601306001,C0300US06013
+"Contra Costa County, California","Contra Costa County, California","338,755","+/-4,072",C2300US06013,C4300US0601306013,C0300US06013
+"Contra Costa County, California","Marin County, California","8,630",+/-875,C2300US06041,C4300US0601306041,C0300US06013
+"Contra Costa County, California","Napa County, California","1,185",+/-274,C2300US06055,C4300US0601306055,C0300US06013
+"Contra Costa County, California","San Francisco County, California","58,570","+/-1,758",C2300US06075,C4300US0601306075,C0300US06013
+"Contra Costa County, California","San Mateo County, California","13,920",+/-978,C2300US06081,C4300US0601306081,C0300US06013
+"Contra Costa County, California","Santa Clara County, California","14,605","+/-1,059",C2300US06085,C4300US0601306085,C0300US06013
+"Contra Costa County, California","Solano County, California","7,215",+/-691,C2300US06095,C4300US0601306095,C0300US06013
+"Contra Costa County, California","Sonoma County, California","1,355",+/-312,C2300US06097,C4300US0601306097,C0300US06013
+"Marin County, California","Alameda County, California","3,525",+/-411,C2300US06001,C4300US0604106001,C0300US06041
+"Marin County, California","Contra Costa County, California","2,410",+/-420,C2300US06013,C4300US0604106013,C0300US06041
+"Marin County, California","Marin County, California","89,875","+/-1,878",C2300US06041,C4300US0604106041,C0300US06041
+"Marin County, California","Napa County, California",440,+/-201,C2300US06055,C4300US0604106055,C0300US06041
+"Marin County, California","San Francisco County, California","22,870","+/-1,159",C2300US06075,C4300US0604106075,C0300US06041
+"Marin County, California","San Mateo County, California","1,945",+/-377,C2300US06081,C4300US0604106081,C0300US06041
+"Marin County, California","Santa Clara County, California",830,+/-268,C2300US06085,C4300US0604106085,C0300US06041
+"Marin County, California","Solano County, California",665,+/-207,C2300US06095,C4300US0604106095,C0300US06041
+"Marin County, California","Sonoma County, California","4,140",+/-539,C2300US06097,C4300US0604106097,C0300US06041
+"Napa County, California","Alameda County, California",915,+/-195,C2300US06001,C4300US0605506001,C0300US06055
+"Napa County, California","Contra Costa County, California","1,595",+/-221,C2300US06013,C4300US0605506013,C0300US06055
+"Napa County, California","Marin County, California","1,070",+/-226,C2300US06041,C4300US0605506041,C0300US06055
+"Napa County, California","Napa County, California","54,060","+/-1,340",C2300US06055,C4300US0605506055,C0300US06055
+"Napa County, California","San Francisco County, California","1,335",+/-240,C2300US06075,C4300US0605506075,C0300US06055
+"Napa County, California","San Mateo County, California",515,+/-157,C2300US06081,C4300US0605506081,C0300US06055
+"Napa County, California","Santa Clara County, California",270,+/-147,C2300US06085,C4300US0605506085,C0300US06055
+"Napa County, California","Solano County, California","4,935",+/-549,C2300US06095,C4300US0605506095,C0300US06055
+"Napa County, California","Sonoma County, California","3,035",+/-428,C2300US06097,C4300US0605506097,C0300US06055
+"San Francisco County, California","Alameda County, California","16,735","+/-1,027",C2300US06001,C4300US0607506001,C0300US06075
+"San Francisco County, California","Contra Costa County, California","3,055",+/-500,C2300US06013,C4300US0607506013,C0300US06075
+"San Francisco County, California","Marin County, California","5,045",+/-616,C2300US06041,C4300US0607506041,C0300US06075
+"San Francisco County, California","Napa County, California",340,+/-163,C2300US06055,C4300US0607506055,C0300US06075
+"San Francisco County, California","San Francisco County, California","401,990","+/-3,913",C2300US06075,C4300US0607506075,C0300US06075
+"San Francisco County, California","San Mateo County, California","44,925","+/-1,514",C2300US06081,C4300US0607506081,C0300US06075
+"San Francisco County, California","Santa Clara County, California","23,455","+/-1,357",C2300US06085,C4300US0607506085,C0300US06075
+"San Francisco County, California","Solano County, California",490,+/-178,C2300US06095,C4300US0607506095,C0300US06075
+"San Francisco County, California","Sonoma County, California",800,+/-182,C2300US06097,C4300US0607506097,C0300US06075
+"San Mateo County, California","Alameda County, California","11,860",+/-824,C2300US06001,C4300US0608106001,C0300US06081
+"San Mateo County, California","Contra Costa County, California","1,925",+/-407,C2300US06013,C4300US0608106013,C0300US06081
+"San Mateo County, California","Marin County, California","1,090",+/-250,C2300US06041,C4300US0608106041,C0300US06081
+"San Mateo County, California","Napa County, California",40,+/-39,C2300US06055,C4300US0608106055,C0300US06081
+"San Mateo County, California","San Francisco County, California","73,495","+/-1,793",C2300US06075,C4300US0608106075,C0300US06081
+"San Mateo County, California","San Mateo County, California","252,835","+/-2,617",C2300US06081,C4300US0608106081,C0300US06081
+"San Mateo County, California","Santa Clara County, California","55,765","+/-1,674",C2300US06085,C4300US0608106085,C0300US06081
+"San Mateo County, California","Solano County, California",30,+/-30,C2300US06095,C4300US0608106095,C0300US06081
+"San Mateo County, California","Sonoma County, California",355,+/-189,C2300US06097,C4300US0608106097,C0300US06081
+"Santa Clara County, California","Alameda County, California","38,795","+/-1,534",C2300US06001,C4300US0608506001,C0300US06085
+"Santa Clara County, California","Contra Costa County, California","1,935",+/-299,C2300US06013,C4300US0608506013,C0300US06085
+"Santa Clara County, California","Marin County, California",195,+/-81,C2300US06041,C4300US0608506041,C0300US06085
+"Santa Clara County, California","Napa County, California",80,+/-71,C2300US06055,C4300US0608506055,C0300US06085
+"Santa Clara County, California","San Francisco County, California","18,060","+/-1,191",C2300US06075,C4300US0608506075,C0300US06085
+"Santa Clara County, California","San Mateo County, California","44,155","+/-1,528",C2300US06081,C4300US0608506081,C0300US06085
+"Santa Clara County, California","Santa Clara County, California","861,940","+/-4,853",C2300US06085,C4300US0608506085,C0300US06085
+"Santa Clara County, California","Solano County, California",270,+/-121,C2300US06095,C4300US0608506095,C0300US06085
+"Santa Clara County, California","Sonoma County, California",275,+/-115,C2300US06097,C4300US0608506097,C0300US06085
+"Solano County, California","Alameda County, California","12,640",+/-963,C2300US06001,C4300US0609506001,C0300US06095
+"Solano County, California","Contra Costa County, California","21,990","+/-1,328",C2300US06013,C4300US0609506013,C0300US06095
+"Solano County, California","Marin County, California","5,700",+/-707,C2300US06041,C4300US0609506041,C0300US06095
+"Solano County, California","Napa County, California","13,050","+/-1,001",C2300US06055,C4300US0609506055,C0300US06095
+"Solano County, California","San Francisco County, California","10,670",+/-756,C2300US06075,C4300US0609506075,C0300US06095
+"Solano County, California","San Mateo County, California","3,050",+/-488,C2300US06081,C4300US0609506081,C0300US06095
+"Solano County, California","Santa Clara County, California","1,755",+/-372,C2300US06085,C4300US0609506085,C0300US06095
+"Solano County, California","Solano County, California","125,880","+/-2,527",C2300US06095,C4300US0609506095,C0300US06095
+"Solano County, California","Sonoma County, California","2,870",+/-447,C2300US06097,C4300US0609506097,C0300US06095
+"Sonoma County, California","Alameda County, California","1,700",+/-318,C2300US06001,C4300US0609706001,C0300US06097
+"Sonoma County, California","Contra Costa County, California","1,115",+/-254,C2300US06013,C4300US0609706013,C0300US06097
+"Sonoma County, California","Marin County, California","13,700","+/-1,019",C2300US06041,C4300US0609706041,C0300US06097
+"Sonoma County, California","Napa County, California","5,205",+/-653,C2300US06055,C4300US0609706055,C0300US06097
+"Sonoma County, California","San Francisco County, California","6,510",+/-547,C2300US06075,C4300US0609706075,C0300US06097
+"Sonoma County, California","San Mateo County, California","1,230",+/-265,C2300US06081,C4300US0609706081,C0300US06097
+"Sonoma County, California","Santa Clara County, California",665,+/-225,C2300US06085,C4300US0609706085,C0300US06097
+"Sonoma County, California","Solano County, California",830,+/-208,C2300US06095,C4300US0609706095,C0300US06097
+"Sonoma County, California","Sonoma County, California","210,665","+/-2,576",C2300US06097,C4300US0609706097,C0300US06097
