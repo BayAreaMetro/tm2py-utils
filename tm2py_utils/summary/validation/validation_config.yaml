@@ -125,10 +125,10 @@ custom_summaries:
   - name: "auto_ownership_by_income"
     description: "Auto ownership by income category"
     data_source: "households"
-    group_by: ["income_category", "num_vehicles"]
+    group_by: ["income_category_bin", "num_vehicles"]
     weight_field: "sample_rate"
     count_name: "households"
-    share_within: "income_category"
+    share_within: "income_category_bin"
     bins:
       income_category:
         breaks: [0, 30000, 60000, 100000, 150000, 1000000000]

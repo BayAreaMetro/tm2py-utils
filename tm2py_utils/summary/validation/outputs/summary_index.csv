@@ -1,5 +1,6 @@
 summary_name,filename,rows,columns,description
 auto_ownership_regional_2023 TM2.2 v05,auto_ownership_regional_2023 TM2.2 v05.csv,5,4,Summary table: auto_ownership_regional_2023 TM2.2 v05
+auto_ownership_by_income_2023 TM2.2 v05,auto_ownership_by_income_2023 TM2.2 v05.csv,25,5,Summary table: auto_ownership_by_income_2023 TM2.2 v05
 auto_ownership_by_household_size_2023 TM2.2 v05,auto_ownership_by_household_size_2023 TM2.2 v05.csv,50,5,Summary table: auto_ownership_by_household_size_2023 TM2.2 v05
 auto_ownership_by_household_size_acs_2023 TM2.2 v05,auto_ownership_by_household_size_acs_2023 TM2.2 v05.csv,20,5,Summary table: auto_ownership_by_household_size_acs_2023 TM2.2 v05
 auto_ownership_by_household_size_county_2023 TM2.2 v05,auto_ownership_by_household_size_county_2023 TM2.2 v05.csv,179,6,Summary table: auto_ownership_by_household_size_county_2023 TM2.2 v05
@@ -18,6 +19,7 @@ trip_purpose_2023 TM2.2 v05,trip_purpose_2023 TM2.2 v05.csv,12,4,Summary table: 
 trip_mode_by_purpose_2023 TM2.2 v05,trip_mode_by_purpose_2023 TM2.2 v05.csv,167,5,Summary table: trip_mode_by_purpose_2023 TM2.2 v05
 trip_distance_2023 TM2.2 v05,trip_distance_2023 TM2.2 v05.csv,6,4,Summary table: trip_distance_2023 TM2.2 v05
 auto_ownership_regional_2015 TM2.2 Sprint 04,auto_ownership_regional_2015 TM2.2 Sprint 04.csv,5,4,Summary table: auto_ownership_regional_2015 TM2.2 Sprint 04
+auto_ownership_by_income_2015 TM2.2 Sprint 04,auto_ownership_by_income_2015 TM2.2 Sprint 04.csv,25,5,Summary table: auto_ownership_by_income_2015 TM2.2 Sprint 04
 auto_ownership_by_household_size_2015 TM2.2 Sprint 04,auto_ownership_by_household_size_2015 TM2.2 Sprint 04.csv,72,5,Summary table: auto_ownership_by_household_size_2015 TM2.2 Sprint 04
 auto_ownership_by_household_size_acs_2015 TM2.2 Sprint 04,auto_ownership_by_household_size_acs_2015 TM2.2 Sprint 04.csv,20,5,Summary table: auto_ownership_by_household_size_acs_2015 TM2.2 Sprint 04
 auto_ownership_by_household_size_county_2015 TM2.2 Sprint 04,auto_ownership_by_household_size_county_2015 TM2.2 Sprint 04.csv,180,6,Summary table: auto_ownership_by_household_size_county_2015 TM2.2 Sprint 04
