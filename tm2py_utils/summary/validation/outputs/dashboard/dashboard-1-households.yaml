@@ -20,21 +20,30 @@ layout:
       y: households
       groupBy: dataset
     description: 'Total: households by number of vehicles owned'
-  household_characteristics:
   - type: bar
-    title: Auto Ownership by Household Size - Share
+    title: Auto Ownership by Income - Share
     props:
-      dataset: auto_ownership_by_household_size.csv
+      dataset: auto_ownership_by_income.csv
       x: num_vehicles
       y: share
-      columns: num_persons
+      columns: income_category_bin
       groupBy: dataset
-    description: 'Share: vehicle ownership by household size'
+    description: 'Share: households by vehicle ownership and income category'
+  - type: bar
+    title: Auto Ownership by Income - Total
+    props:
+      dataset: auto_ownership_by_income.csv
+      x: num_vehicles
+      y: households
+      columns: income_category_bin
+      groupBy: dataset
+    description: 'Total: households by vehicle ownership and income category'
+  household_characteristics:
   - type: bar
     title: Households by Size - Share
     props:
       dataset: household_size_regional.csv
-      x: num_persons
+      x: household_size
       y: share
       groupBy: dataset
     description: 'Share: households by size'
@@ -42,7 +51,7 @@ layout:
     title: Households by Size - Total
     props:
       dataset: household_size_regional.csv
-      x: num_persons
+      x: household_size
       y: households
       groupBy: dataset
     description: 'Total: households by size'

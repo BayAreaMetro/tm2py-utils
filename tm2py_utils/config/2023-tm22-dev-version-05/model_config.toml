@@ -48,8 +48,10 @@
     TNC_ZPV_factor = 0.7
     ctramp_hh_file = "ctramp_output/householdData_{iteration}.csv"
 	highway_maz_ctramp_output_file = "ctramp_output/auto_{period}_MAZ_AUTO_{number}_{period}.omx"
-    sample_rate_by_iteration = [0.05, 0.5 , 1.0, 0.02, 0.02,]
 
+    # sample rate by iteration
+    sample_rate_by_iteration = [0.15, 0.25, 0.50]
+	
     # demand matrices for assignment
     highway_demand_file = "demand_matrices/highway/household/TAZ_Demand_{period}_{iter}.omx"
     active_demand_file = "demand_matrices/active/nm_demand_{period}.omx"
@@ -509,8 +511,8 @@
     output_skim_path = "skim_matrices/highway"
     output_skim_filename_tmpl = "HWYSKM{time_period}_taz.omx"
     output_skim_matrixname_tmpl = "{time_period}_{mode}_{property}"
+    network_acceleration = false
     max_iterations = 100
-    network_acceleration = true
     # labels entire highway network (any of the classes) + MAZ connectors
     generic_highway_mode_code = "c"
     # include other MAZs to estimate density (pop+jobs*2.5)/acres for each MAZ
@@ -520,6 +522,9 @@
     # reliability
     reliability = true
     apply_msa_demand = true
+    # model ID to Emme node ID crosswalk written out in network build process
+    model_to_emme_node_id_xwalk = "emme_project/Database_highway/emme_drive_network_node_id_crosswalk.csv"
+    output_node_sequential_id_xwalk = "inputs/hwy/mtc_final_network_zone_seq.csv"
     [highway.tolls]
         file_path = "inputs/hwy/tolls.csv"
         src_vehicle_group_names = ["da", "s2",  "s3",  "vsm", "sml", "med", "lrg"]
@@ -921,11 +926,13 @@
             source = "household"
             name = "WLK_TRN_KNR"
 
-[post_processor]
-    network_shapefile_path = "output_summaries/network_shapefile_{iteration}_{period}.shp"
-    boardings_by_segment_file_path = "output_summaries/boardings_by_segment_{iteration}_{period}.csv"
-    boardings_by_segment_geofile_path = "output_summaries/boardings_by_segment_{iteration}_{period}.shp"
 
+[post_processor]
+    network_shapefile_path = "output_summaries/Scenario_{period}/"
+    boardings_by_segment_file_path = "output_summaries/Scenario_{period}/transit_segments.csv"
+    boardings_by_segment_geofile_path = "output_summaries/boardings_by_segment_{period}.geojson"
+
+	
 [emme]
     num_processors = "MAX-1"
     num_processors_transit_skim = "32"
@@ -936,6 +943,20 @@
     active_south_database_path = "emme_project/Database_active_south/emmebank"
     transit_database_path = "emme_project/Database_transit/emmebank"
 
+    #[[emme.highway_distribution]]
+    #    time_periods = ["AM"]
+    #    num_processors = "MAX/3"
+    #[[emme.highway_distribution]]
+    #    time_periods = ["PM"]
+    #    num_processors = "MAX/3"
+    #[[emme.highway_distribution]]
+    #    time_periods = ["EA", "MD", "EV"]
+    #    num_processors = "MAX/3"	
+		
+    [[emme.highway_distribution]]
+        time_periods = ["EA", "AM", "MD", "PM", "EV"]
+        num_processors = "MAX-1"
+		
 # see [issue #5](https://github.com/BayAreaMetro/travel-model-two-config/issues/5) for documentation on assumptions
 [[highway.capclass_lookup]]
 	capclass = 0
@@ -1244,7 +1265,7 @@
     description = "knrdummy"
     type = "KNR_dummy"
     assign_type = "AUX_TRANSIT"
-    speed_or_time_factor = "ul1*1"
+    speed_or_time_factor = 40.0
 [[transit.modes]]
     mode_id = "w"
     name = "walk"

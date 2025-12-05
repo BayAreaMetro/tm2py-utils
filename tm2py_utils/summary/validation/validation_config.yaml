@@ -125,10 +125,10 @@ custom_summaries:
   - name: "auto_ownership_by_income"
     description: "Auto ownership by income category"
     data_source: "households"
-    group_by: ["income_category", "num_vehicles"]
+    group_by: ["income_category_bin", "num_vehicles"]
     weight_field: "sample_rate"
     count_name: "households"
-    share_within: "income_category"
+    share_within: "income_category_bin"
     bins:
       income_category:
         breaks: [0, 30000, 60000, 100000, 150000, 1000000000]
@@ -143,11 +143,41 @@ custom_summaries:
     count_name: "households"
     share_within: "num_persons"
   
+  # Auto ownership by household size (ACS-comparable categories: 1, 2, 3, 4+)
+  # Uses aggregated household sizes matching ACS reporting categories
+  - name: "auto_ownership_by_household_size_acs"
+    description: "Auto ownership by household size (ACS categories)"
+    data_source: "households"
+    group_by: ["num_persons_agg", "num_vehicles"]
+    weight_field: "sample_rate"
+    count_name: "households"
+    share_within: "num_persons_agg"
+  
+  # Auto ownership by household size and county (ACS-comparable)
+  # Groups by county for county-level comparison with ACS data
+  - name: "auto_ownership_by_household_size_county"
+    description: "Auto ownership by household size and county (ACS categories)"
+    data_source: "households"
+    group_by: ["county_name", "num_persons_agg", "num_vehicles"]
+    weight_field: "sample_rate"
+    count_name: "households"
+    share_within: ["county_name", "num_persons_agg"]
+  
+  # Auto ownership by county (overall)
+  # Aggregates across all household sizes for county-level comparison
+  - name: "auto_ownership_by_county"
+    description: "Auto ownership by county (overall, all household sizes)"
+    data_source: "households"
+    group_by: ["county_name", "num_vehicles"]
+    weight_field: "sample_rate"
+    count_name: "households"
+    share_within: "county_name"
+  
   # Household size distribution
   - name: "household_size_regional"
     description: "Regional household size distribution"
     data_source: "households"
-    group_by: "num_persons"
+    group_by: "num_persons_agg"
     weight_field: "sample_rate"
     count_name: "households"
   
@@ -194,6 +224,15 @@ custom_summaries:
     description: "Tour mode by purpose cross-tabulation"
     data_source: "individual_tours"
     group_by: ["tour_purpose", "tour_mode"]
+    weight_field: "sample_rate"
+    count_name: "tours"
+    share_within: "tour_purpose"
+  
+  # Tour mode by purpose (aggregated/simplified)
+  - name: "tour_mode_by_purpose_aggregated"
+    description: "Tour mode by purpose cross-tabulation (simplified categories)"
+    data_source: "individual_tours"
+    group_by: ["tour_purpose", "tour_mode_agg"]
     weight_field: "sample_rate"
     count_name: "tours"
     share_within: "tour_purpose"
@@ -269,6 +308,15 @@ custom_summaries:
     description: "Trip mode by purpose cross-tabulation"
     data_source: "individual_trips"
     group_by: ["destination_purpose", "trip_mode"]
+    weight_field: "sample_rate"
+    count_name: "trips"
+    share_within: "destination_purpose"
+  
+  # Trip mode by purpose (aggregated/simplified)
+  - name: "trip_mode_by_purpose_aggregated"
+    description: "Trip mode by purpose cross-tabulation (simplified categories)"
+    data_source: "individual_trips"
+    group_by: ["destination_purpose", "trip_mode_agg"]
     weight_field: "sample_rate"
     count_name: "trips"
     share_within: "destination_purpose"
