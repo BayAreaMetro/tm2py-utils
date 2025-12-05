@@ -114,6 +114,13 @@ class DashboardPipeline:
             acs_county_formatted = acs_county.copy()
             acs_county_formatted['dataset'] = 'ACS 2023 Observed'
             
+            # Map num_persons to num_persons_agg to match model format
+            if 'num_persons' in acs_county_formatted.columns and 'num_persons_agg' not in acs_county_formatted.columns:
+                # Apply same aggregation logic: 1, 2, 3, 4+
+                acs_county_formatted['num_persons_agg'] = acs_county_formatted['num_persons'].apply(
+                    lambda x: '4+' if x >= 4 else str(x)
+                )
+            
             combined_county = pd.concat([model_county, acs_county_formatted[['county', 'num_persons_agg', 'num_vehicles', 'households', 'share', 'dataset']]], ignore_index=True)
             combined_county.to_csv(f'{self.dashboard_dir}/auto_ownership_by_household_size_county.csv', index=False)
             logger.info("✓ Updated auto_ownership_by_household_size_county.csv with ACS data")
@@ -164,14 +171,23 @@ class DashboardPipeline:
             # Household size summary
             logger.info("📊 Processing household size summary...")
             acs_hh_size_detail = pd.read_csv('tm2py_utils/summary/validation/outputs/observed/acs_auto_ownership_by_household_size_regional.csv')
+            
+            # Map num_persons to num_persons_agg if needed
+            if 'num_persons' in acs_hh_size_detail.columns and 'num_persons_agg' not in acs_hh_size_detail.columns:
+                acs_hh_size_detail['num_persons_agg'] = acs_hh_size_detail['num_persons'].apply(
+                    lambda x: '4+' if x >= 4 else str(x)
+                )
+            
             acs_hh_size = acs_hh_size_detail.groupby(['num_persons_agg'])['households'].sum().reset_index()
             acs_hh_size['share'] = acs_hh_size['households'] / acs_hh_size['households'].sum() * 100
             acs_hh_size['dataset'] = 'ACS 2023 Observed'
             
             model_hh_size = pd.read_csv(f'{self.dashboard_dir}/household_size_regional.csv')
-            # Fix column name issue
+            # Fix column name issue - map any old column names to expected format
             if 'household_size' in model_hh_size.columns:
                 model_hh_size = model_hh_size.rename(columns={'household_size': 'num_persons_agg'})
+            if 'num_persons' in model_hh_size.columns and 'num_persons_agg' not in model_hh_size.columns:
+                model_hh_size = model_hh_size.rename(columns={'num_persons': 'num_persons_agg'})
             
             combined_hh_size = pd.concat([model_hh_size, acs_hh_size[['num_persons_agg', 'households', 'share', 'dataset']]], ignore_index=True)
             combined_hh_size.to_csv(f'{self.dashboard_dir}/household_size_regional.csv', index=False)
@@ -193,8 +209,21 @@ class DashboardPipeline:
         logger.info("=" * 60)
         
         try:
-            exec(open('pivot_dashboard_data.py').read())
+            # Run the pivot script as a subprocess to avoid import issues
+            result = subprocess.run(
+                ["python", "pivot_dashboard_data.py"], 
+                capture_output=True, 
+                text=True
+            )
+            
+            if result.returncode != 0:
+                logger.error(f"Pivot script failed: {result.stderr}")
+                raise RuntimeError("Data pivoting failed")
+                
             logger.info("✅ Data pivoting completed successfully")
+            if result.stdout:
+                logger.info(f"Pivot output: {result.stdout}")
+                
         except Exception as e:
             logger.error(f"❌ Data pivoting failed: {e}")
             raise
