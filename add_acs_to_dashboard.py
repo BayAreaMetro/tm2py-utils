@@ -24,11 +24,16 @@ print("✓ Updated auto_ownership_regional.csv with ACS data")
 
 # 2. ACS comparison dataset (already exists)
 acs_comparison = pd.read_csv('tm2py_utils/summary/validation/outputs/dashboard/auto_ownership_by_household_size_acs.csv')
+# Remove existing ACS data to avoid duplication
+acs_comparison = acs_comparison[acs_comparison['dataset'] != 'ACS 2023 Observed']
+
 acs_data = pd.read_csv('tm2py_utils/summary/validation/outputs/observed/acs_auto_ownership_by_household_size_regional.csv')
 
 # Add ACS data to the comparison dataset
 acs_data_formatted = acs_data.copy()
-acs_data_formatted['num_persons_agg'] = acs_data_formatted['num_persons']  # ACS already has 1,2,3,4+ format
+acs_data_formatted['num_persons_agg'] = acs_data_formatted['num_persons'].astype(str)
+# Fix household size labels to match model data (4 -> 4+)
+acs_data_formatted['num_persons_agg'] = acs_data_formatted['num_persons_agg'].replace('4', '4+')
 acs_data_formatted['dataset'] = 'ACS 2023 Observed'
 
 combined_acs = pd.concat([acs_comparison, acs_data_formatted[['num_persons_agg', 'num_vehicles', 'households', 'share', 'dataset']]], ignore_index=True)
@@ -37,11 +42,16 @@ print("✓ Updated auto_ownership_by_household_size_acs.csv with ACS data")
 
 # 3. County comparison with ACS
 model_county = pd.read_csv('tm2py_utils/summary/validation/outputs/dashboard/auto_ownership_by_household_size_county.csv')
+# Remove existing ACS data to avoid duplication
+model_county = model_county[model_county['dataset'] != 'ACS 2023 Observed']
+
 acs_county = pd.read_csv('tm2py_utils/summary/validation/outputs/observed/acs_auto_ownership_by_household_size_county.csv')
 
 # Add ACS county data
 acs_county_formatted = acs_county.copy()
-acs_county_formatted['num_persons_agg'] = acs_county_formatted['num_persons']
+acs_county_formatted['num_persons_agg'] = acs_county_formatted['num_persons'].astype(str)
+# Fix household size labels to match model data (4 -> 4+)
+acs_county_formatted['num_persons_agg'] = acs_county_formatted['num_persons_agg'].replace('4', '4+')
 acs_county_formatted['dataset'] = 'ACS 2023 Observed'
 
 combined_county = pd.concat([model_county, acs_county_formatted[['county', 'num_persons_agg', 'num_vehicles', 'households', 'share', 'dataset']]], ignore_index=True)

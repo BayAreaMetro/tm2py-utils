@@ -36,10 +36,27 @@ layout:
       dataset: auto_ownership_by_household_size_county.csv
       x: county
       y: share
-      groupBy: dataset
+      facet: dataset
       filter: "num_vehicles == 0 and num_persons_agg == '1'"
     description: 'County comparison: 1-person households with 0 vehicles (model vs ACS)'
   household_characteristics:
+  - type: bar
+    title: Households by Size (with ACS Validation)
+    props:
+      dataset: auto_ownership_by_household_size_acs.csv
+      x: num_persons_agg
+      y: households
+      groupBy: dataset
+    description: 'Total households by size: Model vs ACS observed data'
+  - type: bar
+    title: Households by Income Category (Model Data)
+    props:
+      dataset: auto_ownership_by_income.csv
+      x: income_category_bin
+      y: households
+      groupBy: dataset
+      filter: "dataset != 'ACS 2023 Observed'"
+    description: 'Total households by income bracket (2015 vs 2023 model runs)'
   - type: bar
     title: Households by Size - Share
     props:
