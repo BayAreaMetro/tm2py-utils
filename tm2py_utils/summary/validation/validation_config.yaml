@@ -228,6 +228,15 @@ custom_summaries:
     count_name: "tours"
     share_within: "tour_purpose"
   
+  # Tour mode by purpose (aggregated/simplified)
+  - name: "tour_mode_by_purpose_aggregated"
+    description: "Tour mode by purpose cross-tabulation (simplified categories)"
+    data_source: "individual_tours"
+    group_by: ["tour_purpose", "tour_mode_agg"]
+    weight_field: "sample_rate"
+    count_name: "tours"
+    share_within: "tour_purpose"
+  
   # Tour start time
   - name: "tour_start_time"
     description: "Tour departure time distribution"
@@ -299,6 +308,15 @@ custom_summaries:
     description: "Trip mode by purpose cross-tabulation"
     data_source: "individual_trips"
     group_by: ["destination_purpose", "trip_mode"]
+    weight_field: "sample_rate"
+    count_name: "trips"
+    share_within: "destination_purpose"
+  
+  # Trip mode by purpose (aggregated/simplified)
+  - name: "trip_mode_by_purpose_aggregated"
+    description: "Trip mode by purpose cross-tabulation (simplified categories)"
+    data_source: "individual_trips"
+    group_by: ["destination_purpose", "trip_mode_agg"]
     weight_field: "sample_rate"
     count_name: "trips"
     share_within: "destination_purpose"

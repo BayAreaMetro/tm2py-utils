@@ -40,34 +40,34 @@ layout:
   - type: bar
     title: Tours by Mode - Share
     props:
-      dataset: tour_mode_choice.csv
-      x: tour_mode
+      dataset: tour_mode_choice_aggregated.csv
+      x: tour_mode_agg
       y: share
       groupBy: dataset
-    description: 'Share: tour mode distribution'
+    description: 'Share: tour mode distribution (aggregated categories)'
   - type: bar
     title: Tours by Mode - Total
     props:
-      dataset: tour_mode_choice.csv
-      x: tour_mode
+      dataset: tour_mode_choice_aggregated.csv
+      x: tour_mode_agg
       y: tours
       groupBy: dataset
-    description: 'Total: tour mode distribution'
+    description: 'Total: tour mode distribution (aggregated categories)'
   - type: bar
     title: Tour Mode by Purpose - Share
     props:
-      dataset: tour_mode_by_purpose.csv
+      dataset: tour_mode_by_purpose_aggregated.csv
       x: tour_purpose
       y: share
-      columns: tour_mode
+      columns: tour_mode_agg
       groupBy: dataset
-    description: 'Share: mode choice by tour purpose'
+    description: 'Share: mode choice by tour purpose (aggregated categories)'
   - type: bar
     title: Tour Mode by Purpose - Total
     props:
-      dataset: tour_mode_by_purpose.csv
+      dataset: tour_mode_by_purpose_aggregated.csv
       x: tour_purpose
       y: tours
-      columns: tour_mode
+      columns: tour_mode_agg
       groupBy: dataset
-    description: 'Total: mode choice by tour purpose'
+    description: 'Total: mode choice by tour purpose (aggregated categories)'
