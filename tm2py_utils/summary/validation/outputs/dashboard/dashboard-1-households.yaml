@@ -40,18 +40,11 @@ layout:
     description: 'Total: households by vehicle ownership and income category'
   household_characteristics:
   - type: bar
-    title: Households by Size - Share
+    title: Households by Size and Vehicle Ownership (with ACS Validation)
     props:
-      dataset: household_size_regional.csv
-      x: num_persons
+      dataset: auto_ownership_by_household_size_acs.csv
+      x: num_persons_agg
       y: share
       groupBy: dataset
-    description: 'Share: households by size'
-  - type: bar
-    title: Households by Size - Total
-    props:
-      dataset: household_size_regional.csv
-      x: num_persons
-      y: households
-      groupBy: dataset
-    description: 'Total: households by size'
+      facet: num_vehicles
+    description: 'Household size distribution by vehicle ownership: Model vs ACS validation'

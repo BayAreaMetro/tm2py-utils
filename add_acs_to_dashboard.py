@@ -83,5 +83,25 @@ combined_county_agg = pd.concat([model_county_agg, acs_county_agg[['county', 'nu
 combined_county_agg.to_csv('tm2py_utils/summary/validation/outputs/dashboard/auto_ownership_by_county.csv', index=False)
 print("✓ Updated auto_ownership_by_county.csv with ACS data")
 
+# 5. Household size regional with ACS
+model_hh_size = pd.read_csv('tm2py_utils/summary/validation/outputs/dashboard/household_size_regional.csv')
+# Remove existing ACS data to avoid duplication
+model_hh_size = model_hh_size[model_hh_size['dataset'] != 'ACS 2023 Observed']
+
+# Create ACS household size data from the detailed auto ownership data
+acs_hh_size_detail = pd.read_csv('tm2py_utils/summary/validation/outputs/observed/acs_auto_ownership_by_household_size_regional.csv')
+acs_hh_size = acs_hh_size_detail.groupby('num_persons').agg({
+    'households': 'sum'
+}).reset_index()
+
+# Calculate shares
+total_acs_hh = acs_hh_size['households'].sum()
+acs_hh_size['share'] = (acs_hh_size['households'] / total_acs_hh) * 100
+acs_hh_size['dataset'] = 'ACS 2023 Observed'
+
+combined_hh_size = pd.concat([model_hh_size, acs_hh_size[['num_persons', 'households', 'share', 'dataset']]], ignore_index=True)
+combined_hh_size.to_csv('tm2py_utils/summary/validation/outputs/dashboard/household_size_regional.csv', index=False)
+print("✓ Updated household_size_regional.csv with ACS data")
+
 print("\n✅ Dashboard datasets now include ACS observed data for validation comparison")
 print("Dashboard will show: 2015 Model | 2023 Model | ACS 2023 Observed")
