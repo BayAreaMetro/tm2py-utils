@@ -177,7 +177,7 @@ custom_summaries:
   - name: "household_size_regional"
     description: "Regional household size distribution"
     data_source: "households"
-    group_by: "num_persons"
+    group_by: "num_persons_agg"
     weight_field: "sample_rate"
     count_name: "households"
   
