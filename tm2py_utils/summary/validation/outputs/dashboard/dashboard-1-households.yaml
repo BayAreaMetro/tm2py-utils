@@ -19,16 +19,16 @@ layout:
       x: income_category_bin
       y: share
       groupBy: dataset
-      facet: num_vehicles
+      columns: num_vehicles
     description: 'Model comparison: Vehicle ownership across income brackets (<30K to 150K+)'
   - type: bar
     title: Auto Ownership by Household Size (ACS Validation)
     props:
       dataset: auto_ownership_by_household_size_acs.csv
-      x: num_vehicles
+      x: num_persons_agg
       y: share
       groupBy: dataset
-      facet: num_persons_agg
+      columns: num_vehicles
     description: 'Model vs ACS validation: Vehicle ownership by household size (1,2,3,4+ categories)'
   - type: bar
     title: County-Level Auto Ownership (0-Vehicle Households)
@@ -37,7 +37,7 @@ layout:
       x: county
       y: share
       groupBy: dataset
-      filter: "num_vehicles == 0 and num_persons_agg == 1"
+      filter: "num_vehicles == 0 and num_persons_agg == '1'"
     description: 'County comparison: 1-person households with 0 vehicles (model vs ACS)'
   household_characteristics:
   - type: bar
