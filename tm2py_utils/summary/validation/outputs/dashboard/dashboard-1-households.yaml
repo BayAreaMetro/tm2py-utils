@@ -1,62 +1,44 @@
 header:
   tab: Households
   title: Household Summary Statistics
-  description: Household demographics and auto ownership patterns (multi-run comparison with ACS validation)
+  description: Household demographics and auto ownership patterns (multi-run comparison)
 layout:
   auto_ownership:
   - type: bar
-    title: Households by Vehicle Ownership - Share (with ACS Observed)
+    title: Households by Vehicle Ownership - Share
     props:
       dataset: auto_ownership_regional.csv
       x: num_vehicles
       y: share
       groupBy: dataset
-    description: 'Share: households by number of vehicles owned (2015, 2023, ACS observed)'
+    description: 'Share: households by number of vehicles owned'
   - type: bar
-    title: Auto Ownership by Income Level
+    title: Households by Vehicle Ownership - Total
+    props:
+      dataset: auto_ownership_regional.csv
+      x: num_vehicles
+      y: households
+      groupBy: dataset
+    description: 'Total: households by number of vehicles owned'
+  - type: bar
+    title: Auto Ownership by Income - Share
     props:
       dataset: auto_ownership_by_income.csv
-      x: income_category_bin
+      x: num_vehicles
       y: share
+      columns: income_category_bin
       groupBy: dataset
-      columns: num_vehicles
-    description: 'Model comparison: Vehicle ownership across income brackets (<30K to 150K+)'
+    description: 'Share: households by vehicle ownership and income category'
   - type: bar
-    title: Auto Ownership by Household Size (ACS Validation)
+    title: Auto Ownership by Income - Total
     props:
-      dataset: auto_ownership_by_household_size_acs.csv
-      x: num_persons_agg
-      y: share
+      dataset: auto_ownership_by_income.csv
+      x: num_vehicles
+      y: households
+      columns: income_category_bin
       groupBy: dataset
-      columns: num_vehicles
-    description: 'Model vs ACS validation: Vehicle ownership by household size (1,2,3,4+ categories)'
-  - type: bar
-    title: County-Level Auto Ownership (0-Vehicle Households)
-    props:
-      dataset: auto_ownership_by_household_size_county.csv
-      x: county
-      y: share
-      facet: dataset
-      filter: "num_vehicles == 0 and num_persons_agg == '1'"
-    description: 'County comparison: 1-person households with 0 vehicles (model vs ACS)'
+    description: 'Total: households by vehicle ownership and income category'
   household_characteristics:
-  - type: bar
-    title: Households by Size (with ACS Validation)
-    props:
-      dataset: auto_ownership_by_household_size_acs.csv
-      x: num_persons_agg
-      y: households
-      groupBy: dataset
-    description: 'Total households by size: Model vs ACS observed data'
-  - type: bar
-    title: Households by Income Category (Model Data)
-    props:
-      dataset: auto_ownership_by_income.csv
-      x: income_category_bin
-      y: households
-      groupBy: dataset
-      filter: "dataset != 'ACS 2023 Observed'"
-    description: 'Total households by income bracket (2015 vs 2023 model runs)'
   - type: bar
     title: Households by Size - Share
     props:

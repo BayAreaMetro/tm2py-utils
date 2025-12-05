@@ -163,6 +163,16 @@ custom_summaries:
     count_name: "households"
     share_within: ["county_name", "num_persons_agg"]
   
+  # Auto ownership by county (overall)
+  # Aggregates across all household sizes for county-level comparison
+  - name: "auto_ownership_by_county"
+    description: "Auto ownership by county (overall, all household sizes)"
+    data_source: "households"
+    group_by: ["county_name", "num_vehicles"]
+    weight_field: "sample_rate"
+    count_name: "households"
+    share_within: "county_name"
+  
   # Household size distribution
   - name: "household_size_regional"
     description: "Regional household size distribution"

@@ -4,6 +4,7 @@ auto_ownership_by_income_2023 TM2.2 v05,auto_ownership_by_income_2023 TM2.2 v05.
 auto_ownership_by_household_size_2023 TM2.2 v05,auto_ownership_by_household_size_2023 TM2.2 v05.csv,50,5,Summary table: auto_ownership_by_household_size_2023 TM2.2 v05
 auto_ownership_by_household_size_acs_2023 TM2.2 v05,auto_ownership_by_household_size_acs_2023 TM2.2 v05.csv,20,5,Summary table: auto_ownership_by_household_size_acs_2023 TM2.2 v05
 auto_ownership_by_household_size_county_2023 TM2.2 v05,auto_ownership_by_household_size_county_2023 TM2.2 v05.csv,179,6,Summary table: auto_ownership_by_household_size_county_2023 TM2.2 v05
+auto_ownership_by_county_2023 TM2.2 v05,auto_ownership_by_county_2023 TM2.2 v05.csv,45,5,Summary table: auto_ownership_by_county_2023 TM2.2 v05
 household_size_regional_2023 TM2.2 v05,household_size_regional_2023 TM2.2 v05.csv,11,4,Summary table: household_size_regional_2023 TM2.2 v05
 income_distribution_2023 TM2.2 v05,income_distribution_2023 TM2.2 v05.csv,5,4,Summary table: income_distribution_2023 TM2.2 v05
 tour_frequency_by_purpose_2023 TM2.2 v05,tour_frequency_by_purpose_2023 TM2.2 v05.csv,10,4,Summary table: tour_frequency_by_purpose_2023 TM2.2 v05
@@ -23,6 +24,7 @@ auto_ownership_by_income_2015 TM2.2 Sprint 04,auto_ownership_by_income_2015 TM2.
 auto_ownership_by_household_size_2015 TM2.2 Sprint 04,auto_ownership_by_household_size_2015 TM2.2 Sprint 04.csv,72,5,Summary table: auto_ownership_by_household_size_2015 TM2.2 Sprint 04
 auto_ownership_by_household_size_acs_2015 TM2.2 Sprint 04,auto_ownership_by_household_size_acs_2015 TM2.2 Sprint 04.csv,20,5,Summary table: auto_ownership_by_household_size_acs_2015 TM2.2 Sprint 04
 auto_ownership_by_household_size_county_2015 TM2.2 Sprint 04,auto_ownership_by_household_size_county_2015 TM2.2 Sprint 04.csv,180,6,Summary table: auto_ownership_by_household_size_county_2015 TM2.2 Sprint 04
+auto_ownership_by_county_2015 TM2.2 Sprint 04,auto_ownership_by_county_2015 TM2.2 Sprint 04.csv,45,5,Summary table: auto_ownership_by_county_2015 TM2.2 Sprint 04
 household_size_regional_2015 TM2.2 Sprint 04,household_size_regional_2015 TM2.2 Sprint 04.csv,15,4,Summary table: household_size_regional_2015 TM2.2 Sprint 04
 income_distribution_2015 TM2.2 Sprint 04,income_distribution_2015 TM2.2 Sprint 04.csv,5,4,Summary table: income_distribution_2015 TM2.2 Sprint 04
 tour_frequency_by_purpose_2015 TM2.2 Sprint 04,tour_frequency_by_purpose_2015 TM2.2 Sprint 04.csv,10,4,Summary table: tour_frequency_by_purpose_2015 TM2.2 Sprint 04
