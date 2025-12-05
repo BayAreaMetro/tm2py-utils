@@ -47,9 +47,9 @@ def load_maz_shp():
         gpd.GeoDataFrame: MAZ polygons with MAZ/TAZ ids
     """
     print(f"Loading maz shapefile...")
-    maz_shp = os.path.join(MAZ_TAZ_DIR, "mazs_TM2_2_4.shp")
+    maz_shp = os.path.join(MAZ_TAZ_DIR, "mazs_TM2_2_5.shp")
     maz = gpd.read_file(maz_shp).to_crs(ANALYSIS_CRS)
-    maz = maz[["maz", "taz", "geometry"]]
+    maz = maz[["MAZ_NODE", "TAZ_NODE", "geometry"]]
 
     return maz
 
@@ -71,26 +71,26 @@ def spatil_join_firms_to_maz(firms, maz):
     firms = gpd.sjoin(firms, maz, how="left", predicate="within")
     firms = firms.drop(columns=['index_right'])
     print(f"Number of business records after spatial join to maz: {len(firms)}")
-    print(f"Number of firms successfully joined to a MAZ:", firms["maz"].notnull().sum())
+    print(f"Number of firms successfully joined to a MAZ:", firms["MAZ_NODE"].notnull().sum())
 
     # Spatial join 2 - nearest for any leftovers
-    firms_missed = firms[firms["maz"].isnull()]
+    firms_missed = firms[firms["MAZ_NODE"].isnull()]
     if len(firms_missed) > 0:
 
         print(f"Number of firms unsuccessfully joined to a MAZ: {len(firms_missed)}")
 
         # Ensure the missed subset is still a gdf; drop any null MAZ/TAZ columns left over from the first attempt
-        firms_missed = gpd.GeoDataFrame(firms_missed, geometry="geometry", crs=ANALYSIS_CRS).drop(columns=["maz", "taz"])
+        firms_missed = gpd.GeoDataFrame(firms_missed, geometry="geometry", crs=ANALYSIS_CRS).drop(columns=["MAZ_NODE", "TAZ_NODE"])
         
         print(f"Joining unmatched firms to nearest MAZ...")
         firms_nearest = gpd.sjoin_nearest(firms_missed, maz, how="left")
-        print(f"Number of unmatched firms after nearest join operation:", firms_nearest["maz"].isnull().sum())
+        print(f"Number of unmatched firms after nearest join operation:", firms_nearest["MAZ_NODE"].isnull().sum())
         firms_nearest = pd.DataFrame(firms_nearest)
 
         # Filter firms that successfully joined to maz in first step and concatenate results
-        firms = pd.DataFrame(firms[firms["maz"].notnull()])
+        firms = pd.DataFrame(firms[firms["MAZ_NODE"].notnull()])
         firms = pd.concat([firms, firms_nearest])
-        print(f"Total number firms now joined to a maz: ", firms["maz"].notnull().sum())
+        print(f"Total number firms now joined to a maz: ", firms["MAZ_NODE"].notnull().sum())
 
     return firms
 
@@ -107,27 +107,27 @@ def summarize_jobs_by_maz(firms_maz, maz):
     """
     print(f"Summarizing jobs by maz and steelhead categories...")
     # Reduce to needed columns and tally jobs
-    firms_maz = firms_maz[["maz", "taz", "steelhead", "EMPNUM"]]
+    firms_maz = firms_maz[["MAZ_NODE", "TAZ_NODE", "steelhead", "EMPNUM"]]
     print(f"Total jobs by steelhead category: ", firms_maz.groupby(["steelhead"], as_index=False)["EMPNUM"].sum())
-    jobs_maz = firms_maz.groupby(["maz", "taz", "steelhead"], as_index=False)["EMPNUM"].sum()
+    jobs_maz = firms_maz.groupby(["MAZ_NODE", "TAZ_NODE", "steelhead"], as_index=False)["EMPNUM"].sum()
    
     # Spread the steelhead column
-    jobs_maz = jobs_maz.pivot(index=["maz", "taz"], columns="steelhead", values="EMPNUM").reset_index()
+    jobs_maz = jobs_maz.pivot(index=["MAZ_NODE", "TAZ_NODE"], columns="steelhead", values="EMPNUM").reset_index()
 
     # Concatenate maz with jobs and maz w/o jobs so we have a full set of maz
-    maz_no_firms = maz[~maz["maz"].isin(firms_maz["maz"])].drop(columns="geometry")
+    maz_no_firms = maz[~maz["MAZ_NODE"].isin(firms_maz["MAZ_NODE"])].drop(columns="geometry")
     jobs_maz = pd.concat([jobs_maz, maz_no_firms]).reset_index(drop=True)
 
     # Remove trailing decimal and zero from ID cols
-    jobs_maz["maz"] = jobs_maz["maz"].astype(str).str.replace(r"\.0$", "", regex=True)
-    jobs_maz["taz"] = jobs_maz["taz"].astype(str).str.replace(r"\.0$", "", regex=True)
+    jobs_maz["MAZ_NODE"] = jobs_maz["MAZ_NODE"].astype(str).str.replace(r"\.0$", "", regex=True)
+    jobs_maz["TAZ_NODE"] = jobs_maz["TAZ_NODE"].astype(str).str.replace(r"\.0$", "", regex=True)
     jobs_maz = jobs_maz.fillna(0)
 
     # Create total jobs column
     jobs_maz["emp_total"] = jobs_maz.sum(axis=1, numeric_only=True)
     print(f"Total jobs in region from 2023 Esri Business Analyst dataset: ", jobs_maz["emp_total"].sum())
-    print(f"Total unique MAZ ids in unprocessed MAZ data: ", len(maz["maz"].unique()))
-    print(f"Total unique MAZ ids in processed MAZ data: ", len(jobs_maz["maz"].unique()))
+    print(f"Total unique MAZ ids in unprocessed MAZ data: ", len(maz["MAZ_NODE"].unique()))
+    print(f"Total unique MAZ ids in processed MAZ data: ", len(jobs_maz["MAZ_NODE"].unique()))
 
     return jobs_maz
 
@@ -146,7 +146,8 @@ def get_jobs_maz(write=False):
     firms_maz = spatil_join_firms_to_maz(firms, maz)
     jobs_maz = summarize_jobs_by_maz(firms_maz, maz)
     if write==True:
-        OUT_FILE = r"E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-version-05\landuse\jobs_maz_2023_v1.csv"
+        OUT_FILE = r"E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-version-05\landuse\jobs_maz_v2_5_2023.csv"
+        print(f"Writing employment MAZ data to: {OUT_FILE}")
         jobs_maz.to_csv(OUT_FILE)        
     return jobs_maz
 
