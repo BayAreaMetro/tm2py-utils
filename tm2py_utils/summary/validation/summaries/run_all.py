@@ -217,6 +217,13 @@ class DataLoader:
         else:
             logger.warning(f"  ⚠ Data model not found at {data_model_path}")
     
+    def _get_workspace_root(self) -> Path:
+        """Get the workspace root directory for finding geography files."""
+        # Go up from this file to find tm2py-utils root
+        # This file is at: tm2py_utils/summary/validation/summaries/run_all.py
+        # Workspace root is at: tm2py-utils/
+        return Path(__file__).parent.parent.parent.parent.parent
+    
     def _find_iteration_file(self, directory: Path, base_filename: str, iteration: Optional[int] = None) -> Optional[Path]:
         """Find file with specific or highest iteration number.
         
@@ -394,6 +401,18 @@ class DataLoader:
                     
                     # Apply aggregation specs to categorical variables
                     df = self._apply_aggregation_specs(df, file_type)
+                    
+                    # Join geography for households (adds county_name, district_name)
+                    if file_type == 'households' and self.data_model:
+                        try:
+                            df = self.data_model.join_geography(
+                                df, 
+                                join_col='home_mgra',
+                                geography_cols=['county_name', 'district_name'],
+                                workspace_root=self._get_workspace_root()
+                            )
+                        except Exception as e:
+                            logger.warning(f"    ⚠ Could not join geography: {e}")
                     
                     loaded_data[file_type] = df
                     logger.info(f"  ✓ Loaded {file_type}: {len(df):,} records from {file_path.name}")
