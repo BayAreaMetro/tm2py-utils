@@ -9,15 +9,23 @@ import itertools
 from pydantic import BaseModel, Field
 import logging
 from tm2py.config import Configuration
+import argparse
 
 ## TODO: Add logging
 ## TODO: Potentially move this to .toml configuration? Or reference .toml file
 
+parser = argparse.ArgumentParser()
+
+parser.add_argument('RunDirectory')
+parser.add_argument('--iteration', '-i', help = 'Iteration Number', default = 3, )
+args = parser.parse_args()
 # TM2 Test Directory
 #TARGET_DIR = "E:/TM2/2015_TM2_20250619"
-TARGET_DIR = "E:/Box/Modeling and Surveys/Development/Travel Model Two Conversion/Model Outputs/2015-tm22-dev-sprint-04"
+TARGET_DIR = args.RunDirectory
+#TARGET_DIR = "E:/Box/Modeling and Surveys/Development/Travel Model Two Conversion/Model Outputs/2015-tm22-dev-sprint-04"
 #TARGET_DIR = 'V:/Projects/2050_TM161_FBP_Plan_16'
-ITER = 3
+ITER = args.iteration
+
 #SAMPLESHARE = 0.1
 
 class Config:
@@ -30,7 +38,7 @@ class Config:
         _scenario_config = os.path.join(TARGET_DIR, 'scenario_config.toml')
         self.config = Configuration.load_toml([_scenario_config, _model_config])
         self.target_dir = TARGET_DIR
-        self.iter = ITER
+        self.iter = int(ITER)
         self.sampleshare = self.config.household.sample_rate_by_iteration[self.iter - 1]
         self.timeperiod = pd.DataFrame(self.config.time_periods)
         self.income_quartiles = pd.DataFrame(self.config.household.income_segment)
@@ -148,7 +156,7 @@ class DataReader:
         tours = pd.concat([jointTours, indivTours], ignore_index=True)
 
         #tours.rename(columns = {'orig_mgra': 'origin_MAZ_SEQ', 'dest_mgra':'destination_MAZ_SEQ'}, inplace = True)
-        
+        print(tours.columns)
         # Add Residence Landuse Info
         logging.info("Adding residence land use info to tours")
         tours = tours.merge(households[['hh_id', 'CountyID', 'DistID', 'incQ']], on='hh_id', how='left', validate=  'many_to_one')
@@ -218,7 +226,7 @@ class DataReader:
         ct_file = self.config.main_dir / f"householdData_{self.config.iter}.csv"
 
         input_pop_hh = pd.read_csv(popsyn_file)
-        input_pop_hh.rename(columns={'HHID': 'hh_id', 'MAZ': 'MAZ_SEQ', 'TAZ': 'TAZ_SEQ', 'ORIG_MAZ': 'MAZ_NODE', 'ORIG_TAZ': 'TAZ_NODE'}, inplace=True)
+        input_pop_hh.rename(columns={'HHID': 'hh_id', 'MAZ': 'MAZ_SEQ', 'TAZ': 'TAZ_SEQ', 'ORIG_MAZ': 'MAZ_NODE', 'ORIG_TAZ': 'TAZ_NODE', 'MAZ_ORIGINAL': 'MAZ_NODE', 'TAZ_ORIGINAL': 'TAZ_NODE'}, inplace=True)
 
         output_ct_hh = pd.read_csv(ct_file)
         output_ct_hh.rename(columns = {'home_mgra': 'HOME_MAZ_SEQ'}, inplace = True)
@@ -226,6 +234,8 @@ class DataReader:
 
         # Join input and output datasets
         households = input_pop_hh.merge(output_ct_hh, left_on = 'hh_id', right_on = 'hh_id', how = 'inner', validate = 'one_to_one')
+
+        print(households.columns)
 
         logging.info(f"Read input household files; have {len(households):,} rows")
         # Add land use data
@@ -569,7 +579,6 @@ class SummaryGenerator:
     def generate_activity_pattern_summary(self, persons: pd.DataFrame) -> None:
         """
         Generate activity pattern summary.
-
         Universe: Persons
         
         Args:
