@@ -8,33 +8,65 @@ import openmatrix as omx
 import itertools
 from pydantic import BaseModel, Field
 import logging
-from tm2py.config import TimePeriodConfig, HouseholdConfig
+from tm2py.config import Configuration
+import argparse
 
 ## TODO: Add logging
 ## TODO: Potentially move this to .toml configuration? Or reference .toml file
 
+parser = argparse.ArgumentParser()
+
+parser.add_argument('RunDirectory')
+parser.add_argument('--iteration', '-i', help = 'Iteration Number', default = 3, )
+args = parser.parse_args()
 # TM2 Test Directory
 #TARGET_DIR = "E:/TM2/2015_TM2_20250619"
-TARGET_DIR = "E:/Box/Modeling and Surveys/Development/Travel Model Two Conversion/Model Outputs/2015-tm22-dev-sprint-04"
+TARGET_DIR = args.RunDirectory
+#TARGET_DIR = "E:/Box/Modeling and Surveys/Development/Travel Model Two Conversion/Model Outputs/2015-tm22-dev-sprint-04"
 #TARGET_DIR = 'V:/Projects/2050_TM161_FBP_Plan_16'
-ITER = 3
+ITER = args.iteration
+
 #SAMPLESHARE = 0.1
 
 class Config:
     """Configuration class for model parameters and paths."""
     ## TODO: These will most likely change for TM2
 
-    def __init__(self, timeperiod_config, household_config):
+    def __init__(self):
         # Environment variables
+        _model_config = os.path.join(TARGET_DIR, 'model_config.toml')
+        _scenario_config = os.path.join(TARGET_DIR, 'scenario_config.toml')
+        self.config = Configuration.load_toml([_scenario_config, _model_config])
         self.target_dir = TARGET_DIR
-        self.iter = ITER
-        self.sampleshare = float(os.getenv("SAMPLESHARE", "1.0"))
-        self.timeperiod = timeperiod_config
+        self.iter = int(ITER)
+        self.sampleshare = self.config.household.sample_rate_by_iteration[self.iter - 1]
+        self.timeperiod = pd.DataFrame(self.config.time_periods)
+        self.income_quartiles = pd.DataFrame(self.config.household.income_segment)
+        self.modes = pd.DataFrame(self.config.household.ctramp_mode_names.items(), columns = ['code', 'mode'])
+
+
         
+        # Adding additional lookups
+        # Counties
+        self.county = pd.DataFrame({
+            'COUNTY': [1, 2, 3, 4, 5, 6, 7, 8, 9],
+            'county_name': ['San Francisco', 'San Mateo', 'Santa Clara', 'Alameda',
+                           'Contra Costa', 'Solano', 'Napa', 'Sonoma', 'Marin']
+        })
+
+        # Auto sufficiency
+        self.autosuff = pd.DataFrame({
+            'autoSuff': [0, 1, 2],
+            'autoSuff_label': ['Zero automobiles', 'Automobiles < workers', 'Automobiles >= workers']
+        })
+        
+                
+
         # Validate required parameters
         if not self.target_dir or not self.iter or not self.sampleshare:
             raise ValueError("TARGET_DIR, ITER, and SAMPLESHARE environment variables must be set")
         
+
         # Directory paths
         self.target_dir = self.target_dir.replace("\\", "/")
         self.main_dir = Path(self.target_dir) / "ctramp_output"
@@ -48,97 +80,31 @@ class Config:
         # Parse means-based cost factors
         #self._parse_cost_factors()
         
-        print(f"TARGET_DIR  = {self.target_dir}")
-        print(f"ITER        = {self.iter}")
-        print(f"SAMPLESHARE = {self.sampleshare}")
+        self._setup_logging()    
+        
+        logging.info(f"TARGET_DIR  = {self.target_dir}")
+        logging.info(f"ITER        = {self.iter}")
+        logging.info(f"SAMPLESHARE = {self.sampleshare}")
     
-    ## TODO: Where is this and does this still need to be incorporated
-    def _parse_cost_factors(self):
-        """Parse means-based cost factors from parameter files."""
-        # Read highway parameters
-        hwy_param_file = Path(self.target_dir) / "ctramp" / "scripts" / "block" / "hwyParam.block"
-        trn_param_file = Path(self.target_dir) / "ctramp" / "scripts" / "block" / "trnParam.block"
-        
-        with open(hwy_param_file, 'r') as f:
-            hwy_lines = f.readlines()
-        
-        with open(trn_param_file, 'r') as f:
-            trn_lines = f.readlines()
-        
-        # Extract MBT Q1 Factor
-        mbt_q1_pattern = r'^Means_Based_Tolling_Q1Factor\s*=\s*([0-9.]+)'
-        self.mbt_q1_factor = self._extract_factor(hwy_lines, mbt_q1_pattern, "MBT_Q1_factor")
-        
-        # Extract MBT Q2 Factor
-        mbt_q2_pattern = r'^Means_Based_Tolling_Q2Factor\s*=\s*([0-9.]+)'
-        self.mbt_q2_factor = self._extract_factor(hwy_lines, mbt_q2_pattern, "MBT_Q2_factor")
-        
-        # Extract MBF Poverty Threshold
-        mbf_threshold_pattern = r'^Means_Based_Fare_PctOfPoverty_Threshold\s*=\s*([0-9]+)'
-        self.mbf_pct_poverty_threshold = self._extract_factor(trn_lines, mbf_threshold_pattern, "MBF_PctOfPoverty_Threshold")
-        
-        # Extract MBF Factor
-        mbf_factor_pattern = r'^Means_Based_Fare_Factor\s*=\s*([0-9.]+)'
-        self.mbf_factor = self._extract_factor(trn_lines, mbf_factor_pattern, "MBF_factor")
-    
-    def _extract_factor(self, lines: List[str], pattern: str, name: str) -> float:
-        """Extract a factor from parameter lines using regex."""
-        for line in lines:
-            match = re.match(pattern, line)
-            if match:
-                factor = float(match.group(1))
-                print(f"{name}: {factor}")
-                return factor
-        raise ValueError(f"Could not find {name} in parameter file")
+    def _setup_logging(self):
+        """
+        Set up logging to file and console.
+        """
+        log_file = Path(self.results_dir) /'core_summaries.log'
 
-## Move this to dictionary? 
-## TODO: Update to correct dictionary values
-class LookupTables:
-    """Class containing lookup tables for data recoding."""
-    
-    def __init__(self):
-        # Time periods
-        self.timeperiod = pd.DataFrame({
-            'timeCodeNum': [1, 2, 3, 4, 5],
-            'timeperiod_label': ['Early AM', 'AM Peak', 'Midday', 'PM Peak', 'Evening'],
-            'timeperiod_abbrev': ['EA', 'AM', 'MD', 'PM', 'EV']
-        })
-        
-        # Counties
-        self.county = pd.DataFrame({
-            'COUNTY': [1, 2, 3, 4, 5, 6, 7, 8, 9],
-            'county_name': ['San Francisco', 'San Mateo', 'Santa Clara', 'Alameda',
-                           'Contra Costa', 'Solano', 'Napa', 'Sonoma', 'Marin']
-        })
-        
-        # Income quartiles
-        self.incq = pd.DataFrame({
-            'incQ': [1, 2, 3, 4],
-            'incQ_label': ['Less than $30k', '$30k to $60k', '$60k to $100k', 'More than $100k']
-        })
-        
-        # Auto sufficiency
-        self.autosuff = pd.DataFrame({
-            'autoSuff': [0, 1, 2],
-            'autoSuff_label': ['Zero automobiles', 'Automobiles < workers', 'Automobiles >= workers']
-        })
+        self.logger = logging.getLogger()
+        self.logger.setLevel(logging.DEBUG)
+        # console handler
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.INFO)
+        ch.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p'))
+        self.logger.addHandler(ch)
 
-        # Trip and Tour Modes
-        self.tripMode = pd.DataFrame(
-            {'code': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
-             'mode': ['DRIVEALONEFREE' , 'DRIVEALONEPAY', 'SHARED2GP' , 'SHARED2HOV' , 'SHARED2PAY' , 'SHARED3GP' , 
-                      'SHARED3HOV' , 'SHARED3PAY' , 'WALK' , 'BIKE' , 'WALK_SET' , 'PNR_SET' , 'KNR_PERS' , 
-                      'KNR_TNC' , 'TAXI' , 'TNC', 'SCHBUS'],
-             'simple_mode': ['DA', 'DA', 'HOV2', 'HOV2', 'HOV2', 'HOV3', 'HOV3', 'HOV3', 'WALK', 'BIKE', 'WALKTOTRANS',
-                             'DRIVETOTRANS', 'DRIVETOTRANS', 'DRIVETOTRANS', 'TNC', 'TNC', 'SCHBUS']
-             }
-        )
-
-        #Transit Modes
-        self.transitMode = pd.DataFrame({
-            'mode': ['LOC', 'EXP', 'LTR', 'FRY', 'HVY', 'COM'],
-            'mode_label': ['Local Bus', 'Express Bus', 'Light Rail', 'Ferry', 'Heavy Rail', 'Commuter Rail']
-        })
+        # file handler
+        fh = logging.FileHandler(log_file, mode = 'w')
+        fh.setLevel(logging.DEBUG)
+        fh.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p'))
+        self.logger.addHandler(fh)
 
 
 class DataReader:
@@ -153,9 +119,8 @@ class DataReader:
     work-school location
     """
     
-    def __init__(self, config: Config, lookups: LookupTables):
+    def __init__(self, config: Config):
         self.config = config
-        self.lookups = lookups
     
     def add_kids_no_driver(self, persons, households):
         """
@@ -164,12 +129,13 @@ class DataReader:
         """
         # If variable already exists, return households
         if 'kidsNoDr' in households.columns:
-            print("kidsNoDr variable already exists in households")
+            logging.info("kidsNoDr variable already exists in households")
             return households
 
+        logging.info("Adding kidsNoDr variable to households")
         #  No Driver as a binary (1 for kid, 0 for no kid)
-        kidsNoDr_hhlds = persons[['hh_id', 'kidsNoDr']].groupby('hh_id', as_index= False ).agg({'kidsNoDr': 'max'})
-        households = households.merge(kidsNoDr_hhlds, on = 'hh_id')
+        kidsNoDr_hhlds = persons[['hh_id', 'kidsNoDr']].groupby('hh_id', as_index= True ).agg({'kidsNoDr': 'max'})
+        households = households.merge(kidsNoDr_hhlds, on = 'hh_id', how = 'left', validate = 'one_to_one')
 
         return households  
 
@@ -178,58 +144,73 @@ class DataReader:
 
         ## If processed file exist, read that instead:
         if (self.config.updated_dir / 'tours.parquet').exists():
-            print("Reading cached processed tours file")
+            logging.info("Reading cached processed tours file")
             tours = pd.read_parquet(self.config.updated_dir/ 'tours.parquet')
             return tours
 
+        logging.info("Reading and combining tours")
         jointTours = self._read_tours('Joint')
         indivTours = self._read_tours('Indiv')
         jointTours = jointTours.drop(columns = ['tour_composition'])
         indivTours = indivTours.drop(columns = ['person_type', 'atWork_freq'])
         tours = pd.concat([jointTours, indivTours], ignore_index=True)
 
-        tours.rename(columns = {'orig_mgra': 'origin_MAZ_SEQ', 'dest_mgra':'destination_MAZ_SEQ'}, inplace = True)
+        #tours.rename(columns = {'orig_mgra': 'origin_MAZ_SEQ', 'dest_mgra':'destination_MAZ_SEQ'}, inplace = True)
         print(tours.columns)
         # Add Residence Landuse Info
-        tours = tours.merge(households[['hh_id', 'MAZ_NODE', 'TAZ_NODE', 'CountyID', 'DistID', 'incQ', 'incQ_label']], on='hh_id', how='left')
-        print(tours.columns)
+        logging.info("Adding residence land use info to tours")
+        tours = tours.merge(households[['hh_id', 'CountyID', 'DistID', 'incQ']], on='hh_id', how='left', validate=  'many_to_one')
+        logging.debug(tours.head())
 
         ## TODO: Add CountyID for Destination MAZ
-        tours = tours.merge(landuse.rename(columns = {
-                            'MAZ_SEQ':'destination_MAZ_SEQ', 'MAZ_NODE': 'destination_MAZ_NODE', 'TAZ_SEQ': 'destination_TAZ_SEQ',
-                            'TAZ_NODE': 'destination_TAZ_NODE','DistID':'destination_DistID','CountyID': 'destination_CountyID'
-                            })[['destination_MAZ_SEQ', 'destination_TAZ_SEQ', 'destination_MAZ_NODE', 'destination_TAZ_NODE',
-                                'destination_CountyID', 'destination_DistID']], 
-                            on = 'destination_MAZ_SEQ', how='left')
-        
+        logging.info("Adding destination land use info to tours")
+        tours = tours.merge(landuse.rename(columns = {'MAZ_NODE':'destination_MAZ_NODE',
+                                  'DistID':'destination_DistID',
+                                  'CountyID': 'destination_CountyID'
+                            })[['destination_MAZ_NODE', 'destination_CountyID', 'destination_DistID']], 
+                            on = 'destination_MAZ_NODE', validate= 'many_to_one')
+        logging.debug(tours.head())
 
-        print(f"Combined tours; have {len(tours):,} rows")
-        print(tours.columns)
-        tours['tour_mode_label'] = tours['tour_mode'].map(self.lookups.tripMode.set_index('code')['mode'])
-        print(tours.head())
+        tours['tour_mode_label'] = tours['tour_mode'].map(self.config.modes.set_index('code')['mode'])
+        logging.info(f"Combined tours; have {len(tours):,} rows")
+        logging.debug(tours.head())
         #tours = tours._add_tours_attrs()
         return tours
     
-    def combine_trips(self, persons: pd.DataFrame) -> pd.DataFrame:
+    def combine_trips(self, persons: pd.DataFrame, households: pd.DataFrame) -> pd.DataFrame:
+        """
+        Combined individual and joint trips together. Joint trips will be unwind so each person will have a trip
 
+        The following variables will also be merged from the household table:
+            - Home_MAZ
+            - incQ
+            - autoSuff
+        """
         ## If processed file exist, read that instead:
         if (self.config.updated_dir / 'trips.parquet').exists():
-            print("Reading cached processed trips file")
+            logging.info("Reading cached processed trips file")
             trips = pd.read_parquet(self.config.updated_dir/ 'trips.parquet')
             return trips
 
+        logging.info("Reading and combining trips")
         indiv_trip = self._read_trips('Indiv')
         joint_trip = self._read_trips('Joint')
         joint_person_trips = self._get_joint_persons_trips(joint_trip, persons)
 
         combined = pd.concat([joint_person_trips, indiv_trip], ignore_index=True)
-        combined['trip_mode_label'] = combined['trip_mode'].map(self.lookups.tripMode.set_index('code')['mode'])
+        print(combined.columns)
+        combined['trip_mode_label'] = combined['trip_mode'].map(self.config.modes.set_index('code')['mode'])
+        
+        # Join with household data
+        combined = combined.merge(households[['hh_id', 'incQ', 'autoSuff', 'autoSuff_label']], 
+                                  on = 'hh_id', validate = 'm:1')
+        
+        # Don't need to include timePeriod since updated trips output with skims should have timePeriods
+        #combined['timePeriod'] = pd.cut(combined['stop_period'], bins = [1, 4, 12, 22, 30, 40], labels = ['EA', 'AM', 'MD', 'PM', 'EV'], include_lowest= True)
 
-        combined['timePeriod'] = pd.cut(combined['stop_period'], bins = [1, 4, 12, 22, 30, 40], labels = ['EA', 'AM', 'MD', 'PM', 'EV'], include_lowest= True)
-
-        combined.rename(columns= {'orig_mgra': 'origin_MAZ_SEQ', 'dest_mgra': 'destination_MAZ_SEQ', 'parking_mgra': 'parking_MAZ_SEQ'}, inplace= True)
-        print(f"Combined individual trips with joint person trips to make {len(combined):,} rows")
-        print(combined.head())
+        combined.rename(columns= {'parking_mgra': 'parking_MAZ_SEQ'}, inplace= True)
+        logging.info(f"Combined individual trips with joint person trips to make {len(combined):,} rows")
+        logging.debug(combined.head())
         return combined
 
     def read_households(self, land_use: pd.DataFrame) -> pd.DataFrame:
@@ -238,27 +219,29 @@ class DataReader:
         ## TM2
         ## If processed file exist, read that instead:
         if (self.config.updated_dir / 'households.parquet').exists():
-            print("Reading cached processed household file")
+            logging.info("Reading cached processed household file")
             persons = pd.read_parquet(self.config.updated_dir/ 'households.parquet')
             return persons
         popsyn_file = Path(self.config.target_dir) / "inputs" / "popsyn" / "households.csv"
         ct_file = self.config.main_dir / f"householdData_{self.config.iter}.csv"
 
         input_pop_hh = pd.read_csv(popsyn_file)
-        input_pop_hh.rename(columns={'HHID': 'hh_id', 'MAZ': 'MAZ_SEQ', 'TAZ': 'TAZ_SEQ', 'ORIG_MAZ': 'MAZ_NODE', 'ORIG_TAZ': 'TAZ_NODE'}, inplace=True)
+        input_pop_hh.rename(columns={'HHID': 'hh_id', 'MAZ': 'MAZ_SEQ', 'TAZ': 'TAZ_SEQ', 'ORIG_MAZ': 'MAZ_NODE', 'ORIG_TAZ': 'TAZ_NODE', 'MAZ_ORIGINAL': 'MAZ_NODE', 'TAZ_ORIGINAL': 'TAZ_NODE'}, inplace=True)
 
         output_ct_hh = pd.read_csv(ct_file)
         output_ct_hh.rename(columns = {'home_mgra': 'HOME_MAZ_SEQ'}, inplace = True)
-        print(f"Read {len(input_pop_hh):,} rows from popsyn households and {len(output_ct_hh):,} rows from ct households")
+        logging.debug(f"Read {len(input_pop_hh):,} rows from popsyn households and {len(output_ct_hh):,} rows from ct households")
 
         # Join input and output datasets
-        households = input_pop_hh.merge(output_ct_hh, left_on = 'hh_id', right_on = 'hh_id', how = 'inner')
+        households = input_pop_hh.merge(output_ct_hh, left_on = 'hh_id', right_on = 'hh_id', how = 'inner', validate = 'one_to_one')
 
-        print(f"Read household files; have {len(households):,} rows")
-        # Add land use data
-        households = households.merge(land_use, on= ['MAZ_NODE', 'TAZ_NODE', 'MAZ_SEQ', 'TAZ_SEQ'], how = 'inner')
-        print(f"After merging land use, have {len(households):,} rows")
         print(households.columns)
+
+        logging.info(f"Read input household files; have {len(households):,} rows")
+        # Add land use data
+        households = households.merge(land_use, on= ['MAZ_NODE', 'TAZ_NODE', 'MAZ_SEQ', 'TAZ_SEQ'], how = 'left', validate = 'many_to_one')
+        logging.info(f"After merging land use, have {len(households):,} rows")
+        logging.debug(households.head())
 
         # Add household variables
         households = self._add_household_variables(households)
@@ -279,6 +262,7 @@ class DataReader:
 
         ## TM2
         # TODO: Confirm land use file after update
+        logging.info("Reading land use data")
         maz_file = Path(self.config.target_dir) / "inputs" / "landuse" / "maz_data_withDensity.csv"
         maz_data = pd.read_csv(maz_file ) #, usecols = ['MAZ', 'TAZ','MAZ_ORIGINAL', 'TAZ_ORIGINAL', 'CountyID', 'DistID', 'hparkcost'])
 
@@ -286,6 +270,8 @@ class DataReader:
         maz_data = maz_data.rename(columns = {'MAZ_ORIGINAL':'MAZ_NODE', 'TAZ_ORIGINAL':'TAZ_NODE', 'MAZ': 'MAZ_SEQ', 'TAZ': 'TAZ_SEQ'})
         maz_data = maz_data[['MAZ_SEQ', 'TAZ_SEQ', 'MAZ_NODE', 'TAZ_NODE', 'CountyID', 'DistID', 'hparkcost']]
 
+        logging.info(f"Read land use data; have {len(maz_data):,} rows")
+        logging.debug(maz_data.head())
         return maz_data
     
     def read_persons(self, households: pd.DataFrame) -> pd.DataFrame:
@@ -293,10 +279,11 @@ class DataReader:
         
         ## If processed file exist, read that instead:
         if (self.config.updated_dir / 'persons.parquet').exists():
-            print("Reading cached processed persons file")
+            logging.info("Reading cached processed persons file")
             persons = pd.read_parquet(self.config.updated_dir / 'persons.parquet')
             return persons
         # Read input files
+        logging.info("Reading and processing persons input and output data")
         popsyn_file = Path(self.config.target_dir) / "inputs" / "popsyn" / "persons.csv"
         ct_file = self.config.main_dir / f"personData_{self.config.iter}.csv"
         
@@ -306,23 +293,25 @@ class DataReader:
         # Rename columns
         input_pop_persons.rename(columns={'HHID': 'hh_id', 'PERID': 'person_id'}, inplace=True)
         
+        logging.info(f"Read {len(input_pop_persons):,} rows from input persons data and {len(input_ct_persons):,} rows from output persons data")
+
         # Join datasets
-        persons = input_pop_persons.merge(input_ct_persons, on=['hh_id', 'person_id'], how='inner')
-        
-        # Add income quartile from households
-        persons = persons.merge(households[['hh_id', 'incQ', 'incQ_label']], on='hh_id', how='left')
+        logging.info("Merging input and output persons data")
+        persons = input_pop_persons.merge(input_ct_persons, on=['hh_id', 'person_id'], how='inner', validate = 'one_to_one')
+        logging.info(f"After merging input and output persons data, have {len(persons):,} rows")
+
+        # Add income quartile, household size, auto ownership, home MAZ from households
+        logging.info("Adding household attributes to persons data")
+        persons = persons.merge(households[['hh_id', 'incQ', 'size', 'autos', 'MAZ_NODE', 'TAZ_NODE', 'MTCCountyID']], on='hh_id', how='left', validate = 'many_to_one')
+        logging.debug(persons.head())
         
         # Add kids no driver indicator
+        logging.info("Adding kidsNoDr dummy variable to persons data")
         persons['kidsNoDr'] = np.where(persons['type'].isin(['Child too young for school', 'Non-driving-age student']), 1, 0)
         
-        print(f"Read persons files; have {len(persons):,} rows")
+        logging.info(f"Read persons files; have {len(persons):,} rows")
+        logging.debug(persons.head())
 
-        
-        ## TODO: Add kids no driver - need to figure out data dictionary for types
-        # persons['kidsNoDr'] = ((persons['ptype'] == 7) | (persons['ptype'] == 8)).astype(int)
-        
-        print(persons.columns)
-        print(persons.head())
         return persons
     
     def read_work_school_location(self, landuse: pd.DataFrame, tours: pd.DataFrame):
@@ -337,30 +326,36 @@ class DataReader:
             Dataframe with work locations only
 
         """
-        if (self.config.updated_dir / 'work_location.parquet').exists():
-            print("Reading cached processed work_location file")
-            work_location = pd.read_parquet(self.config.updated_dir / 'work_location.parquet')
+        if (self.config.updated_dir / 'work_locations.parquet').exists():
+            logging.info("Reading cached processed work_location file")
+            work_location = pd.read_parquet(self.config.updated_dir / 'work_locations.parquet')
             return work_location
 
+        logging.info("Reading work-school location data")
         wsLoc_File = self.config.main_dir / f'wsLocResults_{ITER}.csv'
         wsLoc = pd.read_csv(wsLoc_File)
         
         # Filter out non-work travel
         work_location = wsLoc[wsLoc['WorkLocation'] != 0]
+        logging.info(f"Filtered work-school location data to work locations; have {len(work_location):,} rows")
 
         work_location.rename(columns={'HHID': 'hh_id', 'HomeMGRA': 'HOME_MAZ_SEQ'}, inplace=True)
         # Add home county
+        logging.info("Adding home county to work location data")
         work_location = work_location.merge(landuse.rename(columns = {'MAZ_SEQ':'HOME_MAZ_SEQ', 'MAZ_NODE': 'HOME_MAZ_NODE',
                                                                     'TAZ_NODE': 'HOME_TAZ_NODE','DistID':'HOME_DistID','CountyID': 'HOME_CountyID'})
                                                                     [['HOME_MAZ_SEQ', 'HOME_MAZ_NODE', 'HOME_TAZ_NODE','HOME_DistID', 'HOME_CountyID']], 
                                                                     on = 'HOME_MAZ_SEQ', how = 'left')
+        logging.debug(work_location.head())
 
         # Add work county
         ## WFH tours do not have a work county 
+        logging.info("Adding work county to work location data")
         work_location = work_location.merge(landuse.rename(columns = {'MAZ_SEQ':'WORK_MAZ_SEQ', 'MAZ_NODE': 'WORK_MAZ_NODE',
                                                                     'TAZ_NODE': 'WORK_TAZ_NODE','DistID':'WORK_DistID','CountyID': 'WORK_CountyID'})
                                                                     [['WORK_MAZ_SEQ', 'WORK_MAZ_NODE', 'WORK_TAZ_NODE', 'WORK_DistID', 'WORK_CountyID']],
                                                                       left_on = 'WorkLocation', right_on = 'WORK_MAZ_SEQ',  how = 'left')
+        logging.debug(work_location.head())
         
         
         ## Add relevant information for journey to work by modes (tour)
@@ -368,17 +363,22 @@ class DataReader:
         ## Filter commute tours
 
         # Adding WFH variable - these will not have a work county or taz
+        logging.info("Adding WFH variable to work location data")
         work_location['WFH'] = np.where(work_location['WorkSegment'] == 99999, 1, 0)
 
         # Filtering tours to only tours with commutes
         # TODO: Determine which id to merge on
+        logging.info("Filtering tours to only tours with commutes")
         commute_tours = tours[tours['tour_purpose']== 'Work']
         commute_tours = commute_tours[['hh_id', 'tour_participants', 'person_id','tour_purpose','tour_mode']]
         commute_tours['person_num'] = commute_tours['tour_participants'].astype(int)
-        
+        logging.debug(f"Commute tours: \n{commute_tours.head()}")
+
         #Merging tour mode from commute tour 
+        logging.info("Adding tour mode to work location data")
         work_location = work_location.merge(right = commute_tours[['person_num', 'person_id', 'tour_mode']], how = 'left',
-                                            left_on = 'PersonID', right_on = 'person_id')
+                                            left_on = 'PersonID', right_on = 'person_id', validate= 'one_to_many')
+        logging.debug(work_location.head())
         
         # Fill in missing values for all merges 
         work_location.fillna(0, inplace = True)
@@ -392,10 +392,14 @@ class DataReader:
         
         """
         # Income quartiles
+        logging.info("Adding income quartile to households data")
+        logging.warning("There are {0} households with negative income".format((households['income'] < 0).sum()))
         households['incQ'] = pd.cut(households['income'], 
-                                   bins=[households['income'].min(), 30000, 60000, 100000, float('inf')],
-                                   labels=[1, 2, 3, 4], include_lowest=True).astype(int)
-        households = households.merge(self.lookups.incq, on='incQ', how='left')
+                                   bins=pd.concat([self.config.income_quartiles['cutoffs'],pd.Series(np.inf)], ignore_index=True),
+                                   labels=self.config.income_quartiles['segment_suffixes'], include_lowest=True)
+        
+        logging.warning("There are {0} households with missing income quartile".format(households['incQ'].isna().sum()))
+        #households = households.merge(self.config.income_quartiles, on='incQ', how='left')
         
         # Workers (capped at 4)
         # TODO: Do we need to do this?
@@ -404,9 +408,10 @@ class DataReader:
         # Auto sufficiency
         households['autoSuff'] = np.where(households['autos'] == 0, 0,
                                  np.where(households['autos'] < households['NWRKRS_ESR'], 1, 2))
-        households = households.merge(self.lookups.autosuff, on='autoSuff', how='left')
+        households = households.merge(self.config.autosuff, on='autoSuff', how='left', validate = 'many_to_one')
         
-        print(households.head())
+        logging.info("Added household variables: income quartile, auto sufficiency")
+        logging.debug(households.head())
         
         return households
 
@@ -443,7 +448,7 @@ class DataReader:
 
         return tours
     
-    def _get_joint_persons_trips(self, trips: pd.DataFrame, persons: pd.DataFrame) -> pd.DataFrame:
+    def _get_joint_persons_trips(self, joint_trips: pd.DataFrame, persons: pd.DataFrame) -> pd.DataFrame:
         """Get persons associated with each tour and trip."""
         
         # Unwind the participants for joint tours and make each person their own row
@@ -456,16 +461,17 @@ class DataReader:
         participants['person_num'] = participants['person_num'].astype(int)
 
         ## Join on household and person num to get person_id
-        joint_tour_persons = pd.merge(participants, persons[['hh_id', 'person_num', 'person_id']], on=['hh_id', 'person_num'], how='left')
+        joint_tour_persons = pd.merge(participants, persons[['hh_id', 'person_num', 'person_id']], on=['hh_id', 'person_num'], how='left', validate = 'many_to_one')
 
-        print(f"Combined joint tours and persons; have {len(joint_tour_persons):,} rows")
-        print(joint_tour_persons.head())
+        logging.info(f"Combined joint tours and persons; have {len(joint_tour_persons):,} rows")
+        logging.debug(joint_tour_persons.head())
 
-        print("Attaching person to joint trips")
-        joint_persons_trips = pd.merge(trips, joint_tour_persons, on= ['hh_id', 'tour_id'], how = 'inner')
+        logging.debug("Attaching person to joint trips")
+        # This is a many to many inner join since we are unwinding joint trips by persons on the trip. Each joint trip becomes a row per participant
+        joint_persons_trips = pd.merge(joint_trips, joint_tour_persons, on= ['hh_id', 'tour_id'], how = 'inner', indicator= True, validate = 'many_to_many')
 
-        print(('Created joint_person_trips with {0} rows from {1} rows from joint trips {2} rows from joint_tour_persons')
-              .format(len(joint_persons_trips), len(trips), len(joint_tour_persons))
+        logging.debug(('Created joint_person_trips with {0} rows from {1} rows from joint trips {2} rows from joint_tour_persons')
+              .format(len(joint_persons_trips), len(joint_trips), len(joint_tour_persons))
               )
 
         return joint_persons_trips 
@@ -479,16 +485,22 @@ class DataReader:
         """
 
         # Read input file
-        tour_file = self.config.main_dir / f"{IndivJoint}TourData_{self.config.iter}.csv"
-        tour = pd.read_csv(tour_file)
+
+        tour_file = self.config.updated_dir/f"{IndivJoint}TourData_{self.config.iter}.parquet"
+        if tour_file.exists():
+            logging.info(f"Reading tour file from {tour_file}")
+            tour = pd.read_parquet(tour_file)
+        else:
+            logging.warning("The updated tour file with skims attached does not exist. Reading original output file")
+            tour_file = self.config.main_dir / f"{IndivJoint}TourData_{self.config.iter}.csv"
+            tour = pd.read_csv(tour_file)
+
 
         # Drop probability and util columns
         tour.drop(list(tour.filter(regex='util|prob')), axis = 1, inplace = True)
 
         # Add income and percent of poverty from households
         ## TODO: Add in percent of poverty calculation for households
-        ## Do this after combining tours 
-        #tour = tour.merge(households[['hh_id', 'incQ', 'incQ_label']], on='hh_id', how='left')
 
         # TODO: Merge on MAZ for this - this is at a MAZ level (mgra_dest instead of dest_taz)
         # TODO: Add parking back in later
@@ -519,8 +531,8 @@ class DataReader:
             tour['person_num'] = 0
  
 
-        print(f"Read {len(tour):,} rows from {tour_file}")
-        print(tour.head())
+        logging.debug(f"Read {len(tour):,} rows from {tour_file}")
+        logging.debug(tour.head())
         return tour
     
     def _read_trips(self, IndivJoint: str) -> pd.DataFrame:
@@ -530,15 +542,21 @@ class DataReader:
         - IndivJoint: 'Indiv' or 'Joint' to specify trip type
         """
         # Read input file
-        trip_file = self.config.main_dir / f"{IndivJoint}TripData_{self.config.iter}.csv"
-        trip = pd.read_csv(trip_file)
+        # Read post-processed trips file - if not default to ctramp output but note that there is no skims attached
+        trip_file = self.config.updated_dir/f"{IndivJoint}TripData_{self.config.iter}.parquet"
+        if trip_file.exists():
+            trip = pd.read_parquet(trip_file)
+        else:
+            logging.warning("The updated trip file with skims attached does not exist. Reading original output file")
+            trip_file = self.config.main_dir / f"{IndivJoint}TripData_{self.config.iter}.csv"
+            trip = pd.read_csv(trip_file)
 
         if IndivJoint == 'Indiv':
             trip['num_participants'] = 1
             trip['tour_participants'] = trip['person_num'].astype(str)
 
-        print(f"Read {len(trip):,} rows from {trip_file}")
-        print(trip.head())
+        logging.debug(f"Read {len(trip):,} rows from {IndivJoint} trips")
+        logging.debug(trip.head())
         return trip
     
 
@@ -546,14 +564,21 @@ class SummaryGenerator:
     """Class for generating various summary reports."""
     
     # TODO: Need to make this run properly
-    def __init__(self, config: Config, lookups: LookupTables):
+    def __init__(self, config: Config):
         self.config = config
-        self.lookups = lookups
+
+    def generate_active_time_summary(self, trips: pd.DataFrame) -> None:
+        """
+        Generate active time summary.
+
+        Universe: Trips
+
+        """
+        summary = trips.groupby([])
 
     def generate_activity_pattern_summary(self, persons: pd.DataFrame) -> None:
         """
         Generate activity pattern summary.
-
         Universe: Persons
         
         Args:
@@ -563,7 +588,7 @@ class SummaryGenerator:
             Outputs a csv and parquet of the summary
         """
         summary = persons.groupby(['type', 'cdap', 'imf_choice', 
-                                   'inmf_choice', 'incQ', 'incQ_label']).agg({'person_id':'count'}).reset_index()
+                                   'inmf_choice', 'incQ']).agg({'person_id':'count'}).reset_index()
         
         summary.rename(columns={'person_id': 'freq'}, inplace=True)
         summary['freq'] = summary['freq'] / self.config.sampleshare
@@ -574,13 +599,13 @@ class SummaryGenerator:
 
         summary.to_parquet(self.config.results_dir / "ActivityPattern.parquet")
         
-        print(f"Wrote {len(summary):,} rows of activity_pattern_summary")     
+        logging.debug(f"Wrote {len(summary):,} rows of activity_pattern_summary")     
     
     # TODO: Update
     def generate_auto_ownership_summary(self, households: pd.DataFrame) -> None:
         """Generate auto ownership summary."""
         summary = households.groupby([
-            'DistID', 'CountyID', 'autos', 'incQ', 'incQ_label',
+            'DistID', 'CountyID', 'autos', 'incQ',
             'workers', 'kidsNoDr'
         ]).size().reset_index(name='freq')
         
@@ -592,9 +617,40 @@ class SummaryGenerator:
 
         summary.to_parquet(self.config.results_dir / "AutomobileOwnership.parquet")
         
-        print(f"Wrote {len(summary):,} rows of autoown_summary")
+        logging.debug(f"Wrote {len(summary):,} rows of autoown_summary")
     
+    def generate_auto_trips_person(self, persons: pd.DataFrame) -> None:
+        """
+        Generate automobile trips by person's home and work location
+
+        Universe: Persons
+        """
+        summary = persons.groupby(
+            ['CountyID', 'MAZ_NODE']
+        )
     
+    def generate_cdap_summary(self, persons: pd.DataFrame, group_by: List[str], output_suffix = ""):
+        """
+        Generate CDAP Summary by different groupings (person type, age, household size/composition, home geography, auto ownership)
+
+        Args:
+            persons: Dataframe of the processed persons output data
+            group_by: List of columns to group by for the summary
+            output_suffix: Suffix to append to the output file name (Optional)
+        
+        Universe: persons
+        """
+        summary = persons.groupby(group_by).agg({'hh_id':'count'}).reset_index()
+        summary.rename(columns={'hh_id': 'freq'}, inplace=True)
+        summary['freq'] = summary['freq'] / self.config.sampleshare
+
+        # Save results
+        output_file = self.config.results_dir/f'CDAPSummary{output_suffix}.csv'
+
+        summary.to_csv(output_file, index = False)        
+        if output_suffix == "":
+            summary.to_parquet(self.config.results_dir / "CDAPSummary.parquet")
+
     ## TODO: Currently summaries are to a MAZ level - may need to change to TAZ for a more aggregated
     def generate_journey_to_work_summary(self, work_locations: pd.DataFrame) -> None:
         """
@@ -716,6 +772,51 @@ class SummaryGenerator:
         persons_touring.to_csv(output_file, index=False)
 
     
+    def generate_trip_distance_summary(self, df: pd.DataFrame):
+        """
+        Generate trip distance summary
+
+        NOTE: Trips taken by transit do not have a skim distance
+        """
+        summary = df.groupby(['autoSuff', 'autoSuff_label', 'incQ', 'timeperiod', 'trip_mode', 'tour_purpose']).agg({
+            'hh_id': 'count',
+            'trip_distance': 'mean'
+        })
+
+        summary.rename(columns = {'hh_id':'freq'}, inplace = True)
+        summary['freq'] = summary['freq']/self.config.sampleshare
+
+        # Save results
+        output_file = self.config.results_dir/'TripDistance'
+        summary.to_csv(output_file + '.csv', index = False)
+        summary.to_parquet(output_file + '.parquet')
+
+    
+    def generate_trip_travel_time_summary(self, df: pd.DataFrame):
+        """
+        Generate trip travel time summary. Group by income, trip mode, and tour purpose
+
+        Universe: Trips
+
+        Args:
+            df (DataFrame): Processed trips dataframe
+        """
+        summary = df.groupby(['incQ', 'trip_mode', 'tour_purpose']).agg({
+            'hh_id': 'count',
+            'num_participants': 'sum',
+            'trip_time': 'mean'
+        })
+
+        summary.rename(columns = {'hh_id': 'freq'}, inplace = True)
+        summary['freq'] = summary['freq']/self.config.sampleshare
+
+        # Save results
+        output_file = self.config.results_dir/'TripTravelTime.csv'
+        summary.to_csv(output_file,index = False)
+
+
+        
+
     def generate_trips_tours_summary(
             self,
             df: pd.DataFrame,
@@ -757,9 +858,14 @@ class SummaryGenerator:
         dest_purpose_dict ={
            'Discretionary': 'Socrec', 'Visiting': 'Socrec', 'Maintenance': 'Pers_Bus'
         }
-        df['simple_trip_mode'] = df['trip_mode'].map(self.lookups.tripMode.set_index('code')['simple_mode'])
+        simple_mode_dict = {
+            1: 'DA', 2: 'DA', 3: 'HOV2', 4: 'HOV2', 5: 'HOV2', 6: 'HOV3',
+            7: 'HOV3', 8: 'HOV3', 9: 'Walk', 10: 'Bike', 11: 'WALKTRAN', 12: 'DRIVETRAN',
+            13: 'DRIVETRAN', 14: 'DRIVETRAN', 15: 'TNC', 16: 'TNC', 17: 'SCHBUS'}
+        
+        df['simple_trip_mode'] = df['trip_mode'].replace(simple_mode_dict)
         df['simple_dest_purpose'] = df['dest_purpose'].replace(dest_purpose_dict)
-        print(df.head())
+        logging.debug(df.head())
         summary = df.groupby(['simple_trip_mode', 'simple_dest_purpose']).size().reset_index(name = 'freq')
 
         summary['freq'] = summary['freq']/self.config.sampleshare
@@ -794,7 +900,7 @@ class SummaryGenerator:
         
         summary.to_parquet(self.config.results_dir / "VehicleMilesTraveled.parquet")
 
-        print(f"Wrote {len(summary):,} rows of vmt_summary")
+        logging.debug(f"Wrote {len(summary):,} rows of vmt_summary")
       
 
 
@@ -802,50 +908,39 @@ class CoreSummaries:
     """Main class orchestrating the entire core summaries process."""
     
     def __init__(self):
-        self.config = Config(TimePeriodConfig, HouseholdConfig)
-        self.lookups = LookupTables()
-        self.data_reader = DataReader(self.config, self.lookups)
-        self.summary_generator = SummaryGenerator(self.config, self.lookups)
+        self.config = Config()
+        self.data_reader = DataReader(self.config)
+        self.summary_generator = SummaryGenerator(self.config)
+
 
 
     def run_analysis(self):
         """Run the complete core summaries analysis."""
-        print("Starting Core Summaries Analysis...")
+        logging.info("Starting Core Summaries Analysis...")
         
         # Read base data
-        print("Reading land use data...")
         landuse = self.data_reader.read_land_use()
-        print(f"Land Use: \n {landuse.head()}")
-        
-        print("Reading household data...")
+       
         households = self.data_reader.read_households(landuse)
-        print(f"Household: \n {households.head()}")
 
-        print("Reading person data...")
-        persons = self.data_reader.read_persons(households)
-        print(f"Persons: \n {persons.head()}")
         
-        print("Adding kids no driver variable")
+        persons = self.data_reader.read_persons(households)
+
         households = self.data_reader.add_kids_no_driver(persons, households)
         
-        # Read tour and trip data
-        print("Reading tour data...")        
+        # Read tour and trip data    
         tours = self.data_reader.combine_tours(households, landuse)
-        print(f"Tours: \n {tours.head()}")
+        trips = self.data_reader.combine_trips(persons, households)
 
-        print("Reading trip data ...")
-        trips = self.data_reader.combine_trips(persons)
-        print(f"Trips \n {trips.head()}")
 
-        print("Filtering commute tours ...")
+        logging.info("Filtering commute tours ...")
         commute_tours =tours[tours['tour_purpose'] == 'Work']
 
-        print("Reading work-school location...")
+
         work_locations = self.data_reader.read_work_school_location(landuse, commute_tours)
-        print(f"Work Locations: \n {work_locations.head()}")
   
         # Save processed data
-        print("Saving processed data...")
+        logging.info("Saving processed data...")
         households.to_parquet(self.config.updated_dir / "households.parquet")
         persons.to_parquet(self.config.updated_dir / "persons.parquet")
         trips.to_parquet(self.config.updated_dir / "trips.parquet")
@@ -854,36 +949,45 @@ class CoreSummaries:
         commute_tours.to_parquet(self.config.updated_dir / "commute_tours.parquet")
 
         # Generate summaries
-        print("Generating summaries...")
+        logging.info("Generating summaries...")
 
-        print("Gerenate Activity Pattern summary")
+        logging.info("Gerenate Activity Pattern summary")
         self.summary_generator.generate_activity_pattern_summary(persons)
 
-        print("Generate Auto Ownership summary")
+        logging.info("Generate Auto Ownership summary")
         self.summary_generator.generate_auto_ownership_summary(households)
 
-        print("Generate time of day summary")
+        logging.info("Generate CDAP Summaries")
+        self.summary_generator.generate_cdap_summary(persons, ['cdap'], "ByShare")
+        self.summary_generator.generate_cdap_summary(persons, ['cdap', 'type' ], "ByPersonType")
+        self.summary_generator.generate_cdap_summary(persons, ['cdap', 'age'], 'ByAge')
+        self.summary_generator.generate_cdap_summary(persons, ['cdap', 'MTCCountyID'], 'ByHomeCounty')
+        self.summary_generator.generate_cdap_summary(persons, ['cdap', 'MAZ_NODE'], 'ByMAZ')
+        self.summary_generator.generate_cdap_summary(persons, ['cdap','autos'], 'ByAutoOwnership')
+        self.summary_generator.generate_cdap_summary(persons,['cdap', 'MTCCountyID','MAZ_NODE', 'autos', 'type', 'age'])
+
+        logging.info("Generate time of day summary")
         self.summary_generator.generate_time_summary(tours) 
 
-        print("Generate trips summary")
+        logging.info("Generate trips summary")
         self.summary_generator.generate_trip_summary_survey(trips)
         self.summary_generator.generate_trips_tours_summary(trips, 'trip', ['trip_mode', 'trip_mode_label'], 'ByMode')
         self.summary_generator.generate_trips_tours_summary(trips, 'trip', ['trip_mode', 'trip_mode_label', 'tour_purpose'], 'ByModePurpose')
         self.summary_generator.generate_trips_tours_summary(trips, 'trip', ['tour_purpose'], 'ByPurpose')
-        self.summary_generator.generate_trips_tours_summary(trips, 'trip', ['timePeriod','trip_mode_label'], 'ByModeTimePeriod')
+        self.summary_generator.generate_trips_tours_summary(trips, 'trip', ['timeperiod','trip_mode_label'], 'ByModeTimePeriod')
         
-        print("Generate tours summaries")
+        logging.info("Generate tours summaries")
         self.summary_generator.generate_trips_tours_summary(tours, 'tour', ['tour_mode', 'tour_mode_label'], 'ByMode')
         self.summary_generator.generate_trips_tours_summary(tours, 'tour', ['tour_mode', 'tour_mode_label', 'tour_purpose'], 'ByModePurpose')
         self.summary_generator.generate_trips_tours_summary(tours, 'tour', ['tour_purpose'], 'ByPurpose')
 
-        print("Generating journey to work summary")
+        logging.info("Generating journey to work summary")
         self.summary_generator.generate_journey_to_work_summary(work_locations)
         self.summary_generator.generate_journey_to_work_mode_summary(work_locations)
         
 
         
-        print("Core Summaries Analysis completed successfully!")
+        logging.info("Core Summaries Analysis completed successfully!")
 
 
 def main():
@@ -892,28 +996,9 @@ def main():
         core_summaries = CoreSummaries()
         core_summaries.run_analysis()
     except Exception as e:
-        print(f"Error running analysis: {e}")
+        logging.debug(f"Error running analysis: {e}")
         raise
 
-def _setup_logging(self):
-        """
-        Set up logging to file and console.
-        """
-        log_file = 'core_summmaries/core_summaries.log'
-
-        self.logger = logging.getLogger()
-        self.logger.setLevel(logging.DEBUG)
-        # console handler
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.INFO)
-        ch.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p'))
-        self.logger.addHandler(ch)
-
-        # file handler
-        fh = logging.FileHandler(log_file, mode = 'w')
-        fh.setLevel(logging.DEBUG)
-        fh.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p'))
-        self.logger.addHandler(fh)
 
 if __name__ == "__main__":
     main()

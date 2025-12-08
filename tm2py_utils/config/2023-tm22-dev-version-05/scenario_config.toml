@@ -3,16 +3,17 @@
 ####################################
 
 [scenario]
-    name = "2023-tm22-dev-version-05"
-    year = 2023
+    name = "tm22-dev-sprint-04"
+    year = 2015
     verify = false
+    zone_seq_file = "inputs/landuse/mtc_final_network_zone_seq.csv"
     landuse_file = "inputs/landuse/maz_data_withDensity.csv"
     landuse_index_column = "TAZ"
 
 [run]
     start_component = ""
     initial_components = [
-       "create_tod_scenarios", 
+        "create_tod_scenarios", 
         "active_modes",
         "air_passenger",
         "prepare_network_highway",
@@ -31,14 +32,14 @@
         "transit_assign",
         "transit_skim",
     ]
-    final_components = []
+    final_components = ["post_processor","network_summary"]
     start_iteration = 0
-    end_iteration = 1
+    end_iteration = 3
 
 [warmstart]
     warmstart = true
-    use_warmstart_skim = false
-    use_warmstart_demand = true
+    use_warmstart_skim = true
+    use_warmstart_demand = false
 
 [slack_notifications]
 enabled = true

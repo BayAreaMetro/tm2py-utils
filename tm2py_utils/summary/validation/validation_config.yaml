@@ -1,0 +1,395 @@
+# CTRAMP Validation Configuration
+# Configure validation analysis runs and output summaries
+# Note: Column mappings are now defined in ctramp_data_model.yaml
+
+# =============================================================================
+# SUMMARY FILTERING
+# =============================================================================
+# Control which summaries to generate using the 'generate_summaries' setting below:
+#
+#   "all"        - Generate all summaries (both core and validation)
+#   "core"       - Generate only core summaries (essential, matches core_summaries.py output)
+#   "validation" - Generate only validation summaries (extended analysis for dashboard)
+#
+# Each summary in the custom_summaries section has a 'summary_type' field:
+#   - core: Essential summaries needed for basic model analysis
+#   - validation: Extended summaries for detailed validation and dashboard visualization
+#
+# To see what will be generated:
+#   - Set generate_summaries: "core" for quick runs (minimal essential summaries)
+#   - Set generate_summaries: "validation" for dashboard-only summaries
+#   - Set generate_summaries: "all" (default) for comprehensive analysis
+# =============================================================================
+
+# Input datasets to analyze
+input_directories:
+  - path: "E:\\stuff\\2023-tm22-dev-version-05\\ctramp_output" 
+    name: "2023_version_05"
+    display_name: "2023 TM2.2 v05"
+    source_type: "model"
+    description: "2023 TM2.2 Development Version 05"
+    iteration: 1  # Use iteration 1 files
+  
+  - path: "E:\\stuff\\2015-tm22-dev-sprint-04\\ctramp_output"
+    name: "2015_sprint_04"
+    display_name: "2015 TM2.2 Sprint 04"
+    source_type: "model"
+    description: "2015 TM2.2 Development Sprint 04"
+    iteration: 1  # Use iteration 1 files
+
+# Pre-aggregated summary data (surveys, observed data, validation targets)
+# Use this for data that's already summarized (e.g., ACS tables, BATS summaries)
+observed_summaries: []
+  # Example: ACS household data
+  # - name: "acs_2019"
+  #   display_name: "ACS 2019"
+  #   summaries:
+  #     auto_ownership_regional:
+  #       file: "C:\\Data\\ACS_2019\\auto_ownership.csv"
+  #       columns:
+  #         num_vehicles: "Vehicles"
+  #         households: "Households"
+  #         share: "Percentage"
+  #     household_size_regional:
+  #       file: "C:\\Data\\ACS_2019\\household_size.csv"
+  #       columns:
+  #         household_size: "HH_Size"
+  #         households: "Count"
+  #         share: "Percent"
+  # 
+  # Example: BATS transit mode share
+  # - name: "bats_2018"
+  #   display_name: "BATS 2018"
+  #   summaries:
+  #     trip_mode_choice:
+  #       file: "C:\\Data\\BATS_2018\\mode_share.csv"
+  #       columns:
+  #         trip_mode: "Mode"
+  #         trips: "Trips"
+  #         share: "Share"
+
+# Output location
+output_directory: "C:\\GitHub\\tm2py-utils\\tm2py_utils\\summary\\validation\\outputs"
+
+# Dataset display order in charts (uses display_name if specified, otherwise name)
+# Datasets will appear in this order in all dashboard charts
+dataset_order:
+  - "2015 TM2.2 Sprint 04"  # Show 2015 first
+  - "2023 TM2.2 v05"        # Then 2023
+
+# Summary generation settings
+summary_config:
+  # Which hardcoded Python summaries to generate (DEPRECATED - use custom_summaries instead)
+  # Leave empty to use only config-driven summaries below
+  enabled_summaries: []
+  
+  # Geographic aggregation levels
+  geographic_levels:
+    - "regional"
+  
+  # Comparison mode
+  comparison_mode: "scenario_vs_scenario"  # or "model_vs_survey"
+
+# Binning configuration for continuous variables
+# Automatically converts numeric values to categorical bins for analysis
+binning_specs:
+  # Income bins (in dollars)
+  income_category:
+    bins: [0, 30000, 60000, 100000, 150000, 1000000000]
+    labels: ['<30K', '30-60K', '60-100K', '100-150K', '150K+']
+    
+  # Tour distance bins (in miles)
+  tour_distance:
+    bins: [0, 5, 10, 20, 50, 1000]
+    labels: ['0-5', '5-10', '10-20', '20-50', '50+']
+    
+  # Tour duration bins (in minutes)
+  tour_duration:
+    bins: [0, 30, 60, 120, 240, 10000]
+    labels: ['0-30', '30-60', '60-120', '120-240', '240+']
+    
+  # Trip distance bins (in miles) - finer granularity than tours
+  trip_distance:
+    bins: [0, 1, 3, 5, 10, 20, 1000]
+    labels: ['0-1', '1-3', '3-5', '5-10', '10-20', '20+']
+    
+  # Trip duration bins (in minutes) - finer granularity than tours
+  trip_duration:
+    bins: [0, 5, 10, 15, 30, 60, 10000]
+    labels: ['0-5', '5-10', '10-15', '15-30', '30-60', '60+']
+    
+  # Worker age bins (in years)
+  worker_age:
+    bins: [0, 25, 35, 45, 55, 65, 120]
+    labels: ['<25', '25-34', '35-44', '45-54', '55-64', '65+']
+
+# File specifications (optional - defaults will be used if not specified)
+# Note: System will automatically find highest iteration number (e.g., _1.csv, _2.csv, etc.)
+
+# Custom summaries (configuration-driven, no Python coding required!)
+# Define custom summaries by specifying data source, groupings, and aggregations
+# These replace the hardcoded Python summary functions
+custom_summaries:
+  # ==================== HOUSEHOLD SUMMARIES ====================
+  
+  # Auto ownership - regional
+  - name: "auto_ownership_regional"
+    summary_type: "core"  # Core summary - matches core_summaries.py output
+    description: "Regional auto ownership distribution"
+    data_source: "households"
+    group_by: "num_vehicles"
+    weight_field: "sample_rate"
+    count_name: "households"
+  
+  # Auto ownership by income
+  - name: "auto_ownership_by_income"
+    summary_type: "core"  # Core summary - matches core_summaries.py output
+    description: "Auto ownership by income category"
+    data_source: "households"
+    group_by: ["income_category_bin", "num_vehicles"]
+    weight_field: "sample_rate"
+    count_name: "households"
+    share_within: "income_category_bin"
+    bins:
+      income_category:
+        breaks: [0, 30000, 60000, 100000, 150000, 1000000000]
+        labels: ['<30K', '30-60K', '60-100K', '100-150K', '150K+']
+  
+  # Auto ownership by household size
+  - name: "auto_ownership_by_household_size"
+    summary_type: "validation"  # Validation summary - extended analysis
+    description: "Auto ownership by household size"
+    data_source: "households"
+    group_by: ["num_persons", "num_vehicles"]
+    weight_field: "sample_rate"
+    count_name: "households"
+    share_within: "num_persons"
+  
+  # Auto ownership by household size (ACS-comparable categories: 1, 2, 3, 4+)
+  # Uses aggregated household sizes matching ACS reporting categories
+  - name: "auto_ownership_by_household_size_acs"
+    summary_type: "validation"  # Validation summary - ACS comparison
+    description: "Auto ownership by household size (ACS categories)"
+    data_source: "households"
+    group_by: ["num_persons_agg", "num_vehicles"]
+    weight_field: "sample_rate"
+    count_name: "households"
+    share_within: "num_persons_agg"
+  
+  # Auto ownership by household size and county (ACS-comparable)
+  # Groups by county for county-level comparison with ACS data
+  - name: "auto_ownership_by_household_size_county"
+    summary_type: "validation"  # Validation summary - county-level detail
+    description: "Auto ownership by household size and county (ACS categories)"
+    data_source: "households"
+    group_by: ["county_name", "num_persons_agg", "num_vehicles"]
+    weight_field: "sample_rate"
+    count_name: "households"
+    share_within: ["county_name", "num_persons_agg"]
+  
+  # Auto ownership by county (overall)
+  # Aggregates across all household sizes for county-level comparison
+  - name: "auto_ownership_by_county"
+    summary_type: "validation"  # Validation summary - county-level aggregation
+    description: "Auto ownership by county (overall, all household sizes)"
+    data_source: "households"
+    group_by: ["county_name", "num_vehicles"]
+    weight_field: "sample_rate"
+    count_name: "households"
+    share_within: "county_name"
+  
+  # Note: household_size_regional and income_distribution are now generated from 
+  # PopulationSim outputs (not CTRAMP) and placed directly in outputs directory
+  
+  # ==================== TOUR SUMMARIES ====================
+  
+  # Tour frequency by purpose
+  - name: "tour_frequency_by_purpose"
+    summary_type: "core"  # Core summary - matches core_summaries.py output
+    description: "Tour frequency by purpose"
+    data_source: "individual_tours"
+    group_by: "tour_purpose"
+    weight_field: "sample_rate"
+    count_name: "tours"
+  
+  # Tour mode choice
+  - name: "tour_mode_choice"
+    summary_type: "core"  # Core summary - matches core_summaries.py output
+    description: "Tour mode choice distribution"
+    data_source: "individual_tours"
+    group_by: "tour_mode"
+    weight_field: "sample_rate"
+    count_name: "tours"
+  
+  # Tour mode choice (aggregated/simplified)
+  - name: "tour_mode_choice_aggregated"
+    summary_type: "validation"  # Validation summary - simplified categories
+    description: "Tour mode choice (simplified categories)"
+    data_source: "individual_tours"
+    group_by: "tour_mode_agg"
+    weight_field: "sample_rate"
+    count_name: "tours"
+  
+  # Tour mode by purpose (cross-tab)
+  - name: "tour_mode_by_purpose"
+    summary_type: "core"  # Core summary - matches core_summaries.py output
+    description: "Tour mode by purpose cross-tabulation"
+    data_source: "individual_tours"
+    group_by: ["tour_purpose", "tour_mode"]
+    weight_field: "sample_rate"
+    count_name: "tours"
+    share_within: "tour_purpose"
+  
+  # Tour mode by purpose (aggregated/simplified)
+  - name: "tour_mode_by_purpose_aggregated"
+    summary_type: "validation"  # Validation summary - simplified categories
+    description: "Tour mode by purpose cross-tabulation (simplified categories)"
+    data_source: "individual_tours"
+    group_by: ["tour_purpose", "tour_mode_agg"]
+    weight_field: "sample_rate"
+    count_name: "tours"
+    share_within: "tour_purpose"
+  
+  # Tour start time
+  - name: "tour_start_time"
+    summary_type: "core"  # Core summary - matches core_summaries.py output
+    description: "Tour departure time distribution"
+    data_source: "individual_tours"
+    group_by: "start_period"
+    weight_field: "sample_rate"
+    count_name: "tours"
+  
+  # Tour end time
+  - name: "tour_end_time"
+    summary_type: "core"  # Core summary - matches core_summaries.py output
+    description: "Tour arrival time distribution"
+    data_source: "individual_tours"
+    group_by: "end_period"
+    weight_field: "sample_rate"
+    count_name: "tours"
+  
+  # Tour distance
+  - name: "tour_distance"
+    summary_type: "validation"  # Validation summary - binned analysis
+    description: "Tour distance distribution"
+    data_source: "individual_tours"
+    group_by: "tour_distance"
+    weight_field: "sample_rate"
+    count_name: "tours"
+    bins:
+      tour_distance:
+        breaks: [0, 5, 10, 20, 50, 999]
+        labels: ["0-5mi", "5-10mi", "10-20mi", "20-50mi", "50+mi"]
+  
+  # Tour duration
+  - name: "tour_duration"
+    summary_type: "validation"  # Validation summary - binned analysis
+    description: "Tour duration distribution"
+    data_source: "individual_tours"
+    group_by: "tour_duration"
+    weight_field: "sample_rate"
+    count_name: "tours"
+    bins:
+      tour_duration:
+        breaks: [0, 60, 120, 240, 480, 9999]
+        labels: ["<1hr", "1-2hr", "2-4hr", "4-8hr", "8+hr"]
+  
+  # ==================== TRIP SUMMARIES ====================
+  
+  # Trip mode choice
+  - name: "trip_mode_choice"
+    summary_type: "core"  # Core summary - matches core_summaries.py output
+    description: "Trip mode choice distribution"
+    data_source: "individual_trips"
+    group_by: "trip_mode"
+    weight_field: "sample_rate"
+    count_name: "trips"
+  
+  # Trip mode choice (aggregated/simplified)
+  - name: "trip_mode_choice_aggregated"
+    summary_type: "validation"  # Validation summary - simplified categories
+    description: "Trip mode choice (simplified categories)"
+    data_source: "individual_trips"
+    group_by: "trip_mode_agg"
+    weight_field: "sample_rate"
+    count_name: "trips"
+  
+  # Trip purpose
+  - name: "trip_purpose"
+    summary_type: "core"  # Core summary - matches core_summaries.py output
+    description: "Trip purpose distribution"
+    data_source: "individual_trips"
+    group_by: "destination_purpose"
+    weight_field: "sample_rate"
+    count_name: "trips"
+  
+  # Trip mode by purpose (cross-tab)
+  - name: "trip_mode_by_purpose"
+    summary_type: "core"  # Core summary - matches core_summaries.py output
+    description: "Trip mode by purpose cross-tabulation"
+    data_source: "individual_trips"
+    group_by: ["destination_purpose", "trip_mode"]
+    weight_field: "sample_rate"
+    count_name: "trips"
+    share_within: "destination_purpose"
+  
+  # Trip mode by purpose (aggregated/simplified)
+  - name: "trip_mode_by_purpose_aggregated"
+    summary_type: "validation"  # Validation summary - simplified categories
+    description: "Trip mode by purpose cross-tabulation (simplified categories)"
+    data_source: "individual_trips"
+    group_by: ["destination_purpose", "trip_mode_agg"]
+    weight_field: "sample_rate"
+    count_name: "trips"
+    share_within: "destination_purpose"
+  
+  # Trip departure time
+  - name: "trip_departure_time"
+    summary_type: "validation"  # Validation summary - time period analysis
+    description: "Trip departure time distribution"
+    data_source: "individual_trips"
+    group_by: "depart_period"
+    weight_field: "sample_rate"
+    count_name: "trips"
+  
+  # Trip distance
+  - name: "trip_distance"
+    summary_type: "validation"  # Validation summary - binned analysis
+    description: "Trip distance distribution"
+    data_source: "individual_trips"
+    group_by: "trip_distance"
+    weight_field: "sample_rate"
+    count_name: "trips"
+    bins:
+      trip_distance:
+        breaks: [0, 1, 3, 5, 10, 20, 999]
+        labels: ["0-1mi", "1-3mi", "3-5mi", "5-10mi", "10-20mi", "20+mi"]
+  
+  # Trip duration
+  - name: "trip_duration"
+    summary_type: "validation"  # Validation summary - binned analysis
+    description: "Trip duration distribution"
+    data_source: "individual_trips"
+    group_by: "trip_duration"
+    weight_field: "sample_rate"
+    count_name: "trips"
+    bins:
+      trip_duration:
+        breaks: [0, 10, 20, 30, 60, 9999]
+        labels: ["0-10min", "10-20min", "20-30min", "30-60min", "60+min"]
+  
+  # ==================== WORKER SUMMARIES ====================
+  # Note: Worker summaries require custom column mappings
+  # and are still handled by worker_summary.py
+
+# Summary filtering - control which summaries to generate
+# Options: "all", "core", "validation"
+# - "core": Essential summaries that match core_summaries.py output (minimal set for basic analysis)
+# - "validation": Extended summaries for detailed model validation and dashboard
+# - "all": Generate both core and validation summaries
+generate_summaries: "all"
+
+# Logging configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(levelname)s - %(message)s"

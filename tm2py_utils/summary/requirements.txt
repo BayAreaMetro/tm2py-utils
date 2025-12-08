@@ -5,3 +5,12 @@ pydantic < 2.0 # used in config.py to validate config files. alternative?
 requests # logger.py, used to post msg to slack about model run; also a deep dependency of the documentation libs. alternative?
 scipy # transit_network.py, using scipy non-negative least squares solver. alternative?
 openmatrix # this will already be in tm2py if you installed it ontop
+pyyaml # for configuration file support
+# Additional requirements for aggregated_analysis.py
+pandas
+numpy
+matplotlib
+seaborn
+openpyxl
+plotly
+kaleido  # For plotly image export

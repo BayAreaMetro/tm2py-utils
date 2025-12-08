@@ -1,0 +1,341 @@
+,county,grouping,universe,share,dataset
+1,Alameda,Total: No vehicle available,46255,1.8850984505961972,2023 ACS 1 Year
+2,Alameda,Total: 1 vehicle available,211081,8.602496293380087,2023 ACS 1 Year
+3,Alameda,Total: 2 vehicles available,305903,12.466917551242645,2023 ACS 1 Year
+4,Alameda,Total: 3 or more vehicles available,254667,10.378821038114404,2023 ACS 1 Year
+5,Alameda,"Total: Car, truck, or van - drove alone:",451588,18.404233901369267,2023 ACS 1 Year
+6,Alameda,"Total: Car, truck, or van - drove alone: No vehicle available",8125,0.3311301461700163,2023 ACS 1 Year
+7,Alameda,"Total: Car, truck, or van - drove alone: 1 vehicle available",99841,4.068967990616688,2023 ACS 1 Year
+8,Alameda,"Total: Car, truck, or van - drove alone: 2 vehicles available",171333,6.982587241076603,2023 ACS 1 Year
+9,Alameda,"Total: Car, truck, or van - drove alone: 3 or more vehicles available",172289,7.0215485235059605,2023 ACS 1 Year
+10,Alameda,"Total: Car, truck, or van - carpooled:",74946,3.0543852227517587,2023 ACS 1 Year
+11,Alameda,"Total: Car, truck, or van - carpooled: No vehicle available",2448,0.09976696588605537,2023 ACS 1 Year
+12,Alameda,"Total: Car, truck, or van - carpooled: 1 vehicle available",16702,0.6806813170869677,2023 ACS 1 Year
+13,Alameda,"Total: Car, truck, or van - carpooled: 2 vehicles available",26528,1.081134832935162,2023 ACS 1 Year
+14,Alameda,"Total: Car, truck, or van - carpooled: 3 or more vehicles available",29268,1.1928021068435737,2023 ACS 1 Year
+15,Alameda,Total: Public transportation (excluding taxicab):,73134,2.980538105845904,2023 ACS 1 Year
+16,Alameda,Total: Public transportation (excluding taxicab): No vehicle available,13457,0.5484330310166042,2023 ACS 1 Year
+17,Alameda,Total: Public transportation (excluding taxicab): 1 vehicle available,27988,1.1406363730469433,2023 ACS 1 Year
+18,Alameda,Total: Public transportation (excluding taxicab): 2 vehicles available,21903,0.8926453651153067,2023 ACS 1 Year
+19,Alameda,Total: Public transportation (excluding taxicab): 3 or more vehicles available,9786,0.3988233366670498,2023 ACS 1 Year
+20,Alameda,Total: Walked:,22045,0.8984325012083704,2023 ACS 1 Year
+21,Alameda,Total: Walked: No vehicle available,5452,0.22219342239002202,2023 ACS 1 Year
+22,Alameda,Total: Walked: 1 vehicle available,6475,0.2638852549477976,2023 ACS 1 Year
+23,Alameda,Total: Walked: 2 vehicles available,6962,0.28373268647823424,2023 ACS 1 Year
+24,Alameda,Total: Walked: 3 or more vehicles available,3156,0.12862113739231648,2023 ACS 1 Year
+25,Alameda,"Total: Taxicab, motorcycle, bicycle, or other means:",28561,1.1639886898168412,2023 ACS 1 Year
+26,Alameda,"Total: Taxicab, motorcycle, bicycle, or other means: No vehicle available",5655,0.23046658173433132,2023 ACS 1 Year
+27,Alameda,"Total: Taxicab, motorcycle, bicycle, or other means: 1 vehicle available",9581,0.3904686683636832,2023 ACS 1 Year
+28,Alameda,"Total: Taxicab, motorcycle, bicycle, or other means: 2 vehicles available",8665,0.3531375651154697,2023 ACS 1 Year
+29,Alameda,"Total: Taxicab, motorcycle, bicycle, or other means: 3 or more vehicles available",4660,0.18991587460335702,2023 ACS 1 Year
+30,Alameda,Total: Worked from home:,167632,6.831754912341189,2023 ACS 1 Year
+31,Alameda,Total: Worked from home: No vehicle available,11118,0.4531083033991681,2023 ACS 1 Year
+32,Alameda,Total: Worked from home: 1 vehicle available,50494,2.0578566893180064,2023 ACS 1 Year
+33,Alameda,Total: Worked from home: 2 vehicles available,70512,2.8736798605218694,2023 ACS 1 Year
+34,Alameda,Total: Worked from home: 3 or more vehicles available,35508,1.4471100591021462,2023 ACS 1 Year
+36,Contra Costa,Total: No vehicle available,16837,1.005965770755475,2023 ACS 1 Year
+37,Contra Costa,Total: 1 vehicle available,99248,5.929802863689457,2023 ACS 1 Year
+38,Contra Costa,Total: 2 vehicles available,210124,12.554347663730086,2023 ACS 1 Year
+39,Contra Costa,Total: 3 or more vehicles available,231696,13.843217035158315,2023 ACS 1 Year
+40,Contra Costa,"Total: Car, truck, or van - drove alone:",340939,20.37019444768076,2023 ACS 1 Year
+41,Contra Costa,"Total: Car, truck, or van - drove alone: No vehicle available",7503,0.4482842060924351,2023 ACS 1 Year
+42,Contra Costa,"Total: Car, truck, or van - drove alone: 1 vehicle available",52957,3.164039277893787,2023 ACS 1 Year
+43,Contra Costa,"Total: Car, truck, or van - drove alone: 2 vehicles available",125654,7.507490821316652,2023 ACS 1 Year
+44,Contra Costa,"Total: Car, truck, or van - drove alone: 3 or more vehicles available",154825,9.250380142377884,2023 ACS 1 Year
+45,Contra Costa,"Total: Car, truck, or van - carpooled:",60203,3.5969684205494965,2023 ACS 1 Year
+46,Contra Costa,"Total: Car, truck, or van - carpooled: No vehicle available",3698,0.22094562096892242,2023 ACS 1 Year
+47,Contra Costa,"Total: Car, truck, or van - carpooled: 1 vehicle available",8626,0.5153804560513588,2023 ACS 1 Year
+48,Contra Costa,"Total: Car, truck, or van - carpooled: 2 vehicles available",18373,1.0977376674045463,2023 ACS 1 Year
+49,Contra Costa,"Total: Car, truck, or van - carpooled: 3 or more vehicles available",29506,1.7629046761246685,2023 ACS 1 Year
+50,Contra Costa,Total: Public transportation (excluding taxicab):,35852,2.1420612230875626,2023 ACS 1 Year
+51,Contra Costa,Total: Public transportation (excluding taxicab): No vehicle available,1672,0.09989753333154092,2023 ACS 1 Year
+52,Contra Costa,Total: Public transportation (excluding taxicab): 1 vehicle available,9952,0.5946054137054396,2023 ACS 1 Year
+53,Contra Costa,Total: Public transportation (excluding taxicab): 2 vehicles available,13225,0.7901584200416438,2023 ACS 1 Year
+54,Contra Costa,Total: Public transportation (excluding taxicab): 3 or more vehicles available,11003,0.6573998560089382,2023 ACS 1 Year
+55,Contra Costa,Total: Walked:,9235,0.5517665791368304,2023 ACS 1 Year
+56,Contra Costa,Total: Walked: No vehicle available,1160,0.06930690111518388,2023 ACS 1 Year
+57,Contra Costa,Total: Walked: 1 vehicle available,3001,0.17930173297126453,2023 ACS 1 Year
+58,Contra Costa,Total: Walked: 2 vehicles available,3357,0.20057178193420028,2023 ACS 1 Year
+59,Contra Costa,Total: Walked: 3 or more vehicles available,1717,0.10258616311618167,2023 ACS 1 Year
+60,Contra Costa,"Total: Taxicab, motorcycle, bicycle, or other means:",12537,0.7490522580009141,2023 ACS 1 Year
+61,Contra Costa,"Total: Taxicab, motorcycle, bicycle, or other means: No vehicle available",902,0.05389209034991023,2023 ACS 1 Year
+62,Contra Costa,"Total: Taxicab, motorcycle, bicycle, or other means: 1 vehicle available",3543,0.21168478504404875,2023 ACS 1 Year
+63,Contra Costa,"Total: Taxicab, motorcycle, bicycle, or other means: 2 vehicles available",3539,0.21144579572985844,2023 ACS 1 Year
+64,Contra Costa,"Total: Taxicab, motorcycle, bicycle, or other means: 3 or more vehicles available",4553,0.2720295868770968,2023 ACS 1 Year
+65,Contra Costa,Total: Worked from home:,99139,5.923290404877772,2023 ACS 1 Year
+66,Contra Costa,Total: Worked from home: No vehicle available,1902,0.11363941889748254,2023 ACS 1 Year
+67,Contra Costa,Total: Worked from home: 1 vehicle available,21169,1.2647911980235582,2023 ACS 1 Year
+68,Contra Costa,Total: Worked from home: 2 vehicles available,45976,2.746943177303185,2023 ACS 1 Year
+69,Contra Costa,Total: Worked from home: 3 or more vehicles available,30092,1.7979166106535462,2023 ACS 1 Year
+71,Marin,Total: No vehicle available,2185,0.6041101609393705,2023 ACS 1 Year
+72,Marin,Total: 1 vehicle available,26287,7.267846133003768,2023 ACS 1 Year
+73,Marin,Total: 2 vehicles available,55124,15.240717854289182,2023 ACS 1 Year
+74,Marin,Total: 3 or more vehicles available,36967,10.220659185101013,2023 ACS 1 Year
+75,Marin,"Total: Car, truck, or van - drove alone:",66964,18.51424842889886,2023 ACS 1 Year
+76,Marin,"Total: Car, truck, or van - drove alone: No vehicle available",434,0.11999259031930747,2023 ACS 1 Year
+77,Marin,"Total: Car, truck, or van - drove alone: 1 vehicle available",12815,3.543099181893837,2023 ACS 1 Year
+78,Marin,"Total: Car, truck, or van - drove alone: 2 vehicles available",31431,8.690062456972703,2023 ACS 1 Year
+79,Marin,"Total: Car, truck, or van - drove alone: 3 or more vehicles available",22284,6.161094199713013,2023 ACS 1 Year
+80,Marin,"Total: Car, truck, or van - carpooled:",8672,2.397639961403305,2023 ACS 1 Year
+81,Marin,"Total: Car, truck, or van - carpooled: No vehicle available",239,0.06607886886247577,2023 ACS 1 Year
+82,Marin,"Total: Car, truck, or van - carpooled: 1 vehicle available",1741,0.48135276439150765,2023 ACS 1 Year
+83,Marin,"Total: Car, truck, or van - carpooled: 2 vehicles available",4057,1.121681886924955,2023 ACS 1 Year
+84,Marin,"Total: Car, truck, or van - carpooled: 3 or more vehicles available",2635,0.7285264412243667,2023 ACS 1 Year
+85,Marin,Total: Public transportation (excluding taxicab):,4741,1.310794632958149,2023 ACS 1 Year
+86,Marin,Total: Public transportation (excluding taxicab): No vehicle available,609,0.16837669931902824,2023 ACS 1 Year
+87,Marin,Total: Public transportation (excluding taxicab): 1 vehicle available,897,0.2480031187014258,2023 ACS 1 Year
+88,Marin,Total: Public transportation (excluding taxicab): 2 vehicles available,2096,0.5795033855052268,2023 ACS 1 Year
+89,Marin,Total: Public transportation (excluding taxicab): 3 or more vehicles available,1139,0.31491142943246825,2023 ACS 1 Year
+90,Marin,Total: Walked:,4473,1.2366978260328625,2023 ACS 1 Year
+91,Marin,Total: Walked: No vehicle available,138,0.03815432595406551,2023 ACS 1 Year
+92,Marin,Total: Walked: 1 vehicle available,934,0.258232901747081,2023 ACS 1 Year
+93,Marin,Total: Walked: 2 vehicles available,2682,0.7415210304985774,2023 ACS 1 Year
+94,Marin,Total: Walked: 3 or more vehicles available,719,0.1987895678331384,2023 ACS 1 Year
+95,Marin,"Total: Taxicab, motorcycle, bicycle, or other means:",3865,1.0685976073366898,2023 ACS 1 Year
+96,Marin,"Total: Taxicab, motorcycle, bicycle, or other means: No vehicle available",462,0.12773404775926278,2023 ACS 1 Year
+97,Marin,"Total: Taxicab, motorcycle, bicycle, or other means: 1 vehicle available",1454,0.4020028256319656,2023 ACS 1 Year
+98,Marin,"Total: Taxicab, motorcycle, bicycle, or other means: 2 vehicles available",1062,0.2936224214725911,2023 ACS 1 Year
+99,Marin,"Total: Taxicab, motorcycle, bicycle, or other means: 3 or more vehicles available",887,0.24523831247287034,2023 ACS 1 Year
+100,Marin,Total: Worked from home:,31848,8.805354876703467,2023 ACS 1 Year
+101,Marin,Total: Worked from home: No vehicle available,303,0.0837736287252308,2023 ACS 1 Year
+102,Marin,Total: Worked from home: 1 vehicle available,8446,2.3351553406379515,2023 ACS 1 Year
+103,Marin,Total: Worked from home: 2 vehicles available,13796,3.814326672915129,2023 ACS 1 Year
+104,Marin,Total: Worked from home: 3 or more vehicles available,9303,2.5720992344251554,2023 ACS 1 Year
+106,Napa,Total: No vehicle available,3296,1.6467320163474124,2023 ACS 1 Year
+107,Napa,Total: 1 vehicle available,9831,4.911717977157588,2023 ACS 1 Year
+108,Napa,Total: 2 vehicles available,26950,13.46463223318045,2023 ACS 1 Year
+109,Napa,Total: 3 or more vehicles available,26641,13.31025110664788,2023 ACS 1 Year
+110,Napa,"Total: Car, truck, or van - drove alone:",46679,23.321542412342495,2023 ACS 1 Year
+111,Napa,"Total: Car, truck, or van - drove alone: No vehicle available",715,0.357224936798665,2023 ACS 1 Year
+112,Napa,"Total: Car, truck, or van - drove alone: 1 vehicle available",6639,3.316945951617255,2023 ACS 1 Year
+113,Napa,"Total: Car, truck, or van - drove alone: 2 vehicles available",20072,10.02827822576616,2023 ACS 1 Year
+114,Napa,"Total: Car, truck, or van - drove alone: 3 or more vehicles available",19253,9.619093298160417,2023 ACS 1 Year
+115,Napa,"Total: Car, truck, or van - carpooled:",6151,3.073133687060963,2023 ACS 1 Year
+116,Napa,"Total: Car, truck, or van - carpooled: No vehicle available",2033,1.0157178972191412,2023 ACS 1 Year
+117,Napa,"Total: Car, truck, or van - carpooled: 1 vehicle available",345,0.17236727719655867,2023 ACS 1 Year
+118,Napa,"Total: Car, truck, or van - carpooled: 2 vehicles available",1472,0.7354337160386503,2023 ACS 1 Year
+119,Napa,"Total: Car, truck, or van - carpooled: 3 or more vehicles available",2301,1.149614796606613,2023 ACS 1 Year
+120,Napa,Total: Public transportation (excluding taxicab):,534,0.26679456818249947,2023 ACS 1 Year
+121,Napa,Total: Public transportation (excluding taxicab): No vehicle available,0,0.0,2023 ACS 1 Year
+122,Napa,Total: Public transportation (excluding taxicab): 1 vehicle available,95,0.047463453141081365,2023 ACS 1 Year
+123,Napa,Total: Public transportation (excluding taxicab): 2 vehicles available,276,0.13789382175724693,2023 ACS 1 Year
+124,Napa,Total: Public transportation (excluding taxicab): 3 or more vehicles available,163,0.0814372932841712,2023 ACS 1 Year
+125,Napa,Total: Walked:,3332,1.6647181670114013,2023 ACS 1 Year
+126,Napa,Total: Walked: No vehicle available,0,0.0,2023 ACS 1 Year
+127,Napa,Total: Walked: 1 vehicle available,909,0.45415030426571545,2023 ACS 1 Year
+128,Napa,Total: Walked: 2 vehicles available,1417,0.7079548747464453,2023 ACS 1 Year
+129,Napa,Total: Walked: 3 or more vehicles available,1006,0.5026129879992406,2023 ACS 1 Year
+130,Napa,"Total: Taxicab, motorcycle, bicycle, or other means:",1371,0.6849725711202374,2023 ACS 1 Year
+131,Napa,"Total: Taxicab, motorcycle, bicycle, or other means: No vehicle available",293,0.14638728179301938,2023 ACS 1 Year
+132,Napa,"Total: Taxicab, motorcycle, bicycle, or other means: 1 vehicle available",76,0.037970762512865096,2023 ACS 1 Year
+133,Napa,"Total: Taxicab, motorcycle, bicycle, or other means: 2 vehicles available",633,0.3162564825084685,2023 ACS 1 Year
+134,Napa,"Total: Taxicab, motorcycle, bicycle, or other means: 3 or more vehicles available",369,0.18435804430588446,2023 ACS 1 Year
+135,Napa,Total: Worked from home:,8651,4.322171927615736,2023 ACS 1 Year
+136,Napa,Total: Worked from home: No vehicle available,255,0.12740190053658682,2023 ACS 1 Year
+137,Napa,Total: Worked from home: 1 vehicle available,1767,0.8828202284241135,2023 ACS 1 Year
+138,Napa,Total: Worked from home: 2 vehicles available,3080,1.5388151123634801,2023 ACS 1 Year
+139,Napa,Total: Worked from home: 3 or more vehicles available,3549,1.7731346862915554,2023 ACS 1 Year
+141,San Francisco,Total: No vehicle available,100440,7.370828865997539,2023 ACS 1 Year
+142,San Francisco,Total: 1 vehicle available,188784,13.853988019100749,2023 ACS 1 Year
+143,San Francisco,Total: 2 vehicles available,108724,7.978753461038594,2023 ACS 1 Year
+144,San Francisco,Total: 3 or more vehicles available,56275,4.12976298719645,2023 ACS 1 Year
+145,San Francisco,"Total: Car, truck, or van - drove alone:",136585,10.023343893491376,2023 ACS 1 Year
+146,San Francisco,"Total: Car, truck, or van - drove alone: No vehicle available",7492,0.5498033638396411,2023 ACS 1 Year
+147,San Francisco,"Total: Car, truck, or van - drove alone: 1 vehicle available",53629,3.935585237500817,2023 ACS 1 Year
+148,San Francisco,"Total: Car, truck, or van - drove alone: 2 vehicles available",48215,3.5382767201719565,2023 ACS 1 Year
+149,San Francisco,"Total: Car, truck, or van - drove alone: 3 or more vehicles available",27249,1.999678571978962,2023 ACS 1 Year
+150,San Francisco,"Total: Car, truck, or van - carpooled:",31977,2.3466447097571015,2023 ACS 1 Year
+151,San Francisco,"Total: Car, truck, or van - carpooled: No vehicle available",2887,0.21186362939202402,2023 ACS 1 Year
+152,San Francisco,"Total: Car, truck, or van - carpooled: 1 vehicle available",12630,0.9268575127195233,2023 ACS 1 Year
+153,San Francisco,"Total: Car, truck, or van - carpooled: 2 vehicles available",10030,0.7360554910987188,2023 ACS 1 Year
+154,San Francisco,"Total: Car, truck, or van - carpooled: 3 or more vehicles available",6430,0.47186807654683566,2023 ACS 1 Year
+155,San Francisco,Total: Public transportation (excluding taxicab):,99881,7.329806431349066,2023 ACS 1 Year
+156,San Francisco,Total: Public transportation (excluding taxicab): No vehicle available,38442,2.821081275056525,2023 ACS 1 Year
+157,San Francisco,Total: Public transportation (excluding taxicab): 1 vehicle available,37201,2.730010002429056,2023 ACS 1 Year
+158,San Francisco,Total: Public transportation (excluding taxicab): 2 vehicles available,14575,1.0695921019704713,2023 ACS 1 Year
+159,San Francisco,Total: Public transportation (excluding taxicab): 3 or more vehicles available,9663,0.709123051893013,2023 ACS 1 Year
+160,San Francisco,Total: Walked:,43986,3.2279298934664253,2023 ACS 1 Year
+161,San Francisco,Total: Walked: No vehicle available,19156,1.4057705869877424,2023 ACS 1 Year
+162,San Francisco,Total: Walked: 1 vehicle available,18874,1.3850759061811782,2023 ACS 1 Year
+163,San Francisco,Total: Walked: 2 vehicles available,5080,0.3727977960898795,2023 ACS 1 Year
+164,San Francisco,Total: Walked: 3 or more vehicles available,876,0.06428560420762489,2023 ACS 1 Year
+165,San Francisco,"Total: Taxicab, motorcycle, bicycle, or other means:",29593,2.17169393300941,2023 ACS 1 Year
+166,San Francisco,"Total: Taxicab, motorcycle, bicycle, or other means: No vehicle available",9371,0.6876945171571379,2023 ACS 1 Year
+167,San Francisco,"Total: Taxicab, motorcycle, bicycle, or other means: 1 vehicle available",13536,0.9933446787150805,2023 ACS 1 Year
+168,San Francisco,"Total: Taxicab, motorcycle, bicycle, or other means: 2 vehicles available",4697,0.3446911905972764,2023 ACS 1 Year
+169,San Francisco,"Total: Taxicab, motorcycle, bicycle, or other means: 3 or more vehicles available",1989,0.14596354653991542,2023 ACS 1 Year
+170,San Francisco,Total: Worked from home:,112201,8.233914472259954,2023 ACS 1 Year
+171,San Francisco,Total: Worked from home: No vehicle available,23092,1.6946154935644682,2023 ACS 1 Year
+172,San Francisco,Total: Worked from home: 1 vehicle available,52914,3.883114681555095,2023 ACS 1 Year
+173,San Francisco,Total: Worked from home: 2 vehicles available,26127,1.9173401611102918,2023 ACS 1 Year
+174,San Francisco,Total: Worked from home: 3 or more vehicles available,10068,0.7388441360300997,2023 ACS 1 Year
+176,San Mateo,Total: No vehicle available,11167,0.9893586577963712,2023 ACS 1 Year
+177,San Mateo,Total: 1 vehicle available,79773,7.067619612106199,2023 ACS 1 Year
+178,San Mateo,Total: 2 vehicles available,150735,13.354614245807827,2023 ACS 1 Year
+179,San Mateo,Total: 3 or more vehicles available,134562,11.921740817622934,2023 ACS 1 Year
+180,San Mateo,"Total: Car, truck, or van - drove alone:",227557,20.160785178845604,2023 ACS 1 Year
+181,San Mateo,"Total: Car, truck, or van - drove alone: No vehicle available",3842,0.3403882836261895,2023 ACS 1 Year
+182,San Mateo,"Total: Car, truck, or van - drove alone: 1 vehicle available",41413,3.6690525741310225,2023 ACS 1 Year
+183,San Mateo,"Total: Car, truck, or van - drove alone: 2 vehicles available",91325,8.091087975575679,2023 ACS 1 Year
+184,San Mateo,"Total: Car, truck, or van - drove alone: 3 or more vehicles available",90977,8.060256345512713,2023 ACS 1 Year
+185,San Mateo,"Total: Car, truck, or van - carpooled:",38679,3.4268293655328956,2023 ACS 1 Year
+186,San Mateo,"Total: Car, truck, or van - carpooled: No vehicle available",1274,0.11287211695465003,2023 ACS 1 Year
+187,San Mateo,"Total: Car, truck, or van - carpooled: 1 vehicle available",8488,0.752008264294403,2023 ACS 1 Year
+188,San Mateo,"Total: Car, truck, or van - carpooled: 2 vehicles available",14350,1.2713617569067723,2023 ACS 1 Year
+189,San Mateo,"Total: Car, truck, or van - carpooled: 3 or more vehicles available",14567,1.29058722737707,2023 ACS 1 Year
+190,San Mateo,Total: Public transportation (excluding taxicab):,20563,1.8218126694964434,2023 ACS 1 Year
+191,San Mateo,Total: Public transportation (excluding taxicab): No vehicle available,3043,0.2695995697747253,2023 ACS 1 Year
+192,San Mateo,Total: Public transportation (excluding taxicab): 1 vehicle available,6553,0.5805737695477408,2023 ACS 1 Year
+193,San Mateo,Total: Public transportation (excluding taxicab): 2 vehicles available,7018,0.6217712062698069,2023 ACS 1 Year
+194,San Mateo,Total: Public transportation (excluding taxicab): 3 or more vehicles available,3949,0.3498681239041703,2023 ACS 1 Year
+195,San Mateo,Total: Walked:,8276,0.7332257770146654,2023 ACS 1 Year
+196,San Mateo,Total: Walked: No vehicle available,421,0.037299184645139455,2023 ACS 1 Year
+197,San Mateo,Total: Walked: 1 vehicle available,2569,0.22760476330965146,2023 ACS 1 Year
+198,San Mateo,Total: Walked: 2 vehicles available,2716,0.24062846911211108,2023 ACS 1 Year
+199,San Mateo,Total: Walked: 3 or more vehicles available,2570,0.22769335994776344,2023 ACS 1 Year
+200,San Mateo,"Total: Taxicab, motorcycle, bicycle, or other means:",11352,1.0057490358470857,2023 ACS 1 Year
+201,San Mateo,"Total: Taxicab, motorcycle, bicycle, or other means: No vehicle available",1170,0.10365806659100513,2023 ACS 1 Year
+202,San Mateo,"Total: Taxicab, motorcycle, bicycle, or other means: 1 vehicle available",3948,0.3497795272660584,2023 ACS 1 Year
+203,San Mateo,"Total: Taxicab, motorcycle, bicycle, or other means: 2 vehicles available",3714,0.3290479139478574,2023 ACS 1 Year
+204,San Mateo,"Total: Taxicab, motorcycle, bicycle, or other means: 3 or more vehicles available",2520,0.22326352804216493,2023 ACS 1 Year
+205,San Mateo,Total: Worked from home:,69810,6.18493130659664,2023 ACS 1 Year
+206,San Mateo,Total: Worked from home: No vehicle available,1417,0.12554143620466177,2023 ACS 1 Year
+207,San Mateo,Total: Worked from home: 1 vehicle available,16802,1.4886007135573234,2023 ACS 1 Year
+208,San Mateo,Total: Worked from home: 2 vehicles available,31612,2.8007169239956022,2023 ACS 1 Year
+209,San Mateo,Total: Worked from home: 3 or more vehicles available,19979,1.7700722328390526,2023 ACS 1 Year
+211,Santa Clara,Total: No vehicle available,36967,1.2679306529360963,2023 ACS 1 Year
+212,Santa Clara,Total: 1 vehicle available,212091,7.2745064547263665,2023 ACS 1 Year
+213,Santa Clara,Total: 2 vehicles available,367523,12.60566660424251,2023 ACS 1 Year
+214,Santa Clara,Total: 3 or more vehicles available,355265,12.18522962142836,2023 ACS 1 Year
+215,Santa Clara,"Total: Car, truck, or van - drove alone:",643569,22.073764773431183,2023 ACS 1 Year
+216,Santa Clara,"Total: Car, truck, or van - drove alone: No vehicle available",17878,0.6131972898312421,2023 ACS 1 Year
+217,Santa Clara,"Total: Car, truck, or van - drove alone: 1 vehicle available",127425,4.370548420222957,2023 ACS 1 Year
+218,Santa Clara,"Total: Car, truck, or van - drove alone: 2 vehicles available",251701,8.633089330339718,2023 ACS 1 Year
+219,Santa Clara,"Total: Car, truck, or van - drove alone: 3 or more vehicles available",246565,8.456929733037265,2023 ACS 1 Year
+220,Santa Clara,"Total: Car, truck, or van - carpooled:",101269,3.4734241158921613,2023 ACS 1 Year
+221,Santa Clara,"Total: Car, truck, or van - carpooled: No vehicle available",2766,0.0948709980799427,2023 ACS 1 Year
+222,Santa Clara,"Total: Car, truck, or van - carpooled: 1 vehicle available",20797,0.7133160329242837,2023 ACS 1 Year
+223,Santa Clara,"Total: Car, truck, or van - carpooled: 2 vehicles available",31980,1.096881604698687,2023 ACS 1 Year
+224,Santa Clara,"Total: Car, truck, or van - carpooled: 3 or more vehicles available",45726,1.568355480189248,2023 ACS 1 Year
+225,Santa Clara,Total: Public transportation (excluding taxicab):,27368,0.9386946765914216,2023 ACS 1 Year
+226,Santa Clara,Total: Public transportation (excluding taxicab): No vehicle available,4759,0.16322887919828177,2023 ACS 1 Year
+227,Santa Clara,Total: Public transportation (excluding taxicab): 1 vehicle available,9866,0.3383938058773372,2023 ACS 1 Year
+228,Santa Clara,Total: Public transportation (excluding taxicab): 2 vehicles available,7249,0.24863335686243845,2023 ACS 1 Year
+229,Santa Clara,Total: Public transportation (excluding taxicab): 3 or more vehicles available,5494,0.18843863465336413,2023 ACS 1 Year
+230,Santa Clara,Total: Walked:,16405,0.5626748819600361,2023 ACS 1 Year
+231,Santa Clara,Total: Walked: No vehicle available,4244,0.14556490088621724,2023 ACS 1 Year
+232,Santa Clara,Total: Walked: 1 vehicle available,5364,0.18397976634158086,2023 ACS 1 Year
+233,Santa Clara,Total: Walked: 2 vehicles available,3745,0.12844970636637218,2023 ACS 1 Year
+234,Santa Clara,Total: Walked: 3 or more vehicles available,3052,0.10468050836586593,2023 ACS 1 Year
+235,Santa Clara,"Total: Taxicab, motorcycle, bicycle, or other means:",23445,0.8041397505366076,2023 ACS 1 Year
+236,Santa Clara,"Total: Taxicab, motorcycle, bicycle, or other means: No vehicle available",3476,0.11922327885968216,2023 ACS 1 Year
+237,Santa Clara,"Total: Taxicab, motorcycle, bicycle, or other means: 1 vehicle available",8948,0.3069073357987445,2023 ACS 1 Year
+238,Santa Clara,"Total: Taxicab, motorcycle, bicycle, or other means: 2 vehicles available",6598,0.22630471631650834,2023 ACS 1 Year
+239,Santa Clara,"Total: Taxicab, motorcycle, bicycle, or other means: 3 or more vehicles available",4423,0.1517044195616727,2023 ACS 1 Year
+240,Santa Clara,Total: Worked from home:,159790,5.4806351349219256,2023 ACS 1 Year
+241,Santa Clara,Total: Worked from home: No vehicle available,3844,0.13184530608073022,2023 ACS 1 Year
+242,Santa Clara,Total: Worked from home: 1 vehicle available,39691,1.3613610935614628,2023 ACS 1 Year
+243,Santa Clara,Total: Worked from home: 2 vehicles available,66250,2.2723078896587867,2023 ACS 1 Year
+244,Santa Clara,Total: Worked from home: 3 or more vehicles available,50005,1.7151208456209452,2023 ACS 1 Year
+246,Solano,Total: No vehicle available,4321,0.6983603642916596,2023 ACS 1 Year
+247,Solano,Total: 1 vehicle available,26831,4.33642835785918,2023 ACS 1 Year
+248,Solano,Total: 2 vehicles available,72423,11.705011030570438,2023 ACS 1 Year
+249,Solano,Total: 3 or more vehicles available,102670,16.593533580612053,2023 ACS 1 Year
+250,Solano,"Total: Car, truck, or van - drove alone:",154292,24.936685333785867,2023 ACS 1 Year
+251,Solano,"Total: Car, truck, or van - drove alone: No vehicle available",2006,0.3242098798354708,2023 ACS 1 Year
+252,Solano,"Total: Car, truck, or van - drove alone: 1 vehicle available",18362,2.967667903060276,2023 ACS 1 Year
+253,Solano,"Total: Car, truck, or van - drove alone: 2 vehicles available",53428,8.635037617073545,2023 ACS 1 Year
+254,Solano,"Total: Car, truck, or van - drove alone: 3 or more vehicles available",80496,13.009769933816578,2023 ACS 1 Year
+255,Solano,"Total: Car, truck, or van - carpooled:",19684,3.1813296483955167,2023 ACS 1 Year
+256,Solano,"Total: Car, truck, or van - carpooled: No vehicle available",621,0.10036606948047226,2023 ACS 1 Year
+257,Solano,"Total: Car, truck, or van - carpooled: 1 vehicle available",2154,0.34812965162791826,2023 ACS 1 Year
+258,Solano,"Total: Car, truck, or van - carpooled: 2 vehicles available",7405,1.196796690020768,2023 ACS 1 Year
+259,Solano,"Total: Car, truck, or van - carpooled: 3 or more vehicles available",9504,1.536037237266358,2023 ACS 1 Year
+260,Solano,Total: Public transportation (excluding taxicab):,3991,0.6450257379976888,2023 ACS 1 Year
+261,Solano,Total: Public transportation (excluding taxicab): No vehicle available,945,0.15273097529637084,2023 ACS 1 Year
+262,Solano,Total: Public transportation (excluding taxicab): 1 vehicle available,504,0.08145652015806444,2023 ACS 1 Year
+263,Solano,Total: Public transportation (excluding taxicab): 2 vehicles available,1095,0.17697398724817573,2023 ACS 1 Year
+264,Solano,Total: Public transportation (excluding taxicab): 3 or more vehicles available,1447,0.23386425529507787,2023 ACS 1 Year
+265,Solano,Total: Walked:,2711,0.4381520360089538,2023 ACS 1 Year
+266,Solano,Total: Walked: No vehicle available,228,0.036849378166743434,2023 ACS 1 Year
+267,Solano,Total: Walked: 1 vehicle available,624,0.10085092971950835,2023 ACS 1 Year
+268,Solano,Total: Walked: 2 vehicles available,1562,0.25245056445812825,2023 ACS 1 Year
+269,Solano,Total: Walked: 3 or more vehicles available,297,0.04800116366457369,2023 ACS 1 Year
+270,Solano,"Total: Taxicab, motorcycle, bicycle, or other means:",2594,0.41924248668654596,2023 ACS 1 Year
+271,Solano,"Total: Taxicab, motorcycle, bicycle, or other means: No vehicle available",272,0.043960661672606205,2023 ACS 1 Year
+272,Solano,"Total: Taxicab, motorcycle, bicycle, or other means: 1 vehicle available",238,0.03846557896353043,2023 ACS 1 Year
+273,Solano,"Total: Taxicab, motorcycle, bicycle, or other means: 2 vehicles available",1425,0.23030861354214646,2023 ACS 1 Year
+274,Solano,"Total: Taxicab, motorcycle, bicycle, or other means: 3 or more vehicles available",659,0.10650763250826283,2023 ACS 1 Year
+275,Solano,Total: Worked from home:,22973,3.7128980904587583,2023 ACS 1 Year
+276,Solano,Total: Worked from home: No vehicle available,249,0.04024339983999612,2023 ACS 1 Year
+277,Solano,Total: Worked from home: 1 vehicle available,4949,0.7998577743298827,2023 ACS 1 Year
+278,Solano,Total: Worked from home: 2 vehicles available,7508,1.2134435582276741,2023 ACS 1 Year
+279,Solano,Total: Worked from home: 3 or more vehicles available,10267,1.6593533580612057,2023 ACS 1 Year
+281,Sonoma,Total: No vehicle available,4567,0.626577763143453,2023 ACS 1 Year
+282,Sonoma,Total: 1 vehicle available,40620,5.572933816266052,2023 ACS 1 Year
+283,Sonoma,Total: 2 vehicles available,96569,13.24895730435737,2023 ACS 1 Year
+284,Sonoma,Total: 3 or more vehicles available,101204,13.884864449566459,2023 ACS 1 Year
+285,Sonoma,"Total: Car, truck, or van - drove alone:",169794,23.295192624300295,2023 ACS 1 Year
+286,Sonoma,"Total: Car, truck, or van - drove alone: No vehicle available",1958,0.2686313247722533,2023 ACS 1 Year
+287,Sonoma,"Total: Car, truck, or van - drove alone: 1 vehicle available",26841,3.6824991768192294,2023 ACS 1 Year
+288,Sonoma,"Total: Car, truck, or van - drove alone: 2 vehicles available",66770,9.160630007683022,2023 ACS 1 Year
+289,Sonoma,"Total: Car, truck, or van - drove alone: 3 or more vehicles available",74225,10.183432115025793,2023 ACS 1 Year
+290,Sonoma,"Total: Car, truck, or van - carpooled:",24949,3.422922840522445,2023 ACS 1 Year
+291,Sonoma,"Total: Car, truck, or van - carpooled: No vehicle available",511,0.07010756228734497,2023 ACS 1 Year
+292,Sonoma,"Total: Car, truck, or van - carpooled: 1 vehicle available",4906,0.6730874766765449,2023 ACS 1 Year
+293,Sonoma,"Total: Car, truck, or van - carpooled: 2 vehicles available",8305,1.1394193831632093,2023 ACS 1 Year
+294,Sonoma,"Total: Car, truck, or van - carpooled: 3 or more vehicles available",11227,1.5403084183953464,2023 ACS 1 Year
+295,Sonoma,Total: Public transportation (excluding taxicab):,1627,0.22321918559982437,2023 ACS 1 Year
+296,Sonoma,Total: Public transportation (excluding taxicab): No vehicle available,194,0.02661617824607617,2023 ACS 1 Year
+297,Sonoma,Total: Public transportation (excluding taxicab): 1 vehicle available,464,0.06365931291845023,2023 ACS 1 Year
+298,Sonoma,Total: Public transportation (excluding taxicab): 2 vehicles available,764,0.1048183514433103,2023 ACS 1 Year
+299,Sonoma,Total: Public transportation (excluding taxicab): 3 or more vehicles available,205,0.02812534299198771,2023 ACS 1 Year
+300,Sonoma,Total: Walked:,5809,0.7969761826363737,2023 ACS 1 Year
+301,Sonoma,Total: Walked: No vehicle available,186,0.02551860388541324,2023 ACS 1 Year
+302,Sonoma,Total: Walked: 1 vehicle available,1028,0.14103830534518713,2023 ACS 1 Year
+303,Sonoma,Total: Walked: 2 vehicles available,2900,0.3978707057403139,2023 ACS 1 Year
+304,Sonoma,Total: Walked: 3 or more vehicles available,1695,0.23254856766545934,2023 ACS 1 Year
+305,Sonoma,"Total: Taxicab, motorcycle, bicycle, or other means:",4104,0.5630556470200856,2023 ACS 1 Year
+306,Sonoma,"Total: Taxicab, motorcycle, bicycle, or other means: No vehicle available",776,0.10646471298430468,2023 ACS 1 Year
+307,Sonoma,"Total: Taxicab, motorcycle, bicycle, or other means: 1 vehicle available",670,0.0919218527055208,2023 ACS 1 Year
+308,Sonoma,"Total: Taxicab, motorcycle, bicycle, or other means: 2 vehicles available",1647,0.22596312150148173,2023 ACS 1 Year
+309,Sonoma,"Total: Taxicab, motorcycle, bicycle, or other means: 3 or more vehicles available",1011,0.1387059598287784,2023 ACS 1 Year
+310,Sonoma,Total: Worked from home:,36677,5.031966853254308,2023 ACS 1 Year
+311,Sonoma,Total: Worked from home: No vehicle available,942,0.1292393809680606,2023 ACS 1 Year
+312,Sonoma,Total: Worked from home: 1 vehicle available,6711,0.9207276918011196,2023 ACS 1 Year
+313,Sonoma,Total: Worked from home: 2 vehicles available,16183,2.2202557348260346,2023 ACS 1 Year
+314,Sonoma,Total: Worked from home: 3 or more vehicles available,12841,1.7617440456590934,2023 ACS 1 Year
+316,Bay Area,Total: No vehicle available,226035,1.9751727768263172,2023 ACS 1 Year
+317,Bay Area,Total: 1 vehicle available,894546,7.816855384426637,2023 ACS 1 Year
+318,Bay Area,Total: 2 vehicles available,1394075,12.181914255996409,2023 ACS 1 Year
+319,Bay Area,Total: 3 or more vehicles available,1299947,11.359390916083973,2023 ACS 1 Year
+320,Bay Area,"Total: Car, truck, or van - drove alone:",2237967,19.556137296594166,2023 ACS 1 Year
+321,Bay Area,"Total: Car, truck, or van - drove alone: No vehicle available",49953,0.436506760991904,2023 ACS 1 Year
+322,Bay Area,"Total: Car, truck, or van - drove alone: 1 vehicle available",439922,3.8441920867431465,2023 ACS 1 Year
+323,Bay Area,"Total: Car, truck, or van - drove alone: 2 vehicles available",859929,7.514359947811084,2023 ACS 1 Year
+324,Bay Area,"Total: Car, truck, or van - drove alone: 3 or more vehicles available",888163,7.761078501048034,2023 ACS 1 Year
+325,Bay Area,"Total: Car, truck, or van - carpooled:",366530,3.202867157255071,2023 ACS 1 Year
+326,Bay Area,"Total: Car, truck, or van - carpooled: No vehicle available",16477,0.14398178089130986,2023 ACS 1 Year
+327,Bay Area,"Total: Car, truck, or van - carpooled: 1 vehicle available",76389,0.6675137622447211,2023 ACS 1 Year
+328,Bay Area,"Total: Car, truck, or van - carpooled: 2 vehicles available",122500,1.0704477853483922,2023 ACS 1 Year
+329,Bay Area,"Total: Car, truck, or van - carpooled: 3 or more vehicles available",151164,1.320923828770648,2023 ACS 1 Year
+330,Bay Area,Total: Public transportation (excluding taxicab):,267691,2.3391774539403793,2023 ACS 1 Year
+331,Bay Area,Total: Public transportation (excluding taxicab): No vehicle available,63121,0.5515733441549051,2023 ACS 1 Year
+332,Bay Area,Total: Public transportation (excluding taxicab): 1 vehicle available,93520,0.8172104235574013,2023 ACS 1 Year
+333,Bay Area,Total: Public transportation (excluding taxicab): 2 vehicles available,68201,0.5959641584371077,2023 ACS 1 Year
+334,Bay Area,Total: Public transportation (excluding taxicab): 3 or more vehicles available,42849,0.3744295277909654,2023 ACS 1 Year
+335,Bay Area,Total: Walked:,116272,1.0160253461063533,2023 ACS 1 Year
+336,Bay Area,Total: Walked: No vehicle available,30985,0.2707577520736321,2023 ACS 1 Year
+337,Bay Area,Total: Walked: 1 vehicle available,39778,0.34759405718847636,2023 ACS 1 Year
+338,Bay Area,Total: Walked: 2 vehicles available,30421,0.26582932308639545,2023 ACS 1 Year
+339,Bay Area,Total: Walked: 3 or more vehicles available,15088,0.13184421375784933,2023 ACS 1 Year
+340,Bay Area,"Total: Taxicab, motorcycle, bicycle, or other means:",117422,1.026074447764726,2023 ACS 1 Year
+341,Bay Area,"Total: Taxicab, motorcycle, bicycle, or other means: No vehicle available",22377,0.19553804157339572,2023 ACS 1 Year
+342,Bay Area,"Total: Taxicab, motorcycle, bicycle, or other means: 1 vehicle available",41994,0.366958239166697,2023 ACS 1 Year
+343,Bay Area,"Total: Taxicab, motorcycle, bicycle, or other means: 2 vehicles available",31980,0.2794524095954415,2023 ACS 1 Year
+344,Bay Area,"Total: Taxicab, motorcycle, bicycle, or other means: 3 or more vehicles available",21071,0.18412575742919163,2023 ACS 1 Year
+345,Bay Area,Total: Worked from home:,708721,6.1930516316726365,2023 ACS 1 Year
+346,Bay Area,Total: Worked from home: No vehicle available,43122,0.3768150971411704,2023 ACS 1 Year
+347,Bay Area,Total: Worked from home: 1 vehicle available,202943,1.7733868155261943,2023 ACS 1 Year
+348,Bay Area,Total: Worked from home: 2 vehicles available,281044,2.4558606317179885,2023 ACS 1 Year
+349,Bay Area,Total: Worked from home: 3 or more vehicles available,181612,1.5869890872872834,2023 ACS 1 Year

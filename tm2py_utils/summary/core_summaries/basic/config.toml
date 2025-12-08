@@ -1,0 +1,41 @@
+# TM2 Mode Share Analysis Configuration
+# Configuration for TM2-specific transportation mode analysis
+
+[paths]
+# Default TM2 core summaries path (can be overridden via command line)
+data_dir = "E:\\Box\\Modeling and Surveys\\Development\\Travel Model Two Conversion\\Model Outputs\\2015-tm22-dev-sprint-04\\core_summaries"
+# Output directory defaults to "agg" subdirectory within the data_dir if not specified
+output_dir = ""  # Empty means use default: data_dir/agg
+
+[analysis_settings]
+# Which analyses to run
+run_overall_mode_share = true
+run_mode_by_purpose = true
+run_mode_by_time = true
+run_demographics = true
+
+# Output formats
+create_treemaps = true
+create_excel_summary = true
+create_charts = false  # Additional bar/pie charts
+
+[visualization]
+# Treemap settings
+treemap_width = 1000
+treemap_height = 700
+font_size = 12
+
+# Color scheme for mode categories
+color_scheme = "Set3"  # Plotly color scheme
+
+[mode_filtering]
+# Minimum trips to include mode in analysis (reduces noise)
+min_trips = 100
+
+# Include only specific mode categories (empty = all)
+include_categories = []  # ["Auto - Solo", "Transit", "Active"]
+
+[geographic_scope]
+# Future enhancement: TAZ/county-level analysis
+include_geography = false
+geography_level = "county"  # "taz", "county", "district"

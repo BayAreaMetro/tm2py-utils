@@ -6,7 +6,6 @@
     name = "tm22-dev-sprint-04"
     year = 2015
     verify = false
-    maz_landuse_file = "inputs/landuse/maz_data.csv"
     zone_seq_file = "inputs/landuse/mtc_final_network_zone_seq.csv"
     landuse_file = "inputs/landuse/maz_data_withDensity.csv"
     landuse_index_column = "TAZ"
@@ -45,3 +44,10 @@
 
 [slack_notifications]
 enabled = true
+
+[post_processor]
+    # Network export options (set to true to enable)
+    export_transit_network_shapefile = true
+    export_highway_network_shapefile = true
+    export_boardings_by_segment = true
+    export_boardings_by_segment_geofile = true
