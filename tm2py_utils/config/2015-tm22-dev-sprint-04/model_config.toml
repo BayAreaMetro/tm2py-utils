@@ -60,35 +60,15 @@
         "single_tnc"=0.72
         "shared_tnc"=0.20
     [household.taxi_split]
-        "da"= 0.00
-        "sr2"= 0.53
-        "sr3"= 0.47
+        "sr2_hov"= 0.53
+        "sr3_hov"= 0.47
     [household.single_tnc_split]
-        "da"= 0.00
-        "sr2"= 0.53
-        "sr3"= 0.47
+        "sr2_hov"= 0.53
+        "sr3_hov"= 0.47
     [household.shared_tnc_split]
-        "da"= 0.00
-        "sr2"= 0.18
-        "sr3"= 0.82
-    [household.ctramp_mode_names]
-        1 = 'sov_gp'
-        2 = 'sov_pay'
-        3 = 'sr2_gp'
-        4 = 'sr2_hov'
-        5 = 'sr2_pay'
-        6 = 'sr3_gp'
-        7 = 'sr3_hov'
-        8 = 'sr3_pay'
-        9 = 'walk'
-        10 = 'bike'
-        11 = 'wlk'
-        12 = 'pnr'
-        13 = 'knr'
-        14 = 'knr'
-        15 = 'taxi'
-        16 = 'tnc'
-        17 = 'schlbus'
+        "sr2_hov"= 0.18
+        "sr3_hov"= 0.82
+   
 	[household.income_segment]
         enabled = false
         segment_suffixes = ["LowInc", "MedInc", "HighInc", "XHighInc"]
@@ -523,6 +503,8 @@
     # reliability
     reliability = true
     apply_msa_demand = true
+    # threshold (miles) for maz assignment; when an auto trip distance is below the threshold, it will be assigned at the MAZ level instead of the TAZ level
+    maz_drive_distance_threshold = 0.5
     [highway.tolls]
         file_path = "inputs/hwy/tolls.csv"
         src_vehicle_group_names = ["da", "s2",  "s3",  "vsm", "sml", "med", "lrg"]
@@ -545,16 +527,16 @@
             # based on ~= 5 miles @ 40 mph = 11
             #           = time + (0.6 / vot) * (dist * opcost)
             #           = 5 / 40 * 60 + (0.6 / 17.23) * (5 * 18.93)
-        demand_file = "demand_matrices/highway/maz_demand/auto_{period}_MAZ_AUTO_{number}_{period}_{iter}.omx"
+        demand_file = "demand_matrices/highway/maz_demand/MAZ_AUTO_{period}_{iter}.csv"
         [[highway.maz_to_maz.demand_county_groups]]
             number = 1
-            counties = ["San Francisco", "San Mateo", "Santa Clara"]
-        [[highway.maz_to_maz.demand_county_groups]]
-            number = 2
-            counties = ["Alameda", "Contra Costa"]
-        [[highway.maz_to_maz.demand_county_groups]]
-            number = 3
-            counties = ["Solano", "Napa", "Sonoma", "Marin"]
+            counties = ["San Francisco", "San Mateo", "Santa Clara", "Alameda", "Contra Costa", "Solano", "Napa", "Sonoma", "Marin"]
+        # [[highway.maz_to_maz.demand_county_groups]]
+        #     number = 2
+        #     counties = ["Alameda", "Contra Costa"]
+        # [[highway.maz_to_maz.demand_county_groups]]
+        #     number = 3
+        #     counties = ["Solano", "Napa", "Sonoma", "Marin"]
 
     [[highway.relative_gaps]]
         global_iteration = 0
