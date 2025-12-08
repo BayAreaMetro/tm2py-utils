@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 VARIABLE_LABELS = {}
 CATEGORICAL_ORDER = {}
 DATASET_ORDER = []
-variable_labels_path = Path(__file__).parent / "variable_labels.yaml"
+variable_labels_path = Path(__file__).parent / "data_model" / "variable_labels.yaml"
 if variable_labels_path.exists():
     with open(variable_labels_path, 'r') as f:
         config = yaml.safe_load(f) or {}
@@ -142,6 +142,15 @@ def create_bar_chart(
     if color_palette is None:
         color_palette = MTC_PALETTE_CATEGORICAL
     
+    # Convert share values from decimal to percentage (0.28 -> 28%)
+    # Only multiply by 100 if values are in decimal format (0-1), not already percentages
+    if 'share' in y.lower():
+        df = df.copy()
+        max_share = df[y].max()
+        # If max value is <= 1, assume it's in decimal format and convert to percentage
+        if max_share <= 1.0:
+            df[y] = df[y] * 100
+    
     # Get readable labels for axes
     x_label = VARIABLE_LABELS.get(x, x.replace('_', ' ').title())
     y_label = VARIABLE_LABELS.get(y, y.replace('_', ' ').title())
@@ -237,9 +246,9 @@ def create_bar_chart(
         opacity=0.95
     )
     
-    # Add % suffix to y-axis if column contains 'share' (values already in percent form)
+    # Add % suffix to y-axis if column contains 'share' (values already converted above)
     if 'share' in y.lower():
-        fig.update_yaxes(ticksuffix='%')
+        fig.update_yaxes(ticksuffix='%', title=VARIABLE_LABELS.get(y, y.replace('_', ' ').title()))
     
     # Style faceted charts
     if facet_col:
@@ -287,39 +296,38 @@ def create_chart_from_config(
     y = props.get('y')
     columns = props.get('columns')  # For stacking/coloring
     groupBy = props.get('groupBy')  # For grouping by dataset
+    facet = props.get('facet')  # Explicit faceting column
     stacked = props.get('stacked', False)
     
-    # Determine if we need faceting (3+ dimensions)
-    # Count non-null dimensions: x, y is always present, plus columns/groupBy and dataset
-    has_columns = columns is not None
-    has_dataset = 'dataset' in df.columns and df['dataset'].nunique() > 1
-    needs_faceting = has_columns and has_dataset
+    # Determine faceting strategy
+    if facet:
+        # Explicit facet column specified
+        facet_col = facet
+        color_col = columns or groupBy
+    else:
+        # Old logic: auto-facet if 3+ dimensions
+        has_columns = columns is not None
+        has_dataset = 'dataset' in df.columns and df['dataset'].nunique() > 1
+        needs_faceting = has_columns and has_dataset
+        
+        if needs_faceting:
+            facet_col = 'dataset'
+            color_col = columns
+        else:
+            facet_col = None
+            color_col = groupBy or columns
     
     if chart_type == 'bar':
-        if needs_faceting:
-            # Use columns for color, facet by dataset
-            return create_bar_chart(
-                df=df,
-                x=x,
-                y=y,
-                title=title,
-                color_col=columns,
-                stacked=stacked,
-                facet_col='dataset',
-                text=y if props.get('show_values') else None
-            )
-        else:
-            # Use groupBy if specified, otherwise fall back to columns
-            color_col = groupBy or columns
-            return create_bar_chart(
-                df=df,
-                x=x,
-                y=y,
-                title=title,
-                color_col=color_col,
-                stacked=stacked,
-                text=y if props.get('show_values') else None
-            )
+        return create_bar_chart(
+            df=df,
+            x=x,
+            y=y,
+            title=title,
+            color_col=color_col,
+            stacked=stacked,
+            facet_col=facet_col,
+            text=y if props.get('show_values') else None
+        )
     
     # Add more chart types as needed
     else:
@@ -559,10 +567,21 @@ def main():
     
     # Dashboard selector
     dashboard_names = {f.stem: f for f in dashboard_files}
+    
+    def format_dashboard_name(filename: str) -> str:
+        """Format dashboard filename for display."""
+        # Remove 'dashboard-' prefix and the number prefix (e.g., '0-', '1-', etc.)
+        name = filename.replace('dashboard-', '')
+        # Remove leading number and hyphen (e.g., '0-population' -> 'population')
+        if name and name[0].isdigit() and len(name) > 2 and name[1] == '-':
+            name = name[2:]
+        # Replace remaining hyphens with spaces and title case
+        return name.replace('-', ' ').title()
+    
     selected_dashboard = st.sidebar.selectbox(
         "Select Dashboard",
         options=list(dashboard_names.keys()),
-        format_func=lambda x: x.replace('dashboard-', '').replace('-', ' ').replace('1', '').replace('3', '').replace('4', '').strip().title()
+        format_func=format_dashboard_name
     )
     
     # Data freshness indicator

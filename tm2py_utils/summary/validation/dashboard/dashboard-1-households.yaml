@@ -21,21 +21,32 @@ layout:
       groupBy: dataset
     description: 'Total: households by number of vehicles owned'
   - type: bar
-    title: Auto Ownership by Income - Share
+    title: Auto Ownership by Income - Share (by Income Category)
     props:
       dataset: auto_ownership_by_income.csv
       x: num_vehicles
       y: share
-      columns: income_category_bin
-      groupBy: dataset
-    description: 'Share: households by vehicle ownership and income category'
+      columns: dataset
+      facet: income_category_bin
+    description: 'Share: households by vehicle ownership, faceted by income category'
   - type: bar
-    title: Auto Ownership by Income - Total
+    title: Auto Ownership by Income - Total (by Income Category)
     props:
       dataset: auto_ownership_by_income.csv
       x: num_vehicles
       y: households
-      columns: income_category_bin
+      columns: dataset
+      facet: income_category_bin
+    description: 'Total: household counts by vehicle ownership, faceted by income category'
+  
+  auto_ownership_by_income_detailed:
+  - type: bar
+    title: Auto Ownership by Income - Share (Grouped View)
+    props:
+      dataset: auto_ownership_by_income.csv
+      x: income_category_bin
+      y: share
+      columns: num_vehicles
       groupBy: dataset
-    description: 'Total: households by vehicle ownership and income category'
-  household_characteristics: []
+      facet: dataset
+    description: 'Share: vehicle ownership distribution within each income bracket, by dataset'

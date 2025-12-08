@@ -1,7 +1,7 @@
 header:
   tab: Population
   title: Synthetic Population Summary
-  description: Comparison of 2015 vs 2023 synthetic populations from PopulationSim
+  description: Comparison of 2015 vs 2023 synthetic populations from PopulationSim with ACS 2023 observed data
   
 layout:
   household_demographics:
@@ -48,7 +48,7 @@ layout:
       x: income_category
       y: share
       groupBy: dataset
-    description: 'Share: household income distribution across model years'
+    description: 'Share: household income distribution across model years (income in 2010 dollars)'
   - type: bar
     title: Households by Income - Total
     props:
@@ -56,7 +56,7 @@ layout:
       x: income_category
       y: households
       groupBy: dataset
-    description: 'Total: household counts by income category across model years'
+    description: 'Total: household counts by income category across model years (income in 2010 dollars)'
     
   labor_force:
   - type: bar

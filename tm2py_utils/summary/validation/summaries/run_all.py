@@ -882,6 +882,19 @@ def main():
         if custom_summary_configs:
             logger.info(f"Loaded {len(custom_summary_configs)} custom summary configurations")
         
+        # Filter summaries based on summary_type if specified
+        generate_summaries = config_data.get('generate_summaries', 'all')
+        if generate_summaries != 'all':
+            filtered_configs = []
+            for summary_config in custom_summary_configs:
+                summary_type = summary_config.get('summary_type', 'core')  # Default to 'core' if not specified
+                if generate_summaries == 'core' and summary_type == 'core':
+                    filtered_configs.append(summary_config)
+                elif generate_summaries == 'validation' and summary_type == 'validation':
+                    filtered_configs.append(summary_config)
+            logger.info(f"Filtered to {len(filtered_configs)} {generate_summaries} summaries (from {len(custom_summary_configs)} total)")
+            custom_summary_configs = filtered_configs
+        
         summary_generator = SummaryGenerator(
             config.summary_config, 
             data_loader.data_model,
