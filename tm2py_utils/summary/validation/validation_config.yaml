@@ -173,25 +173,8 @@ custom_summaries:
     count_name: "households"
     share_within: "county_name"
   
-  # Household size distribution
-  - name: "household_size_regional"
-    description: "Regional household size distribution"
-    data_source: "households"
-    group_by: "num_persons_agg"
-    weight_field: "sample_rate"
-    count_name: "households"
-  
-  # Income distribution
-  - name: "income_distribution"
-    description: "Regional income distribution"
-    data_source: "households"
-    group_by: "income_category"
-    weight_field: "sample_rate"
-    count_name: "households"
-    bins:
-      income_category:
-        breaks: [0, 30000, 60000, 100000, 150000, 1000000000]
-        labels: ['<30K', '30-60K', '60-100K', '100-150K', '150K+']
+  # Note: household_size_regional and income_distribution are now generated from 
+  # PopulationSim outputs (not CTRAMP) and placed directly in outputs directory
   
   # ==================== TOUR SUMMARIES ====================
   
