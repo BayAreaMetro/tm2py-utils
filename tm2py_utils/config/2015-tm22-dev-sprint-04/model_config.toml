@@ -517,6 +517,9 @@
     area_type_buffer_dist_miles = 0.5
     # nodes at interchanges, for highway reliability calculation
     interchange_nodes_file = "inputs/hwy/interchange_nodes.csv"
+    # model ID to Emme node ID crosswalk written out in network build process
+    model_to_emme_node_id_xwalk = "emme_project/Database_highway/emme_drive_network_node_id_crosswalk.csv"
+    output_node_sequential_id_xwalk = "inputs/hwy/mtc_final_network_zone_seq.csv"
     # reliability
     reliability = true
     apply_msa_demand = true
