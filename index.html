@@ -270,11 +270,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="dashboard/" class="md-tabs__link">
+        <a href="validation-system/" class="md-tabs__link">
           
   
   
-  Features
+  Validation System
 
         </a>
       </li>
@@ -688,7 +688,7 @@
   
   
   <span class="md-ellipsis">
-    Features
+    Validation System
     
   </span>
   
@@ -699,7 +699,7 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
-            Features
+            Validation System
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -710,35 +710,12 @@
   
   
     <li class="md-nav__item">
-      <a href="dashboard/" class="md-nav__link">
+      <a href="validation-system/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Validation Dashboard
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="summaries/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Summary Generation
+    Complete Guide
     
   </span>
   
@@ -762,6 +739,52 @@
   
   <span class="md-ellipsis">
     Configuration Reference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="dashboard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dashboard
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="summaries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Summaries
     
   </span>
   
@@ -1138,17 +1161,18 @@
 </ul>
 <h2 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
 <h3 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Clone the repository</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Clone repository</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/BayAreaMetro/tm2py-utils.git
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nb">cd</span><span class="w"> </span>tm2py-utils
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="c1"># Create conda environment</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>conda<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>environment.yml
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>conda<span class="w"> </span>activate<span class="w"> </span>tm2py-utils
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>conda<span class="w"> </span>activate<span class="w"> </span>tm2py_utils
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c1"># Install package</span>
 <a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
 </code></pre></div>
+<p>See <a href="install/">Installation Guide</a> for detailed instructions.</p>
 <h3 id="running-the-validation-dashboard">Running the Validation Dashboard<a class="headerlink" href="#running-the-validation-dashboard" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Navigate to validation directory</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">cd</span><span class="w"> </span>tm2py_utils/summary/validation
@@ -1161,6 +1185,12 @@
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>python<span class="w"> </span>run_and_deploy_dashboard.py<span class="w"> </span>--config<span class="w"> </span>validation_config.yaml<span class="w"> </span>--launch-dashboard
 </code></pre></div>
 <p>View the live dashboard: <a href="https://tm2-validation-dashboard.streamlit.app/">https://tm2-validation-dashboard.streamlit.app/</a></p>
+<p><strong>📚 New to the validation system?</strong> Check out the <strong><a href="validation-system/">Complete Validation System Guide</a></strong> for step-by-step instructions on:
+- Creating summaries from model runs
+- Adding observed data (ACS, CTPP, surveys)
+- Custom aggregations and binning
+- Dashboard visualization
+- Deployment options</p>
 <h2 id="key-features">Key Features<a class="headerlink" href="#key-features" title="Permanent link">&para;</a></h2>
 <h3 id="validation-dashboard">📊 Validation Dashboard<a class="headerlink" href="#validation-dashboard" title="Permanent link">&para;</a></h3>
 <p>Interactive web-based dashboard for comparing model runs and validating against observed data:</p>
