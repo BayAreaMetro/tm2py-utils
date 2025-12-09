@@ -567,13 +567,14 @@ def main():
     validation_dir = Path(__file__).parent.parent
     outputs_dir = validation_dir / "outputs"
     data_dir = outputs_dir / "dashboard"  # CSVs are in outputs/dashboard folder
+    dashboard_config_dir = validation_dir / "dashboard"  # YAML configs are in dashboard/ folder
     
     # Find dashboard YAML files
-    dashboard_files = sorted(outputs_dir.glob("dashboard/dashboard-*.yaml"))
+    dashboard_files = sorted(dashboard_config_dir.glob("dashboard-*.yaml"))
     
     if not dashboard_files:
         st.error("No dashboard configuration files found!")
-        st.info(f"Looking in: {data_dir}")
+        st.info(f"Looking in: {dashboard_config_dir}")
         return
     
     # Dashboard selector
