@@ -1,0 +1,83 @@
+site_name: tm2py-utils Documentation
+site_description: Utilities for Travel Model Two (TM2) analysis and validation
+site_author: Bay Area Metro
+repo_url: https://github.com/BayAreaMetro/tm2py-utils
+repo_name: BayAreaMetro/tm2py-utils
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: blue
+      accent: light-blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: blue
+      accent: light-blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: install.md
+    - Quick Start: index.md#quick-start
+  - Features:
+    - Validation Dashboard: dashboard.md
+    - Summary Generation: summaries.md
+    - Configuration Reference: configuration.md
+  - Development:
+    - Contributing Guide: contributing.md
+  - Reference:
+    - Consolidation Proposal: ../summary/CONSOLIDATION_PROPOSAL.md
+    - Deployment Guide: ../summary/DASHBOARD_DEPLOYMENT.md
+
+markdown_extensions:
+  - admonition
+  - codehilite:
+      guess_lang: false
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - tables
+  - attr_list
+  - def_list
+
+plugins:
+  - search
+  - git-revision-date-localized:
+      enable_creation_date: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/BayAreaMetro/tm2py-utils
+    - icon: fontawesome/solid/globe
+      link: https://bayareametro.gov
+  version:
+    provider: mike
+
+extra_css:
+  - css/extra.css
+
+docs_dir: tm2py_utils/docs
+site_dir: site

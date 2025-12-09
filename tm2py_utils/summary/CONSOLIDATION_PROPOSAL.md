@@ -95,9 +95,16 @@ generate_summaries: "all"
 ```
 
 **Current summary breakdown:**
-- **10 core summaries** - Essential analysis matching core_summaries.py
+- **21 core summaries** - Essential analysis matching core_summaries.py outputs
 - **13 validation summaries** - Extended analysis for dashboard/validation
-- **Total: 23 summaries**
+- **Total: 34 summaries**
+
+Core summaries now include:
+- Auto ownership (regional, by income)
+- Tour summaries (frequency, mode, timing)
+- Trip summaries (mode, purpose, distance, travel time)
+- Activity patterns / CDAP (5 breakdowns: overall, by person type, age, county, auto ownership)
+- Journey to work (overall and by mode)
 
 Use `python list_summaries.py` to see full breakdown.
 

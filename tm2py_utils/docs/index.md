@@ -1,59 +1,130 @@
-# Travel Model Two
+# tm2py-utils
 
-## Welcome to tm2py 🎂
+**Utilities and analysis tools for Travel Model Two (TM2)**
 
-### The python package developed to run Travel Model Two
+## Overview
 
-Travel Model Two, currently under development, is an important extension of Travel Model One. Fundamental to the foundation of Travel Model Two is the use of a wide ranging set of on-board transit rider surveys as well as the California Household travel survey, which obtained a statistical larger sample in the nine-county Bay Area.
+`tm2py-utils` provides a collection of utilities for working with Travel Model Two outputs, including:
 
-Travel Model Two runs with a ***CTRAMP household demand model*** and ***EMME skimming/assignment*** procedures.
+- **Validation Dashboard** - Interactive web dashboard for model validation and scenario comparison
+- **Summary Generation** - Automated summary statistics from CTRAMP model outputs
+- **PopulationSim Integration** - Synthetic population analysis and validation
+- **Network Analysis** - Tools for analyzing transportation networks
 
-## Changes from Travel Model One
+## Quick Start
 
-Important travel behavior enhancements in Travel Model Two include:
+### Installation
 
-* A much more detailed spatial representation of transportation system supply including an accurate all-streets network for entire 9-county Bay Area, pedestrian paths\sidewalks from OpenStreetMap, bicycle facilities from MTC's BikeMapper, and transit networks from MTC's RTD network
-* Land-use and demographic forecast integration with [Bay Area UrbanSim Two](https://github.com/BayAreaMetro/bayarea_urbansim) represented at a 40,000 micro-analysis zone (MAZ) level
-* Detailed transit access/egress based on actual origin/destinations at the MAZ level considering boarding and alighting at specific transit stops allowing for a more accurate representation of walk times
-* More detailed temporal resolution using half-hourly time windows compared to hourly time windows in Travel Model One
-* The effects of transit capacity and crowding
-* More detailed auto assignments, most notably with the loading of short trips to local streets
-* The inclusion of Taxis and Transportation Network Companies (TNCs) such as Uber and Lyft as a mode choice option
-* Representation of Automated Vehicles
+```bash
+# Clone the repository
+git clone https://github.com/BayAreaMetro/tm2py-utils.git
+cd tm2py-utils
 
-## Versions
+# Create conda environment
+conda env create -f environment.yml
+conda activate tm2py-utils
 
-* **TM2.0**: Initial TM2 with Cube, CTRAMP core, 3-zone system. In use by TAM (Marin)
-* **TM2.1**: TM2 with transit CCR implemented in Emme (uses Cube and Emme), CTRAMP core. Anticipated release: Summer 2022. This work is being performed in the branch [transit-ccr](https://github.com/BayAreaMetro/travel-model-two/tree/transit-ccr)
-* **TM2.2**: TM2 with Emme only (not Cube). CTRAMP core. This work is being performed in the [tm2py repository](https://github.com/BayAreaMetro/tm2py) -- **these docs are for this version**
-* **TM2.3**: TM2 with Emme only and ActivitySim core.
+# Install package
+pip install -e .
+```
 
-## Documentation Sections
+### Running the Validation Dashboard
 
-* [Architecture](architecture.md) - System design and components
-* [Installation](install.md) - Setup and installation instructions
-* [Input](inputs.md) - Input data requirements and formats
-* [Creating Base Year Inputs](create-base-year-inputs.md) - How to generate base year input files
-* [Run](run.md) - How to execute the model
-* [Outputs](outputs.md) - Model outputs and analysis
-* [Network Summary Component](network_summary.md) - Comprehensive network analysis component
-* [API](api.md) - Programming interface documentation
-* [Server Setup](server-setup.md) - Server configuration
+```bash
+# Navigate to validation directory
+cd tm2py_utils/summary/validation
 
-### Legacy Documentation Sections
+# Launch dashboard
+streamlit run dashboard/dashboard_app.py --server.port 8501
+```
 
-* [Guide](guide.md) - Detailed user guide for TM2.1
-* [Process](process.md) - Model process documentation
-* [Geographies](geographies.md) - Geographic data information
-* [Papers](papers.md) - Research papers and publications
-* [Network QA](network_qa.md) - Network quality assurance
+Or use the deployment script:
 
-## References
+```bash
+# Generate summaries and launch dashboard
+python run_and_deploy_dashboard.py --config validation_config.yaml --launch-dashboard
+```
 
-* [Travel Model One documentation wiki](https://github.com/BayAreaMetro/modeling-website/wiki/TravelModel)
-* [Travel Model One github repo](https://github.com/BayAreaMetro/travel-model-one)
-* [Legacy TM2 documentation](https://bayareametro.github.io/travel-model-two/develop/)
+View the live dashboard: [https://tm2-validation-dashboard.streamlit.app/](https://tm2-validation-dashboard.streamlit.app/)
 
-## Contributing 🎂
+## Key Features
 
-How do you create and update these pages? See [Contributing/Documentation](contributing/documentation/)
+### 📊 Validation Dashboard
+
+Interactive web-based dashboard for comparing model runs and validating against observed data:
+
+- **Population** - Synthetic population demographics (from PopulationSim)
+- **Households** - Auto ownership patterns
+- **Activity Patterns** - Daily activity patterns (CDAP)
+- **Tours** - Tour frequency and mode choice
+- **Trips** - Trip mode and purpose analysis
+- **Journey to Work** - Commute patterns
+- **Time of Day** - Temporal distribution of travel
+- **Trip Characteristics** - Distance and travel time
+
+### 🔧 Summary Generation
+
+Config-driven system for generating model validation summaries:
+
+- **Core Summaries** (21) - Essential analysis matching legacy outputs
+- **Validation Summaries** (13) - Extended analysis for dashboard
+- **Custom Summaries** - Easy to add via YAML configuration
+
+```bash
+# Generate all summaries
+python -m tm2py_utils.summary.validation.summaries.run_all --config validation_config.yaml
+
+# Generate only core summaries (fast)
+# Edit validation_config.yaml: generate_summaries: "core"
+python -m tm2py_utils.summary.validation.summaries.run_all --config validation_config.yaml
+```
+
+### 🏘️ PopulationSim Integration
+
+Analysis tools for synthetic population outputs:
+
+- Household demographics (size, income, workers)
+- Person demographics (age distribution)
+- Geographic distribution by county
+- Validation against ACS data
+
+## Documentation
+
+- [Installation Guide](install.md)
+- [Dashboard Guide](dashboard.md)
+- [Summary System](summaries.md)
+- [Contributing](contributing.md)
+- [Consolidation Proposal](../summary/CONSOLIDATION_PROPOSAL.md) - Plan to consolidate summary systems
+
+## Architecture
+
+```
+tm2py_utils/
+├── summary/
+│   ├── validation/              # Validation dashboard and summaries
+│   │   ├── dashboard/           # Dashboard YAML configs and app
+│   │   ├── summaries/           # Summary generation scripts
+│   │   ├── data_model/          # Data model definitions
+│   │   ├── outputs/             # Generated summary CSVs
+│   │   └── validation_config.yaml
+│   └── core_summaries/          # Legacy summary system (being deprecated)
+├── inputs/                      # Input data preparation tools
+├── requests/                    # Special analysis requests
+└── docs/                        # Documentation (this site)
+```
+
+## Related Projects
+
+- [tm2py](https://github.com/BayAreaMetro/tm2py) - Main Travel Model Two implementation
+- [PopulationSim](https://github.com/ActivitySim/PopulationSim) - Synthetic population generator
+- [Bay Area UrbanSim](https://github.com/BayAreaMetro/bayarea_urbansim) - Land use model
+
+## Support
+
+- **Issues**: [GitHub Issues](https://github.com/BayAreaMetro/tm2py-utils/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/BayAreaMetro/tm2py-utils/discussions)
+- **MTC Contact**: modeling@bayareametro.gov
+
+## License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](https://github.com/BayAreaMetro/tm2py-utils/blob/main/LICENSE) file for details.

@@ -1,0 +1,59 @@
+dashboard:
+  tab: Journey to Work
+  title: Commute Patterns and Mode Choice
+  description: Work location choice results showing commute distances, travel times, and mode choice patterns by origin-destination pairs.
+
+sections:
+  commute_overview:
+    title: "Commute Distance and Time"
+    description: "Average commute characteristics by home and work county"
+    charts:
+      - type: bar
+        title: "Average Commute Distance by Origin-Destination"
+        dataset: journey_to_work.csv
+        x: home_county
+        y: avg_distance
+        color: work_county
+        facet: dataset
+        axis_labels:
+          home_county: "Home County"
+          avg_distance: "Average Distance (miles)"
+          work_county: "Work County"
+      
+      - type: bar
+        title: "Average Commute Time by Origin-Destination"
+        dataset: journey_to_work.csv
+        x: home_county
+        y: avg_time
+        color: work_county
+        facet: dataset
+        axis_labels:
+          home_county: "Home County"
+          avg_time: "Average Time (minutes)"
+          work_county: "Work County"
+  
+  commute_mode:
+    title: "Commute Mode Choice"
+    description: "Mode share for work tours by origin-destination pairs"
+    charts:
+      - type: bar
+        title: "Mode Share for Work Tours"
+        dataset: journey_to_work_by_mode.csv
+        x: tour_mode
+        y: share
+        color: dataset
+        axis_labels:
+          tour_mode: "Commute Mode"
+          share: "Share of Commute Tours (%)"
+      
+      - type: bar
+        title: "Mode Share by Origin-Destination"
+        dataset: journey_to_work_by_mode.csv
+        x: home_county
+        y: share
+        color: tour_mode
+        facet: dataset
+        axis_labels:
+          home_county: "Home County"
+          share: "Share of Commute Tours (%)"
+          tour_mode: "Mode"

@@ -1,57 +1,96 @@
-## Install tm2py 🎂
+# Installation Guide
 
-First, you need to [set up your server](server-setup.md).
+## Prerequisites
 
-### 1. **Clone the Repository** 
+- **Python**: 3.9 or higher
+- **Conda**: Anaconda or Miniconda
+- **Git**: For cloning the repository
 
-Clone the [tm2py GitHub repo](https://github.com/BayAreaMetro/tm2py) using Git Bash or GitHub Desktop, and switch to the branch you want to run.
+## Installation Steps
 
-### 2. **Open the OpenPaths EMME Shell and Create a Virtual Environment** 🐍
+### 1. Clone the Repository
 
-Open the **OpenPaths EMME Shell** and:
+```bash
+git clone https://github.com/BayAreaMetro/tm2py-utils.git
+cd tm2py-utils
+```
 
-- Change directory (`cd`) to the parent folder of the `tm2py` GitHub folder.  
-- Create a new virtual environment alongside the `tm2py` folder (not inside it):
+### 2. Create Conda Environment
 
-`python -m venv <your_tm2py_env_name>`
+```bash
+# Create environment from environment.yml (if available)
+conda env create -f environment.yml
 
+# Or create manually
+conda create -n tm2py-utils python=3.9 pandas numpy pyyaml
+conda activate tm2py-utils
+```
 
-### 3. **Activate the Virtual Environment** ⚡
+### 3. Install Dependencies
 
-Activate the virtual environment in the OpenPaths EMME shell:
+```bash
+# Install required packages
+pip install -r requirements.txt
 
-`<your_tm2py_env_name>\Scripts\activate`
+# Install additional dashboard dependencies
+pip install streamlit plotly
+```
 
-### 4. **Copy `emme.pth` to the Virtual Environment** 
+### 4. Install tm2py-utils
 
-Copy the `emme.pth` file from your OpenPaths EMME installation folder to the virtual environment’s `site-packages` folder. You can do this via shell commands or manually in Windows.
+```bash
+# Install in development mode
+pip install -e .
+```
 
-Copy from:  
-`C:\Program Files\Bentley\OpenPaths\EMME 24.01.00\emme.pth`  
-Copy to:  
-`<your_tm2py_env_name>\Lib\site-packages\`
+## Verifying Installation
 
-(*Yes, this is one of those quirky things travel modelers do.*)
+Test that the installation works:
 
-### 5. **Install `tm2py` in Editable Mode**
+```bash
+# Check package is importable
+python -c "import tm2py_utils; print('tm2py-utils installed successfully!')"
 
-In the same activated shell:
+# List available summaries
+cd tm2py_utils/summary/validation
+python list_summaries.py
+```
 
-- Change into the `tm2py` folder:  
-`cd tm2py`
+## Optional: Set Up Data Paths
 
-- Install in editable mode:  
-`pip install -e .`
+Edit `tm2py_utils/summary/validation/validation_config.yaml` to point to your model output directories:
 
-### 6. **Verify the Installation**
+```yaml
+input_directories:
+  - path: "E:\\model_runs\\2023-tm22-dev-version-05\\ctramp_output"
+    name: "2023_version_05"
+    display_name: "2023 TM2.2 v05"
+```
 
-- In the shell, launch Python:  
-`python`
+## Troubleshooting
 
-- Try importing tm2py:  
-`import tm2py`
+### Import Errors
 
-You should only see packages listed in `requirements.txt` installed. If the import works without errors, the installation was successful.
+If you get `ModuleNotFoundError`, ensure you've activated the conda environment:
 
+```bash
+conda activate tm2py-utils
+```
 
+### Streamlit Not Found
 
+If `streamlit` command is not recognized:
+
+```bash
+pip install streamlit
+```
+
+### Permission Errors
+
+On Windows, you may need to run PowerShell as Administrator for some operations.
+
+## Next Steps
+
+- [Run the Dashboard](dashboard.md)
+- [Generate Summaries](summaries.md)
+- [Configure Analysis](configuration.md)

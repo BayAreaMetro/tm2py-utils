@@ -1,0 +1,69 @@
+dashboard:
+  tab: Time of Day
+  title: Tour and Trip Timing Patterns
+  description: Temporal distribution of travel showing tour departure/arrival times and trip timing by mode and purpose.
+
+sections:
+  tour_timing:
+    title: "Tour Departure and Arrival Times"
+    description: "Distribution of tour start and end times by purpose and mode"
+    charts:
+      - type: bar
+        title: "Tour Start Time Distribution"
+        dataset: tour_start_time.csv
+        x: start_period
+        y: tours
+        color: dataset
+        axis_labels:
+          start_period: "Departure Time Period"
+          tours: "Number of Tours"
+      
+      - type: bar
+        title: "Tour End Time Distribution"
+        dataset: tour_end_time.csv
+        x: end_period
+        y: tours
+        color: dataset
+        axis_labels:
+          end_period: "Arrival Time Period"
+          tours: "Number of Tours"
+      
+      - type: bar
+        title: "Tour Timing by Purpose and Mode"
+        dataset: time_of_day_tours.csv
+        x: tour_purpose
+        y: tours
+        color: tour_mode
+        facet: dataset
+        axis_labels:
+          tour_purpose: "Tour Purpose"
+          tours: "Number of Tours"
+          tour_mode: "Mode"
+  
+  trip_timing:
+    title: "Trip Mode by Time Period"
+    description: "Mode share varies throughout the day"
+    charts:
+      - type: bar
+        title: "Mode Share by Departure Time"
+        dataset: trip_mode_by_time_period.csv
+        x: depart_period
+        y: share
+        color: trip_mode
+        facet: dataset
+        axis_labels:
+          depart_period: "Departure Time Period"
+          share: "Share of Trips (%)"
+          trip_mode: "Mode"
+      
+      - type: bar
+        title: "Trip Volume by Time and Mode"
+        dataset: trip_mode_by_time_period.csv
+        x: depart_period
+        y: trips
+        color: trip_mode
+        facet: dataset
+        axis_labels:
+          depart_period: "Departure Time Period"
+          trips: "Number of Trips"
+          trip_mode: "Mode"

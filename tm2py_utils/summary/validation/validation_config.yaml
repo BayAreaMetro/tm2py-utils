@@ -382,6 +382,134 @@ custom_summaries:
   # Note: Worker summaries require custom column mappings
   # and are still handled by worker_summary.py
 
+  # ==================== ADDITIONAL CORE SUMMARIES ====================
+  # These match remaining outputs from core_summaries.py
+  
+  # Activity Pattern (CDAP) - overall by share
+  - name: "cdap_by_share"
+    summary_type: "core"
+    description: "Coordinated daily activity pattern overall distribution"
+    data_source: "persons"
+    group_by: ["cdap_activity"]
+    weight_field: "sample_rate"
+    count_name: "persons"
+  
+  # Activity Pattern (CDAP) - by person type
+  - name: "cdap_by_person_type"
+    summary_type: "core"
+    description: "Coordinated daily activity pattern by person type"
+    data_source: "persons"
+    group_by: ["cdap_activity", "person_type"]
+    weight_field: "sample_rate"
+    count_name: "persons"
+    share_within: "person_type"
+  
+  # Activity Pattern (CDAP) - by age
+  - name: "cdap_by_age"
+    summary_type: "core"
+    description: "Coordinated daily activity pattern by age group"
+    data_source: "persons"
+    group_by: ["cdap_activity", "age_category"]
+    weight_field: "sample_rate"
+    count_name: "persons"
+    share_within: "age_category"
+  
+  # Activity Pattern (CDAP) - by home county
+  - name: "cdap_by_home_county"
+    summary_type: "core"
+    description: "Coordinated daily activity pattern by home county"
+    data_source: "persons"
+    group_by: ["cdap_activity", "county_name"]
+    weight_field: "sample_rate"
+    count_name: "persons"
+    share_within: "county_name"
+  
+  # Activity Pattern (CDAP) - by auto ownership
+  - name: "cdap_by_auto_ownership"
+    summary_type: "core"
+    description: "Coordinated daily activity pattern by household auto ownership"
+    data_source: "persons"
+    group_by: ["cdap_activity", "num_vehicles"]
+    weight_field: "sample_rate"
+    count_name: "persons"
+    share_within: "num_vehicles"
+  
+  # Journey to Work - distance/time
+  - name: "journey_to_work"
+    summary_type: "core"
+    description: "Commute distance and time by residence and work location"
+    data_source: "workplace_school"
+    group_by: ["home_county", "work_county"]
+    weight_field: "sample_rate"
+    aggregations:
+      workers: "count"
+      avg_distance: {"column": "distance_miles", "agg": "mean"}
+      avg_time: {"column": "time_minutes", "agg": "mean"}
+  
+  # Journey to Work by Mode
+  - name: "journey_to_work_by_mode"
+    summary_type: "core"
+    description: "Commute mode choice by home and work location"
+    data_source: "workplace_school"
+    group_by: ["home_county", "work_county", "tour_mode"]
+    weight_field: "sample_rate"
+    count_name: "workers"
+    share_within: ["home_county", "work_county"]
+  
+  # Time of Day - tour start/end periods
+  - name: "time_of_day_tours"
+    summary_type: "core"
+    description: "Tour departure and arrival times by purpose and mode"
+    data_source: "individual_tours"
+    group_by: ["tour_purpose", "tour_mode", "start_period", "end_period"]
+    weight_field: "sample_rate"
+    count_name: "tours"
+  
+  # Time of Day - persons touring (requires special aggregation - may need custom function)
+  # This calculates number of persons touring at each time period
+  # Note: This is complex - each tour spans multiple time periods, need to count unique persons per period
+  # May require custom summary function rather than config-driven approach
+  
+  # Trip mode by time period
+  - name: "trip_mode_by_time_period"
+    summary_type: "core"
+    description: "Trip mode choice by time of day"
+    data_source: "individual_trips"
+    group_by: ["depart_period", "trip_mode"]
+    weight_field: "sample_rate"
+    count_name: "trips"
+    share_within: "depart_period"
+  
+  # Trip distance by mode, purpose, and income
+  - name: "trip_distance_detailed"
+    summary_type: "core"
+    description: "Average trip distance by mode, purpose, auto sufficiency, and income"
+    data_source: "individual_trips"
+    group_by: ["auto_sufficiency", "income_category_bin", "depart_period", "trip_mode", "tour_purpose"]
+    weight_field: "sample_rate"
+    aggregations:
+      trips: "count"
+      avg_distance: {"column": "trip_distance_miles", "agg": "mean"}
+    bins:
+      income_category:
+        breaks: [0, 30000, 60000, 100000, 150000, 1000000000]
+        labels: ['<30K', '30-60K', '60-100K', '100-150K', '150K+']
+  
+  # Trip travel time by income, mode, and purpose
+  - name: "trip_travel_time"
+    summary_type: "core"
+    description: "Average trip travel time by income, mode, and purpose"
+    data_source: "individual_trips"
+    group_by: ["income_category_bin", "trip_mode", "tour_purpose"]
+    weight_field: "sample_rate"
+    aggregations:
+      trips: "count"
+      avg_time: {"column": "trip_time_minutes", "agg": "mean"}
+    bins:
+      income_category:
+        breaks: [0, 30000, 60000, 100000, 150000, 1000000000]
+        labels: ['<30K', '30-60K', '60-100K', '100-150K', '150K+']
+
 # Summary filtering - control which summaries to generate
 # Options: "all", "core", "validation"
 # - "core": Essential summaries that match core_summaries.py output (minimal set for basic analysis)

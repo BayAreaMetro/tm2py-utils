@@ -1,25 +1,25 @@
 header:
   tab: Trips
   title: Trip Pattern Statistics
-  description: Trip mode choice, purpose, distance, and duration (multi-comparison)
+  description: Trip mode choice, purpose, distance, and duration (multi-run comparison)
 layout:
   trip_patterns:
   - type: bar
     title: Trips by Mode - Share
     props:
-      dataset: trip_mode_choice.csv
-      x: trip_mode
+      dataset: trip_mode_choice_aggregated.csv
+      x: trip_mode_agg
       y: share
       groupBy: dataset
-    description: 'Share: trip mode distribution'
+    description: 'Share: trip mode distribution (aggregated categories)'
   - type: bar
     title: Trips by Mode - Total
     props:
-      dataset: trip_mode_choice.csv
-      x: trip_mode
+      dataset: trip_mode_choice_aggregated.csv
+      x: trip_mode_agg
       y: trips
       groupBy: dataset
-    description: 'Total: trip mode distribution'
+    description: 'Total: trip mode distribution (aggregated categories)'
   - type: bar
     title: Trips by Purpose - Share
     props:
@@ -36,6 +36,22 @@ layout:
       y: trips
       groupBy: dataset
     description: 'Total: trip purpose distribution'
+  - type: bar
+    title: Trips by Distance - Share
+    props:
+      dataset: trip_distance.csv
+      x: trip_distance_bin
+      y: share
+      groupBy: dataset
+    description: 'Share: trip distance distribution'
+  - type: bar
+    title: Trips by Distance - Total
+    props:
+      dataset: trip_distance.csv
+      x: trip_distance_bin
+      y: trips
+      groupBy: dataset
+    description: 'Total: trip distance distribution'
   mode_purpose:
   - type: bar
     title: Trip Mode by Purpose - Share

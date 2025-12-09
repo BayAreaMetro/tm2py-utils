@@ -1,7 +1,7 @@
 header:
   tab: Households
-  title: Auto Ownership Summary
-  description: Auto ownership patterns by household characteristics (from CTRAMP model outputs)
+  title: Household Summary Statistics
+  description: Household demographics and auto ownership patterns (multi-run comparison)
 layout:
   auto_ownership:
   - type: bar
