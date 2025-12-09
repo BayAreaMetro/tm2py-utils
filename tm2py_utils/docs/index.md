@@ -16,17 +16,19 @@
 ### Installation
 
 ```bash
-# Clone the repository
+# Clone repository
 git clone https://github.com/BayAreaMetro/tm2py-utils.git
 cd tm2py-utils
 
 # Create conda environment
 conda env create -f environment.yml
-conda activate tm2py-utils
+conda activate tm2py_utils
 
 # Install package
 pip install -e .
 ```
+
+See [Installation Guide](install.md) for detailed instructions.
 
 ### Running the Validation Dashboard
 
@@ -46,6 +48,13 @@ python run_and_deploy_dashboard.py --config validation_config.yaml --launch-dash
 ```
 
 View the live dashboard: [https://tm2-validation-dashboard.streamlit.app/](https://tm2-validation-dashboard.streamlit.app/)
+
+**📚 New to the validation system?** Check out the **[Complete Validation System Guide](validation-system.md)** for step-by-step instructions on:
+- Creating summaries from model runs
+- Adding observed data (ACS, CTPP, surveys)
+- Custom aggregations and binning
+- Dashboard visualization
+- Deployment options
 
 ## Key Features
 

@@ -33,10 +33,11 @@ nav:
   - Getting Started:
     - Installation: install.md
     - Quick Start: index.md#quick-start
-  - Features:
-    - Validation Dashboard: dashboard.md
-    - Summary Generation: summaries.md
+  - Validation System:
+    - Complete Guide: validation-system.md
     - Configuration Reference: configuration.md
+    - Dashboard: dashboard.md
+    - Summaries: summaries.md
   - Development:
     - Contributing Guide: contributing.md
   - Reference:
