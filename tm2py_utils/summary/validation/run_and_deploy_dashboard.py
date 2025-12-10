@@ -19,6 +19,7 @@ Usage:
 """
 
 import argparse
+import os
 import shutil
 import subprocess
 import sys
@@ -35,20 +36,19 @@ def run_summaries(config_path: Path, summary_type: str = None):
     logger.info("STEP 1: Generating Validation Summaries")
     logger.info("=" * 80)
     
-    # Use relative import if run from validation directory
-    summaries_dir = Path(__file__).parent / 'summaries'
-    run_all_script = summaries_dir / 'run_all.py'
+    # Run as module using -m flag with proper path setup
+    # Add the tm2py-utils root to Python path
+    repo_root = Path(__file__).parent.parent.parent.parent
     
-    if run_all_script.exists():
-        # Run directly with python
-        cmd = [sys.executable, str(run_all_script), '--config', str(config_path)]
-    else:
-        # Try module import (if running from repo root)
-        cmd = [
-            sys.executable, '-m',
-            'tm2py_utils.summary.validation.summaries.run_all',
-            '--config', str(config_path)
-        ]
+    cmd = [
+        sys.executable, '-m',
+        'tm2py_utils.summary.validation.summaries.run_all',
+        '--config', str(config_path)
+    ]
+    
+    # Set PYTHONPATH environment variable to include repo root
+    env = os.environ.copy()
+    env['PYTHONPATH'] = str(repo_root) + os.pathsep + env.get('PYTHONPATH', '')
     
     if summary_type:
         logger.info(f"Generating {summary_type} summaries only")
@@ -56,9 +56,10 @@ def run_summaries(config_path: Path, summary_type: str = None):
         logger.info("Generating all summaries")
     
     logger.info(f"Command: {' '.join(cmd)}")
+    logger.info(f"PYTHONPATH: {env.get('PYTHONPATH')}")
     
     try:
-        result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+        result = subprocess.run(cmd, env=env, check=True, capture_output=True, text=True)
         logger.info("✓ Summary generation completed successfully")
         if result.stdout:
             logger.info(result.stdout)

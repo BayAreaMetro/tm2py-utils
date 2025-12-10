@@ -11,11 +11,11 @@ sections:
       - type: bar
         title: "Activity Pattern Share"
         dataset: cdap_by_share.csv
-        x: cdap_activity
+        x: cdap
         y: share
         color: dataset
         axis_labels:
-          cdap_activity: "Daily Activity Pattern"
+          cdap: "Daily Activity Pattern"
           share: "Share of Persons (%)"
   
   cdap_by_person_type:
@@ -27,7 +27,7 @@ sections:
         dataset: cdap_by_person_type.csv
         x: person_type
         y: share
-        color: cdap_activity
+        color: cdap
         facet: dataset
         axis_labels:
           person_type: "Person Type"
@@ -42,7 +42,7 @@ sections:
         dataset: cdap_by_age.csv
         x: age_category
         y: share
-        color: cdap_activity
+        color: cdap
         facet: dataset
         axis_labels:
           age_category: "Age Group"
@@ -57,7 +57,7 @@ sections:
         dataset: cdap_by_home_county.csv
         x: county_name
         y: share
-        color: cdap_activity
+        color: cdap
         facet: dataset
         axis_labels:
           county_name: "Home County"
@@ -72,7 +72,7 @@ sections:
         dataset: cdap_by_auto_ownership.csv
         x: num_vehicles
         y: share
-        color: cdap_activity
+        color: cdap
         facet: dataset
         axis_labels:
           num_vehicles: "Household Vehicles"

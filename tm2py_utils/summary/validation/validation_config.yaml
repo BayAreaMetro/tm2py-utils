@@ -23,21 +23,19 @@
 
 # Input datasets to analyze
 input_directories:
-  - path: "E:\\stuff\\2023-tm22-dev-version-05\\ctramp_output" 
+  - path: "A:\\2023-tm22-dev-version-05\\ctramp_output"
     name: "2023_version_05"
     display_name: "2023 TM2.2 v05"
     source_type: "model"
     description: "2023 TM2.2 Development Version 05"
     iteration: 1  # Use iteration 1 files
-  
-  - path: "E:\\stuff\\2015-tm22-dev-sprint-04\\ctramp_output"
+
+  - path: "A:\\2015-tm22-dev-sprint-04\\ctramp_output"
     name: "2015_sprint_04"
     display_name: "2015 TM2.2 Sprint 04"
     source_type: "model"
     description: "2015 TM2.2 Development Sprint 04"
-    iteration: 1  # Use iteration 1 files
-
-# Pre-aggregated summary data (surveys, observed data, validation targets)
+    iteration: 1  # Use iteration 1 files# Pre-aggregated summary data (surveys, observed data, validation targets)
 # Use this for data that's already summarized (e.g., ACS tables, BATS summaries)
 observed_summaries: []
   # Example: ACS household data
@@ -390,7 +388,7 @@ custom_summaries:
     summary_type: "core"
     description: "Coordinated daily activity pattern overall distribution"
     data_source: "persons"
-    group_by: ["cdap_activity"]
+    group_by: ["cdap"]
     weight_field: "sample_rate"
     count_name: "persons"
   
@@ -399,7 +397,7 @@ custom_summaries:
     summary_type: "core"
     description: "Coordinated daily activity pattern by person type"
     data_source: "persons"
-    group_by: ["cdap_activity", "person_type"]
+    group_by: ["cdap", "person_type"]
     weight_field: "sample_rate"
     count_name: "persons"
     share_within: "person_type"
@@ -409,7 +407,7 @@ custom_summaries:
     summary_type: "core"
     description: "Coordinated daily activity pattern by age group"
     data_source: "persons"
-    group_by: ["cdap_activity", "age_category"]
+    group_by: ["cdap", "age_category"]
     weight_field: "sample_rate"
     count_name: "persons"
     share_within: "age_category"
@@ -419,7 +417,7 @@ custom_summaries:
     summary_type: "core"
     description: "Coordinated daily activity pattern by home county"
     data_source: "persons"
-    group_by: ["cdap_activity", "county_name"]
+    group_by: ["cdap", "county_name"]
     weight_field: "sample_rate"
     count_name: "persons"
     share_within: "county_name"
@@ -429,7 +427,7 @@ custom_summaries:
     summary_type: "core"
     description: "Coordinated daily activity pattern by household auto ownership"
     data_source: "persons"
-    group_by: ["cdap_activity", "num_vehicles"]
+    group_by: ["cdap", "num_vehicles"]
     weight_field: "sample_rate"
     count_name: "persons"
     share_within: "num_vehicles"
