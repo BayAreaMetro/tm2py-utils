@@ -56,18 +56,18 @@ layout:
   - type: bar
     title: Trip Mode by Purpose - Share
     props:
-      dataset: trip_mode_by_purpose.csv
+      dataset: trip_mode_by_purpose_aggregated.csv
       x: destination_purpose
       y: share
-      columns: trip_mode
+      columns: trip_mode_agg
       groupBy: dataset
-    description: 'Share: mode choice by trip purpose'
+    description: 'Share: mode choice by trip purpose (aggregated categories)'
   - type: bar
     title: Trip Mode by Purpose - Total
     props:
-      dataset: trip_mode_by_purpose.csv
+      dataset: trip_mode_by_purpose_aggregated.csv
       x: destination_purpose
       y: trips
-      columns: trip_mode
+      columns: trip_mode_agg
       groupBy: dataset
-    description: 'Total: mode choice by trip purpose'
+    description: 'Total: mode choice by trip purpose (aggregated categories)'
