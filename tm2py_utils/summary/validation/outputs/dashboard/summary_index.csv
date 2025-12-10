@@ -19,6 +19,8 @@ trip_purpose_2023 TM2.2 v05,trip_purpose_2023 TM2.2 v05.csv,12,4,Summary table: 
 trip_mode_by_purpose_2023 TM2.2 v05,trip_mode_by_purpose_2023 TM2.2 v05.csv,167,5,Summary table: trip_mode_by_purpose_2023 TM2.2 v05
 trip_mode_by_purpose_aggregated_2023 TM2.2 v05,trip_mode_by_purpose_aggregated_2023 TM2.2 v05.csv,62,5,Summary table: trip_mode_by_purpose_aggregated_2023 TM2.2 v05
 trip_distance_2023 TM2.2 v05,trip_distance_2023 TM2.2 v05.csv,6,4,Summary table: trip_distance_2023 TM2.2 v05
+cdap_by_share_2023 TM2.2 v05,cdap_by_share_2023 TM2.2 v05.csv,3,4,Summary table: cdap_by_share_2023 TM2.2 v05
+cdap_by_person_type_2023 TM2.2 v05,cdap_by_person_type_2023 TM2.2 v05.csv,22,5,Summary table: cdap_by_person_type_2023 TM2.2 v05
 time_of_day_tours_2023 TM2.2 v05,time_of_day_tours_2023 TM2.2 v05.csv,17681,7,Summary table: time_of_day_tours_2023 TM2.2 v05
 auto_ownership_regional_2015 TM2.2 Sprint 04,auto_ownership_regional_2015 TM2.2 Sprint 04.csv,5,4,Summary table: auto_ownership_regional_2015 TM2.2 Sprint 04
 auto_ownership_by_income_2015 TM2.2 Sprint 04,auto_ownership_by_income_2015 TM2.2 Sprint 04.csv,25,5,Summary table: auto_ownership_by_income_2015 TM2.2 Sprint 04
@@ -40,4 +42,6 @@ trip_purpose_2015 TM2.2 Sprint 04,trip_purpose_2015 TM2.2 Sprint 04.csv,12,4,Sum
 trip_mode_by_purpose_2015 TM2.2 Sprint 04,trip_mode_by_purpose_2015 TM2.2 Sprint 04.csv,177,5,Summary table: trip_mode_by_purpose_2015 TM2.2 Sprint 04
 trip_mode_by_purpose_aggregated_2015 TM2.2 Sprint 04,trip_mode_by_purpose_aggregated_2015 TM2.2 Sprint 04.csv,65,5,Summary table: trip_mode_by_purpose_aggregated_2015 TM2.2 Sprint 04
 trip_distance_2015 TM2.2 Sprint 04,trip_distance_2015 TM2.2 Sprint 04.csv,6,4,Summary table: trip_distance_2015 TM2.2 Sprint 04
+cdap_by_share_2015 TM2.2 Sprint 04,cdap_by_share_2015 TM2.2 Sprint 04.csv,3,4,Summary table: cdap_by_share_2015 TM2.2 Sprint 04
+cdap_by_person_type_2015 TM2.2 Sprint 04,cdap_by_person_type_2015 TM2.2 Sprint 04.csv,22,5,Summary table: cdap_by_person_type_2015 TM2.2 Sprint 04
 time_of_day_tours_2015 TM2.2 Sprint 04,time_of_day_tours_2015 TM2.2 Sprint 04.csv,33158,7,Summary table: time_of_day_tours_2015 TM2.2 Sprint 04

@@ -23,17 +23,10 @@ from dataclasses import dataclass
 from enum import Enum
 import sys
 import os
-import webbrowser
 
 # Validation summary modules
 from . import household_summary, worker_summary, tour_summary, trip_summary
 from ..data_model.ctramp_data_model_loader import load_data_model
-from ..dashboard.dashboard_writer import (
-    create_household_dashboard, 
-    create_worker_dashboard,
-    create_tour_dashboard,
-    create_trip_dashboard
-)
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -686,14 +679,16 @@ def _combine_multi_run_summaries(summaries: Dict[str, pd.DataFrame]) -> Dict[str
 
 
 def save_summaries(summaries: Dict[str, pd.DataFrame], output_dir: Path, 
-                  output_config: OutputConfig = None, generate_simwrapper: bool = True):
-    """Save all summary tables to CSV files and optionally generate SimWrapper dashboards.
+                  output_config: OutputConfig = None):
+    """Save all summary tables to CSV files.
+    
+    Saves both per-dataset files (e.g., 'cdap_by_share_2015 TM2.2 Sprint 04.csv')
+    and combined files (e.g., 'cdap_by_share.csv') that merge all datasets together.
     
     Args:
         summaries: Dictionary of summary name to DataFrame
         output_dir: Directory to save output files
         output_config: Optional configuration for custom filenames and column names
-        generate_simwrapper: Whether to generate SimWrapper dashboard files (default: True)
     """
     output_dir.mkdir(parents=True, exist_ok=True)
     
@@ -740,40 +735,17 @@ def save_summaries(summaries: Dict[str, pd.DataFrame], output_dir: Path,
     index_df.to_csv(output_dir / "summary_index.csv", index=False)
     logger.info(f"  ✓ Created summary index with {len(index_data)} tables")
     
-    # Generate dashboards if enabled
-    if generate_simwrapper:
-        logger.info("\nGenerating dashboards...")
-        dashboard_dir = output_dir / "dashboard"
-        dashboard_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Combine multi-run summaries (merge summaries with same base name)
-        combined_summaries = _combine_multi_run_summaries(summaries)
-        logger.info(f"  ℹ Combined {len(summaries)} summaries into {len(combined_summaries)} multi-run tables")
-        
-        # Group combined summaries by type
-        household_summaries = {k: v for k, v in combined_summaries.items() if 'household' in k.lower() or 'auto_ownership' in k.lower()}
-        worker_summaries = {k: v for k, v in combined_summaries.items() if 'worker' in k.lower() or 'person' in k.lower()}
-        tour_summaries = {k: v for k, v in combined_summaries.items() if 'tour' in k.lower()}
-        trip_summaries = {k: v for k, v in combined_summaries.items() if 'trip' in k.lower()}
-        
-        # Create dashboards for each category
-        if household_summaries:
-            create_household_dashboard(dashboard_dir, household_summaries)
-            logger.info(f"  ✓ Created household dashboard with {len(household_summaries)} summaries")
-        
-        if worker_summaries:
-            create_worker_dashboard(dashboard_dir, worker_summaries)
-            logger.info(f"  ✓ Created worker dashboard with {len(worker_summaries)} summaries")
-        
-        if tour_summaries:
-            create_tour_dashboard(dashboard_dir, tour_summaries)
-            logger.info(f"  ✓ Created tour dashboard with {len(tour_summaries)} summaries")
-        
-        if trip_summaries:
-            create_trip_dashboard(dashboard_dir, trip_summaries)
-            logger.info(f"  ✓ Created trip dashboard with {len(trip_summaries)} summaries")
-        
-        logger.info(f"  ✓ Dashboards saved to {dashboard_dir}")
+    # Combine multi-run summaries (merge summaries with same base name)
+    logger.info("\nCombining multi-run summaries...")
+    combined_summaries = _combine_multi_run_summaries(summaries)
+    logger.info(f"  ℹ Combined {len(summaries)} summaries into {len(combined_summaries)} multi-run tables")
+    
+    # Save combined summaries as CSV files
+    logger.info(f"Saving {len(combined_summaries)} combined summary files...")
+    for name, df in combined_summaries.items():
+        csv_path = output_dir / f"{name}.csv"
+        df.to_csv(csv_path, index=False)
+        logger.info(f"  ✓ Saved {name}.csv: {len(df)} rows")
 
 
 def create_default_config(input_dirs: List[Path], output_dir: Path) -> RunConfig:
@@ -944,20 +916,9 @@ def main():
             sys.exit(1)
         
         # Save results with output configuration
-        save_summaries(summaries, config.output_directory, config.output_config, 
-                      generate_simwrapper=not args.no_dashboard)
+        save_summaries(summaries, config.output_directory, config.output_config)
         
         logger.info("✅ Validation summary generation completed successfully!")
-        
-        # Open SimWrapper in browser if dashboards were generated
-        if not args.no_dashboard:
-            simwrapper_dir = config.output_directory / "simwrapper"
-            if simwrapper_dir.exists():
-                logger.info("\n🌐 Opening SimWrapper in browser...")
-                # Open SimWrapper with local folder
-                webbrowser.open('https://simwrapper.github.io/site/')
-                logger.info(f"   → In SimWrapper, click 'Add Local folder' and select:")
-                logger.info(f"   → {simwrapper_dir.absolute()}")
         
     except Exception as e:
         logger.error(f"❌ Error during execution: {e}")

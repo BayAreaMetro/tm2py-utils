@@ -473,21 +473,54 @@ tm2py_utils/summary/validation/
 
 ## Validation
 
-Check configuration validity:
+Check configuration validity before running:
 
 ```bash
 cd tm2py_utils/summary/validation
 
-# List configured summaries
-python list_summaries.py
+# Quick pre-flight check (recommended before every run)
+python check_config.py
+```
 
-# Test generation (dry run)
-python -m tm2py_utils.summary.validation.summaries.run_all \
-  --config validation_config.yaml --dry-run
+**Example output:**
 
+```
+================================================================================
+TM2PY VALIDATION SYSTEM - QUICK CHECK
+================================================================================
+
+📄 Loading configuration...
+  ✓ Configuration file is valid YAML
+
+📁 Checking input directories...
+  ✓ 2023 TM2.2 v05: A:\2023-tm22-dev-version-05\ctramp_output
+  ✓ 2015 TM2.2 Sprint 04: A:\2015-tm22-dev-sprint-04\ctramp_output
+
+📊 Counting configured summaries...
+  ✓ 29 active summaries configured
+
+📦 Found 110 output CSV files in outputs/dashboard/
+
+🎨 Checking dashboard configurations...
+  ✓ 8 dashboard files found
+
+================================================================================
+✅ BASIC CHECKS PASSED
+
+Next steps:
+  1. Generate summaries: python run_and_deploy_dashboard.py --config validation_config.yaml
+  2. Launch dashboard: streamlit run dashboard/dashboard_app.py
+```
+
+**Additional validation commands:**
+
+```bash
 # Generate single summary for testing
 python -m tm2py_utils.summary.validation.summaries.run_all \
   --config validation_config.yaml --summary-name trip_mode_choice
+
+# Detailed validation (checks column availability - advanced)
+python validate_config.py
 ```
 
 ## Common Configurations

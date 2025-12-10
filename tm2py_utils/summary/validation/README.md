@@ -2,19 +2,48 @@
 
 A flexible framework for generating validation summaries and interactive dashboards comparing multiple TM2.2 model runs.
 
+## 🎯 Quick Start
+
+```bash
+# 1. Check configuration
+python check_config.py
+
+# 2. Generate summaries and deploy dashboard files
+python run_and_deploy_dashboard.py --config validation_config.yaml
+
+# 3. Validate dashboards (optional - checks for missing files)
+python check_dashboards.py
+
+# 4. Launch dashboard
+streamlit run dashboard/dashboard_app.py --server.port 8501
+```
+
+Visit http://localhost:8501
+
+## 📖 Full Documentation
+
+**Complete guide:** [Validation System Documentation](../../docs/validation-system.md)
+
+The full documentation covers:
+- Adding new model runs and datasets
+- Creating custom summaries
+- Dashboard configuration
+- Troubleshooting and known limitations
+
 ## 📁 Directory Structure
 
 ```
 validation/
 ├── README.md                      # This file - start here!
-├── validation_config.yaml         # Configure datasets to analyze
+├── validation_config.yaml         # Configure datasets and summaries
+├── check_config.py                # Quick validation check (run before generating)
+├── run_and_deploy_dashboard.py   # Main workflow - generates summaries + deploys
 │
 ├── summaries/                     # Summary generation code
-│   ├── run_all.py                 # Main script - run this to generate summaries
+│   ├── run_all.py                 # Core summary generation engine
 │   ├── household_summary.py       # Household & auto ownership summaries
 │   ├── tour_summary.py            # Tour frequency, mode, timing summaries
 │   ├── trip_summary.py            # Trip mode, purpose, timing summaries
-│   ├── worker_summary.py          # Worker location summaries
 │   └── summary_utils.py           # Shared utility functions
 │
 ├── data_model/                    # Data model configuration
@@ -22,32 +51,162 @@ validation/
 │   ├── ctramp_data_model_loader.py
 │   └── variable_labels.yaml       # Display labels for dashboard
 │
-├── dashboard/                     # Dashboard code
-│   ├── run_dashboard.py           # Run this to launch dashboard locally
-│   ├── dashboard_app.py           # Main Streamlit dashboard (used by Streamlit Cloud)
-│   └── dashboard_writer.py        # Generates dashboard YAML configs
+├── dashboard/                     # Dashboard configuration
+│   ├── dashboard_app.py           # Streamlit application
+│   ├── dashboard-*.yaml           # Dashboard tab configurations (8 tabs)
+│   └── validation-app-banner.PNG  # Dashboard header image
 │
-└── outputs/                       # All generated files go here
-    └── dashboard/                 # Dashboard data files
-        ├── *.csv                  # Summary data
-        ├── dashboard-*.yaml       # Dashboard configs
-        └── validation-app-banner.PNG
+└── outputs/                       # Generated files
+    ├── *.csv                      # Per-dataset summary files
+    ├── summary_index.csv          # Catalog of all generated summaries
+    └── dashboard/                 # Dashboard-ready files
+        ├── *.csv                  # Combined summary files (for multi-run comparison)
+        └── dashboard-*.yaml       # Dashboard configs (copied here)
 ```
 
-## 🚀 Quick Start
+## 🔧 Key Files
 
-### 1. Add a New Dataset
+### Configuration Files
 
-Edit `validation_config.yaml` to add a dataset (model output or validation/survey data):
+- **validation_config.yaml** - Main configuration
+  - `input_directories`: Model run paths
+  - `custom_summaries`: List of summaries to generate (29 active)
+  - Some summaries commented out due to missing columns (see docs)
 
-```yaml
-datasets:
-  # Full model output with all tables
-  my_new_dataset:
-    path: "A:/path/to/ctramp_output"
-    name: "2024_version_06"
-    display_name: "2024 TM2.2 v06"
-    source_type: "model"
+- **dashboard-*.yaml** (8 files) - Dashboard tab configurations
+  - dashboard-population.yaml
+  - dashboard-households.yaml  
+  - dashboard-activity-patterns.yaml
+  - dashboard-tours.yaml
+  - dashboard-trips.yaml
+  - dashboard-commute.yaml ⚠️ (Coming soon - needs workplace_school data)
+  - dashboard-time-of-day.yaml
+  - dashboard-trip-characteristics.yaml
+
+### Scripts
+
+- **check_config.py** - Quick validation check
+  - Verifies input directories exist
+  - Checks YAML syntax
+  - Counts configured summaries
+  - Fast pre-flight check before running
+
+- **check_dashboards.py** - Dashboard validation
+  - Checks all dashboard YAML files are valid
+  - Verifies all referenced CSV files exist
+  - Detects missing columns in charts
+  - Run after summary generation to catch issues
+
+- **run_and_deploy_dashboard.py** - Main workflow
+  - Calls `summaries/run_all.py` to generate all summaries
+  - Creates both per-dataset AND combined CSV files
+  - Copies files to `outputs/dashboard/`
+  - Optional: `--launch-dashboard` to start Streamlit automatically
+
+## 📊 How Summary Generation Works
+
+The refactored architecture (as of Dec 2024) works as follows:
+
+1. **Read data** from each configured input directory
+2. **Generate summaries** for each dataset individually
+3. **Save per-dataset files**: `summary_name_dataset_label.csv`
+4. **Automatically combine** summaries across datasets
+5. **Save combined files**: `summary_name.csv` (with `dataset` column)
+6. **Copy all files** to `outputs/dashboard/` for dashboard use
+
+### Example Output
+
+```
+outputs/
+  cdap_by_share_2023 TM2.2 v05.csv       # Per-dataset file
+  cdap_by_share_2015 TM2.2 Sprint 04.csv # Per-dataset file
+  cdap_by_share.csv                      # Combined file (used by dashboard)
+  
+outputs/dashboard/
+  (same files copied here for dashboard)
+```
+
+The **combined files** have a `dataset` column that the dashboard uses to create side-by-side comparisons.
+
+## ⚙️ Architecture Changes (Recent)
+
+**Major refactoring completed Dec 2024:**
+
+- ✅ **Centralized combination logic** - Now happens in `save_summaries()` function
+- ✅ **Removed dashboard categorization** - No more household/worker/tour/trip splits
+- ✅ **Always generate combined files** - Both per-dataset and combined files created
+- ✅ **Simplified dashboard** - References combined files directly
+
+**Impact:**
+- Cleaner code, less duplication
+- Easier to add new summaries
+- Dashboard configs simpler (just reference `summary_name.csv`)
+
+## ⚠️ Known Limitations
+
+Some summaries are commented out in `validation_config.yaml`:
+
+| Summary | Issue | Required Fix |
+|---------|-------|--------------|
+| `cdap_by_age` | Needs `age_category` | Derive from `age` column |
+| `cdap_by_home_county` | Needs `county_name` | Add household geography join |
+| `cdap_by_auto_ownership` | Needs `num_vehicles` | Join household to person data |
+| `journey_to_work` | `workplace_school` not loading | Fix wsLocResults.csv processing |
+| `journey_to_work_by_mode` | `workplace_school` not loading | Fix wsLocResults.csv processing |
+
+See [Troubleshooting](../../docs/validation-system.md#troubleshooting) in full docs for details.
+
+## 🐛 Troubleshooting
+
+### Dashboard shows "No data"
+
+1. **Check if CSV exists:**
+   ```bash
+   ls outputs/dashboard/summary_name.csv
+   ```
+
+2. **Check CSV structure:**
+   ```bash
+   python -c "import pandas as pd; print(pd.read_csv('outputs/dashboard/summary_name.csv').columns)"
+   ```
+
+3. **Verify dashboard references correct file:**
+   - Should reference combined file: `summary_name.csv`
+   - NOT per-dataset file: `summary_name_2023 TM2.2 v05.csv`
+
+4. **Run dashboard validation:**
+   ```bash
+   python check_dashboards.py
+   ```
+
+### Summary not generating
+
+1. **Run validation check:**
+   ```bash
+   python check_config.py
+   ```
+
+2. **Check for missing columns:**
+   - Review commented-out summaries in `validation_config.yaml`
+   - Each has explanation of what's needed
+
+3. **Check summary_index.csv:**
+   ```bash
+   cat outputs/dashboard/summary_index.csv | grep "summary_name"
+   ```
+
+## 🚀 Next Steps
+
+1. **Review full documentation:** [validation-system.md](../../docs/validation-system.md)
+2. **Understand configuration:** See examples in `validation_config.yaml`
+3. **Add custom summaries:** Use template in `examples/custom_summary_template.yaml`
+4. **Explore dashboard configs:** Look at `dashboard/dashboard-*.yaml` files
+
+## 📧 Support
+
+- **Issues:** https://github.com/BayAreaMetro/tm2py-utils/issues
+- **Docs:** https://bayareametro.github.io/tm2py-utils/
+- **Email:** modeling@bayareametro.gov
     iteration: 1
   
 ```

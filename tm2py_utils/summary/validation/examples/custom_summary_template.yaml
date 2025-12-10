@@ -1,0 +1,199 @@
+# Custom Summary Template
+# 
+# Copy this template to add new summaries to validation_config.yaml
+# Place under the `custom_summaries:` section
+#
+# See full documentation: docs/validation-system.md
+
+# ==============================================================================
+# EXAMPLE 1: Simple Count by Category
+# ==============================================================================
+# Counts trips by mode with share calculation
+- name: "trip_mode_choice"
+  summary_type: "core"                    # "core" or "validation"
+  description: "Trip mode choice distribution"
+  data_source: "individual_trips"         # Data table to use
+  group_by: "trip_mode"                   # Column to group by
+  weight_field: "sample_rate"             # Apply expansion weights
+  count_name: "trips"                     # Name for count column
+
+# Output: trip_mode_choice.csv
+# Columns: trip_mode, trips, share, dataset
+
+
+# ==============================================================================
+# EXAMPLE 2: Cross-Tabulation with Share Within Groups
+# ==============================================================================
+# Mode choice by tour purpose, showing shares within each purpose
+- name: "trip_mode_by_purpose"
+  summary_type: "core"
+  description: "Trip mode choice by purpose"
+  data_source: "individual_trips"
+  group_by: ["destination_purpose", "trip_mode"]  # Multiple grouping columns
+  weight_field: "sample_rate"
+  count_name: "trips"
+  share_within: "destination_purpose"     # Each purpose sums to 100%
+
+# Output: trip_mode_by_purpose.csv
+# Columns: destination_purpose, trip_mode, trips, share, dataset
+
+
+# ==============================================================================
+# EXAMPLE 3: Multiple Aggregations (Count + Statistics)
+# ==============================================================================
+# Average trip distance and time by mode
+- name: "trip_characteristics_by_mode"
+  summary_type: "core"
+  description: "Trip distance and time statistics by mode"
+  data_source: "individual_trips"
+  group_by: "trip_mode"
+  weight_field: "sample_rate"
+  aggregations:
+    trips: "count"                        # Count of trips
+    avg_distance:                         # Mean distance
+      column: "trip_distance_miles"
+      agg: "mean"
+    avg_time:                             # Mean travel time
+      column: "trip_time_minutes"
+      agg: "mean"
+    total_vmt:                            # Total vehicle miles
+      column: "trip_distance_miles"
+      agg: "sum"
+
+# Output: trip_characteristics_by_mode.csv
+# Columns: trip_mode, trips, avg_distance, avg_time, total_vmt, dataset
+
+
+# ==============================================================================
+# EXAMPLE 4: Using Bins to Discretize Continuous Variables
+# ==============================================================================
+# Trip distance distribution by income category
+- name: "trip_distance_by_income"
+  summary_type: "validation"
+  description: "Trip distance distribution by income category"
+  data_source: "individual_trips"
+  group_by: ["distance_bin", "income_bin"]
+  weight_field: "sample_rate"
+  count_name: "trips"
+  bins:
+    distance:
+      breaks: [0, 5, 10, 20, 50, 1000]
+      labels: ['<5mi', '5-10mi', '10-20mi', '20-50mi', '50+mi']
+    income:
+      breaks: [0, 30000, 60000, 100000, 150000, 1000000000]
+      labels: ['<30K', '30-60K', '60-100K', '100-150K', '150K+']
+  share_within: "income_bin"              # Share within each income category
+
+# Output: trip_distance_by_income.csv
+# Columns: distance_bin, income_bin, trips, share, dataset
+# Note: Column names in group_by must match bin definition names
+
+
+# ==============================================================================
+# EXAMPLE 5: Filtering Data Before Aggregation
+# ==============================================================================
+# Analyze only work tours with positive distance
+- name: "work_tour_characteristics"
+  summary_type: "core"
+  description: "Work tour mode choice and distance"
+  data_source: "individual_tours"
+  group_by: ["tour_mode"]
+  weight_field: "sample_rate"
+  aggregations:
+    tours: "count"
+    avg_distance:
+      column: "tour_distance_miles"
+      agg: "mean"
+  filters:
+    tour_purpose: ["Work"]                # Only Work tours
+    tour_distance_miles: {">": 0}         # Distance greater than 0
+
+# Output: work_tour_characteristics.csv
+# Columns: tour_mode, tours, avg_distance, dataset
+
+
+# ==============================================================================
+# EXAMPLE 6: Comparing to Observed Data
+# ==============================================================================
+# Auto ownership compared to ACS data
+- name: "auto_ownership_validation"
+  summary_type: "validation"
+  description: "Household auto ownership validation against ACS"
+  data_source: "households"
+  group_by: "num_vehicles"
+  weight_field: "sample_rate"
+  count_name: "households"
+  observed_data: "ACS 2019"               # Name from observed_data_sources
+  observed_file: "auto_ownership"         # File key from observed_data_sources
+
+# Output: auto_ownership_validation.csv
+# Columns: num_vehicles, households, share, dataset
+# Dataset column includes both model runs AND "ACS 2019"
+
+
+# ==============================================================================
+# AVAILABLE DATA SOURCES
+# ==============================================================================
+# - households         → householdData_1.csv
+# - persons            → personData_1.csv
+# - individual_tours   → indivTourData_1.csv
+# - individual_trips   → indivTripData_1.csv
+# - workplace_school   → wsLocResults.csv (if available)
+
+
+# ==============================================================================
+# AVAILABLE AGGREGATION FUNCTIONS
+# ==============================================================================
+# - count     → Count rows
+# - mean      → Average
+# - sum       → Total
+# - max       → Maximum
+# - min       → Minimum
+# - median    → Median
+# - std       → Standard deviation
+
+
+# ==============================================================================
+# FILTER OPERATORS
+# ==============================================================================
+# - ["value1", "value2"]     → Equals any of these
+# - {">": value}             → Greater than
+# - {"<": value}             → Less than
+# - {">=": value}            → Greater than or equal
+# - {"<=": value}            → Less than or equal
+
+
+# ==============================================================================
+# COMMON COLUMNS (check ctramp_data_model.yaml for complete list)
+# ==============================================================================
+# Household columns:
+#   - hh_id, income, auto_ownership, household_size, num_workers
+#
+# Person columns:
+#   - person_id, age, gender, person_type, cdap
+#
+# Tour columns:
+#   - tour_id, tour_purpose, tour_mode, start_period, end_period,
+#     tour_distance_miles
+#
+# Trip columns:
+#   - trip_id, trip_mode, trip_purpose, destination_purpose,
+#     trip_distance_miles, trip_time_minutes, depart_period
+
+
+# ==============================================================================
+# TROUBLESHOOTING
+# ==============================================================================
+# 
+# Summary not generating?
+# 1. Run: python check_config.py
+# 2. Check if required columns exist in data source
+# 3. Review outputs/dashboard/summary_index.csv to see what was generated
+# 4. Check for column name mismatches in ctramp_data_model.yaml
+#
+# Column not found errors?
+# - Some columns are derived during processing (e.g., person_type from type)
+# - Some columns require joins (e.g., county_name needs household data)
+# - Check existing working summaries in validation_config.yaml for patterns
+#
+# See full troubleshooting guide: docs/validation-system.md#troubleshooting

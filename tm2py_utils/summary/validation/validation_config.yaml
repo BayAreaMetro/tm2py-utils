@@ -403,56 +403,66 @@ custom_summaries:
     share_within: "person_type"
   
   # Activity Pattern (CDAP) - by age
-  - name: "cdap_by_age"
-    summary_type: "core"
-    description: "Coordinated daily activity pattern by age group"
-    data_source: "persons"
-    group_by: ["cdap", "age_category"]
-    weight_field: "sample_rate"
-    count_name: "persons"
-    share_within: "age_category"
+  # DISABLED: Requires 'age_category' column which must be derived from 'age' column
+  # To enable: Add age categorization logic to data loading/processing
+  # - name: "cdap_by_age"
+  #   summary_type: "core"
+  #   description: "Coordinated daily activity pattern by age group"
+  #   data_source: "persons"
+  #   group_by: ["cdap", "age_category"]
+  #   weight_field: "sample_rate"
+  #   count_name: "persons"
+  #   share_within: "age_category"
   
   # Activity Pattern (CDAP) - by home county
-  - name: "cdap_by_home_county"
-    summary_type: "core"
-    description: "Coordinated daily activity pattern by home county"
-    data_source: "persons"
-    group_by: ["cdap", "county_name"]
-    weight_field: "sample_rate"
-    count_name: "persons"
-    share_within: "county_name"
+  # DISABLED: Requires 'county_name' column from household data
+  # To enable: Add household join to person data or derive county from MAZ/TAZ geography
+  # - name: "cdap_by_home_county"
+  #   summary_type: "core"
+  #   description: "Coordinated daily activity pattern by home county"
+  #   data_source: "persons"
+  #   group_by: ["cdap", "county_name"]
+  #   weight_field: "sample_rate"
+  #   count_name: "persons"
+  #   share_within: "county_name"
   
   # Activity Pattern (CDAP) - by auto ownership
-  - name: "cdap_by_auto_ownership"
-    summary_type: "core"
-    description: "Coordinated daily activity pattern by household auto ownership"
-    data_source: "persons"
-    group_by: ["cdap", "num_vehicles"]
-    weight_field: "sample_rate"
-    count_name: "persons"
-    share_within: "num_vehicles"
+  # DISABLED: Requires 'num_vehicles' column from household data
+  # To enable: Add household join to person data to get household-level auto ownership
+  # - name: "cdap_by_auto_ownership"
+  #   summary_type: "core"
+  #   description: "Coordinated daily activity pattern by household auto ownership"
+  #   data_source: "persons"
+  #   group_by: ["cdap", "num_vehicles"]
+  #   weight_field: "sample_rate"
+  #   count_name: "persons"
+  #   share_within: "num_vehicles"
   
   # Journey to Work - distance/time
-  - name: "journey_to_work"
-    summary_type: "core"
-    description: "Commute distance and time by residence and work location"
-    data_source: "workplace_school"
-    group_by: ["home_county", "work_county"]
-    weight_field: "sample_rate"
-    aggregations:
-      workers: "count"
-      avg_distance: {"column": "distance_miles", "agg": "mean"}
-      avg_time: {"column": "time_minutes", "agg": "mean"}
+  # DISABLED: Data source 'workplace_school' not currently loading/processing
+  # To enable: Fix workplace_school data loading in data processing pipeline
+  # - name: "journey_to_work"
+  #   summary_type: "core"
+  #   description: "Commute distance and time by residence and work location"
+  #   data_source: "workplace_school"
+  #   group_by: ["home_county", "work_county"]
+  #   weight_field: "sample_rate"
+  #   aggregations:
+  #     workers: "count"
+  #     avg_distance: {"column": "distance_miles", "agg": "mean"}
+  #     avg_time: {"column": "time_minutes", "agg": "mean"}
   
   # Journey to Work by Mode
-  - name: "journey_to_work_by_mode"
-    summary_type: "core"
-    description: "Commute mode choice by home and work location"
-    data_source: "workplace_school"
-    group_by: ["home_county", "work_county", "tour_mode"]
-    weight_field: "sample_rate"
-    count_name: "workers"
-    share_within: ["home_county", "work_county"]
+  # DISABLED: Data source 'workplace_school' not currently loading/processing
+  # To enable: Fix workplace_school data loading in data processing pipeline
+  # - name: "journey_to_work_by_mode"
+  #   summary_type: "core"
+  #   description: "Commute mode choice by home and work location"
+  #   data_source: "workplace_school"
+  #   group_by: ["home_county", "work_county", "tour_mode"]
+  #   weight_field: "sample_rate"
+  #   count_name: "workers"
+  #   share_within: ["home_county", "work_county"]
   
   # Time of Day - tour start/end periods
   - name: "time_of_day_tours"

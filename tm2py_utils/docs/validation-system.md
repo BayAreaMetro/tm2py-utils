@@ -919,6 +919,151 @@ python run_and_deploy_dashboard.py \
 
 ---
 
+## System Architecture
+
+### Summary File Generation
+
+The validation system generates **two types of CSV files** for each summary:
+
+1. **Per-Dataset Files**: One file per input directory with dataset name in filename
+   - Example: `cdap_by_share_2023 TM2.2 v05.csv`, `cdap_by_share_2015 TM2.2 Sprint 04.csv`
+   - Contains data for single model run only
+   - Useful for debugging and individual analysis
+
+2. **Combined Files**: Single file merging all datasets with `dataset` column
+   - Example: `cdap_by_share.csv` (contains rows for all datasets)
+   - Used by dashboard for multi-run comparisons
+   - Generated automatically in `save_summaries()` function
+
+**File locations:**
+- `outputs/` - All generated CSV files (both types)
+- `outputs/dashboard/` - Copy of all files for dashboard use
+- `summary_index.csv` - Metadata catalog of all generated summaries
+
+### How Summary Combination Works
+
+When you have multiple model runs configured (e.g., base year and plan year), the system:
+
+1. Generates individual summary for each dataset
+2. Groups summaries by base name (removes dataset suffix)
+3. Concatenates DataFrames and adds `dataset` column
+4. Saves combined file without dataset suffix
+
+Example:
+```python
+# Generated files:
+cdap_by_share_2023 TM2.2 v05.csv      # 3 rows (H, M, N)
+cdap_by_share_2015 TM2.2 Sprint 04.csv  # 3 rows (H, M, N)
+
+# Combined automatically:
+cdap_by_share.csv                     # 6 rows (3 per dataset)
+```
+
+### Dashboard Integration
+
+Dashboard YAML files reference the **combined files** (without dataset suffix):
+
+```yaml
+charts:
+  - type: bar
+    dataset: cdap_by_share.csv  # Combined file
+    x: cdap
+    y: share
+    color: dataset  # Splits bars by model run
+```
+
+The `facet: dataset` or `color: dataset` parameter creates side-by-side comparisons.
+
+---
+
+## Troubleshooting
+
+### Summary Not Generating
+
+**Check 1: Required columns exist in data**
+
+Some summaries require columns that must be derived or joined from other sources:
+
+```yaml
+# Example: This will FAIL if person data doesn't have age_category
+- name: "cdap_by_age"
+  group_by: ["cdap", "age_category"]  # ❌ age_category doesn't exist
+```
+
+**Solutions:**
+- Check `personData_1.csv` columns: `python -c "import pandas as pd; print(pd.read_csv('personData_1.csv', nrows=1).columns.tolist())"`
+- Derive needed columns in data preprocessing
+- Comment out summary in `validation_config.yaml` if not feasible
+
+**Check 2: Data source file exists**
+
+```yaml
+# This fails if wsLocResults.csv is missing
+- name: "journey_to_work"
+  data_source: "workplace_school"  # Requires wsLocResults.csv
+```
+
+**Check 3: Review summary_index.csv**
+
+```bash
+# See what actually generated
+cat outputs/dashboard/summary_index.csv | grep "your_summary_name"
+```
+
+### Dashboard Shows No Data
+
+**Symptom:** Chart area is blank or shows "No data"
+
+**Common causes:**
+
+1. **CSV file doesn't exist**
+   ```bash
+   # Check if file exists
+   ls outputs/dashboard/cdap_by_share.csv
+   ```
+
+2. **Column names don't match**
+   ```yaml
+   # Dashboard expects 'cdap' but CSV has 'cdap_pattern'
+   charts:
+     - x: cdap  # ❌ Column not found
+   ```
+
+3. **Wrong file referenced** (per-dataset instead of combined)
+   ```yaml
+   # Wrong:
+   dataset: cdap_by_share_2023 TM2.2 v05.csv
+   
+   # Right:
+   dataset: cdap_by_share.csv
+   ```
+
+**Debug steps:**
+```bash
+# Check CSV structure
+python -c "import pandas as pd; df = pd.read_csv('outputs/dashboard/cdap_by_share.csv'); print(df.columns); print(df.head())"
+```
+
+### Known Limitations
+
+**Disabled Summaries** (commented out in `validation_config.yaml`):
+
+| Summary | Issue | Solution Required |
+|---------|-------|-------------------|
+| `cdap_by_age` | Needs `age_category` column | Derive from `age` (e.g., <18, 18-64, 65+) |
+| `cdap_by_home_county` | Needs `county_name` column | Join household geography or derive from MAZ |
+| `cdap_by_auto_ownership` | Needs `num_vehicles` from household | Join person to household data |
+| `journey_to_work` | `workplace_school` data not loading | Fix `wsLocResults.csv` data loading |
+| `journey_to_work_by_mode` | `workplace_school` data not loading | Fix `wsLocResults.csv` data loading |
+
+**To enable these summaries:**
+1. Implement required data derivation/joins
+2. Uncomment summary configuration in `validation_config.yaml`
+3. Update dashboard YAML if needed
+4. Test generation and verify output
+
+---
+
 ## Additional Resources
 
 - **[Configuration Reference](configuration.md)** - Complete YAML syntax

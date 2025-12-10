@@ -1,0 +1,34 @@
+dashboard:
+  tab: Activity Patterns
+  title: Coordinated Daily Activity Patterns (CDAP)
+  description: Person-level daily activity patterns showing mandatory (work/school), non-mandatory (discretionary), and home activities.
+
+sections:
+  cdap_overall:
+    title: "Overall Activity Pattern Distribution"
+    description: "Share of persons by daily activity pattern across all model runs"
+    charts:
+      - type: bar
+        title: "Activity Pattern Share"
+        dataset: cdap_by_share.csv
+        x: cdap
+        y: share
+        color: dataset
+        axis_labels:
+          cdap: "Daily Activity Pattern"
+          share: "Share of Persons (%)"
+  
+  cdap_by_person_type:
+    title: "Activity Patterns by Person Type"
+    description: "Activity patterns vary by employment and school status"
+    charts:
+      - type: bar
+        title: "Activity Pattern by Person Type"
+        dataset: cdap_by_person_type.csv
+        x: person_type
+        y: share
+        color: cdap
+        facet: dataset
+        axis_labels:
+          person_type: "Person Type"
+          share: "Share within Person Type (%)"

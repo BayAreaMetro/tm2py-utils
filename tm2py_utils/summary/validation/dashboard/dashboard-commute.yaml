@@ -1,7 +1,10 @@
 dashboard:
   tab: Journey to Work
   title: Commute Patterns and Mode Choice
-  description: Work location choice results showing commute distances, travel times, and mode choice patterns by origin-destination pairs.
+  description: |
+    ⚠️ COMING SOON: This dashboard requires workplace_school data that is not currently being loaded.
+    
+    Work location choice results showing commute distances, travel times, and mode choice patterns by origin-destination pairs.
 
 sections:
   commute_overview:
