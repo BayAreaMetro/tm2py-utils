@@ -49,13 +49,13 @@ Household-level demographics, location, and vehicle ownership.
 
 | Column Name | Description | Example Values | Notes |
 |------------|-------------|----------------|-------|
-| `hh_id` | Unique household identifier | 1, 2, 3, ... | Primary key |
-| `home_mgra` | Home location MGRA | 1, 2, 3, ..., 1454 | Joins to geography lookup |
-| `income` | Income category | 1, 2, 3, 4 | 1=Low, 2=Med-Low, 3=Med-High, 4=High |
+| `hh_id` | Unique household identifier | 1562223, 1580323, ... | Primary key |
+| `home_mgra` | Home location MGRA | 3, 4, 5, ..., 1454 | Joins to geography lookup |
+| `income` | Annual household income (dollars) | 140705, 125256, 772355 | Continuous dollar amount |
 | `autos` | Number of vehicles | 0, 1, 2, 3, 4, 5, 6+ | Integer count |
 | `size` | Household size (persons) | 1, 2, 3, ..., 15 | Total household members |
 | `workers` | Number of workers | 0, 1, 2, ... | Workers ≤ size |
-| `sampleRate` | Sample expansion factor | 0.05, 0.5, 1.0 | **Percentage** (0.05 = 5% sample) |
+| `sampleRate` | Sample expansion factor | 0.01, 0.05, 0.5, 1.0 | **Decimal fraction** (0.01 = 1% sample) |
 
 **Optional Columns:**
 
@@ -67,9 +67,9 @@ Household-level demographics, location, and vehicle ownership.
 | `jtf_choice` | Joint tour frequency | 0, 1, 2, 3 |
 
 **Key Points:**
-- `sampleRate` is the **sampling percentage**, not the expansion factor (system inverts it: 0.5 → weight of 2.0)
+- `sampleRate` is the **sampling fraction**, not the expansion factor (system inverts it: 0.01 → weight of 100.0)
 - `home_mgra` must exist in the geography lookup file to get county/district names
-- `income` categories represent quartiles (1=lowest, 4=highest)
+- `income` is continuous in dollars, not categorical (binning must be done in postprocessing or summary config)
 
 **Official Documentation**: https://bayareametro.github.io/tm2py/ctramp-outputs/household/
 
@@ -83,25 +83,25 @@ Individual characteristics, employment, and daily activity patterns.
 
 | Column Name | Description | Example Values | Notes |
 |------------|-------------|----------------|-------|
-| `hh_id` | Household identifier | 1, 2, 3, ... | Foreign key to households |
-| `person_id` | Unique person identifier | 1, 2, 3, ... | Primary key (globally unique) |
+| `hh_id` | Household identifier | 1562223, 1580323, ... | Foreign key to households |
+| `person_id` | Unique person identifier | 3806279, 3841021, ... | Primary key (globally unique) |
 | `person_num` | Person number in household | 1, 2, 3, ... | 1 to household size |
-| `age` | Person age in years | 5, 25, 65, ... | Integer |
-| `gender` | Gender | 1, 2 | 1=Male, 2=Female |
-| `type` | Person type classification | 1-8 | See person type codes below |
+| `age` | Person age in years | 9, 12, 39, 47, 51 | Integer |
+| `gender` | Gender | "m", "f" | **Text values**: "m"=Male, "f"=Female |
+| `type` | Person type classification | **Text values** | See person type values below |
 
-**Person Type Codes** (`type`):
+**Person Type Values** (`type`) - **Text Strings**:
 
-| Code | Description |
+| Value | Description |
 |------|-------------|
-| 1 | Full-time worker |
-| 2 | Part-time worker |
-| 3 | University student |
-| 4 | Non-working adult |
-| 5 | Retired adult |
-| 6 | Driving-age student |
-| 7 | School-age child |
-| 8 | Preschool child |
+| "Full-time worker" | Full-time worker |
+| "Part-time worker" | Part-time worker |
+| "University student" | University student |
+| "Non-worker" | Non-working adult |
+| "Retired" | Retired adult |
+| "Student of driving age" | Driving-age student (high school) |
+| "Student of non-driving age" | School-age child (K-8) |
+| "Child too young for school" | Preschool child |
 
 **Optional but Common Columns:**
 
@@ -135,12 +135,12 @@ Round-trip journeys from home (or workplace) to a destination and back.
 | `hh_id` | Household identifier | 1, 2, 3, ... | Foreign key |
 | `person_id` | Person identifier | 1, 2, 3, ... | Foreign key |
 | `person_num` | Person number in household | 1, 2, 3 | - |
-| `person_type` | Person type classification | 1-8 | Same as persons.type |
-| `tour_id` | Tour sequence for this person | 1, 2, 3 | Primary key (unique per person) |
+| `person_type` | Person type classification | Text values | Same as persons.type |
+| `tour_id` | Tour sequence for this person | 0, 1, 2, 3 | Primary key (0-indexed, unique per person) |
 | `tour_category` | High-level tour classification | "MANDATORY", "INDIVIDUAL_NON_MANDATORY", "AT_WORK" | Text values |
 | `tour_purpose` | Specific tour purpose | "Work", "Shop", "Discretionary" | Text values |
-| `start_period` | Departure time period | 1-48 | 30-minute intervals (1=3:00-3:30 AM, 14=9:30-10:00 AM) |
-| `end_period` | Return time period | 1-48 | Same scale as start_period |
+| `start_period` | Departure time period | 1-40 | 30-minute intervals (1=5:00-5:30 AM, 7=8:00-8:30 AM) |
+| `end_period` | Return time period | 1-40 | Same scale as start_period |
 
 **Tour Purpose Values** (text strings in data):
 - `Work` - Work tour
@@ -167,11 +167,12 @@ Round-trip journeys from home (or workplace) to a destination and back.
 | `num_ib_stops` | Inbound intermediate stops | 0, 1, 2, 3 |
 | `sampleRate` | Sample expansion factor | 0.05, 0.5, 1.0 |
 
-**Time Periods** (1-48, 30-minute intervals):
-- 1 = 3:00-3:30 AM
-- 14 = 9:30-10:00 AM
-- 34 = 7:30-8:00 PM
-- 48 = 2:30-3:00 AM (next day)
+**Time Periods** (1-40, 30-minute intervals starting at 5:00 AM):
+- 1 = 5:00-5:30 AM
+- 7 = 8:00-8:30 AM (typical morning commute)
+- 13 = 11:00-11:30 AM
+- 25 = 5:00-5:30 PM (typical evening commute)
+- 40 = 3:00-3:30 AM (next day)
 
 **Official Documentation**: https://bayareametro.github.io/tm2py/ctramp-outputs/individual-tours/
 
@@ -202,7 +203,7 @@ Individual trip segments (one-way movements) that make up tours.
 | `orig_mgra` | Origin MGRA | 100, 200 |
 | `dest_mgra` | Destination MGRA | 150, 250 |
 | `trip_dist` | Trip distance (miles) | 2.5, 5.0 |
-| `stop_period` | Departure time period | 1-48 |
+| `stop_period` | Departure time period | 1-40 |
 | `trip_mode` | Trip transportation mode | 1-17 (see mode codes) |
 | `tour_mode` | Parent tour mode | 1-17 |
 | `sampleRate` | Sample expansion factor | 0.05, 0.5, 1.0 |
@@ -250,21 +251,21 @@ The 17-mode standard used for `tour_mode` and `trip_mode`:
 | 6 | SR3_GP | Shared Ride 3+ - General Purpose |
 | 7 | SR3_HOV | Shared Ride 3+ - HOV lanes |
 | 8 | SR3_PAY | Shared Ride 3+ - Express/Toll |
-| 9 | WALK | Walk |
-| 10 | BIKE | Bicycle |
-| 11 | WLK_TRN | Walk to Transit |
-| 12 | PNR_TRN | Park-and-Ride to Transit |
-| 13 | KNRPRV_TRN | Kiss-and-Ride (Private vehicle) to Transit |
-| 14 | KNRTNC_TRN | Kiss-and-Ride (TNC) to Transit |
+| 9 | WALK_TRN | Walk to Transit |
+| 10 | PNR_TRN | Park-and-Ride to Transit |
+| 11 | KNR_TRN | Kiss-and-Ride to Transit |
+| 12 | TNC_TRN | TNC to Transit |
+| 13 | WALK | Walk |
+| 14 | BIKE | Bicycle |
 | 15 | TAXI | Taxi |
-| 16 | TNC | Transportation Network Company (Uber/Lyft) |
-| 17 | SCHLBUS | School Bus |
+| 16 | TNC_SINGLE | TNC Single (Uber/Lyft alone) |
+| 17 | TNC_SHARED | TNC Shared (UberPool/Lyft Shared) |
 
 **Common Aggregations:**
 - **Auto**: 1-8 (all SOV and shared ride modes)
-- **Transit**: 11-14 (all transit access modes)
-- **Active**: 9-10 (walk and bike)
-- **TNC/Taxi**: 15-16
+- **Transit**: 9-12 (all transit access modes)
+- **Active**: 13-14 (walk and bike)
+- **TNC/Taxi**: 15-17 (taxi and TNC modes)
 
 ---
 
@@ -290,13 +291,19 @@ trips (tour_id, trip_id/stop_id)
 
 ## Sample Expansion (Weighting)
 
-**CRITICAL**: The `sampleRate` field is a **percentage**, not an expansion factor.
+**CRITICAL**: The `sampleRate` field is a **decimal fraction**, not an expansion factor.
 
-- **In CSVs**: `sampleRate = 0.05` means 5% sample
-- **Expansion factor**: `1 / sampleRate = 1 / 0.05 = 20.0`
-- **Interpretation**: Each record represents 20 actual households/persons/tours/trips
+- **In CSVs**: `sampleRate = 0.01` means 1% sample (typical for full region model)
+- **Expansion factor**: `1 / sampleRate = 1 / 0.01 = 100.0`
+- **Interpretation**: Each record represents 100 actual households/persons/tours/trips
 
 **The system automatically inverts `sampleRate` to calculate weights.**
+
+**Common Values:**
+- `0.01` = 1% sample (expansion factor 100) - typical for full model runs
+- `0.05` = 5% sample (expansion factor 20) - smaller test runs
+- `0.50` = 50% sample (expansion factor 2) - quick tests
+- `1.00` = 100% sample (expansion factor 1) - no sampling
 
 | Sample Rate | Expansion Factor | Meaning |
 |-------------|------------------|---------|
