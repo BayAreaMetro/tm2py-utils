@@ -532,20 +532,22 @@ class SummaryGenerator:
             logger.info(f"\nProcessing dataset: {display_name} ({dataset_name})")
             
             # Household summaries
-            if SummaryType.AUTO_OWNERSHIP in self.config.enabled_summaries:
-                if 'households' in data:
-                    # Get weight field from data model
-                    weight_col = None
-                    if hasattr(self, 'data_model') and self.data_model:
-                        weight_col = self.data_model.get_weight_field('households')
-                    
-                    all_summaries.update(
-                        household_summary.generate_all_household_summaries(
-                            data['households'], display_name, weight_col
-                        )
-                    )
-                else:
-                    logger.warning(f"  ⚠ No household data for {dataset_name}")
+            # MIGRATION: Temporarily disabled to test config-driven summaries
+            # TODO: Remove after verifying config-driven summaries work identically
+            # if SummaryType.AUTO_OWNERSHIP in self.config.enabled_summaries:
+            #     if 'households' in data:
+            #         # Get weight field from data model
+            #         weight_col = None
+            #         if hasattr(self, 'data_model') and self.data_model:
+            #             weight_col = self.data_model.get_weight_field('households')
+            #         
+            #         all_summaries.update(
+            #             household_summary.generate_all_household_summaries(
+            #                 data['households'], display_name, weight_col
+            #             )
+            #         )
+            #     else:
+            #         logger.warning(f"  ⚠ No household data for {dataset_name}")
             
             # Worker summaries
             if SummaryType.WORK_LOCATION in self.config.enabled_summaries:

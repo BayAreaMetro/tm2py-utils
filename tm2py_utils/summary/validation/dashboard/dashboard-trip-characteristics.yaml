@@ -1,107 +1,80 @@
-dashboard:
+header:
   tab: Trip Characteristics
   title: Trip Distance and Travel Time Analysis
   description: Detailed analysis of trip characteristics including distance and travel time by mode, purpose, income, and auto sufficiency.
 
-sections:
+layout:
   trip_distance_overview:
-    title: "Trip Distance Distribution"
-    description: "How far people travel by trip distance bins"
-    charts:
-      - type: bar
-        title: "Trip Distance Distribution"
+    - type: bar
+      title: "Trip Distance Distribution"
+      props:
         dataset: trip_distance.csv
-        x: trip_distance
+        x: trip_distance_bin
         y: trips
-        color: dataset
-        axis_labels:
-          trip_distance: "Distance Category"
-          trips: "Number of Trips"
-      
-      - type: bar
-        title: "Trip Distance Share"
+        groupBy: dataset
+      description: "How far people travel by trip distance bins"
+    
+    - type: bar
+      title: "Trip Distance Share"
+      props:
         dataset: trip_distance.csv
-        x: trip_distance
+        x: trip_distance_bin
         y: share
-        color: dataset
-        axis_labels:
-          trip_distance: "Distance Category"
-          share: "Share of Trips (%)"
+        groupBy: dataset
   
   trip_distance_detailed:
-    title: "Trip Distance by Demographics and Mode"
-    description: "Average trip distance varies by income, auto ownership, mode, and purpose"
-    charts:
-      - type: bar
-        title: "Average Trip Distance by Income and Mode"
+    - type: bar
+      title: "Average Trip Distance by Income and Mode"
+      props:
         dataset: trip_distance_detailed.csv
         x: income_category_bin
         y: avg_distance
-        color: trip_mode
-        facet: dataset
-        axis_labels:
-          income_category_bin: "Income Category"
-          avg_distance: "Average Distance (miles)"
-          trip_mode: "Mode"
-      
-      - type: bar
-        title: "Average Trip Distance by Auto Sufficiency"
+        groupBy: trip_mode
+        facetBy: dataset
+      description: "Average trip distance varies by income, auto ownership, mode, and purpose"
+    
+    - type: bar
+      title: "Average Trip Distance by Auto Sufficiency"
+      props:
         dataset: trip_distance_detailed.csv
         x: auto_sufficiency
         y: avg_distance
-        color: trip_mode
-        facet: dataset
-        axis_labels:
-          auto_sufficiency: "Auto Sufficiency"
-          avg_distance: "Average Distance (miles)"
-          trip_mode: "Mode"
-      
-      - type: bar
-        title: "Average Trip Distance by Purpose"
+        groupBy: trip_mode
+        facetBy: dataset
+    
+    - type: bar
+      title: "Average Trip Distance by Purpose"
+      props:
         dataset: trip_distance_detailed.csv
         x: tour_purpose
         y: avg_distance
-        color: trip_mode
-        facet: dataset
-        axis_labels:
-          tour_purpose: "Trip Purpose"
-          avg_distance: "Average Distance (miles)"
-          trip_mode: "Mode"
+        groupBy: trip_mode
+        facetBy: dataset
   
   trip_travel_time:
-    title: "Trip Travel Time Analysis"
-    description: "Average trip travel time by income, mode, and purpose"
-    charts:
-      - type: bar
-        title: "Trip Duration Distribution"
+    - type: bar
+      title: "Trip Duration Distribution"
+      props:
         dataset: trip_duration.csv
-        x: trip_duration
+        x: trip_duration_bin
         y: trips
-        color: dataset
-        axis_labels:
-          trip_duration: "Duration Category"
-          trips: "Number of Trips"
-      
-      - type: bar
-        title: "Average Trip Time by Income and Mode"
+        groupBy: dataset
+      description: "Average trip travel time by income, mode, and purpose"
+    
+    - type: bar
+      title: "Average Trip Time by Income and Mode"
+      props:
         dataset: trip_travel_time.csv
         x: income_category_bin
         y: avg_time
-        color: trip_mode
-        facet: dataset
-        axis_labels:
-          income_category_bin: "Income Category"
-          avg_time: "Average Time (minutes)"
-          trip_mode: "Mode"
-      
-      - type: bar
-        title: "Average Trip Time by Purpose"
+        groupBy: trip_mode
+        facetBy: dataset
+    
+    - type: bar
+      title: "Average Trip Time by Purpose"
+      props:
         dataset: trip_travel_time.csv
         x: tour_purpose
         y: avg_time
-        color: trip_mode
-        facet: dataset
-        axis_labels:
-          tour_purpose: "Trip Purpose"
-          avg_time: "Average Time (minutes)"
-          trip_mode: "Mode"
+        groupBy: trip_mode
+        facetBy: dataset
