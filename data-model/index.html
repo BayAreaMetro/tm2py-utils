@@ -1,0 +1,2144 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Utilities for Travel Model Two (TM2) analysis and validation">
+      
+      
+        <meta name="author" content="Bay Area Metro">
+      
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>CTRAMP Data Model Reference - tm2py-utils Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.618322db.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../css/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="light-blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#ctramp-data-model-reference" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="tm2py-utils Documentation" class="md-header__button md-logo" aria-label="tm2py-utils Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            tm2py-utils Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              CTRAMP Data Model Reference
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="light-blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="light-blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/BayAreaMetro/tm2py-utils" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    BayAreaMetro/tm2py-utils
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../install/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../validation-system/" class="md-tabs__link">
+          
+  
+  
+  Validation System
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../contributing/" class="md-tabs__link">
+          
+  
+  
+  Development
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../summary/CONSOLIDATION_PROPOSAL.md" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="tm2py-utils Documentation" class="md-nav__button md-logo" aria-label="tm2py-utils Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    tm2py-utils Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/BayAreaMetro/tm2py-utils" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    BayAreaMetro/tm2py-utils
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.md#quick-start" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation System
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Validation System
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../validation-system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Complete Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dashboard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../summaries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Summaries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../summary/CONSOLIDATION_PROPOSAL.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Consolidation Proposal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../summary/DASHBOARD_DEPLOYMENT.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-data-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Data Files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Data Files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#required-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Required Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#geography-reference-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Geography Reference File
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#table-schemas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table Schemas
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Table Schemas">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-households-householddata_iterationcsv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Households (householdData_{iteration}.csv)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-persons-persondata_iterationcsv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Persons (personData_{iteration}.csv)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-individual-tours-indivtourdata_iterationcsv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Individual Tours (indivTourData_{iteration}.csv)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-individual-trips-indivtripdata_iterationcsv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Individual Trips (indivTripData_{iteration}.csv)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-workplaceschool-location-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Workplace/School Location (Optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transportation-mode-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transportation Mode Codes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-relationships" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Relationships
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sample-expansion-weighting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sample Expansion (Weighting)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#preparing-travel-survey-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Preparing Travel Survey Data
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Preparing Travel Survey Data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#required-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Required Steps:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-transformation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example Transformation:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#official-tm2-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Official TM2 Documentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="ctramp-data-model-reference">CTRAMP Data Model Reference<a class="headerlink" href="#ctramp-data-model-reference" title="Permanent link">&para;</a></h1>
+<p>This document describes the <strong>required data format</strong> for the validation summary system. All input data must conform to this structure, whether from model outputs or household travel surveys.</p>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>The CTRAMP (Coordinated Travel-Regional Activity Modeling Platform) data model consists of <strong>four core tables</strong> that represent household travel behavior at different levels of detail:</p>
+<ol>
+<li><strong>Households</strong> - Demographics and vehicle ownership</li>
+<li><strong>Persons</strong> - Individual characteristics and daily patterns</li>
+<li><strong>Tours</strong> - Round-trip journeys from/to home (or workplace)</li>
+<li><strong>Trips</strong> - Individual trip segments within tours</li>
+</ol>
+<p>These tables have a <strong>hierarchical relationship</strong>: households contain persons, persons make tours, tours consist of trips.</p>
+<h2 id="core-data-files">Core Data Files<a class="headerlink" href="#core-data-files" title="Permanent link">&para;</a></h2>
+<h3 id="required-files">Required Files<a class="headerlink" href="#required-files" title="Permanent link">&para;</a></h3>
+<p>The system expects these files in each model output directory:</p>
+<table>
+<thead>
+<tr>
+<th>File Pattern</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>householdData_{iteration}.csv</code></td>
+<td>Household demographics and vehicle ownership</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>personData_{iteration}.csv</code></td>
+<td>Person-level attributes and activity patterns</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>indivTourData_{iteration}.csv</code></td>
+<td>Individual tour patterns (round-trips)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>indivTripData_{iteration}.csv</code></td>
+<td>Individual trip segments</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>wsLocResults.csv</code></td>
+<td>Workplace and school location choices</td>
+<td>⚠️ Optional</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note</strong>: <code>{iteration}</code> is typically <code>1</code> for final model outputs (e.g., <code>householdData_1.csv</code>).</p>
+<h3 id="geography-reference-file">Geography Reference File<a class="headerlink" href="#geography-reference-file" title="Permanent link">&para;</a></h3>
+<p>The system also requires a <strong>geography lookup file</strong> to map zones to counties/districts:</p>
+<ul>
+<li><strong>File</strong>: <code>tm2py_utils/inputs/maz_taz/mazs_tazs_county_tract_PUMA_2.5.csv</code></li>
+<li><strong>Purpose</strong>: Joins home_mgra to county names and planning districts</li>
+<li><strong>Key columns</strong>: <code>MAZ_SEQ</code>, <code>county_name</code>, <code>DistName</code></li>
+</ul>
+<p>This file is <strong>not</strong> in the model output directory - it's a static reference file in the workspace.</p>
+<h2 id="table-schemas">Table Schemas<a class="headerlink" href="#table-schemas" title="Permanent link">&para;</a></h2>
+<h3 id="1-households-householddata_iterationcsv">1. Households (<code>householdData_{iteration}.csv</code>)<a class="headerlink" href="#1-households-householddata_iterationcsv" title="Permanent link">&para;</a></h3>
+<p>Household-level demographics, location, and vehicle ownership.</p>
+<p><strong>Required Columns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Column Name</th>
+<th>Description</th>
+<th>Example Values</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hh_id</code></td>
+<td>Unique household identifier</td>
+<td>1, 2, 3, ...</td>
+<td>Primary key</td>
+</tr>
+<tr>
+<td><code>home_mgra</code></td>
+<td>Home location MGRA</td>
+<td>1, 2, 3, ..., 1454</td>
+<td>Joins to geography lookup</td>
+</tr>
+<tr>
+<td><code>income</code></td>
+<td>Income category</td>
+<td>1, 2, 3, 4</td>
+<td>1=Low, 2=Med-Low, 3=Med-High, 4=High</td>
+</tr>
+<tr>
+<td><code>autos</code></td>
+<td>Number of vehicles</td>
+<td>0, 1, 2, 3, 4, 5, 6+</td>
+<td>Integer count</td>
+</tr>
+<tr>
+<td><code>size</code></td>
+<td>Household size (persons)</td>
+<td>1, 2, 3, ..., 15</td>
+<td>Total household members</td>
+</tr>
+<tr>
+<td><code>workers</code></td>
+<td>Number of workers</td>
+<td>0, 1, 2, ...</td>
+<td>Workers ≤ size</td>
+</tr>
+<tr>
+<td><code>sampleRate</code></td>
+<td>Sample expansion factor</td>
+<td>0.05, 0.5, 1.0</td>
+<td><strong>Percentage</strong> (0.05 = 5% sample)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Optional Columns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Column Name</th>
+<th>Description</th>
+<th>Example Values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>automated_vehicles</code></td>
+<td>Number of autonomous vehicles</td>
+<td>0, 1, 2</td>
+</tr>
+<tr>
+<td><code>transponder</code></td>
+<td>Has toll transponder</td>
+<td>0, 1</td>
+</tr>
+<tr>
+<td><code>cdap_pattern</code></td>
+<td>Coordinated Daily Activity Pattern</td>
+<td>"MMNHH" (M/N/H per person)</td>
+</tr>
+<tr>
+<td><code>jtf_choice</code></td>
+<td>Joint tour frequency</td>
+<td>0, 1, 2, 3</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key Points:</strong>
+- <code>sampleRate</code> is the <strong>sampling percentage</strong>, not the expansion factor (system inverts it: 0.5 → weight of 2.0)
+- <code>home_mgra</code> must exist in the geography lookup file to get county/district names
+- <code>income</code> categories represent quartiles (1=lowest, 4=highest)</p>
+<p><strong>Official Documentation</strong>: https://bayareametro.github.io/tm2py/ctramp-outputs/household/</p>
+<hr />
+<h3 id="2-persons-persondata_iterationcsv">2. Persons (<code>personData_{iteration}.csv</code>)<a class="headerlink" href="#2-persons-persondata_iterationcsv" title="Permanent link">&para;</a></h3>
+<p>Individual characteristics, employment, and daily activity patterns.</p>
+<p><strong>Required Columns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Column Name</th>
+<th>Description</th>
+<th>Example Values</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hh_id</code></td>
+<td>Household identifier</td>
+<td>1, 2, 3, ...</td>
+<td>Foreign key to households</td>
+</tr>
+<tr>
+<td><code>person_id</code></td>
+<td>Unique person identifier</td>
+<td>1, 2, 3, ...</td>
+<td>Primary key (globally unique)</td>
+</tr>
+<tr>
+<td><code>person_num</code></td>
+<td>Person number in household</td>
+<td>1, 2, 3, ...</td>
+<td>1 to household size</td>
+</tr>
+<tr>
+<td><code>age</code></td>
+<td>Person age in years</td>
+<td>5, 25, 65, ...</td>
+<td>Integer</td>
+</tr>
+<tr>
+<td><code>gender</code></td>
+<td>Gender</td>
+<td>1, 2</td>
+<td>1=Male, 2=Female</td>
+</tr>
+<tr>
+<td><code>type</code></td>
+<td>Person type classification</td>
+<td>1-8</td>
+<td>See person type codes below</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Person Type Codes</strong> (<code>type</code>):</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Full-time worker</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Part-time worker</td>
+</tr>
+<tr>
+<td>3</td>
+<td>University student</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Non-working adult</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Retired adult</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Driving-age student</td>
+</tr>
+<tr>
+<td>7</td>
+<td>School-age child</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Preschool child</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Optional but Common Columns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Column Name</th>
+<th>Description</th>
+<th>Example Values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cdap</code></td>
+<td>Coordinated Daily Activity Pattern</td>
+<td>"M", "N", "H"</td>
+</tr>
+<tr>
+<td><code>value_of_time</code></td>
+<td>Value of time ($/hour)</td>
+<td>12.50, 25.00</td>
+</tr>
+<tr>
+<td><code>telecommute</code></td>
+<td>Telecommute choice</td>
+<td>0, 1</td>
+</tr>
+<tr>
+<td><code>transit_subsidy_choice</code></td>
+<td>Has transit subsidy</td>
+<td>0, 1</td>
+</tr>
+<tr>
+<td><code>transit_pass_choice</code></td>
+<td>Transit pass type</td>
+<td>0, 1, 2</td>
+</tr>
+<tr>
+<td><code>fp_choice</code></td>
+<td>Free parking at work</td>
+<td>0, 1</td>
+</tr>
+<tr>
+<td><code>sampleRate</code></td>
+<td>Sample expansion factor</td>
+<td>0.05, 0.5, 1.0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>CDAP Codes</strong>:
+- <code>M</code> = Mandatory (work/school tour)
+- <code>N</code> = Non-mandatory (shopping, discretionary, etc.)
+- <code>H</code> = Home (no out-of-home activity)</p>
+<p><strong>Official Documentation</strong>: https://bayareametro.github.io/tm2py/ctramp-outputs/person/</p>
+<hr />
+<h3 id="3-individual-tours-indivtourdata_iterationcsv">3. Individual Tours (<code>indivTourData_{iteration}.csv</code>)<a class="headerlink" href="#3-individual-tours-indivtourdata_iterationcsv" title="Permanent link">&para;</a></h3>
+<p>Round-trip journeys from home (or workplace) to a destination and back.</p>
+<p><strong>Required Columns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Column Name</th>
+<th>Description</th>
+<th>Example Values</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hh_id</code></td>
+<td>Household identifier</td>
+<td>1, 2, 3, ...</td>
+<td>Foreign key</td>
+</tr>
+<tr>
+<td><code>person_id</code></td>
+<td>Person identifier</td>
+<td>1, 2, 3, ...</td>
+<td>Foreign key</td>
+</tr>
+<tr>
+<td><code>person_num</code></td>
+<td>Person number in household</td>
+<td>1, 2, 3</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>person_type</code></td>
+<td>Person type classification</td>
+<td>1-8</td>
+<td>Same as persons.type</td>
+</tr>
+<tr>
+<td><code>tour_id</code></td>
+<td>Tour sequence for this person</td>
+<td>1, 2, 3</td>
+<td>Primary key (unique per person)</td>
+</tr>
+<tr>
+<td><code>tour_category</code></td>
+<td>High-level tour classification</td>
+<td>"MANDATORY", "INDIVIDUAL_NON_MANDATORY", "AT_WORK"</td>
+<td>Text values</td>
+</tr>
+<tr>
+<td><code>tour_purpose</code></td>
+<td>Specific tour purpose</td>
+<td>"Work", "Shop", "Discretionary"</td>
+<td>Text values</td>
+</tr>
+<tr>
+<td><code>start_period</code></td>
+<td>Departure time period</td>
+<td>1-48</td>
+<td>30-minute intervals (1=3:00-3:30 AM, 14=9:30-10:00 AM)</td>
+</tr>
+<tr>
+<td><code>end_period</code></td>
+<td>Return time period</td>
+<td>1-48</td>
+<td>Same scale as start_period</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Tour Purpose Values</strong> (text strings in data):
+- <code>Work</code> - Work tour
+- <code>School</code> - K-12 school tour
+- <code>University</code> - University/college tour
+- <code>Escort</code> - Escort someone (pick-up/drop-off)
+- <code>Shop</code> - Shopping
+- <code>Maintenance</code> - Personal business
+- <code>Eating Out</code> - Dining
+- <code>Visiting</code> - Social/visiting
+- <code>Discretionary</code> - Recreation/leisure
+- <code>Work-Based</code> - At-work subtour</p>
+<p><strong>Optional but Common Columns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Column Name</th>
+<th>Description</th>
+<th>Example Values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>orig_mgra</code></td>
+<td>Origin MGRA</td>
+<td>100, 200 (home or workplace)</td>
+</tr>
+<tr>
+<td><code>dest_mgra</code></td>
+<td>Destination MGRA</td>
+<td>150, 250</td>
+</tr>
+<tr>
+<td><code>tour_mode</code></td>
+<td>Primary tour mode</td>
+<td>1-17 (see mode codes)</td>
+</tr>
+<tr>
+<td><code>tour_distance</code></td>
+<td>Round-trip distance (miles)</td>
+<td>5.2, 12.8</td>
+</tr>
+<tr>
+<td><code>tour_time</code></td>
+<td>Round-trip time (minutes)</td>
+<td>45, 90</td>
+</tr>
+<tr>
+<td><code>num_ob_stops</code></td>
+<td>Outbound intermediate stops</td>
+<td>0, 1, 2, 3</td>
+</tr>
+<tr>
+<td><code>num_ib_stops</code></td>
+<td>Inbound intermediate stops</td>
+<td>0, 1, 2, 3</td>
+</tr>
+<tr>
+<td><code>sampleRate</code></td>
+<td>Sample expansion factor</td>
+<td>0.05, 0.5, 1.0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Time Periods</strong> (1-48, 30-minute intervals):
+- 1 = 3:00-3:30 AM
+- 14 = 9:30-10:00 AM
+- 34 = 7:30-8:00 PM
+- 48 = 2:30-3:00 AM (next day)</p>
+<p><strong>Official Documentation</strong>: https://bayareametro.github.io/tm2py/ctramp-outputs/individual-tours/</p>
+<hr />
+<h3 id="4-individual-trips-indivtripdata_iterationcsv">4. Individual Trips (<code>indivTripData_{iteration}.csv</code>)<a class="headerlink" href="#4-individual-trips-indivtripdata_iterationcsv" title="Permanent link">&para;</a></h3>
+<p>Individual trip segments (one-way movements) that make up tours.</p>
+<p><strong>Required Columns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Column Name</th>
+<th>Description</th>
+<th>Example Values</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hh_id</code></td>
+<td>Household identifier</td>
+<td>1, 2, 3, ...</td>
+<td>Foreign key</td>
+</tr>
+<tr>
+<td><code>person_id</code></td>
+<td>Person identifier</td>
+<td>1, 2, 3, ...</td>
+<td>Foreign key</td>
+</tr>
+<tr>
+<td><code>person_num</code></td>
+<td>Person number in household</td>
+<td>1, 2, 3</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>tour_id</code></td>
+<td>Tour identifier</td>
+<td>1, 2, 3</td>
+<td>Foreign key to tours</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Optional but Common Columns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Column Name</th>
+<th>Description</th>
+<th>Example Values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>stop_id</code></td>
+<td>Trip sequence within tour</td>
+<td>-1 (direct), 0, 1, 2</td>
+</tr>
+<tr>
+<td><code>inbound</code></td>
+<td>Trip direction</td>
+<td>0 (outbound), 1 (inbound)</td>
+</tr>
+<tr>
+<td><code>tour_purpose</code></td>
+<td>Parent tour purpose</td>
+<td>"Work", "Shop", etc.</td>
+</tr>
+<tr>
+<td><code>orig_purpose</code></td>
+<td>Origin activity purpose</td>
+<td>"Home", "Work", "Shop"</td>
+</tr>
+<tr>
+<td><code>dest_purpose</code></td>
+<td>Destination activity purpose</td>
+<td>"Work", "Shop", "Home"</td>
+</tr>
+<tr>
+<td><code>orig_mgra</code></td>
+<td>Origin MGRA</td>
+<td>100, 200</td>
+</tr>
+<tr>
+<td><code>dest_mgra</code></td>
+<td>Destination MGRA</td>
+<td>150, 250</td>
+</tr>
+<tr>
+<td><code>trip_dist</code></td>
+<td>Trip distance (miles)</td>
+<td>2.5, 5.0</td>
+</tr>
+<tr>
+<td><code>stop_period</code></td>
+<td>Departure time period</td>
+<td>1-48</td>
+</tr>
+<tr>
+<td><code>trip_mode</code></td>
+<td>Trip transportation mode</td>
+<td>1-17 (see mode codes)</td>
+</tr>
+<tr>
+<td><code>tour_mode</code></td>
+<td>Parent tour mode</td>
+<td>1-17</td>
+</tr>
+<tr>
+<td><code>sampleRate</code></td>
+<td>Sample expansion factor</td>
+<td>0.05, 0.5, 1.0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Stop ID Interpretation</strong>:
+- <code>-1</code> = Direct trip (no intermediate stops)
+- <code>0</code>, <code>1</code>, <code>2</code>, ... = Intermediate stop sequence</p>
+<p><strong>Official Documentation</strong>: https://bayareametro.github.io/tm2py/ctramp-outputs/individual-trips/</p>
+<hr />
+<h3 id="5-workplaceschool-location-optional">5. Workplace/School Location (Optional)<a class="headerlink" href="#5-workplaceschool-location-optional" title="Permanent link">&para;</a></h3>
+<p>Location choice results for work and school.</p>
+<p><strong>File</strong>: <code>wsLocResults.csv</code> (no iteration number)</p>
+<p><strong>Key Columns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Column Name</th>
+<th>Description</th>
+<th>Example Values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>HHID</code></td>
+<td>Household identifier</td>
+<td>1, 2, 3</td>
+</tr>
+<tr>
+<td><code>PersonID</code></td>
+<td>Person identifier</td>
+<td>1, 2, 3</td>
+</tr>
+<tr>
+<td><code>WorkLocation</code></td>
+<td>Work MGRA</td>
+<td>0 (no work), 100, 200</td>
+</tr>
+<tr>
+<td><code>SchoolLocation</code></td>
+<td>School MGRA</td>
+<td>0 (no school), 150, 250</td>
+</tr>
+<tr>
+<td><code>WorkLocationDistance</code></td>
+<td>Home to work distance</td>
+<td>0.0, 5.2, 12.8</td>
+</tr>
+<tr>
+<td><code>SchoolLocationDistance</code></td>
+<td>Home to school distance</td>
+<td>0.0, 2.5, 8.0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Official Documentation</strong>: https://bayareametro.github.io/tm2py/ctramp-outputs/workplace-school-location/</p>
+<hr />
+<h2 id="transportation-mode-codes">Transportation Mode Codes<a class="headerlink" href="#transportation-mode-codes" title="Permanent link">&para;</a></h2>
+<p>The 17-mode standard used for <code>tour_mode</code> and <code>trip_mode</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Mode Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>SOV_GP</td>
+<td>Single Occupant Vehicle - General Purpose lanes</td>
+</tr>
+<tr>
+<td>2</td>
+<td>SOV_PAY</td>
+<td>Single Occupant Vehicle - Express/Toll lanes</td>
+</tr>
+<tr>
+<td>3</td>
+<td>SR2_GP</td>
+<td>Shared Ride 2 - General Purpose</td>
+</tr>
+<tr>
+<td>4</td>
+<td>SR2_HOV</td>
+<td>Shared Ride 2 - HOV lanes</td>
+</tr>
+<tr>
+<td>5</td>
+<td>SR2_PAY</td>
+<td>Shared Ride 2 - Express/Toll</td>
+</tr>
+<tr>
+<td>6</td>
+<td>SR3_GP</td>
+<td>Shared Ride 3+ - General Purpose</td>
+</tr>
+<tr>
+<td>7</td>
+<td>SR3_HOV</td>
+<td>Shared Ride 3+ - HOV lanes</td>
+</tr>
+<tr>
+<td>8</td>
+<td>SR3_PAY</td>
+<td>Shared Ride 3+ - Express/Toll</td>
+</tr>
+<tr>
+<td>9</td>
+<td>WALK</td>
+<td>Walk</td>
+</tr>
+<tr>
+<td>10</td>
+<td>BIKE</td>
+<td>Bicycle</td>
+</tr>
+<tr>
+<td>11</td>
+<td>WLK_TRN</td>
+<td>Walk to Transit</td>
+</tr>
+<tr>
+<td>12</td>
+<td>PNR_TRN</td>
+<td>Park-and-Ride to Transit</td>
+</tr>
+<tr>
+<td>13</td>
+<td>KNRPRV_TRN</td>
+<td>Kiss-and-Ride (Private vehicle) to Transit</td>
+</tr>
+<tr>
+<td>14</td>
+<td>KNRTNC_TRN</td>
+<td>Kiss-and-Ride (TNC) to Transit</td>
+</tr>
+<tr>
+<td>15</td>
+<td>TAXI</td>
+<td>Taxi</td>
+</tr>
+<tr>
+<td>16</td>
+<td>TNC</td>
+<td>Transportation Network Company (Uber/Lyft)</td>
+</tr>
+<tr>
+<td>17</td>
+<td>SCHLBUS</td>
+<td>School Bus</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Common Aggregations:</strong>
+- <strong>Auto</strong>: 1-8 (all SOV and shared ride modes)
+- <strong>Transit</strong>: 11-14 (all transit access modes)
+- <strong>Active</strong>: 9-10 (walk and bike)
+- <strong>TNC/Taxi</strong>: 15-16</p>
+<hr />
+<h2 id="data-relationships">Data Relationships<a class="headerlink" href="#data-relationships" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>households (hh_id)
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    ↓
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>persons (hh_id, person_id)
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    ↓
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>tours (person_id, tour_id)
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    ↓
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>trips (tour_id, trip_id/stop_id)
+</code></pre></div>
+<p><strong>Join Keys:</strong>
+- <code>households.hh_id</code> → <code>persons.hh_id</code>
+- <code>persons.person_id</code> → <code>tours.person_id</code>
+- <code>tours.tour_id</code> → <code>trips.tour_id</code>
+- <code>households.home_mgra</code> → <code>geography.MAZ_SEQ</code> (for county/district)</p>
+<hr />
+<h2 id="sample-expansion-weighting">Sample Expansion (Weighting)<a class="headerlink" href="#sample-expansion-weighting" title="Permanent link">&para;</a></h2>
+<p><strong>CRITICAL</strong>: The <code>sampleRate</code> field is a <strong>percentage</strong>, not an expansion factor.</p>
+<ul>
+<li><strong>In CSVs</strong>: <code>sampleRate = 0.05</code> means 5% sample</li>
+<li><strong>Expansion factor</strong>: <code>1 / sampleRate = 1 / 0.05 = 20.0</code></li>
+<li><strong>Interpretation</strong>: Each record represents 20 actual households/persons/tours/trips</li>
+</ul>
+<p><strong>The system automatically inverts <code>sampleRate</code> to calculate weights.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Sample Rate</th>
+<th>Expansion Factor</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.0</td>
+<td>1.0</td>
+<td>100% sample (no expansion)</td>
+</tr>
+<tr>
+<td>0.5</td>
+<td>2.0</td>
+<td>50% sample (each record = 2 real units)</td>
+</tr>
+<tr>
+<td>0.05</td>
+<td>20.0</td>
+<td>5% sample (each record = 20 real units)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>All summaries are weighted</strong> by default using the household <code>sampleRate</code> field.</p>
+<hr />
+<h2 id="preparing-travel-survey-data">Preparing Travel Survey Data<a class="headerlink" href="#preparing-travel-survey-data" title="Permanent link">&para;</a></h2>
+<p>To compare model outputs with household travel surveys (e.g., NHTS, CHTS), you must <strong>transform survey data to match this exact format</strong>:</p>
+<h3 id="required-steps">Required Steps:<a class="headerlink" href="#required-steps" title="Permanent link">&para;</a></h3>
+<ol>
+<li>
+<p><strong>Match column names exactly</strong> - Use <code>hh_id</code>, <code>person_id</code>, <code>tour_mode</code>, etc. (not survey-specific names)</p>
+</li>
+<li>
+<p><strong>Align geography</strong> - Map survey zones/TAZs to MGRAs used by the model</p>
+</li>
+<li>
+<p><strong>Standardize codes</strong>:</p>
+</li>
+<li>Person types → 1-8 codes</li>
+<li>Tour purposes → "Work", "Shop", etc. (text values)</li>
+<li>Transportation modes → 1-17 numeric codes</li>
+<li>
+<p>Time periods → 1-48 (30-minute intervals)</p>
+</li>
+<li>
+<p><strong>Add required fields</strong>:</p>
+</li>
+<li><code>sampleRate</code> - Survey expansion factor (as percentage if &gt;1, invert if needed)</li>
+<li>
+<p>Geography lookup - Ensure survey zones map to counties/districts</p>
+</li>
+<li>
+<p><strong>Create hierarchy</strong>:</p>
+</li>
+<li>Household file with unique <code>hh_id</code></li>
+<li>Person file with <code>person_id</code> linked to <code>hh_id</code></li>
+<li>Tour/trip files linked to <code>person_id</code> and <code>tour_id</code></li>
+</ol>
+<h3 id="example-transformation">Example Transformation:<a class="headerlink" href="#example-transformation" title="Permanent link">&para;</a></h3>
+<p><strong>Survey Format</strong> (before):
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>household_id,num_autos,hh_size,region
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>1001,2,3,&quot;San Francisco&quot;
+</code></pre></div></p>
+<p><strong>CTRAMP Format</strong> (after):
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>hh_id,autos,size,home_mgra,income,workers,sampleRate
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>1,2,3,450,3,2,0.01
+</code></pre></div></p>
+<p><strong>Key Differences:</strong>
+- Survey IDs → Sequential IDs starting from 1
+- Region name → <code>home_mgra</code> (numeric zone)
+- Add missing fields: <code>income</code>, <code>workers</code>, <code>sampleRate</code>
+- Column names match CTRAMP exactly</p>
+<hr />
+<h2 id="data-validation">Data Validation<a class="headerlink" href="#data-validation" title="Permanent link">&para;</a></h2>
+<p>The system expects:</p>
+<p>✅ <strong>Valid relationships</strong>: Every person has a household, every tour has a person<br />
+✅ <strong>Consistent geography</strong>: All MGRAs exist in geography lookup<br />
+✅ <strong>Valid codes</strong>: Person types 1-8, modes 1-17, etc.<br />
+✅ <strong>Required columns present</strong>: See schemas above<br />
+✅ <strong>Numeric types correct</strong>: IDs as integers, rates as floats  </p>
+<p>❌ <strong>The system does NOT</strong>:
+- Check for logical errors (e.g., 8-year-old full-time worker)
+- Validate tour/trip sequences
+- Verify mode choice feasibility
+- Standardize survey data formats</p>
+<hr />
+<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
+<p>The data model is defined in <code>ctramp_data_model.yaml</code> which maps:</p>
+<ol>
+<li><strong>Input schema</strong> - CSV column names → Internal field names</li>
+<li><strong>Value mappings</strong> - Numeric codes → Human-readable labels</li>
+<li><strong>Aggregation specs</strong> - How to group categories (e.g., 4+ person households)</li>
+<li><strong>Weight fields</strong> - Which columns contain expansion factors</li>
+</ol>
+<p><strong>To customize</strong>: Edit <code>ctramp_data_model.yaml</code> if your model uses different column names or codes.</p>
+<hr />
+<h2 id="official-tm2-documentation">Official TM2 Documentation<a class="headerlink" href="#official-tm2-documentation" title="Permanent link">&para;</a></h2>
+<p>Complete CTRAMP data specifications:</p>
+<ul>
+<li><strong>Overview</strong>: https://bayareametro.github.io/tm2py/ctramp-outputs/</li>
+<li><strong>Households</strong>: https://bayareametro.github.io/tm2py/ctramp-outputs/household/</li>
+<li><strong>Persons</strong>: https://bayareametro.github.io/tm2py/ctramp-outputs/person/</li>
+<li><strong>Tours</strong>: https://bayareametro.github.io/tm2py/ctramp-outputs/individual-tours/</li>
+<li><strong>Trips</strong>: https://bayareametro.github.io/tm2py/ctramp-outputs/individual-trips/</li>
+<li><strong>Data Dictionaries</strong>: https://bayareametro.github.io/tm2py/ctramp-outputs/data-dictionaries/</li>
+</ul>
+<hr />
+<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong><a href="../generate-summaries/">Generate Summaries</a></strong> - Run the system on model outputs</li>
+<li><strong><a href="../custom-summaries/">Custom Summaries</a></strong> - Create new aggregations</li>
+<li><strong><a href="../external-data/">External Data</a></strong> - Integrate ACS/CTPP/survey data</li>
+<li><strong><a href="../validation-system/">Validation System Overview</a></strong> - Return to main guide</li>
+</ul>
+
+
+
+
+
+
+
+  
+    
+  
+  
+    
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="December 11, 2025 17:42:55 UTC">December 11, 2025</span>
+  </span>
+
+    
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Created">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="December 11, 2025 17:42:55 UTC">December 11, 2025</span>
+  </span>
+
+    
+    
+    
+  </aside>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/BayAreaMetro/tm2py-utils" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://bayareametro.gov" target="_blank" rel="noopener" title="bayareametro.gov" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M351.9 280H161c2.9 64.5 17.2 123.9 37.5 167.4 11.4 24.5 23.7 41.8 35.1 52.4 11.2 10.5 18.9 12.2 22.9 12.2s11.7-1.7 22.9-12.2c11.4-10.6 23.7-28 35.1-52.4 20.3-43.5 34.6-102.9 37.5-167.4zm-191-48h190.9c-2.8-64.5-17.1-123.9-37.4-167.4-11.4-24.4-23.7-41.8-35.1-52.4C268.1 1.7 260.4 0 256.4 0s-11.7 1.7-22.9 12.2c-11.4 10.6-23.7 28-35.1 52.4-20.3 43.5-34.6 102.9-37.5 167.4m-48 0c3.5-85.6 25.6-165.1 57.9-217.3C78.7 47.3 10.9 131.2 1.5 232zM1.5 280c9.4 100.8 77.2 184.7 169.3 217.3-32.3-52.2-54.4-131.7-57.9-217.3zm398.4 0c-3.5 85.6-25.6 165.1-57.9 217.3 92.1-32.7 159.9-116.5 169.3-217.3zm111.4-48C501.9 131.2 434.1 47.3 342 14.7c32.3 52.2 54.4 131.7 57.9 217.3z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+    
+  </body>
+</html>

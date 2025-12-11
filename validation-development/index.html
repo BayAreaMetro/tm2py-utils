@@ -1,0 +1,2578 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Utilities for Travel Model Two (TM2) analysis and validation">
+      
+      
+        <meta name="author" content="Bay Area Metro">
+      
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>Validation System Development Tasks - tm2py-utils Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.618322db.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../css/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="light-blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#validation-system-development-tasks" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="tm2py-utils Documentation" class="md-header__button md-logo" aria-label="tm2py-utils Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            tm2py-utils Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Validation System Development Tasks
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="light-blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="light-blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/BayAreaMetro/tm2py-utils" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    BayAreaMetro/tm2py-utils
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../install/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../validation-system/" class="md-tabs__link">
+          
+  
+  
+  Validation System
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../contributing/" class="md-tabs__link">
+          
+  
+  
+  Development
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../summary/CONSOLIDATION_PROPOSAL.md" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="tm2py-utils Documentation" class="md-nav__button md-logo" aria-label="tm2py-utils Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    tm2py-utils Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/BayAreaMetro/tm2py-utils" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    BayAreaMetro/tm2py-utils
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.md#quick-start" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation System
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Validation System
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../validation-system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Complete Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dashboard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../summaries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Summaries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../summary/CONSOLIDATION_PROPOSAL.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Consolidation Proposal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../summary/DASHBOARD_DEPLOYMENT.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-update-data-model-with-new-postprocessing-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Update Data Model with New Postprocessing Fields
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Update Data Model with New Postprocessing Fields">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current Status
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#required-updates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Required Updates
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-update-data-model-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task: Update Data Model Documentation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#affected-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Affected Components
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-prepare-2023-household-travel-survey-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Prepare 2023 Household Travel Survey Data
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Prepare 2023 Household Travel Survey Data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-status_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current Status
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#required-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Required Format
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-convert-survey-to-ctramp-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task: Convert Survey to CTRAMP Format
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Task: Convert Survey to CTRAMP Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#file-1-householddata_surveycsv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File 1: householdData_survey.csv
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file-2-persondata_surveycsv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File 2: personData_survey.csv
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file-3-indivtourdata_surveycsv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File 3: indivTourData_survey.csv
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file-4-indivtripdata_surveycsv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File 4: indivTripData_survey.csv
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration-with-validation-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integration with Validation System
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#critical-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Critical Notes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-fix-non-working-summaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Fix Non-Working Summaries
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Fix Non-Working Summaries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-status_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current Status
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-debug-and-fix-broken-summaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task: Debug and Fix Broken Summaries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Issues
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Output
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-build-additional-summaries-from-calibrationvalidation-spreadsheet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Build Additional Summaries from Calibration/Validation Spreadsheet
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Build Additional Summaries from Calibration/Validation Spreadsheet">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-status_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current Status
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-add-new-summaries-from-spreadsheet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task: Add New Summaries from Spreadsheet
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prioritization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prioritization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-reformat-ctpp-data-to-match-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Reformat CTPP Data to Match System
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Reformat CTPP Data to Match System">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-status_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current Status
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#required-format_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Required Format
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-create-ctpp-preprocessing-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task: Create CTPP Preprocessing Script
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Task: Create CTPP Preprocessing Script">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-identify-relevant-ctpp-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Identify Relevant CTPP Tables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-map-ctpp-geography-to-tm22-geography" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Map CTPP Geography to TM2.2 Geography
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-map-ctpp-categories-to-ctramp-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: Map CTPP Categories to CTRAMP Codes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-calculate-shares" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4: Calculate Shares
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-5-match-model-summary-column-names" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5: Match Model Summary Column Names
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-6-add-to-validation-config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6: Add to Validation Config
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ctpp-tables-to-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CTPP Tables to Process
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#preprocessing-script-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Preprocessing Script Template
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary-of-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary of Tasks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Summary of Tasks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#recommended-sequence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommended Sequence
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#success-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Success Criteria
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Documentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#questions-or-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Questions or Issues?
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="validation-system-development-tasks">Validation System Development Tasks<a class="headerlink" href="#validation-system-development-tasks" title="Permanent link">&para;</a></h1>
+<p>This page tracks <strong>ongoing development work</strong> for the validation summary system. These are tasks that need to be completed to make the system fully functional for TM2.2 calibration and validation.</p>
+<hr />
+<h2 id="1-update-data-model-with-new-postprocessing-fields">1. Update Data Model with New Postprocessing Fields<a class="headerlink" href="#1-update-data-model-with-new-postprocessing-fields" title="Permanent link">&para;</a></h2>
+<h3 id="current-status">Current Status<a class="headerlink" href="#current-status" title="Permanent link">&para;</a></h3>
+<p>The CTRAMP data model is being <strong>enhanced with additional fields</strong> from model postprocessing. The current data model (documented in <a href="../data-model/">data-model.md</a>) reflects the core CTRAMP outputs, but several important fields are missing.</p>
+<h3 id="required-updates">Required Updates<a class="headerlink" href="#required-updates" title="Permanent link">&para;</a></h3>
+<p><strong>New fields being added to model outputs:</strong>
+- Income categories (aggregated from continuous income)
+- Distance bins for tours and trips
+- Time period aggregations
+- Mode aggregations (Auto/Transit/Active)
+- Geography lookups (TAZ → County, MAZ → TAZ)
+- Additional person/household categorizations</p>
+<h3 id="task-update-data-model-documentation">Task: Update Data Model Documentation<a class="headerlink" href="#task-update-data-model-documentation" title="Permanent link">&para;</a></h3>
+<p>When new fields are added to the postprocessing pipeline, you must <strong>update the data model documentation</strong> to reflect the changes.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li>
+<p><strong>Identify new fields</strong> in the postprocessed output files
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c"># Check actual columns in model outputs</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd </span><span class="n">C</span><span class="p">:\</span><span class="n">model_runs</span><span class="p">\</span><span class="n">2023_base_year</span><span class="p">\</span><span class="n">ctramp_output</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">python</span> <span class="n">-c</span> <span class="s2">&quot;import pandas as pd; df = pd.read_csv(&#39;householdData_1.csv&#39;, nrows=1); print(df.columns.tolist())&quot;</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Update data-model.md</strong> with new field definitions</p>
+</li>
+</ol>
+<p>Add new fields to the appropriate table (households, persons, tours, trips):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="gu">### New Postprocessed Fields</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>| Column | Type | Description | Values/Range | Required |
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>|--------|------|-------------|--------------|----------|
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>| income_category | string | Household income quartile | Q1, Q2, Q3, Q4 | Optional |
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>| county_name | string | County name from TAZ lookup | Alameda, Contra Costa, etc. | Optional |
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>| tour_distance_bin | string | Binned tour distance | 0-5, 5-10, 10-25, 25+ | Optional |
+</code></pre></div>
+<ol>
+<li><strong>Document derivation logic</strong></li>
+</ol>
+<p>Explain how new fields are calculated:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="gs">**Income Category Derivation:**</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">-</span><span class="w"> </span>Q1: income &lt; $30,000
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">-</span><span class="w"> </span>Q2: $30,000 - $60,000
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="k">-</span><span class="w"> </span>Q3: $60,000 - $100,000
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="k">-</span><span class="w"> </span>Q4: $100,000+
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="gs">**County Name Derivation:**</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="k">-</span><span class="w"> </span>Lookup from TAZ to County using geography crosswalk file
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="k">-</span><span class="w"> </span>Requires <span class="sb">`taz_geography.csv`</span> with columns: <span class="sb">`taz`</span>, <span class="sb">`county_name`</span>
+</code></pre></div>
+<ol>
+<li><strong>Update example schemas</strong></li>
+</ol>
+<p>Modify the sample CSV structure to include new fields:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>hh_id,income,income_category,taz,county_name,num_persons,num_workers,num_vehicles
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>1,45000,Q2,1001,Alameda,2,1,1
+</code></pre></div>
+<ol>
+<li><strong>Update summary configurations</strong> that use new fields</li>
+</ol>
+<p>If summaries reference new fields, update <code>validation_config.yaml</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">summaries</span><span class="p">:</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;auto_ownership_by_income_category&quot;</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="nt">data_source</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;households&quot;</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="nt">group_by</span><span class="p">:</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;income_category&quot;</span><span class="w">  </span><span class="c1"># NEW FIELD</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;num_vehicles&quot;</span>
+</code></pre></div>
+<h3 id="affected-components">Affected Components<a class="headerlink" href="#affected-components" title="Permanent link">&para;</a></h3>
+<ul>
+<li>✏️ <strong>data-model.md</strong> - Add new field definitions</li>
+<li>✏️ <strong>validation_config.yaml</strong> - Update summaries using new fields</li>
+<li>✏️ <strong>custom-summaries.md</strong> - Add examples using new fields</li>
+<li>✏️ <strong>Postprocessing scripts</strong> - Document where fields are created</li>
+</ul>
+<hr />
+<h2 id="2-prepare-2023-household-travel-survey-data">2. Prepare 2023 Household Travel Survey Data<a class="headerlink" href="#2-prepare-2023-household-travel-survey-data" title="Permanent link">&para;</a></h2>
+<h3 id="current-status_1">Current Status<a class="headerlink" href="#current-status_1" title="Permanent link">&para;</a></h3>
+<p>The <strong>2023 household travel survey data</strong> is being prepared for validation. This survey provides observed trip-making behavior for comparison with model outputs.</p>
+<h3 id="required-format">Required Format<a class="headerlink" href="#required-format" title="Permanent link">&para;</a></h3>
+<p>The survey data <strong>must be transformed to exactly match the CTRAMP data model</strong> (see <a href="../data-model/">data-model.md</a>). This is a <strong>non-negotiable requirement</strong> - the validation system expects identical schemas.</p>
+<h3 id="task-convert-survey-to-ctramp-format">Task: Convert Survey to CTRAMP Format<a class="headerlink" href="#task-convert-survey-to-ctramp-format" title="Permanent link">&para;</a></h3>
+<p>You must create <strong>4 CSV files</strong> with the same structure as CTRAMP model outputs:</p>
+<h4 id="file-1-householddata_surveycsv">File 1: <code>householdData_survey.csv</code><a class="headerlink" href="#file-1-householddata_surveycsv" title="Permanent link">&para;</a></h4>
+<p><strong>Required columns</strong> (at minimum):</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Description</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hh_id</code></td>
+<td>Household ID</td>
+<td>Unique identifier from survey</td>
+</tr>
+<tr>
+<td><code>home_taz</code></td>
+<td>Home TAZ</td>
+<td>Map survey home location to TM2.2 TAZ system</td>
+</tr>
+<tr>
+<td><code>income</code></td>
+<td>Annual household income</td>
+<td>Continuous dollar amount</td>
+</tr>
+<tr>
+<td><code>num_persons</code></td>
+<td>Household size</td>
+<td>Count of persons</td>
+</tr>
+<tr>
+<td><code>num_workers</code></td>
+<td>Number of workers</td>
+<td>Count of workers</td>
+</tr>
+<tr>
+<td><code>num_vehicles</code></td>
+<td>Number of vehicles</td>
+<td>Count of vehicles</td>
+</tr>
+<tr>
+<td><code>building_type</code></td>
+<td>Housing type</td>
+<td>1=Single Family, 2=Multi-Family, 3=Mobile Home, 4=Other</td>
+</tr>
+<tr>
+<td><code>sample_rate</code></td>
+<td>Sample expansion factor</td>
+<td>Survey weight for expanding to population</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Derived fields</strong> (if using new postprocessed data model):</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Description</th>
+<th>Derivation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>income_category</code></td>
+<td>Income quartile</td>
+<td>Bin <code>income</code> into Q1/Q2/Q3/Q4</td>
+</tr>
+<tr>
+<td><code>county_name</code></td>
+<td>County name</td>
+<td>Map <code>home_taz</code> to county</td>
+</tr>
+<tr>
+<td><code>num_persons_agg</code></td>
+<td>Aggregated household size</td>
+<td>Aggregate to 1/2/3/4+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example transformation:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="c1"># Load survey household data</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">survey_hh</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;survey_households_raw.csv&#39;</span><span class="p">)</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="c1"># Map to CTRAMP format</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="n">ctramp_hh</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    <span class="s1">&#39;hh_id&#39;</span><span class="p">:</span> <span class="n">survey_hh</span><span class="p">[</span><span class="s1">&#39;household_id&#39;</span><span class="p">],</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    <span class="s1">&#39;home_taz&#39;</span><span class="p">:</span> <span class="n">survey_hh</span><span class="p">[</span><span class="s1">&#39;home_taz_tm22&#39;</span><span class="p">],</span>  <span class="c1"># Must use TM2.2 TAZ system</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    <span class="s1">&#39;income&#39;</span><span class="p">:</span> <span class="n">survey_hh</span><span class="p">[</span><span class="s1">&#39;annual_income&#39;</span><span class="p">],</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    <span class="s1">&#39;num_persons&#39;</span><span class="p">:</span> <span class="n">survey_hh</span><span class="p">[</span><span class="s1">&#39;household_size&#39;</span><span class="p">],</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    <span class="s1">&#39;num_workers&#39;</span><span class="p">:</span> <span class="n">survey_hh</span><span class="p">[</span><span class="s1">&#39;workers&#39;</span><span class="p">],</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>    <span class="s1">&#39;num_vehicles&#39;</span><span class="p">:</span> <span class="n">survey_hh</span><span class="p">[</span><span class="s1">&#39;vehicles&#39;</span><span class="p">],</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>    <span class="s1">&#39;building_type&#39;</span><span class="p">:</span> <span class="n">survey_hh</span><span class="p">[</span><span class="s1">&#39;housing_type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">({</span>
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>        <span class="s1">&#39;Single Family&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>        <span class="s1">&#39;Multi-Family&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>        <span class="s1">&#39;Mobile Home&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>        <span class="s1">&#39;Other&#39;</span><span class="p">:</span> <span class="mi">4</span>
+<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>    <span class="p">}),</span>
+<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>    <span class="s1">&#39;sample_rate&#39;</span><span class="p">:</span> <span class="n">survey_hh</span><span class="p">[</span><span class="s1">&#39;expansion_factor&#39;</span><span class="p">]</span>  <span class="c1"># Survey weight</span>
+<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a><span class="p">})</span>
+<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>
+<a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a><span class="c1"># Add derived fields (if using enhanced data model)</span>
+<a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a><span class="n">ctramp_hh</span><span class="p">[</span><span class="s1">&#39;income_category&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">ctramp_hh</span><span class="p">[</span><span class="s1">&#39;income&#39;</span><span class="p">],</span> 
+<a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a>    <span class="n">bins</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">30000</span><span class="p">,</span> <span class="mi">60000</span><span class="p">,</span> <span class="mi">100000</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)],</span>
+<a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a>    <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Q1&#39;</span><span class="p">,</span> <span class="s1">&#39;Q2&#39;</span><span class="p">,</span> <span class="s1">&#39;Q3&#39;</span><span class="p">,</span> <span class="s1">&#39;Q4&#39;</span><span class="p">])</span>
+<a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a>
+<a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a><span class="n">ctramp_hh</span><span class="p">[</span><span class="s1">&#39;num_persons_agg&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ctramp_hh</span><span class="p">[</span><span class="s1">&#39;num_persons&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+<a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a>    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s1">&#39;4+&#39;</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">4</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a><span class="p">)</span>
+<a id="__codelineno-5-31" name="__codelineno-5-31" href="#__codelineno-5-31"></a>
+<a id="__codelineno-5-32" name="__codelineno-5-32" href="#__codelineno-5-32"></a><span class="c1"># Save in CTRAMP format</span>
+<a id="__codelineno-5-33" name="__codelineno-5-33" href="#__codelineno-5-33"></a><span class="n">ctramp_hh</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;householdData_survey.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="file-2-persondata_surveycsv">File 2: <code>personData_survey.csv</code><a class="headerlink" href="#file-2-persondata_surveycsv" title="Permanent link">&para;</a></h4>
+<p><strong>Required columns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Description</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>person_id</code></td>
+<td>Person ID</td>
+<td>Unique identifier</td>
+</tr>
+<tr>
+<td><code>hh_id</code></td>
+<td>Household ID</td>
+<td>Links to household file</td>
+</tr>
+<tr>
+<td><code>person_num</code></td>
+<td>Person number in household</td>
+<td>1, 2, 3, etc.</td>
+</tr>
+<tr>
+<td><code>person_type</code></td>
+<td>Person type code</td>
+<td>1-8 (see data-model.md)</td>
+</tr>
+<tr>
+<td><code>age</code></td>
+<td>Age in years</td>
+<td>Continuous</td>
+</tr>
+<tr>
+<td><code>gender</code></td>
+<td>Gender</td>
+<td>1=Male, 2=Female</td>
+</tr>
+<tr>
+<td><code>work_taz</code></td>
+<td>Work location TAZ</td>
+<td>-1 if not working</td>
+</tr>
+<tr>
+<td><code>school_taz</code></td>
+<td>School location TAZ</td>
+<td>-1 if not in school</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Person type mapping</strong> (critical for CDAP summaries):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">map_person_type</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Map survey person characteristics to CTRAMP person_type codes&quot;&quot;&quot;</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>        <span class="k">return</span> <span class="mi">8</span>  <span class="c1"># Preschool</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="k">elif</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">16</span><span class="p">:</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>        <span class="k">return</span> <span class="mi">7</span> <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;enrolled_in_school&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="mi">8</span>  <span class="c1"># School age</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    <span class="k">elif</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">18</span><span class="p">:</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>        <span class="k">return</span> <span class="mi">6</span>  <span class="c1"># Driving age student</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    <span class="k">elif</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;full_time_worker&#39;</span><span class="p">]:</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>        <span class="k">return</span> <span class="mi">1</span>  <span class="c1"># Full-time worker</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>    <span class="k">elif</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;part_time_worker&#39;</span><span class="p">]:</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>        <span class="k">return</span> <span class="mi">2</span>  <span class="c1"># Part-time worker</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>    <span class="k">elif</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;enrolled_in_university&#39;</span><span class="p">]:</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>        <span class="k">return</span> <span class="mi">3</span>  <span class="c1"># University student</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>    <span class="k">elif</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">65</span><span class="p">:</span>
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>        <span class="k">return</span> <span class="mi">5</span>  <span class="c1"># Retired</span>
+<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>        <span class="k">return</span> <span class="mi">4</span>  <span class="c1"># Non-working adult</span>
+<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>
+<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="n">survey_persons</span><span class="p">[</span><span class="s1">&#39;person_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">survey_persons</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">map_person_type</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="file-3-indivtourdata_surveycsv">File 3: <code>indivTourData_survey.csv</code><a class="headerlink" href="#file-3-indivtourdata_surveycsv" title="Permanent link">&para;</a></h4>
+<p><strong>Required columns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Description</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tour_id</code></td>
+<td>Tour ID</td>
+<td>Unique identifier</td>
+</tr>
+<tr>
+<td><code>person_id</code></td>
+<td>Person ID</td>
+<td>Links to person file</td>
+</tr>
+<tr>
+<td><code>hh_id</code></td>
+<td>Household ID</td>
+<td>Links to household file</td>
+</tr>
+<tr>
+<td><code>tour_purpose</code></td>
+<td>Primary tour purpose</td>
+<td>Work, School, Shop, Discretionary, etc.</td>
+</tr>
+<tr>
+<td><code>tour_mode</code></td>
+<td>Primary tour mode</td>
+<td>1-17 (see data-model.md)</td>
+</tr>
+<tr>
+<td><code>start_period</code></td>
+<td>Departure time period</td>
+<td>1-40 (half-hour periods)</td>
+</tr>
+<tr>
+<td><code>end_period</code></td>
+<td>Return time period</td>
+<td>1-40</td>
+</tr>
+<tr>
+<td><code>tour_distance</code></td>
+<td>Total tour distance (miles)</td>
+<td>Round-trip distance</td>
+</tr>
+<tr>
+<td><code>num_ob_stops</code></td>
+<td>Outbound stops</td>
+<td>Intermediate stops before primary destination</td>
+</tr>
+<tr>
+<td><code>num_ib_stops</code></td>
+<td>Inbound stops</td>
+<td>Intermediate stops on return</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Mode code mapping</strong> (see data-model.md for full list):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">mode_mapping</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="s1">&#39;Drive Alone&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="s1">&#39;Shared Ride 2&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="s1">&#39;Shared Ride 3+&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="s1">&#39;Walk to Transit&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    <span class="s1">&#39;Drive to Transit&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    <span class="s1">&#39;Walk&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>    <span class="s1">&#39;Bike&#39;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>    <span class="c1"># ... (see data-model.md for codes 8-17)</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="p">}</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="n">survey_tours</span><span class="p">[</span><span class="s1">&#39;tour_mode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">survey_tours</span><span class="p">[</span><span class="s1">&#39;mode_description&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">mode_mapping</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Time period mapping</strong> (5:00 AM = period 1, 30-minute increments):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">time_to_period</span><span class="p">(</span><span class="n">time_str</span><span class="p">):</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert time string to period number (1-40)&quot;&quot;&quot;</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    <span class="n">hour</span><span class="p">,</span> <span class="n">minute</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">time_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">))</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="n">total_minutes</span> <span class="o">=</span> <span class="p">(</span><span class="n">hour</span> <span class="o">-</span> <span class="mi">5</span><span class="p">)</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">minute</span>  <span class="c1"># Minutes since 5:00 AM</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    <span class="n">period</span> <span class="o">=</span> <span class="p">(</span><span class="n">total_minutes</span> <span class="o">//</span> <span class="mi">30</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="n">period</span><span class="p">))</span>  <span class="c1"># Clamp to 1-40</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="n">survey_tours</span><span class="p">[</span><span class="s1">&#39;start_period&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">survey_tours</span><span class="p">[</span><span class="s1">&#39;departure_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">time_to_period</span><span class="p">)</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="n">survey_tours</span><span class="p">[</span><span class="s1">&#39;end_period&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">survey_tours</span><span class="p">[</span><span class="s1">&#39;return_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">time_to_period</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="file-4-indivtripdata_surveycsv">File 4: <code>indivTripData_survey.csv</code><a class="headerlink" href="#file-4-indivtripdata_surveycsv" title="Permanent link">&para;</a></h4>
+<p><strong>Required columns:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Description</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>trip_id</code></td>
+<td>Trip ID</td>
+<td>Unique identifier</td>
+</tr>
+<tr>
+<td><code>person_id</code></td>
+<td>Person ID</td>
+<td>Links to person file</td>
+</tr>
+<tr>
+<td><code>hh_id</code></td>
+<td>Household ID</td>
+<td>Links to household file</td>
+</tr>
+<tr>
+<td><code>tour_id</code></td>
+<td>Parent tour ID</td>
+<td>Links to tour file</td>
+</tr>
+<tr>
+<td><code>trip_mode</code></td>
+<td>Trip mode</td>
+<td>1-17 (same codes as tour_mode)</td>
+</tr>
+<tr>
+<td><code>trip_purpose</code></td>
+<td>Trip purpose</td>
+<td>Work, School, Shop, Eat, Discretionary, etc.</td>
+</tr>
+<tr>
+<td><code>origin_taz</code></td>
+<td>Origin TAZ</td>
+<td>Trip origin</td>
+</tr>
+<tr>
+<td><code>destination_taz</code></td>
+<td>Destination TAZ</td>
+<td>Trip destination</td>
+</tr>
+<tr>
+<td><code>trip_distance</code></td>
+<td>Trip distance (miles)</td>
+<td>One-way distance</td>
+</tr>
+<tr>
+<td><code>depart_period</code></td>
+<td>Departure time period</td>
+<td>1-40</td>
+</tr>
+</tbody>
+</table>
+<h3 id="integration-with-validation-system">Integration with Validation System<a class="headerlink" href="#integration-with-validation-system" title="Permanent link">&para;</a></h3>
+<p>Once survey data is in CTRAMP format, add to <code>validation_config.yaml</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">input_directories</span><span class="p">:</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:/model_runs/2023_base_year&quot;</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2023_base_year&quot;</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="nt">display_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2023</span><span class="nv"> </span><span class="s">Base</span><span class="nv"> </span><span class="s">Year</span><span class="nv"> </span><span class="s">Model&quot;</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="nt">source_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;model&quot;</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span><span class="nt">iteration</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:/survey_data/2023_household_travel_survey&quot;</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2023_survey&quot;</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">    </span><span class="nt">display_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2023</span><span class="nv"> </span><span class="s">Household</span><span class="nv"> </span><span class="s">Travel</span><span class="nv"> </span><span class="s">Survey&quot;</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="w">    </span><span class="nt">source_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;survey&quot;</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="w">    </span><span class="nt">iteration</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">  </span><span class="c1"># Use _1.csv suffix or omit iteration for no suffix</span>
+</code></pre></div>
+<p>The system will then:
+1. Load survey data alongside model outputs
+2. Apply same aggregations and binning
+3. Compare model vs. survey in dashboard</p>
+<h3 id="critical-notes">Critical Notes<a class="headerlink" href="#critical-notes" title="Permanent link">&para;</a></h3>
+<p>⚠️ <strong>Geography Alignment</strong>: Survey TAZs must match TM2.2 TAZ system exactly. If survey uses different geography, you must <strong>crosswalk</strong> locations.</p>
+<p>⚠️ <strong>Sample Weights</strong>: <code>sample_rate</code> is critical for accurate aggregation. Survey weights expand sample to represent full population.</p>
+<p>⚠️ <strong>Mode/Purpose Codes</strong>: Must use exact CTRAMP codes. Do NOT create custom categories - map to standard codes.</p>
+<p>⚠️ <strong>Intersects with Task 1</strong>: If new postprocessed fields are added to data model, survey data must include those fields too (e.g., <code>income_category</code>, <code>county_name</code>).</p>
+<hr />
+<h2 id="3-fix-non-working-summaries">3. Fix Non-Working Summaries<a class="headerlink" href="#3-fix-non-working-summaries" title="Permanent link">&para;</a></h2>
+<h3 id="current-status_2">Current Status<a class="headerlink" href="#current-status_2" title="Permanent link">&para;</a></h3>
+<p>Some summaries defined in <code>validation_config.yaml</code> have <strong>errors</strong> and do not generate output correctly. These will be <strong>obvious on the dashboard</strong> - charts will be missing or show errors.</p>
+<h3 id="task-debug-and-fix-broken-summaries">Task: Debug and Fix Broken Summaries<a class="headerlink" href="#task-debug-and-fix-broken-summaries" title="Permanent link">&para;</a></h3>
+<p><strong>Steps to identify broken summaries:</strong></p>
+<ol>
+<li><strong>Run full summary generation</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nb">cd </span><span class="n">C</span><span class="p">:\</span><span class="n">GitHub</span><span class="p">\</span><span class="n">tm2py-utils</span><span class="p">\</span><span class="n">tm2py_utils</span><span class="p">\</span><span class="n">summary</span><span class="p">\</span><span class="n">validation</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">conda</span> <span class="n">activate</span> <span class="n">tm2py-utils</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">python</span> <span class="n">-m</span> <span class="n">tm2py_utils</span><span class="p">.</span><span class="n">summary</span><span class="p">.</span><span class="n">validation</span><span class="p">.</span><span class="n">summaries</span><span class="p">.</span><span class="n">run_all</span> <span class="p">-</span><span class="n">-config</span> <span class="n">validation_config</span><span class="p">.</span><span class="n">yaml</span>
+</code></pre></div>
+<ol>
+<li><strong>Check console output for errors</strong></li>
+</ol>
+<p>Look for:
+   - <code>KeyError</code> - Missing column in data
+   - <code>ValueError</code> - Invalid binning or grouping
+   - <code>FileNotFoundError</code> - Missing input files
+   - Empty DataFrames - No data after filtering</p>
+<ol>
+<li><strong>Identify missing output files</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nb">cd </span><span class="n">outputs</span><span class="p">/</span><span class="n">dashboard</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="nb">Get-ChildItem</span> <span class="p">*.</span><span class="n">csv</span> <span class="p">|</span> <span class="nb">Measure-Object</span>  <span class="c"># Should be 25 files</span>
+</code></pre></div>
+<p>Compare to expected summaries in <code>validation_config.yaml</code>.</p>
+<ol>
+<li><strong>Debug specific summary</strong></li>
+</ol>
+<p>For each broken summary, check:</p>
+<p><strong>a) Column names match data model</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nt">summaries</span><span class="p">:</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;broken_summary&quot;</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span><span class="nt">group_by</span><span class="p">:</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;tour_mode&quot;</span><span class="w">  </span><span class="c1"># Does this column exist in indivTourData_1.csv?</span>
+</code></pre></div>
+<p>Fix: Use actual column name from data model</p>
+<p><strong>b) Binning spec references valid columns</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nt">binning_specs</span><span class="p">:</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="nt">tour_distance_bins</span><span class="p">:</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="nt">column</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;tour_distance&quot;</span><span class="w">  </span><span class="c1"># Does this column exist?</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="nt">bins</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">5</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">10</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">25</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">100</span><span class="p p-Indicator">]</span>
+</code></pre></div>
+<p>Fix: Add missing column to data model (Task 1) or remove binning</p>
+<p><strong>c) Aggregation spec references valid categories</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nt">aggregation_specs</span><span class="p">:</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="nt">mode_groups</span><span class="p">:</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="nt">column</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;tour_mode&quot;</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">    </span><span class="nt">mapping</span><span class="p">:</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">      </span><span class="nt">Auto</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">3</span><span class="p p-Indicator">]</span><span class="w">  </span><span class="c1"># Are these valid tour_mode codes?</span>
+</code></pre></div>
+<p>Fix: Use correct mode codes from data-model.md</p>
+<p><strong>d) Filters use valid syntax</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nt">summaries</span><span class="p">:</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;commute_tours&quot;</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="nt">filter</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;tour_purpose</span><span class="nv"> </span><span class="s">==</span><span class="nv"> </span><span class="s">&#39;Work&#39;&quot;</span><span class="w">  </span><span class="c1"># Quotes correct? Column exists?</span>
+</code></pre></div>
+<p>Fix: Use pandas query syntax, check column names</p>
+<ol>
+<li><strong>Test fix</strong></li>
+</ol>
+<p>Run single summary to verify:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tm2py_utils.summary.validation.summaries.run_all</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_summary</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="c1"># Test specific summary</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="n">generate_summary</span><span class="p">(</span><span class="s1">&#39;broken_summary&#39;</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="common-issues">Common Issues<a class="headerlink" href="#common-issues" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Error</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KeyError: 'tour_distance'</code></td>
+<td>Column doesn't exist in data</td>
+<td>Add to data model (Task 1) or remove from config</td>
+</tr>
+<tr>
+<td><code>Empty DataFrame after groupby</code></td>
+<td>Filter too restrictive</td>
+<td>Check filter syntax, verify data exists</td>
+</tr>
+<tr>
+<td><code>ValueError: bins must be monotonic</code></td>
+<td>Invalid bin edges</td>
+<td>Fix bin specification in <code>binning_specs</code></td>
+</tr>
+<tr>
+<td><code>No observed data for summary</code></td>
+<td>Missing observed_summaries config</td>
+<td>Add external data (Task 5) or remove comparison</td>
+</tr>
+</tbody>
+</table>
+<h3 id="expected-output">Expected Output<a class="headerlink" href="#expected-output" title="Permanent link">&para;</a></h3>
+<p>After fixes, all 25 summaries should generate without errors:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>Processing summary: auto_ownership_regional... ✓
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>Processing summary: auto_ownership_by_county... ✓
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>Processing summary: auto_ownership_by_household_size... ✓
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>...
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>All summaries completed successfully!
+</code></pre></div>
+<hr />
+<h2 id="4-build-additional-summaries-from-calibrationvalidation-spreadsheet">4. Build Additional Summaries from Calibration/Validation Spreadsheet<a class="headerlink" href="#4-build-additional-summaries-from-calibrationvalidation-spreadsheet" title="Permanent link">&para;</a></h2>
+<h3 id="current-status_3">Current Status<a class="headerlink" href="#current-status_3" title="Permanent link">&para;</a></h3>
+<p>The system has <strong>25 pre-configured summaries</strong>, but the <strong>calibration/validation spreadsheet</strong> lists additional validation targets that need summary generation.</p>
+<h3 id="task-add-new-summaries-from-spreadsheet">Task: Add New Summaries from Spreadsheet<a class="headerlink" href="#task-add-new-summaries-from-spreadsheet" title="Permanent link">&para;</a></h3>
+<p><strong>Steps:</strong></p>
+<ol>
+<li><strong>Review calibration/validation spreadsheet</strong></li>
+</ol>
+<p>Identify targets not currently covered by the 25 summaries. Look for:
+   - Additional geography breakdowns (e.g., by district, superdistrict)
+   - New cross-tabulations (e.g., mode by income AND household size)
+   - Time-of-day summaries not yet implemented
+   - Trip length distributions by purpose/mode combinations</p>
+<ol>
+<li><strong>Design summary configuration</strong></li>
+</ol>
+<p>For each new target, create a summary specification. See <a href="../custom-summaries/">custom-summaries.md</a> for examples.</p>
+<p><strong>Example:</strong> Add "Trip Mode by Income and Household Size"</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nt">summaries</span><span class="p">:</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;trip_mode_by_income_household_size&quot;</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Trip</span><span class="nv"> </span><span class="s">mode</span><span class="nv"> </span><span class="s">shares</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">income</span><span class="nv"> </span><span class="s">category</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">household</span><span class="nv"> </span><span class="s">size&quot;</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">    </span><span class="nt">data_source</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;trips&quot;</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">    </span><span class="nt">group_by</span><span class="p">:</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;income_category&quot;</span><span class="w">  </span><span class="c1"># Requires Task 1 - new field</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;num_persons_agg&quot;</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;trip_mode&quot;</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="w">    </span><span class="nt">metrics</span><span class="p">:</span>
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">column</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;trip_id&quot;</span>
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="w">        </span><span class="nt">aggregation</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;count&quot;</span>
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="w">        </span><span class="nt">output_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;trips&quot;</span>
+<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a><span class="w">    </span><span class="nt">share_within</span><span class="p">:</span>
+<a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;income_category&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;num_persons_agg&quot;</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a><span class="w">    </span><span class="nt">weight_column</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;sample_rate&quot;</span>
+<a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a><span class="w">    </span><span class="nt">aggregation_specs</span><span class="p">:</span>
+<a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;mode_groups&quot;</span><span class="w">  </span><span class="c1"># Group modes into Auto/Transit/Active</span>
+<a id="__codelineno-18-18" name="__codelineno-18-18" href="#__codelineno-18-18"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;household_size_4plus&quot;</span>
+</code></pre></div>
+<ol>
+<li><strong>Add required binning/aggregation specs</strong></li>
+</ol>
+<p>If new summary requires custom bins or aggregations:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nt">binning_specs</span><span class="p">:</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span><span class="nt">income_quartiles</span><span class="p">:</span><span class="w">  </span><span class="c1"># For income_category</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">    </span><span class="nt">column</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;income&quot;</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">    </span><span class="nt">bins</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">30000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">60000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">100000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">999999</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">    </span><span class="nt">labels</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;Q1&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;Q2&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;Q3&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;Q4&quot;</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="w">    </span><span class="nt">output_column</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;income_category&quot;</span>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a>
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="nt">aggregation_specs</span><span class="p">:</span>
+<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="w">  </span><span class="nt">mode_groups</span><span class="p">:</span>
+<a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="w">    </span><span class="nt">column</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;trip_mode&quot;</span>
+<a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a><span class="w">    </span><span class="nt">mapping</span><span class="p">:</span>
+<a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a><span class="w">      </span><span class="nt">Auto</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">3</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a><span class="w">      </span><span class="nt">Transit</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">4</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">5</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">6</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">7</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">8</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">9</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">10</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">11</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">12</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a><span class="w">      </span><span class="nt">Active</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">13</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">14</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a><span class="w">    </span><span class="nt">output_column</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mode_group&quot;</span>
+</code></pre></div>
+<ol>
+<li><strong>Test new summary</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="c"># Run validation with new summary added</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="n">python</span> <span class="n">-m</span> <span class="n">tm2py_utils</span><span class="p">.</span><span class="n">summary</span><span class="p">.</span><span class="n">validation</span><span class="p">.</span><span class="n">summaries</span><span class="p">.</span><span class="n">run_all</span> <span class="p">-</span><span class="n">-config</span> <span class="n">validation_config</span><span class="p">.</span><span class="n">yaml</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="c"># Check output</span>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="nb">cd </span><span class="n">outputs</span><span class="p">/</span><span class="n">dashboard</span>
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="nb">Get-Content</span> <span class="n">trip_mode_by_income_household_size</span><span class="p">.</span><span class="n">csv</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="n">-First</span> <span class="n">10</span>
+</code></pre></div>
+<ol>
+<li><strong>Add to dashboard</strong> (if desired)</li>
+</ol>
+<p>Create chart configuration in appropriate dashboard YAML:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1"># In dashboard-trips.yaml</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="nt">layout</span><span class="p">:</span>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">  </span><span class="nt">trip_mode_by_income</span><span class="p">:</span>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bar</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="w">      </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Trip</span><span class="nv"> </span><span class="s">Mode</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">Income</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">Household</span><span class="nv"> </span><span class="s">Size&quot;</span>
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="w">      </span><span class="nt">props</span><span class="p">:</span>
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="w">        </span><span class="nt">dataset</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;trip_mode_by_income_household_size.csv&quot;</span>
+<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="w">        </span><span class="nt">x</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;income_category&quot;</span>
+<a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a><span class="w">        </span><span class="nt">y</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;share&quot;</span>
+<a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a><span class="w">        </span><span class="nt">groupBy</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mode_group&quot;</span>
+<a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a><span class="w">        </span><span class="nt">facet</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_persons_agg&quot;</span>
+<a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a><span class="w">      </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Trip</span><span class="nv"> </span><span class="s">mode</span><span class="nv"> </span><span class="s">shares</span><span class="nv"> </span><span class="s">across</span><span class="nv"> </span><span class="s">income</span><span class="nv"> </span><span class="s">categories,</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">household</span><span class="nv"> </span><span class="s">size&quot;</span>
+</code></pre></div>
+<h3 id="prioritization">Prioritization<a class="headerlink" href="#prioritization" title="Permanent link">&para;</a></h3>
+<p><strong>High Priority</strong> (required for calibration):
+- VMT by facility type and time period
+- Transit boardings by line and time period
+- Work location by residence district
+- Mode shares for work and school tours</p>
+<p><strong>Medium Priority</strong> (validation targets):
+- Trip length distributions by mode and purpose
+- Activity participation rates by person type
+- Auto occupancy by purpose
+- Park-and-ride usage</p>
+<p><strong>Low Priority</strong> (nice to have):
+- Detailed origin-destination patterns
+- Toll facility usage
+- Non-motorized trip characteristics</p>
+<h3 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h3>
+<p>After adding new summaries, update <strong>generate-summaries.md</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="gu">### Additional Summaries (Custom Configured)</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>| Summary | Description | Geography | Source |
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>|---------|-------------|-----------|--------|
+<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>| trip_mode_by_income_household_size | Trip mode shares by income and household size | Regional | Trips |
+<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>| vmt_by_facility_time | VMT by facility type and time period | Regional | Network |
+</code></pre></div>
+<hr />
+<h2 id="5-reformat-ctpp-data-to-match-system">5. Reformat CTPP Data to Match System<a class="headerlink" href="#5-reformat-ctpp-data-to-match-system" title="Permanent link">&para;</a></h2>
+<h3 id="current-status_4">Current Status<a class="headerlink" href="#current-status_4" title="Permanent link">&para;</a></h3>
+<p><strong>Census Transportation Planning Products (CTPP)</strong> data provides observed journey-to-work patterns but is <strong>not currently formatted</strong> for the validation system.</p>
+<h3 id="required-format_1">Required Format<a class="headerlink" href="#required-format_1" title="Permanent link">&para;</a></h3>
+<p>CTPP data must be <strong>preprocessed into the same format as model summaries</strong> - same columns, same categories, same geography. See <a href="../external-data/">external-data.md</a> for detailed guidance.</p>
+<h3 id="task-create-ctpp-preprocessing-script">Task: Create CTPP Preprocessing Script<a class="headerlink" href="#task-create-ctpp-preprocessing-script" title="Permanent link">&para;</a></h3>
+<p><strong>Goal:</strong> Convert CTPP tables into CSV files that match model summary output format.</p>
+<h4 id="step-1-identify-relevant-ctpp-tables">Step 1: Identify Relevant CTPP Tables<a class="headerlink" href="#step-1-identify-relevant-ctpp-tables" title="Permanent link">&para;</a></h4>
+<p><strong>Key tables for TM2.2 validation:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Description</th>
+<th>Validation Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A302100</td>
+<td>Workers by Work Location</td>
+<td>Work location choice</td>
+</tr>
+<tr>
+<td>A302200</td>
+<td>Workers by Mode to Work</td>
+<td>Commute mode choice</td>
+</tr>
+<tr>
+<td>A102100</td>
+<td>Workers by Residence</td>
+<td>Home-work flow patterns</td>
+</tr>
+<tr>
+<td>B302105</td>
+<td>Travel Time to Work</td>
+<td>Commute time distributions</td>
+</tr>
+</tbody>
+</table>
+<h4 id="step-2-map-ctpp-geography-to-tm22-geography">Step 2: Map CTPP Geography to TM2.2 Geography<a class="headerlink" href="#step-2-map-ctpp-geography-to-tm22-geography" title="Permanent link">&para;</a></h4>
+<p>CTPP uses <strong>Census geographies</strong> (tracts, PUMAs, counties). TM2.2 uses <strong>TAZs</strong>.</p>
+<p><strong>Create geography crosswalk:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="c1"># Load CTPP data (by county)</span>
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="n">ctpp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;ctpp_a302200_workers_by_mode.csv&#39;</span><span class="p">)</span>
+<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="c1"># Columns: county_fips, mode_category, workers</span>
+<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>
+<a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="c1"># Load TM2.2 county mapping</span>
+<a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a><span class="n">taz_county</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;taz_to_county.csv&#39;</span><span class="p">)</span>
+<a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a><span class="c1"># Columns: taz, county_name, county_fips</span>
+<a id="__codelineno-23-10" name="__codelineno-23-10" href="#__codelineno-23-10"></a>
+<a id="__codelineno-23-11" name="__codelineno-23-11" href="#__codelineno-23-11"></a><span class="c1"># Map county_fips to county_name</span>
+<a id="__codelineno-23-12" name="__codelineno-23-12" href="#__codelineno-23-12"></a><span class="n">county_mapping</span> <span class="o">=</span> <span class="n">taz_county</span><span class="p">[[</span><span class="s1">&#39;county_fips&#39;</span><span class="p">,</span> <span class="s1">&#39;county_name&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+<a id="__codelineno-23-13" name="__codelineno-23-13" href="#__codelineno-23-13"></a><span class="n">ctpp</span> <span class="o">=</span> <span class="n">ctpp</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">county_mapping</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;county_fips&#39;</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="step-3-map-ctpp-categories-to-ctramp-codes">Step 3: Map CTPP Categories to CTRAMP Codes<a class="headerlink" href="#step-3-map-ctpp-categories-to-ctramp-codes" title="Permanent link">&para;</a></h4>
+<p><strong>Mode mapping example:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="c1"># CTPP mode categories</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="n">ctpp_mode_mapping</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>    <span class="s1">&#39;Car, truck, or van -- Drove alone&#39;</span><span class="p">:</span> <span class="s1">&#39;Drive Alone&#39;</span><span class="p">,</span>
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>    <span class="s1">&#39;Car, truck, or van -- Carpooled: 2-person&#39;</span><span class="p">:</span> <span class="s1">&#39;Shared Ride 2&#39;</span><span class="p">,</span>
+<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a>    <span class="s1">&#39;Car, truck, or van -- Carpooled: 3-or-more&#39;</span><span class="p">:</span> <span class="s1">&#39;Shared Ride 3+&#39;</span><span class="p">,</span>
+<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a>    <span class="s1">&#39;Public transportation&#39;</span><span class="p">:</span> <span class="s1">&#39;Transit&#39;</span><span class="p">,</span>
+<a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a>    <span class="s1">&#39;Walked&#39;</span><span class="p">:</span> <span class="s1">&#39;Walk&#39;</span><span class="p">,</span>
+<a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a>    <span class="s1">&#39;Bicycle&#39;</span><span class="p">:</span> <span class="s1">&#39;Bike&#39;</span><span class="p">,</span>
+<a id="__codelineno-24-9" name="__codelineno-24-9" href="#__codelineno-24-9"></a>    <span class="s1">&#39;Taxicab, motorcycle, or other means&#39;</span><span class="p">:</span> <span class="s1">&#39;Other&#39;</span><span class="p">,</span>
+<a id="__codelineno-24-10" name="__codelineno-24-10" href="#__codelineno-24-10"></a>    <span class="s1">&#39;Worked at home&#39;</span><span class="p">:</span> <span class="s1">&#39;Work from Home&#39;</span>
+<a id="__codelineno-24-11" name="__codelineno-24-11" href="#__codelineno-24-11"></a><span class="p">}</span>
+<a id="__codelineno-24-12" name="__codelineno-24-12" href="#__codelineno-24-12"></a>
+<a id="__codelineno-24-13" name="__codelineno-24-13" href="#__codelineno-24-13"></a><span class="n">ctpp</span><span class="p">[</span><span class="s1">&#39;tour_mode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ctpp</span><span class="p">[</span><span class="s1">&#39;mode_category&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">ctpp_mode_mapping</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Aggregate to match model summary:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="c1"># Model summary has mode_group aggregation (Auto/Transit/Active)</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="n">mode_group_mapping</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>    <span class="s1">&#39;Drive Alone&#39;</span><span class="p">:</span> <span class="s1">&#39;Auto&#39;</span><span class="p">,</span>
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a>    <span class="s1">&#39;Shared Ride 2&#39;</span><span class="p">:</span> <span class="s1">&#39;Auto&#39;</span><span class="p">,</span>
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>    <span class="s1">&#39;Shared Ride 3+&#39;</span><span class="p">:</span> <span class="s1">&#39;Auto&#39;</span><span class="p">,</span>
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>    <span class="s1">&#39;Transit&#39;</span><span class="p">:</span> <span class="s1">&#39;Transit&#39;</span><span class="p">,</span>
+<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a>    <span class="s1">&#39;Walk&#39;</span><span class="p">:</span> <span class="s1">&#39;Active&#39;</span><span class="p">,</span>
+<a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a>    <span class="s1">&#39;Bike&#39;</span><span class="p">:</span> <span class="s1">&#39;Active&#39;</span><span class="p">,</span>
+<a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a>    <span class="s1">&#39;Other&#39;</span><span class="p">:</span> <span class="s1">&#39;Other&#39;</span><span class="p">,</span>
+<a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a>    <span class="s1">&#39;Work from Home&#39;</span><span class="p">:</span> <span class="s1">&#39;Other&#39;</span>
+<a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a><span class="p">}</span>
+<a id="__codelineno-25-12" name="__codelineno-25-12" href="#__codelineno-25-12"></a>
+<a id="__codelineno-25-13" name="__codelineno-25-13" href="#__codelineno-25-13"></a><span class="n">ctpp</span><span class="p">[</span><span class="s1">&#39;mode_group&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ctpp</span><span class="p">[</span><span class="s1">&#39;tour_mode&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">mode_group_mapping</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="step-4-calculate-shares">Step 4: Calculate Shares<a class="headerlink" href="#step-4-calculate-shares" title="Permanent link">&para;</a></h4>
+<p>Match model summary metric structure:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="c1"># Group by county and mode_group</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="n">ctpp_summary</span> <span class="o">=</span> <span class="n">ctpp</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;county_name&#39;</span><span class="p">,</span> <span class="s1">&#39;mode_group&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">agg</span><span class="p">({</span>
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>    <span class="s1">&#39;workers&#39;</span><span class="p">:</span> <span class="s1">&#39;sum&#39;</span>
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="p">})</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a>
+<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="c1"># Calculate shares within each county</span>
+<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="n">ctpp_summary</span><span class="p">[</span><span class="s1">&#39;share&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ctpp_summary</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;county_name&#39;</span><span class="p">)[</span><span class="s1">&#39;workers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+<a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a>    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">/</span> <span class="n">x</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="p">)</span>
+<a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a>
+<a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a><span class="c1"># Add dataset identifier</span>
+<a id="__codelineno-26-12" name="__codelineno-26-12" href="#__codelineno-26-12"></a><span class="n">ctpp_summary</span><span class="p">[</span><span class="s1">&#39;dataset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;CTPP 2016-2020&#39;</span>
+</code></pre></div>
+<h4 id="step-5-match-model-summary-column-names">Step 5: Match Model Summary Column Names<a class="headerlink" href="#step-5-match-model-summary-column-names" title="Permanent link">&para;</a></h4>
+<p>Ensure columns match exactly:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="c1"># Model summary: work_mode_by_county.csv</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="c1"># Columns: county_name, mode_group, workers, share, dataset</span>
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>
+<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="n">ctpp_formatted</span> <span class="o">=</span> <span class="n">ctpp_summary</span><span class="p">[[</span>
+<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>    <span class="s1">&#39;county_name&#39;</span><span class="p">,</span>
+<a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a>    <span class="s1">&#39;mode_group&#39;</span><span class="p">,</span> 
+<a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a>    <span class="s1">&#39;workers&#39;</span><span class="p">,</span>
+<a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a>    <span class="s1">&#39;share&#39;</span><span class="p">,</span>
+<a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a>    <span class="s1">&#39;dataset&#39;</span>
+<a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a><span class="p">]]</span>
+<a id="__codelineno-27-11" name="__codelineno-27-11" href="#__codelineno-27-11"></a>
+<a id="__codelineno-27-12" name="__codelineno-27-12" href="#__codelineno-27-12"></a><span class="c1"># Save in same format as model summary</span>
+<a id="__codelineno-27-13" name="__codelineno-27-13" href="#__codelineno-27-13"></a><span class="n">ctpp_formatted</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;work_mode_by_county_ctpp.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="step-6-add-to-validation-config">Step 6: Add to Validation Config<a class="headerlink" href="#step-6-add-to-validation-config" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="nt">observed_summaries</span><span class="p">:</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;work_mode_by_county_ctpp&quot;</span>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="w">    </span><span class="nt">file_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:/validation_data/ctpp/work_mode_by_county_ctpp.csv&quot;</span>
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;CTPP</span><span class="nv"> </span><span class="s">2016-2020</span><span class="nv"> </span><span class="s">work</span><span class="nv"> </span><span class="s">mode</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">county&quot;</span>
+<a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="w">    </span><span class="nt">dataset_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;CTPP</span><span class="nv"> </span><span class="s">2016-2020&quot;</span>
+<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a>
+<a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a><span class="w">    </span><span class="nt">column_mapping</span><span class="p">:</span>
+<a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a><span class="w">      </span><span class="nt">dimensions</span><span class="p">:</span>
+<a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a><span class="w">        </span><span class="nt">county_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;county_name&quot;</span>
+<a id="__codelineno-28-10" name="__codelineno-28-10" href="#__codelineno-28-10"></a><span class="w">        </span><span class="nt">mode_group</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mode_group&quot;</span>
+<a id="__codelineno-28-11" name="__codelineno-28-11" href="#__codelineno-28-11"></a><span class="w">      </span><span class="nt">metrics</span><span class="p">:</span>
+<a id="__codelineno-28-12" name="__codelineno-28-12" href="#__codelineno-28-12"></a><span class="w">        </span><span class="nt">workers</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;workers&quot;</span>
+<a id="__codelineno-28-13" name="__codelineno-28-13" href="#__codelineno-28-13"></a><span class="w">        </span><span class="nt">share</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;share&quot;</span>
+</code></pre></div>
+<h3 id="ctpp-tables-to-process">CTPP Tables to Process<a class="headerlink" href="#ctpp-tables-to-process" title="Permanent link">&para;</a></h3>
+<p><strong>Priority 1</strong> (commute patterns):
+- A302200: Mode to work by residence
+- A302100: Workers by workplace
+- B302105: Travel time to work</p>
+<p><strong>Priority 2</strong> (demographics):
+- A101102: Household size
+- A101103: Household income
+- A101104: Vehicles available</p>
+<p><strong>Priority 3</strong> (detailed flows):
+- A302106: Residence-workplace flows by mode
+- A302107: Residence-workplace flows by time</p>
+<h3 id="preprocessing-script-template">Preprocessing Script Template<a class="headerlink" href="#preprocessing-script-template" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="sd">CTPP Preprocessing for TM2.2 Validation System</span>
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>
+<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="sd">Converts CTPP tables to match model summary format</span>
+<a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a>
+<a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<a id="__codelineno-29-8" name="__codelineno-29-8" href="#__codelineno-29-8"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<a id="__codelineno-29-9" name="__codelineno-29-9" href="#__codelineno-29-9"></a>
+<a id="__codelineno-29-10" name="__codelineno-29-10" href="#__codelineno-29-10"></a><span class="k">def</span><span class="w"> </span><span class="nf">process_ctpp_mode_choice</span><span class="p">(</span><span class="n">ctpp_file</span><span class="p">,</span> <span class="n">county_mapping_file</span><span class="p">,</span> <span class="n">output_file</span><span class="p">):</span>
+<a id="__codelineno-29-11" name="__codelineno-29-11" href="#__codelineno-29-11"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-29-12" name="__codelineno-29-12" href="#__codelineno-29-12"></a><span class="sd">    Process CTPP A302200 (Mode to Work) table</span>
+<a id="__codelineno-29-13" name="__codelineno-29-13" href="#__codelineno-29-13"></a>
+<a id="__codelineno-29-14" name="__codelineno-29-14" href="#__codelineno-29-14"></a><span class="sd">    Args:</span>
+<a id="__codelineno-29-15" name="__codelineno-29-15" href="#__codelineno-29-15"></a><span class="sd">        ctpp_file: Path to CTPP CSV</span>
+<a id="__codelineno-29-16" name="__codelineno-29-16" href="#__codelineno-29-16"></a><span class="sd">        county_mapping_file: Path to county mapping</span>
+<a id="__codelineno-29-17" name="__codelineno-29-17" href="#__codelineno-29-17"></a><span class="sd">        output_file: Path for output CSV</span>
+<a id="__codelineno-29-18" name="__codelineno-29-18" href="#__codelineno-29-18"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-29-19" name="__codelineno-29-19" href="#__codelineno-29-19"></a>    <span class="c1"># Load CTPP data</span>
+<a id="__codelineno-29-20" name="__codelineno-29-20" href="#__codelineno-29-20"></a>    <span class="n">ctpp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">ctpp_file</span><span class="p">)</span>
+<a id="__codelineno-29-21" name="__codelineno-29-21" href="#__codelineno-29-21"></a>
+<a id="__codelineno-29-22" name="__codelineno-29-22" href="#__codelineno-29-22"></a>    <span class="c1"># Load county mapping</span>
+<a id="__codelineno-29-23" name="__codelineno-29-23" href="#__codelineno-29-23"></a>    <span class="n">counties</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">county_mapping_file</span><span class="p">)</span>
+<a id="__codelineno-29-24" name="__codelineno-29-24" href="#__codelineno-29-24"></a>
+<a id="__codelineno-29-25" name="__codelineno-29-25" href="#__codelineno-29-25"></a>    <span class="c1"># Map CTPP mode categories to model mode groups</span>
+<a id="__codelineno-29-26" name="__codelineno-29-26" href="#__codelineno-29-26"></a>    <span class="n">mode_mapping</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-29-27" name="__codelineno-29-27" href="#__codelineno-29-27"></a>        <span class="s1">&#39;Drove alone&#39;</span><span class="p">:</span> <span class="s1">&#39;Auto&#39;</span><span class="p">,</span>
+<a id="__codelineno-29-28" name="__codelineno-29-28" href="#__codelineno-29-28"></a>        <span class="s1">&#39;Carpooled&#39;</span><span class="p">:</span> <span class="s1">&#39;Auto&#39;</span><span class="p">,</span>
+<a id="__codelineno-29-29" name="__codelineno-29-29" href="#__codelineno-29-29"></a>        <span class="s1">&#39;Public transportation&#39;</span><span class="p">:</span> <span class="s1">&#39;Transit&#39;</span><span class="p">,</span>
+<a id="__codelineno-29-30" name="__codelineno-29-30" href="#__codelineno-29-30"></a>        <span class="s1">&#39;Walked&#39;</span><span class="p">:</span> <span class="s1">&#39;Active&#39;</span><span class="p">,</span>
+<a id="__codelineno-29-31" name="__codelineno-29-31" href="#__codelineno-29-31"></a>        <span class="s1">&#39;Bicycle&#39;</span><span class="p">:</span> <span class="s1">&#39;Active&#39;</span><span class="p">,</span>
+<a id="__codelineno-29-32" name="__codelineno-29-32" href="#__codelineno-29-32"></a>        <span class="s1">&#39;Other&#39;</span><span class="p">:</span> <span class="s1">&#39;Other&#39;</span>
+<a id="__codelineno-29-33" name="__codelineno-29-33" href="#__codelineno-29-33"></a>    <span class="p">}</span>
+<a id="__codelineno-29-34" name="__codelineno-29-34" href="#__codelineno-29-34"></a>
+<a id="__codelineno-29-35" name="__codelineno-29-35" href="#__codelineno-29-35"></a>    <span class="n">ctpp</span><span class="p">[</span><span class="s1">&#39;mode_group&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ctpp</span><span class="p">[</span><span class="s1">&#39;mode_category&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">mode_mapping</span><span class="p">)</span>
+<a id="__codelineno-29-36" name="__codelineno-29-36" href="#__codelineno-29-36"></a>
+<a id="__codelineno-29-37" name="__codelineno-29-37" href="#__codelineno-29-37"></a>    <span class="c1"># Join geography</span>
+<a id="__codelineno-29-38" name="__codelineno-29-38" href="#__codelineno-29-38"></a>    <span class="n">ctpp</span> <span class="o">=</span> <span class="n">ctpp</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">counties</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;county_fips&#39;</span><span class="p">)</span>
+<a id="__codelineno-29-39" name="__codelineno-29-39" href="#__codelineno-29-39"></a>
+<a id="__codelineno-29-40" name="__codelineno-29-40" href="#__codelineno-29-40"></a>    <span class="c1"># Aggregate</span>
+<a id="__codelineno-29-41" name="__codelineno-29-41" href="#__codelineno-29-41"></a>    <span class="n">summary</span> <span class="o">=</span> <span class="n">ctpp</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;county_name&#39;</span><span class="p">,</span> <span class="s1">&#39;mode_group&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">agg</span><span class="p">({</span>
+<a id="__codelineno-29-42" name="__codelineno-29-42" href="#__codelineno-29-42"></a>        <span class="s1">&#39;workers&#39;</span><span class="p">:</span> <span class="s1">&#39;sum&#39;</span>
+<a id="__codelineno-29-43" name="__codelineno-29-43" href="#__codelineno-29-43"></a>    <span class="p">})</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+<a id="__codelineno-29-44" name="__codelineno-29-44" href="#__codelineno-29-44"></a>
+<a id="__codelineno-29-45" name="__codelineno-29-45" href="#__codelineno-29-45"></a>    <span class="c1"># Calculate shares</span>
+<a id="__codelineno-29-46" name="__codelineno-29-46" href="#__codelineno-29-46"></a>    <span class="n">summary</span><span class="p">[</span><span class="s1">&#39;share&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;county_name&#39;</span><span class="p">)[</span><span class="s1">&#39;workers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+<a id="__codelineno-29-47" name="__codelineno-29-47" href="#__codelineno-29-47"></a>        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">/</span> <span class="n">x</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<a id="__codelineno-29-48" name="__codelineno-29-48" href="#__codelineno-29-48"></a>    <span class="p">)</span>
+<a id="__codelineno-29-49" name="__codelineno-29-49" href="#__codelineno-29-49"></a>
+<a id="__codelineno-29-50" name="__codelineno-29-50" href="#__codelineno-29-50"></a>    <span class="c1"># Add dataset identifier</span>
+<a id="__codelineno-29-51" name="__codelineno-29-51" href="#__codelineno-29-51"></a>    <span class="n">summary</span><span class="p">[</span><span class="s1">&#39;dataset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;CTPP 2016-2020&#39;</span>
+<a id="__codelineno-29-52" name="__codelineno-29-52" href="#__codelineno-29-52"></a>
+<a id="__codelineno-29-53" name="__codelineno-29-53" href="#__codelineno-29-53"></a>    <span class="c1"># Save</span>
+<a id="__codelineno-29-54" name="__codelineno-29-54" href="#__codelineno-29-54"></a>    <span class="n">summary</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-29-55" name="__codelineno-29-55" href="#__codelineno-29-55"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saved </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span><span class="si">}</span><span class="s2"> rows to </span><span class="si">{</span><span class="n">output_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-29-56" name="__codelineno-29-56" href="#__codelineno-29-56"></a>
+<a id="__codelineno-29-57" name="__codelineno-29-57" href="#__codelineno-29-57"></a><span class="c1"># Run preprocessing</span>
+<a id="__codelineno-29-58" name="__codelineno-29-58" href="#__codelineno-29-58"></a><span class="n">process_ctpp_mode_choice</span><span class="p">(</span>
+<a id="__codelineno-29-59" name="__codelineno-29-59" href="#__codelineno-29-59"></a>    <span class="n">ctpp_file</span><span class="o">=</span><span class="s1">&#39;ctpp_a302200_raw.csv&#39;</span><span class="p">,</span>
+<a id="__codelineno-29-60" name="__codelineno-29-60" href="#__codelineno-29-60"></a>    <span class="n">county_mapping_file</span><span class="o">=</span><span class="s1">&#39;taz_to_county.csv&#39;</span><span class="p">,</span>
+<a id="__codelineno-29-61" name="__codelineno-29-61" href="#__codelineno-29-61"></a>    <span class="n">output_file</span><span class="o">=</span><span class="s1">&#39;work_mode_by_county_ctpp.csv&#39;</span>
+<a id="__codelineno-29-62" name="__codelineno-29-62" href="#__codelineno-29-62"></a><span class="p">)</span>
+</code></pre></div>
+<h3 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h3>
+<p>After preprocessing, verify format matches model summaries:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="c1"># Load model summary</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="n">model</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;outputs/dashboard/work_mode_by_county.csv&#39;</span><span class="p">)</span>
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="c1"># Load CTPP summary</span>
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="n">ctpp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;work_mode_by_county_ctpp.csv&#39;</span><span class="p">)</span>
+<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a>
+<a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a><span class="c1"># Check columns match</span>
+<a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a><span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">ctpp</span><span class="o">.</span><span class="n">columns</span><span class="p">),</span> <span class="s2">&quot;Column mismatch!&quot;</span>
+<a id="__codelineno-30-9" name="__codelineno-30-9" href="#__codelineno-30-9"></a>
+<a id="__codelineno-30-10" name="__codelineno-30-10" href="#__codelineno-30-10"></a><span class="c1"># Check categories match</span>
+<a id="__codelineno-30-11" name="__codelineno-30-11" href="#__codelineno-30-11"></a><span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;mode_group&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span>
+<a id="__codelineno-30-12" name="__codelineno-30-12" href="#__codelineno-30-12"></a>    <span class="nb">set</span><span class="p">(</span><span class="n">ctpp</span><span class="p">[</span><span class="s1">&#39;mode_group&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+<a id="__codelineno-30-13" name="__codelineno-30-13" href="#__codelineno-30-13"></a><span class="p">),</span> <span class="s2">&quot;Mode categories don&#39;t align!&quot;</span>
+<a id="__codelineno-30-14" name="__codelineno-30-14" href="#__codelineno-30-14"></a>
+<a id="__codelineno-30-15" name="__codelineno-30-15" href="#__codelineno-30-15"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✓ CTPP format matches model summary&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="integration">Integration<a class="headerlink" href="#integration" title="Permanent link">&para;</a></h3>
+<p>Once CTPP is preprocessed, it will automatically appear in dashboard comparisons:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="c1"># Combined file will have both datasets</span>
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="n">combined</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;outputs/dashboard/work_mode_by_county.csv&#39;</span><span class="p">)</span>
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>
+<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="nb">print</span><span class="p">(</span><span class="n">combined</span><span class="p">[</span><span class="s1">&#39;dataset&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+<a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="c1"># Output: [&#39;2023_base_year&#39;, &#39;CTPP 2016-2020&#39;]</span>
+</code></pre></div>
+<hr />
+<h2 id="summary-of-tasks">Summary of Tasks<a class="headerlink" href="#summary-of-tasks" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Status</th>
+<th>Priority</th>
+<th>Effort</th>
+<th>Dependencies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Update data model docs</td>
+<td>🔄 In Progress</td>
+<td>High</td>
+<td>Medium</td>
+<td>Postprocessing pipeline updates</td>
+</tr>
+<tr>
+<td>2. Format 2023 survey data</td>
+<td>⏳ Not Started</td>
+<td>High</td>
+<td>High</td>
+<td>Task 1 (data model changes)</td>
+</tr>
+<tr>
+<td>3. Fix broken summaries</td>
+<td>⏳ Not Started</td>
+<td>High</td>
+<td>Low</td>
+<td>None</td>
+</tr>
+<tr>
+<td>4. Add new summaries</td>
+<td>⏳ Not Started</td>
+<td>Medium</td>
+<td>Medium</td>
+<td>Task 1, Task 3</td>
+</tr>
+<tr>
+<td>5. Reformat CTPP data</td>
+<td>⏳ Not Started</td>
+<td>Medium</td>
+<td>Medium</td>
+<td>Geography crosswalk</td>
+</tr>
+</tbody>
+</table>
+<h3 id="recommended-sequence">Recommended Sequence<a class="headerlink" href="#recommended-sequence" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Complete Task 1 first</strong> - Finalize data model with all postprocessed fields</li>
+<li><strong>Then Task 2</strong> - Format survey data to match finalized data model</li>
+<li><strong>Then Task 3</strong> - Fix broken summaries using updated data</li>
+<li><strong>Parallel: Tasks 4 &amp; 5</strong> - Add new summaries while preprocessing CTPP</li>
+</ol>
+<h3 id="success-criteria">Success Criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h3>
+<p>✅ All 4 CTRAMP data files documented with complete schemas<br />
+✅ 2023 survey data loads without errors<br />
+✅ All 25 existing summaries generate successfully<br />
+✅ 10+ new summaries added from calibration spreadsheet<br />
+✅ CTPP data integrated for model-vs-observed comparison<br />
+✅ Dashboard displays all comparisons without errors  </p>
+<hr />
+<h2 id="related-documentation">Related Documentation<a class="headerlink" href="#related-documentation" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong><a href="../data-model/">Data Model Reference</a></strong> - Current CTRAMP schema (needs updates per Task 1)</li>
+<li><strong><a href="../custom-summaries/">Custom Summaries Guide</a></strong> - How to configure new summaries (Task 4)</li>
+<li><strong><a href="../external-data/">External Data Integration</a></strong> - CTPP preprocessing guidance (Task 5)</li>
+<li><strong><a href="../generate-summaries/">Generate Summaries</a></strong> - Running validation after changes</li>
+<li><strong><a href="../validation-system/">Validation System Overview</a></strong> - Return to main documentation</li>
+</ul>
+<hr />
+<h2 id="questions-or-issues">Questions or Issues?<a class="headerlink" href="#questions-or-issues" title="Permanent link">&para;</a></h2>
+<p>If you encounter issues with any of these tasks:</p>
+<ol>
+<li><strong>Check error messages</strong> in console output - most issues are column name mismatches</li>
+<li><strong>Review data model</strong> - ensure new fields are documented</li>
+<li><strong>Test incrementally</strong> - process one summary at a time, not all 25 at once</li>
+<li><strong>Verify geography alignment</strong> - TAZ systems must match exactly</li>
+<li><strong>Document as you go</strong> - update relevant .md files when making changes</li>
+</ol>
+
+
+
+
+
+
+
+  
+    
+  
+  
+    
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="December 11, 2025 17:42:55 UTC">December 11, 2025</span>
+  </span>
+
+    
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Created">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="December 11, 2025 17:42:55 UTC">December 11, 2025</span>
+  </span>
+
+    
+    
+    
+  </aside>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/BayAreaMetro/tm2py-utils" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://bayareametro.gov" target="_blank" rel="noopener" title="bayareametro.gov" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M351.9 280H161c2.9 64.5 17.2 123.9 37.5 167.4 11.4 24.5 23.7 41.8 35.1 52.4 11.2 10.5 18.9 12.2 22.9 12.2s11.7-1.7 22.9-12.2c11.4-10.6 23.7-28 35.1-52.4 20.3-43.5 34.6-102.9 37.5-167.4zm-191-48h190.9c-2.8-64.5-17.1-123.9-37.4-167.4-11.4-24.4-23.7-41.8-35.1-52.4C268.1 1.7 260.4 0 256.4 0s-11.7 1.7-22.9 12.2c-11.4 10.6-23.7 28-35.1 52.4-20.3 43.5-34.6 102.9-37.5 167.4m-48 0c3.5-85.6 25.6-165.1 57.9-217.3C78.7 47.3 10.9 131.2 1.5 232zM1.5 280c9.4 100.8 77.2 184.7 169.3 217.3-32.3-52.2-54.4-131.7-57.9-217.3zm398.4 0c-3.5 85.6-25.6 165.1-57.9 217.3 92.1-32.7 159.9-116.5 169.3-217.3zm111.4-48C501.9 131.2 434.1 47.3 342 14.7c32.3 52.2 54.4 131.7 57.9 217.3z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+    
+  </body>
+</html>

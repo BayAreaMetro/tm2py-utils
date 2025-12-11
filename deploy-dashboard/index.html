@@ -1,0 +1,2281 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Utilities for Travel Model Two (TM2) analysis and validation">
+      
+      
+        <meta name="author" content="Bay Area Metro">
+      
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>Deploy Dashboard - tm2py-utils Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.618322db.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../css/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="light-blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#deploy-dashboard" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="tm2py-utils Documentation" class="md-header__button md-logo" aria-label="tm2py-utils Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            tm2py-utils Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Deploy Dashboard
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="light-blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="light-blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/BayAreaMetro/tm2py-utils" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    BayAreaMetro/tm2py-utils
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../install/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../validation-system/" class="md-tabs__link">
+          
+  
+  
+  Validation System
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../contributing/" class="md-tabs__link">
+          
+  
+  
+  Development
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../summary/CONSOLIDATION_PROPOSAL.md" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="tm2py-utils Documentation" class="md-nav__button md-logo" aria-label="tm2py-utils Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    tm2py-utils Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/BayAreaMetro/tm2py-utils" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    BayAreaMetro/tm2py-utils
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.md#quick-start" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation System
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Validation System
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../validation-system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Complete Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dashboard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../summaries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Summaries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../summary/CONSOLIDATION_PROPOSAL.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Consolidation Proposal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../summary/DASHBOARD_DEPLOYMENT.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Start
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quick Start">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-1-launch-dashboard-directly" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 1: Launch Dashboard Directly
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-2-generate-summaries-launch-dashboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 2: Generate Summaries + Launch Dashboard
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-3-custom-port" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 3: Custom Port
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dashboard-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dashboard Structure
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dashboard Structure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#file-organization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File Organization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tab-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tab Structure
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dashboard-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dashboard Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dashboard Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#yaml-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        YAML Structure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chart-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chart Types
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chart Types">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-bar-chart" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Bar Chart
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-line-chart" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Line Chart
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-scatter-plot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Scatter Plot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-heatmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Heatmap
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#faceting-small-multiples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Faceting (Small Multiples)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grouping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Grouping
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#customizing-charts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Customizing Charts
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Customizing Charts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#adding-a-new-chart" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a New Chart
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#creating-a-new-tab" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Creating a New Tab
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#customizing-colors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Customizing Colors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#customizing-chart-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Customizing Chart Layout
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-configurations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example Configurations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Example Configurations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-1-simple-bar-chart" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 1: Simple Bar Chart
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-2-faceted-comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 2: Faceted Comparison
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-3-model-vs-acs-comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 3: Model vs. ACS Comparison
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-4-heatmap-time-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 4: Heatmap Time Matrix
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#running-the-dashboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running the Dashboard
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Running the Dashboard">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#local-development" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Local Development
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#production-deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Production Deployment
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using Docker
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#port-already-in-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Port Already in Use
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#csv-not-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CSV Not Found
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#empty-charts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Empty Charts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#module-not-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Module Not Found
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#encoding-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Encoding Errors
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Features
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced Features">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filtering-by-dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filtering by Dataset
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exporting-charts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exporting Charts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-variable-labels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Variable Labels
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#categorical-ordering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Categorical Ordering
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Optimization
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance Optimization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#large-datasets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Large Datasets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#caching" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Caching
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#alternative-visualization-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Alternative Visualization Tools
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Alternative Visualization Tools">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tableau" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tableau
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#power-bi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Power BI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#r-shiny" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        R Shiny
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#observable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observable
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resources
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="deploy-dashboard">Deploy Dashboard<a class="headerlink" href="#deploy-dashboard" title="Permanent link">&para;</a></h1>
+<p>Guide to launching and customizing the Streamlit validation dashboard.</p>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>The validation dashboard is a <strong>Streamlit web application</strong> that visualizes summary data with interactive charts. It displays model-vs-model and model-vs-observed comparisons across multiple datasets.</p>
+<p><strong>Features:</strong>
+- Interactive charts (bar, line, scatter, heatmap)
+- Multi-dataset comparisons
+- Filter by dataset, geography, time period
+- Export charts as images
+- Fully configurable via YAML</p>
+<p><strong>Technology:</strong> Built with <a href="https://streamlit.io/">Streamlit</a> and <a href="https://plotly.com/python/">Plotly</a></p>
+<hr />
+<h2 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
+<h3 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h3>
+<p>Ensure you have the <code>tm2py-utils</code> conda environment activated:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">conda</span> <span class="n">activate</span> <span class="n">tm2py-utils</span>
+</code></pre></div>
+<p>This environment includes Streamlit, Plotly, and all required dependencies.</p>
+<h3 id="option-1-launch-dashboard-directly">Option 1: Launch Dashboard Directly<a class="headerlink" href="#option-1-launch-dashboard-directly" title="Permanent link">&para;</a></h3>
+<p>From the validation directory:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">cd </span><span class="n">C</span><span class="p">:\</span><span class="n">GitHub</span><span class="p">\</span><span class="n">tm2py-utils</span><span class="p">\</span><span class="n">tm2py_utils</span><span class="p">\</span><span class="n">summary</span><span class="p">\</span><span class="n">validation</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">streamlit</span> <span class="n">run</span> <span class="n">dashboard</span><span class="p">/</span><span class="n">dashboard_app</span><span class="p">.</span><span class="n">py</span> <span class="p">-</span><span class="n">-server</span><span class="p">.</span><span class="n">port</span> <span class="n">8501</span>
+</code></pre></div>
+<p><strong>Dashboard opens at:</strong> http://localhost:8501</p>
+<h3 id="option-2-generate-summaries-launch-dashboard">Option 2: Generate Summaries + Launch Dashboard<a class="headerlink" href="#option-2-generate-summaries-launch-dashboard" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">cd </span><span class="n">C</span><span class="p">:\</span><span class="n">GitHub</span><span class="p">\</span><span class="n">tm2py-utils</span><span class="p">\</span><span class="n">tm2py_utils</span><span class="p">\</span><span class="n">summary</span><span class="p">\</span><span class="n">validation</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">python</span> <span class="n">run_and_deploy_dashboard</span><span class="p">.</span><span class="n">py</span> <span class="p">-</span><span class="n">-config</span> <span class="n">validation_config</span><span class="p">.</span><span class="n">yaml</span> <span class="p">-</span><span class="n">-launch-dashboard</span>
+</code></pre></div>
+<p>This:
+1. Generates all summaries
+2. Copies CSVs to dashboard directory
+3. Launches Streamlit</p>
+<h3 id="option-3-custom-port">Option 3: Custom Port<a class="headerlink" href="#option-3-custom-port" title="Permanent link">&para;</a></h3>
+<p>If port 8501 is already in use:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">streamlit</span> <span class="n">run</span> <span class="n">dashboard</span><span class="p">/</span><span class="n">dashboard_app</span><span class="p">.</span><span class="n">py</span> <span class="p">-</span><span class="n">-server</span><span class="p">.</span><span class="n">port</span> <span class="n">8503</span>
+</code></pre></div>
+<hr />
+<h2 id="dashboard-structure">Dashboard Structure<a class="headerlink" href="#dashboard-structure" title="Permanent link">&para;</a></h2>
+<h3 id="file-organization">File Organization<a class="headerlink" href="#file-organization" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>tm2py_utils/summary/validation/
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>├── dashboard/
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>│   ├── dashboard_app.py           # Main Streamlit app
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>│   ├── dashboard-households.yaml  # Household charts config
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>│   ├── dashboard-population.yaml  # Population charts config
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>│   ├── dashboard-commute.yaml     # Work location charts config
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>│   ├── dashboard-activity-patterns.yaml  # CDAP charts config
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>│   ├── dashboard-tours.yaml       # Tour charts config
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>│   ├── dashboard-trips.yaml       # Trip charts config
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>│   ├── dashboard-time-of-day.yaml # Time distribution charts config
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>│   └── dashboard-trip-characteristics.yaml  # Trip distance/duration
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>├── outputs/
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>│   └── dashboard/
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>│       ├── *.csv                  # Combined summary CSVs
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>│       └── dashboard/             # (Optional) Copied CSVs for deployment
+</code></pre></div>
+<h3 id="tab-structure">Tab Structure<a class="headerlink" href="#tab-structure" title="Permanent link">&para;</a></h3>
+<p>The dashboard has <strong>8 tabs</strong>, each configured by a YAML file:</p>
+<table>
+<thead>
+<tr>
+<th>Tab</th>
+<th>Config File</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Households</td>
+<td><code>dashboard-households.yaml</code></td>
+<td>Auto ownership, household size</td>
+</tr>
+<tr>
+<td>Population</td>
+<td><code>dashboard-population.yaml</code></td>
+<td>Person demographics, CDAP</td>
+</tr>
+<tr>
+<td>Commute</td>
+<td><code>dashboard-commute.yaml</code></td>
+<td>Work location, commute distance</td>
+</tr>
+<tr>
+<td>Activity Patterns</td>
+<td><code>dashboard-activity-patterns.yaml</code></td>
+<td>Daily activity patterns by person type</td>
+</tr>
+<tr>
+<td>Tours</td>
+<td><code>dashboard-tours.yaml</code></td>
+<td>Tour frequency, mode, purpose</td>
+</tr>
+<tr>
+<td>Trips</td>
+<td><code>dashboard-trips.yaml</code></td>
+<td>Trip mode, purpose</td>
+</tr>
+<tr>
+<td>Time of Day</td>
+<td><code>dashboard-time-of-day.yaml</code></td>
+<td>Tour start/end times</td>
+</tr>
+<tr>
+<td>Trip Characteristics</td>
+<td><code>dashboard-trip-characteristics.yaml</code></td>
+<td>Distance, duration distributions</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="dashboard-configuration">Dashboard Configuration<a class="headerlink" href="#dashboard-configuration" title="Permanent link">&para;</a></h2>
+<h3 id="yaml-structure">YAML Structure<a class="headerlink" href="#yaml-structure" title="Permanent link">&para;</a></h3>
+<p>Each tab is configured with a YAML file:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">header</span><span class="p">:</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">tab</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Households&quot;</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Household</span><span class="nv"> </span><span class="s">Summary</span><span class="nv"> </span><span class="s">Statistics&quot;</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Household</span><span class="nv"> </span><span class="s">demographics</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">auto</span><span class="nv"> </span><span class="s">ownership</span><span class="nv"> </span><span class="s">patterns&quot;</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="nt">layout</span><span class="p">:</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">  </span><span class="nt">section_name</span><span class="p">:</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bar</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">      </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Chart</span><span class="nv"> </span><span class="s">Title&quot;</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">      </span><span class="nt">props</span><span class="p">:</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">        </span><span class="nt">dataset</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;auto_ownership_regional.csv&quot;</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">        </span><span class="nt">x</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_vehicles&quot;</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">        </span><span class="nt">y</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;share&quot;</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="w">        </span><span class="nt">groupBy</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;dataset&quot;</span>
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="w">      </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Chart</span><span class="nv"> </span><span class="s">description&quot;</span>
+</code></pre></div>
+<p><strong>Sections:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Section</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>header</code></td>
+<td>Tab metadata (name, title, description)</td>
+</tr>
+<tr>
+<td><code>layout</code></td>
+<td>Chart definitions grouped by section</td>
+</tr>
+</tbody>
+</table>
+<h3 id="chart-types">Chart Types<a class="headerlink" href="#chart-types" title="Permanent link">&para;</a></h3>
+<h4 id="1-bar-chart">1. Bar Chart<a class="headerlink" href="#1-bar-chart" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bar</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Households</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">Vehicle</span><span class="nv"> </span><span class="s">Ownership&quot;</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nt">props</span><span class="p">:</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="nt">dataset</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;auto_ownership_regional.csv&quot;</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="nt">x</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_vehicles&quot;</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="nt">y</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;share&quot;</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="nt">groupBy</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;dataset&quot;</span>
+</code></pre></div>
+<p><strong>Props:</strong>
+- <code>dataset</code> - CSV filename (in <code>outputs/dashboard/</code>)
+- <code>x</code> - Column for x-axis
+- <code>y</code> - Column for y-axis (metric)
+- <code>groupBy</code> - Column for grouping (creates separate bars)
+- <code>facet</code> - (Optional) Column for faceting (small multiples)
+- <code>columns</code> - (Optional) Column for sub-grouping within bars</p>
+<h4 id="2-line-chart">2. Line Chart<a class="headerlink" href="#2-line-chart" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">line</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Tour</span><span class="nv"> </span><span class="s">Distance</span><span class="nv"> </span><span class="s">Distribution&quot;</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nt">props</span><span class="p">:</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="nt">dataset</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;tour_distance.csv&quot;</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="nt">x</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;tour_distance_bin&quot;</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="nt">y</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;share&quot;</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="nt">groupBy</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;dataset&quot;</span>
+</code></pre></div>
+<p><strong>Use for:</strong> Trends, distributions over continuous dimensions</p>
+<h4 id="3-scatter-plot">3. Scatter Plot<a class="headerlink" href="#3-scatter-plot" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">scatter</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Tour</span><span class="nv"> </span><span class="s">Mode</span><span class="nv"> </span><span class="s">vs</span><span class="nv"> </span><span class="s">Purpose&quot;</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nt">props</span><span class="p">:</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="nt">dataset</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;tour_mode_by_purpose.csv&quot;</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="nt">x</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;tour_purpose&quot;</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="nt">y</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;share&quot;</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">    </span><span class="nt">groupBy</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;tour_mode&quot;</span>
+</code></pre></div>
+<p><strong>Use for:</strong> Relationships between two continuous variables</p>
+<h4 id="4-heatmap">4. Heatmap<a class="headerlink" href="#4-heatmap" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">heatmap</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Tour</span><span class="nv"> </span><span class="s">Time</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">Day</span><span class="nv"> </span><span class="s">Matrix&quot;</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="nt">props</span><span class="p">:</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="nt">dataset</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;time_of_day_tours.csv&quot;</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="nt">x</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;start_period&quot;</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span><span class="nt">y</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;end_period&quot;</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">    </span><span class="nt">z</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;tours&quot;</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">    </span><span class="nt">groupBy</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;dataset&quot;</span>
+</code></pre></div>
+<p><strong>Props:</strong>
+- <code>z</code> - Values for heatmap color intensity</p>
+<p><strong>Use for:</strong> 2D matrices (start time × end time, origin × destination)</p>
+<h3 id="faceting-small-multiples">Faceting (Small Multiples)<a class="headerlink" href="#faceting-small-multiples" title="Permanent link">&para;</a></h3>
+<p>Create separate charts for each category:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bar</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Auto</span><span class="nv"> </span><span class="s">Ownership</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">Income&quot;</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nt">props</span><span class="p">:</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span><span class="nt">dataset</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;auto_ownership_by_income.csv&quot;</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">    </span><span class="nt">x</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_vehicles&quot;</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">    </span><span class="nt">y</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;share&quot;</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">    </span><span class="nt">columns</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;dataset&quot;</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">    </span><span class="nt">facet</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;income_category_bin&quot;</span><span class="w">  </span><span class="c1"># One chart per income category</span>
+</code></pre></div>
+<p><strong>Result:</strong> 4 side-by-side charts (one per income quartile)</p>
+<h3 id="grouping">Grouping<a class="headerlink" href="#grouping" title="Permanent link">&para;</a></h3>
+<p>Stack or group bars by a dimension:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nt">props</span><span class="p">:</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nt">x</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;tour_purpose&quot;</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="nt">y</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;tours&quot;</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="nt">groupBy</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;tour_mode&quot;</span><span class="w">  </span><span class="c1"># Separate bars for each mode</span>
+</code></pre></div>
+<p><strong>Result:</strong> Grouped bars showing mode distribution for each purpose</p>
+<hr />
+<h2 id="customizing-charts">Customizing Charts<a class="headerlink" href="#customizing-charts" title="Permanent link">&para;</a></h2>
+<h3 id="adding-a-new-chart">Adding a New Chart<a class="headerlink" href="#adding-a-new-chart" title="Permanent link">&para;</a></h3>
+<p><strong>Step 1:</strong> Identify the summary CSV</p>
+<p>Example: <code>auto_ownership_by_county.csv</code></p>
+<p><strong>Step 2:</strong> Choose appropriate YAML file</p>
+<p>Example: <code>dashboard-households.yaml</code> (for household-related charts)</p>
+<p><strong>Step 3:</strong> Add chart configuration</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nt">layout</span><span class="p">:</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="nt">auto_ownership_by_county</span><span class="p">:</span><span class="w">  </span><span class="c1"># New section</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bar</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">      </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Vehicle</span><span class="nv"> </span><span class="s">Ownership</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">County&quot;</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">      </span><span class="nt">props</span><span class="p">:</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">        </span><span class="nt">dataset</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;auto_ownership_by_county.csv&quot;</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">        </span><span class="nt">x</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;county_name&quot;</span>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">        </span><span class="nt">y</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;share&quot;</span>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="w">        </span><span class="nt">groupBy</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_vehicles&quot;</span>
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="w">      </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Share</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">households</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">vehicle</span><span class="nv"> </span><span class="s">ownership</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">each</span><span class="nv"> </span><span class="s">county&quot;</span>
+</code></pre></div>
+<p><strong>Step 4:</strong> Reload dashboard</p>
+<p>Dashboard auto-reloads when YAML file changes (Streamlit watches for file changes).</p>
+<h3 id="creating-a-new-tab">Creating a New Tab<a class="headerlink" href="#creating-a-new-tab" title="Permanent link">&para;</a></h3>
+<p><strong>Step 1:</strong> Create new YAML file</p>
+<p>Example: <code>dashboard-network.yaml</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nt">header</span><span class="p">:</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="nt">tab</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Network&quot;</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Network</span><span class="nv"> </span><span class="s">Performance&quot;</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Highway</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">transit</span><span class="nv"> </span><span class="s">network</span><span class="nv"> </span><span class="s">statistics&quot;</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="nt">layout</span><span class="p">:</span>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">  </span><span class="nt">congestion</span><span class="p">:</span>
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">line</span>
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="w">      </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;VMT</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">Time</span><span class="nv"> </span><span class="s">Period&quot;</span>
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="w">      </span><span class="nt">props</span><span class="p">:</span>
+<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="w">        </span><span class="nt">dataset</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;vmt_by_period.csv&quot;</span>
+<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a><span class="w">        </span><span class="nt">x</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;time_period&quot;</span>
+<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a><span class="w">        </span><span class="nt">y</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;vmt&quot;</span>
+<a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a><span class="w">        </span><span class="nt">groupBy</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;dataset&quot;</span>
+</code></pre></div>
+<p><strong>Step 2:</strong> Update <code>dashboard_app.py</code></p>
+<p>Add to list of dashboard configurations (around line 500):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">dashboard_configs</span> <span class="o">=</span> <span class="p">[</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>    <span class="s1">&#39;dashboard-households.yaml&#39;</span><span class="p">,</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>    <span class="s1">&#39;dashboard-population.yaml&#39;</span><span class="p">,</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>    <span class="s1">&#39;dashboard-commute.yaml&#39;</span><span class="p">,</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>    <span class="s1">&#39;dashboard-activity-patterns.yaml&#39;</span><span class="p">,</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>    <span class="s1">&#39;dashboard-tours.yaml&#39;</span><span class="p">,</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>    <span class="s1">&#39;dashboard-trips.yaml&#39;</span><span class="p">,</span>
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>    <span class="s1">&#39;dashboard-time-of-day.yaml&#39;</span><span class="p">,</span>
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>    <span class="s1">&#39;dashboard-trip-characteristics.yaml&#39;</span><span class="p">,</span>
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>    <span class="s1">&#39;dashboard-network.yaml&#39;</span><span class="p">,</span>  <span class="c1"># NEW</span>
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="p">]</span>
+</code></pre></div>
+<p><strong>Step 3:</strong> Restart dashboard</p>
+<h3 id="customizing-colors">Customizing Colors<a class="headerlink" href="#customizing-colors" title="Permanent link">&para;</a></h3>
+<p>Dashboard uses <strong>MTC brand colors</strong> defined in <code>dashboard_app.py</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">MTC_COLORS</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>    <span class="s1">&#39;primary_blue&#39;</span><span class="p">:</span> <span class="s1">&#39;#003D7A&#39;</span><span class="p">,</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>    <span class="s1">&#39;teal&#39;</span><span class="p">:</span> <span class="s1">&#39;#00A19A&#39;</span><span class="p">,</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>    <span class="s1">&#39;orange&#39;</span><span class="p">:</span> <span class="s1">&#39;#ED8B00&#39;</span><span class="p">,</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>    <span class="s1">&#39;purple&#39;</span><span class="p">:</span> <span class="s1">&#39;#7A3F93&#39;</span><span class="p">,</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>    <span class="s1">&#39;green&#39;</span><span class="p">:</span> <span class="s1">&#39;#8CC63F&#39;</span><span class="p">,</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>    <span class="s1">&#39;red&#39;</span><span class="p">:</span> <span class="s1">&#39;#E31937&#39;</span><span class="p">,</span>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>To change:</strong> Edit color definitions in <code>dashboard_app.py</code> and reload.</p>
+<h3 id="customizing-chart-layout">Customizing Chart Layout<a class="headerlink" href="#customizing-chart-layout" title="Permanent link">&para;</a></h3>
+<p>Edit <code>PLOTLY_LAYOUT</code> in <code>dashboard_app.py</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">PLOTLY_LAYOUT</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>    <span class="s1">&#39;font&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;family&#39;</span><span class="p">:</span> <span class="s1">&#39;Inter, Arial, sans-serif&#39;</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">13</span><span class="p">},</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>    <span class="s1">&#39;plot_bgcolor&#39;</span><span class="p">:</span> <span class="s1">&#39;rgba(248, 249, 250, 0.3)&#39;</span><span class="p">,</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>    <span class="s1">&#39;paper_bgcolor&#39;</span><span class="p">:</span> <span class="s1">&#39;white&#39;</span><span class="p">,</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>    <span class="s1">&#39;margin&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mi">60</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="mi">70</span><span class="p">},</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Customizable:</strong>
+- Font family, size, color
+- Background colors
+- Margins
+- Hover behavior</p>
+<hr />
+<h2 id="example-configurations">Example Configurations<a class="headerlink" href="#example-configurations" title="Permanent link">&para;</a></h2>
+<h3 id="example-1-simple-bar-chart">Example 1: Simple Bar Chart<a class="headerlink" href="#example-1-simple-bar-chart" title="Permanent link">&para;</a></h3>
+<p><strong>Goal:</strong> Compare vehicle ownership across datasets</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bar</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">  </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Households</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">Vehicle</span><span class="nv"> </span><span class="s">Ownership&quot;</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">  </span><span class="nt">props</span><span class="p">:</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">    </span><span class="nt">dataset</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;auto_ownership_regional.csv&quot;</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">    </span><span class="nt">x</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_vehicles&quot;</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">    </span><span class="nt">y</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;share&quot;</span>
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="w">    </span><span class="nt">groupBy</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;dataset&quot;</span>
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Regional</span><span class="nv"> </span><span class="s">vehicle</span><span class="nv"> </span><span class="s">ownership</span><span class="nv"> </span><span class="s">distribution&quot;</span>
+</code></pre></div>
+<p><strong>Output:</strong> Grouped bars showing share for each vehicle count, grouped by dataset</p>
+<h3 id="example-2-faceted-comparison">Example 2: Faceted Comparison<a class="headerlink" href="#example-2-faceted-comparison" title="Permanent link">&para;</a></h3>
+<p><strong>Goal:</strong> Compare income quartiles side-by-side</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bar</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Auto</span><span class="nv"> </span><span class="s">Ownership</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">Income</span><span class="nv"> </span><span class="s">Category&quot;</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">  </span><span class="nt">props</span><span class="p">:</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">    </span><span class="nt">dataset</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;auto_ownership_by_income.csv&quot;</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">    </span><span class="nt">x</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_vehicles&quot;</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">    </span><span class="nt">y</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;share&quot;</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">    </span><span class="nt">columns</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;dataset&quot;</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="w">    </span><span class="nt">facet</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;income_category_bin&quot;</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Vehicle</span><span class="nv"> </span><span class="s">ownership</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">income</span><span class="nv"> </span><span class="s">quartile&quot;</span>
+</code></pre></div>
+<p><strong>Output:</strong> 4 charts (one per income category), each showing dataset comparison</p>
+<h3 id="example-3-model-vs-acs-comparison">Example 3: Model vs. ACS Comparison<a class="headerlink" href="#example-3-model-vs-acs-comparison" title="Permanent link">&para;</a></h3>
+<p><strong>Goal:</strong> Compare model to ACS observed data</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bar</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Auto</span><span class="nv"> </span><span class="s">Ownership</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">Household</span><span class="nv"> </span><span class="s">Size</span><span class="nv"> </span><span class="s">-</span><span class="nv"> </span><span class="s">Model</span><span class="nv"> </span><span class="s">vs</span><span class="nv"> </span><span class="s">ACS&quot;</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">  </span><span class="nt">props</span><span class="p">:</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">    </span><span class="nt">dataset</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;auto_ownership_by_household_size_acs.csv&quot;</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">    </span><span class="nt">x</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_persons_agg&quot;</span>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="w">    </span><span class="nt">y</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;share&quot;</span>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="w">    </span><span class="nt">columns</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_vehicles&quot;</span>
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="w">    </span><span class="nt">groupBy</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;dataset&quot;</span>
+<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="w">    </span><span class="nt">facet</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;dataset&quot;</span>
+<a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Vehicle</span><span class="nv"> </span><span class="s">ownership</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">household</span><span class="nv"> </span><span class="s">size</span><span class="nv"> </span><span class="s">-</span><span class="nv"> </span><span class="s">Model</span><span class="nv"> </span><span class="s">vs</span><span class="nv"> </span><span class="s">ACS</span><span class="nv"> </span><span class="s">2023&quot;</span>
+</code></pre></div>
+<p><strong>Output:</strong> Side-by-side charts comparing model runs to ACS data</p>
+<h3 id="example-4-heatmap-time-matrix">Example 4: Heatmap Time Matrix<a class="headerlink" href="#example-4-heatmap-time-matrix" title="Permanent link">&para;</a></h3>
+<p><strong>Goal:</strong> Visualize tour start/end time patterns</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">heatmap</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">  </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Tour</span><span class="nv"> </span><span class="s">Time-of-Day</span><span class="nv"> </span><span class="s">Matrix&quot;</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">  </span><span class="nt">props</span><span class="p">:</span>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="w">    </span><span class="nt">dataset</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;time_of_day_tours.csv&quot;</span>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="w">    </span><span class="nt">x</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;start_period&quot;</span>
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="w">    </span><span class="nt">y</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;end_period&quot;</span>
+<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="w">    </span><span class="nt">z</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;tours&quot;</span>
+<a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a><span class="w">    </span><span class="nt">groupBy</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;dataset&quot;</span>
+<a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a><span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Tours</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">departure</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">arrival</span><span class="nv"> </span><span class="s">time&quot;</span>
+</code></pre></div>
+<p><strong>Output:</strong> Heatmap showing tour volume by start time (x) and end time (y)</p>
+<hr />
+<h2 id="running-the-dashboard">Running the Dashboard<a class="headerlink" href="#running-the-dashboard" title="Permanent link">&para;</a></h2>
+<h3 id="local-development">Local Development<a class="headerlink" href="#local-development" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c"># From validation directory</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="nb">cd </span><span class="n">C</span><span class="p">:\</span><span class="n">GitHub</span><span class="p">\</span><span class="n">tm2py-utils</span><span class="p">\</span><span class="n">tm2py_utils</span><span class="p">\</span><span class="n">summary</span><span class="p">\</span><span class="n">validation</span>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="n">streamlit</span> <span class="n">run</span> <span class="n">dashboard</span><span class="p">/</span><span class="n">dashboard_app</span><span class="p">.</span><span class="n">py</span>
+</code></pre></div>
+<p><strong>Features:</strong>
+- Auto-reload on file changes
+- Debug mode shows errors in browser
+- Ctrl+C to stop</p>
+<h3 id="production-deployment">Production Deployment<a class="headerlink" href="#production-deployment" title="Permanent link">&para;</a></h3>
+<p>For hosting on a server:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>streamlit<span class="w"> </span>run<span class="w"> </span>dashboard/dashboard_app.py<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">  </span>--server.port<span class="w"> </span><span class="m">8501</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">  </span>--server.address<span class="w"> </span><span class="m">0</span>.0.0.0<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="w">  </span>--server.headless<span class="w"> </span><span class="nb">true</span>
+</code></pre></div>
+<p><strong>Options:</strong>
+- <code>--server.address 0.0.0.0</code> - Accept connections from any IP
+- <code>--server.headless true</code> - Run without opening browser
+- <code>--server.fileWatcherType none</code> - Disable file watching (saves resources)</p>
+<h3 id="using-docker">Using Docker<a class="headerlink" href="#using-docker" title="Permanent link">&para;</a></h3>
+<p>Create <code>Dockerfile</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="k">FROM</span><span class="w"> </span><span class="s">python:3.9-slim</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app</span>
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="k">COPY</span><span class="w"> </span>requirements.txt<span class="w"> </span>.
+<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="k">RUN</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>
+<a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="k">COPY</span><span class="w"> </span>tm2py_utils/<span class="w"> </span>./tm2py_utils/
+<a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a><span class="k">COPY</span><span class="w"> </span>outputs/dashboard/<span class="w"> </span>./outputs/dashboard/
+<a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a>
+<a id="__codelineno-23-10" name="__codelineno-23-10" href="#__codelineno-23-10"></a><span class="k">EXPOSE</span><span class="w"> </span><span class="s">8501</span>
+<a id="__codelineno-23-11" name="__codelineno-23-11" href="#__codelineno-23-11"></a>
+<a id="__codelineno-23-12" name="__codelineno-23-12" href="#__codelineno-23-12"></a><span class="k">CMD</span><span class="w"> </span><span class="o">[</span><span class="s2">&quot;streamlit&quot;</span>,<span class="w"> </span><span class="s2">&quot;run&quot;</span>,<span class="w"> </span><span class="s2">&quot;tm2py_utils/summary/validation/dashboard/dashboard_app.py&quot;</span>,<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-23-13" name="__codelineno-23-13" href="#__codelineno-23-13"></a><span class="w">     </span><span class="s2">&quot;--server.port=8501&quot;</span>,<span class="w"> </span><span class="s2">&quot;--server.address=0.0.0.0&quot;</span><span class="o">]</span>
+</code></pre></div>
+<p>Build and run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>tm2-dashboard<span class="w"> </span>.
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>docker<span class="w"> </span>run<span class="w"> </span>-p<span class="w"> </span><span class="m">8501</span>:8501<span class="w"> </span>tm2-dashboard
+</code></pre></div>
+<hr />
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<h3 id="port-already-in-use">Port Already in Use<a class="headerlink" href="#port-already-in-use" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>ERROR: Port 8501 is already in use
+</code></pre></div>
+<p><strong>Solution:</strong> Use a different port</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="n">streamlit</span> <span class="n">run</span> <span class="n">dashboard</span><span class="p">/</span><span class="n">dashboard_app</span><span class="p">.</span><span class="n">py</span> <span class="p">-</span><span class="n">-server</span><span class="p">.</span><span class="n">port</span> <span class="n">8503</span>
+</code></pre></div>
+<h3 id="csv-not-found">CSV Not Found<a class="headerlink" href="#csv-not-found" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>FileNotFoundError: auto_ownership_regional.csv
+</code></pre></div>
+<p><strong>Cause:</strong> Dashboard looks in <code>outputs/dashboard/</code> directory</p>
+<p><strong>Solutions:</strong>
+1. Run summary generation first
+2. Check <code>output_directory</code> in <code>validation_config.yaml</code>
+3. Verify CSV files exist in output directory</p>
+<h3 id="empty-charts">Empty Charts<a class="headerlink" href="#empty-charts" title="Permanent link">&para;</a></h3>
+<p><strong>Cause:</strong> CSV has no data or wrong column names</p>
+<p><strong>Solutions:</strong>
+1. Check CSV has data: <code>head auto_ownership_regional.csv</code>
+2. Verify column names match YAML <code>props</code> exactly
+3. Check for case sensitivity (<code>num_vehicles</code> ≠ <code>Num_Vehicles</code>)</p>
+<h3 id="module-not-found">Module Not Found<a class="headerlink" href="#module-not-found" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>ModuleNotFoundError: No module named &#39;streamlit&#39;
+</code></pre></div>
+<p><strong>Solution:</strong> Activate correct conda environment</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="n">conda</span> <span class="n">activate</span> <span class="n">tm2py-utils</span>
+</code></pre></div>
+<h3 id="encoding-errors">Encoding Errors<a class="headerlink" href="#encoding-errors" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>UnicodeDecodeError: &#39;charmap&#39; codec can&#39;t decode
+</code></pre></div>
+<p><strong>Fixed in code</strong> - dashboard_app.py uses <code>encoding='utf-8'</code> for YAML files</p>
+<hr />
+<h2 id="advanced-features">Advanced Features<a class="headerlink" href="#advanced-features" title="Permanent link">&para;</a></h2>
+<h3 id="filtering-by-dataset">Filtering by Dataset<a class="headerlink" href="#filtering-by-dataset" title="Permanent link">&para;</a></h3>
+<p>Dashboard includes sidebar filter:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="c1"># In dashboard_app.py</span>
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="n">datasets</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">multiselect</span><span class="p">(</span>
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>    <span class="s2">&quot;Select Datasets&quot;</span><span class="p">,</span>
+<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a>    <span class="n">options</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;dataset&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">(),</span>
+<a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a>    <span class="n">default</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;dataset&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+<a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a><span class="p">)</span>
+</code></pre></div>
+<p>Users can toggle datasets on/off to focus comparisons.</p>
+<h3 id="exporting-charts">Exporting Charts<a class="headerlink" href="#exporting-charts" title="Permanent link">&para;</a></h3>
+<p>Plotly charts include built-in export:
+- Hover over chart
+- Click camera icon
+- Save as PNG</p>
+<h3 id="custom-variable-labels">Custom Variable Labels<a class="headerlink" href="#custom-variable-labels" title="Permanent link">&para;</a></h3>
+<p>Edit <code>data_model/variable_labels.yaml</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="nt">num_vehicles</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Number</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">Vehicles&quot;</span>
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="nt">num_persons</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Household</span><span class="nv"> </span><span class="s">Size&quot;</span>
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="nt">tour_mode</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Tour</span><span class="nv"> </span><span class="s">Mode&quot;</span>
+</code></pre></div>
+<p>Dashboard uses these labels for axis titles and legends.</p>
+<h3 id="categorical-ordering">Categorical Ordering<a class="headerlink" href="#categorical-ordering" title="Permanent link">&para;</a></h3>
+<p>Control order of categorical variables:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="nt">categorical_order</span><span class="p">:</span>
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="w">  </span><span class="nt">tour_purpose</span><span class="p">:</span>
+<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Work</span>
+<a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">School</span>
+<a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">University</span>
+<a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Shop</span>
+<a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Discretionary</span>
+<a id="__codelineno-33-8" name="__codelineno-33-8" href="#__codelineno-33-8"></a><span class="w">  </span><span class="nt">income_category_bin</span><span class="p">:</span>
+<a id="__codelineno-33-9" name="__codelineno-33-9" href="#__codelineno-33-9"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;30K</span>
+<a id="__codelineno-33-10" name="__codelineno-33-10" href="#__codelineno-33-10"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30-60K</span>
+<a id="__codelineno-33-11" name="__codelineno-33-11" href="#__codelineno-33-11"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">60-100K</span>
+<a id="__codelineno-33-12" name="__codelineno-33-12" href="#__codelineno-33-12"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100-150K</span>
+<a id="__codelineno-33-13" name="__codelineno-33-13" href="#__codelineno-33-13"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">150K+</span>
+</code></pre></div>
+<p>Charts display categories in this order (not alphabetical).</p>
+<hr />
+<h2 id="performance-optimization">Performance Optimization<a class="headerlink" href="#performance-optimization" title="Permanent link">&para;</a></h2>
+<h3 id="large-datasets">Large Datasets<a class="headerlink" href="#large-datasets" title="Permanent link">&para;</a></h3>
+<p>For very large CSVs (&gt;100MB):</p>
+<p><strong>Option 1:</strong> Filter in query</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="c1"># In dashboard_app.py</span>
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">csv_path</span><span class="p">)</span>
+<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;county&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">selected_county</span><span class="p">]</span>  <span class="c1"># Filter before plotting</span>
+</code></pre></div>
+<p><strong>Option 2:</strong> Use Parquet instead of CSV</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="c1"># Convert CSV to Parquet</span>
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;large_summary.csv&#39;</span><span class="p">)</span>
+<a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a><span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="s1">&#39;large_summary.parquet&#39;</span><span class="p">)</span>
+<a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a>
+<a id="__codelineno-35-5" name="__codelineno-35-5" href="#__codelineno-35-5"></a><span class="c1"># Load in dashboard</span>
+<a id="__codelineno-35-6" name="__codelineno-35-6" href="#__codelineno-35-6"></a><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="s1">&#39;large_summary.parquet&#39;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="caching">Caching<a class="headerlink" href="#caching" title="Permanent link">&para;</a></h3>
+<p>Streamlit caches data automatically. For explicit caching:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="nd">@st</span><span class="o">.</span><span class="n">cache_data</span>
+<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">load_large_dataset</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h2 id="alternative-visualization-tools">Alternative Visualization Tools<a class="headerlink" href="#alternative-visualization-tools" title="Permanent link">&para;</a></h2>
+<p>While the system provides a Streamlit dashboard, <strong>summary CSVs can be used with any BI tool:</strong></p>
+<h3 id="tableau">Tableau<a class="headerlink" href="#tableau" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Load combined CSVs as data sources</li>
+<li>Use <code>dataset</code> column for filtering</li>
+<li>Create calculated fields for custom metrics</li>
+</ol>
+<h3 id="power-bi">Power BI<a class="headerlink" href="#power-bi" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Import CSVs via "Get Data" → "Text/CSV"</li>
+<li>Use <code>dataset</code> as slicer</li>
+<li>Create measures with DAX</li>
+</ol>
+<h3 id="r-shiny">R Shiny<a class="headerlink" href="#r-shiny" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="nf">library</span><span class="p">(</span><span class="n">shiny</span><span class="p">)</span>
+<a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a><span class="nf">library</span><span class="p">(</span><span class="n">ggplot2</span><span class="p">)</span>
+<a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a>
+<a id="__codelineno-37-4" name="__codelineno-37-4" href="#__codelineno-37-4"></a><span class="n">data</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">read.csv</span><span class="p">(</span><span class="s">&quot;auto_ownership_regional.csv&quot;</span><span class="p">)</span>
+<a id="__codelineno-37-5" name="__codelineno-37-5" href="#__codelineno-37-5"></a>
+<a id="__codelineno-37-6" name="__codelineno-37-6" href="#__codelineno-37-6"></a><span class="n">ui</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">fluidPage</span><span class="p">(</span>
+<a id="__codelineno-37-7" name="__codelineno-37-7" href="#__codelineno-37-7"></a><span class="w">  </span><span class="nf">selectInput</span><span class="p">(</span><span class="s">&quot;dataset&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Dataset&quot;</span><span class="p">,</span><span class="w"> </span><span class="nf">unique</span><span class="p">(</span><span class="n">data</span><span class="o">$</span><span class="n">dataset</span><span class="p">)),</span>
+<a id="__codelineno-37-8" name="__codelineno-37-8" href="#__codelineno-37-8"></a><span class="w">  </span><span class="nf">plotOutput</span><span class="p">(</span><span class="s">&quot;plot&quot;</span><span class="p">)</span>
+<a id="__codelineno-37-9" name="__codelineno-37-9" href="#__codelineno-37-9"></a><span class="p">)</span>
+<a id="__codelineno-37-10" name="__codelineno-37-10" href="#__codelineno-37-10"></a>
+<a id="__codelineno-37-11" name="__codelineno-37-11" href="#__codelineno-37-11"></a><span class="n">server</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="n">output</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-37-12" name="__codelineno-37-12" href="#__codelineno-37-12"></a><span class="w">  </span><span class="n">output</span><span class="o">$</span><span class="n">plot</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">renderPlot</span><span class="p">({</span>
+<a id="__codelineno-37-13" name="__codelineno-37-13" href="#__codelineno-37-13"></a><span class="w">    </span><span class="n">filtered</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">$</span><span class="n">dataset</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">input</span><span class="o">$</span><span class="n">dataset</span><span class="p">,]</span>
+<a id="__codelineno-37-14" name="__codelineno-37-14" href="#__codelineno-37-14"></a><span class="w">    </span><span class="nf">ggplot</span><span class="p">(</span><span class="n">filtered</span><span class="p">,</span><span class="w"> </span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">num_vehicles</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">=</span><span class="n">share</span><span class="p">))</span><span class="w"> </span><span class="o">+</span>
+<a id="__codelineno-37-15" name="__codelineno-37-15" href="#__codelineno-37-15"></a><span class="w">      </span><span class="nf">geom_bar</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s">&quot;identity&quot;</span><span class="p">)</span>
+<a id="__codelineno-37-16" name="__codelineno-37-16" href="#__codelineno-37-16"></a><span class="w">  </span><span class="p">})</span>
+<a id="__codelineno-37-17" name="__codelineno-37-17" href="#__codelineno-37-17"></a><span class="p">}</span>
+<a id="__codelineno-37-18" name="__codelineno-37-18" href="#__codelineno-37-18"></a>
+<a id="__codelineno-37-19" name="__codelineno-37-19" href="#__codelineno-37-19"></a><span class="nf">shinyApp</span><span class="p">(</span><span class="n">ui</span><span class="p">,</span><span class="w"> </span><span class="n">server</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="observable">Observable<a class="headerlink" href="#observable" title="Permanent link">&para;</a></h3>
+<p>Upload CSVs to Observable and create interactive notebooks with D3.js.</p>
+<hr />
+<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong><a href="../generate-summaries/">Generate Summaries</a></strong> - Create summary CSVs for dashboard</li>
+<li><strong><a href="../custom-summaries/">Custom Summaries</a></strong> - Define new summaries to visualize</li>
+<li><strong><a href="../external-data/">External Data Integration</a></strong> - Add ACS/CTPP comparisons</li>
+<li><strong><a href="../validation-system/">Validation System Overview</a></strong> - Return to main guide</li>
+</ul>
+<hr />
+<h2 id="resources">Resources<a class="headerlink" href="#resources" title="Permanent link">&para;</a></h2>
+<p><strong>Streamlit Documentation:</strong>
+- https://docs.streamlit.io/
+- https://docs.streamlit.io/library/api-reference</p>
+<p><strong>Plotly Documentation:</strong>
+- https://plotly.com/python/
+- https://plotly.com/python/bar-charts/
+- https://plotly.com/python/facet-plots/</p>
+<p><strong>Example Dashboards:</strong>
+- Streamlit Gallery: https://streamlit.io/gallery
+- Plotly Examples: https://plotly.com/python/</p>
+<hr />
+<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
+<p><strong>To launch dashboard:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="n">conda</span> <span class="n">activate</span> <span class="n">tm2py-utils</span>
+<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="nb">cd </span><span class="n">C</span><span class="p">:\</span><span class="n">GitHub</span><span class="p">\</span><span class="n">tm2py-utils</span><span class="p">\</span><span class="n">tm2py_utils</span><span class="p">\</span><span class="n">summary</span><span class="p">\</span><span class="n">validation</span>
+<a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a><span class="n">streamlit</span> <span class="n">run</span> <span class="n">dashboard</span><span class="p">/</span><span class="n">dashboard_app</span><span class="p">.</span><span class="n">py</span>
+</code></pre></div></p>
+<p><strong>To customize:</strong>
+1. Edit YAML files in <code>dashboard/</code> directory
+2. Dashboard auto-reloads on save
+3. Add new tabs by creating new YAML files</p>
+<p><strong>Key files:</strong>
+- <code>dashboard_app.py</code> - Main application
+- <code>dashboard-*.yaml</code> - Chart configurations
+- <code>outputs/dashboard/*.csv</code> - Data files</p>
+<p>The dashboard is <strong>fully configurable via YAML</strong> - no Python coding required for most customizations.</p>
+
+
+
+
+
+
+
+  
+    
+  
+  
+    
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="December 11, 2025 17:42:55 UTC">December 11, 2025</span>
+  </span>
+
+    
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Created">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="December 11, 2025 17:42:55 UTC">December 11, 2025</span>
+  </span>
+
+    
+    
+    
+  </aside>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/BayAreaMetro/tm2py-utils" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://bayareametro.gov" target="_blank" rel="noopener" title="bayareametro.gov" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M351.9 280H161c2.9 64.5 17.2 123.9 37.5 167.4 11.4 24.5 23.7 41.8 35.1 52.4 11.2 10.5 18.9 12.2 22.9 12.2s11.7-1.7 22.9-12.2c11.4-10.6 23.7-28 35.1-52.4 20.3-43.5 34.6-102.9 37.5-167.4zm-191-48h190.9c-2.8-64.5-17.1-123.9-37.4-167.4-11.4-24.4-23.7-41.8-35.1-52.4C268.1 1.7 260.4 0 256.4 0s-11.7 1.7-22.9 12.2c-11.4 10.6-23.7 28-35.1 52.4-20.3 43.5-34.6 102.9-37.5 167.4m-48 0c3.5-85.6 25.6-165.1 57.9-217.3C78.7 47.3 10.9 131.2 1.5 232zM1.5 280c9.4 100.8 77.2 184.7 169.3 217.3-32.3-52.2-54.4-131.7-57.9-217.3zm398.4 0c-3.5 85.6-25.6 165.1-57.9 217.3 92.1-32.7 159.9-116.5 169.3-217.3zm111.4-48C501.9 131.2 434.1 47.3 342 14.7c32.3 52.2 54.4 131.7 57.9 217.3z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+    
+  </body>
+</html>
