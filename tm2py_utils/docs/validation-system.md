@@ -94,6 +94,7 @@ The validation summary system is a **data aggregation and comparison pipeline** 
 
 **Development:**
 - **[Development Tasks & Next Steps](validation-development.md)** - Ongoing work: data model updates, survey formatting, CTPP integration
+- **[Code Flow and Execution Guide](code-flow.md)** - Detailed technical documentation for developers
 
 ### Pre-Configured Summaries
 

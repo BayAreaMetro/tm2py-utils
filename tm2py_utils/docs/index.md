@@ -56,6 +56,12 @@ View the live dashboard: [https://tm2-dashboard.streamlit.app/](https://tm2-dash
 - Dashboard visualization
 - Deployment options
 
+**👨‍💻 Developer?** See **[Code Flow and Execution Guide](code-flow.md)** for detailed technical documentation on:
+- How code executes from configuration to outputs
+- Class architecture and processing pipeline
+- Function call hierarchy and data transformations
+- Performance optimization and error handling
+
 ## Key Features
 
 ### 📊 Validation Dashboard
