@@ -113,7 +113,9 @@ See **[Development Tasks & Next Steps](validation-development.md)** for ongoing 
 - Fixing broken summaries and adding new validation targets
 - Integrating CTPP journey-to-work data
 
-For detailed technical documentation on how the system works, see **[Code Flow and Execution Guide](code-flow.md)**
+### Code Flow
+
+For developers who want to understand how the validation system executes from configuration files to final outputs, see the **[Code Flow and Execution Guide](code-flow.md)** for detailed technical documentation including class architecture, data processing pipelines, and visual execution diagrams.
 
 ## Quick Start
 
