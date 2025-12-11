@@ -17,8 +17,59 @@ input_directories:
     description: "2015 TM2.2 Development Sprint 04"
     iteration: 1  # Use iteration 1 files
 
+# Population synthesizer summary inputs (external)
+# These are pre-generated summaries from PopulationSim that will be copied to the dashboard
+popsyn_summaries:
+  source_directory: "C:\\GitHub\\populationsim\\bay_area\\output_2023\\aggregate_summaries"
+  copy_files: false  # Set to true to copy popsyn files during summary generation
+  # Files to copy from PopulationSim output to dashboard (only copied if copy_files is true)
+  files:
+    - "household_size_regional.csv"
+    - "households_by_county.csv"
+    - "households_by_income.csv"
+    - "households_by_workers.csv"
+    - "persons_by_age.csv"
+
+# ACS observed data (external)
+# Pre-generated summaries from ACS data to compare against model outputs
+# Run process_acs_household_vehicle.py first to generate these files from raw ACS data
+acs_summaries:
+  source_directory: "C:\\GitHub\\populationsim\\bay_area\\output_2023\\aggregate_summaries"
+  copy_files: false  # Set to true to copy ACS observed data files during summary generation
+  # Files to copy (should contain actual ACS observed data with dataset="ACS 2023")
+  files:
+    - "household_size_acs.csv"
+    - "households_by_income_acs.csv"
+    - "households_by_workers_acs.csv"
+    - "households_by_county_acs.csv"
+    - "persons_by_age_acs.csv"
+
+# Observed summary data sources (pre-aggregated survey/ACS data)
+# These are loaded and merged with model summaries for comparison
+observed_summaries:
+  - name: "acs_2023"
+    display_name: "ACS 2023"
+    summaries:
+      # Auto ownership by household size - matches auto_ownership_by_household_size_acs model summary
+      auto_ownership_by_household_size_acs:
+        file: "C:\\GitHub\\tm2py-utils\\tm2py_utils\\summary\\validation\\outputs\\observed\\acs_auto_ownership_by_household_size_regional.csv"
+        columns:
+          num_persons_agg: "num_persons"  # Map ACS 'num_persons' to model 'num_persons_agg'
+          num_vehicles: "num_vehicles"
+          households: "households"
+          share: "share"
+      # County-level auto ownership - matches auto_ownership_by_household_size_county model summary
+      auto_ownership_by_household_size_county:
+        file: "C:\\GitHub\\tm2py-utils\\tm2py_utils\\summary\\validation\\outputs\\observed\\acs_auto_ownership_by_household_size_county.csv"
+        columns:
+          county: "county"  # County name (both model and ACS use 'county')
+          num_persons_agg: "num_persons"
+          num_vehicles: "num_vehicles"
+          households: "households"
+          share: "share"
+
 # Output location
-output_directory: "C:\\GitHub\\tm2py-utils\\tm2py_utils\\summary\\validation"
+output_directory: "C:\\GitHub\\tm2py-utils\\tm2py_utils\\summary\\validation\\outputs\\dashboard"
 
 # Summary generation settings
 summary_config:
@@ -38,6 +89,24 @@ summary_config:
   
   # Comparison mode
   comparison_mode: "scenario_vs_scenario"  # or "model_vs_survey"
+
+# Aggregation specifications for categorical variables
+# Maps detailed categories to broader groups for comparison (e.g., with ACS/survey data)
+aggregation_specs:
+  # Household size aggregation - maps 4+ persons to single category to match ACS
+  num_persons_agg:
+    apply_to: ["num_persons"]
+    mapping:
+      1: 1
+      2: 2
+      3: 3
+      4: 4
+      5: 4
+      6: 4
+      7: 4
+      8: 4
+      9: 4
+      10: 4
 
 # Binning configuration for continuous variables
 # Automatically converts numeric values to categorical bins for analysis
@@ -71,6 +140,184 @@ binning_specs:
   worker_age:
     bins: [0, 25, 35, 45, 55, 65, 120]
     labels: ['<25', '25-34', '35-44', '45-54', '55-64', '65+']
+
+# Summary definitions - all summaries to generate
+summaries:
+  # Auto ownership summaries (replacing household_summary.py)
+  - name: "auto_ownership_regional"
+    description: "Regional vehicle ownership distribution"
+    data_source: "households"
+    group_by: "num_vehicles"
+    weight_field: "sample_rate"
+    count_name: "households"
+  
+  - name: "auto_ownership_by_income"
+    description: "Vehicle ownership by household income"
+    data_source: "households"
+    group_by: ["income_category_bin", "num_vehicles"]
+    weight_field: "sample_rate"
+    count_name: "households"
+    share_within: "income_category_bin"
+  
+  - name: "auto_ownership_by_household_size"
+    description: "Vehicle ownership by household size"
+    data_source: "households"
+    group_by: ["num_persons", "num_vehicles"]
+    weight_field: "sample_rate"
+    count_name: "households"
+    share_within: "num_persons"
+  
+  - name: "auto_ownership_by_household_size_acs"
+    description: "Vehicle ownership by household size (ACS categories)"
+    data_source: "households"
+    group_by: ["num_persons_agg", "num_vehicles"]
+    weight_field: "sample_rate"
+    count_name: "households"
+    share_within: "num_persons_agg"
+  
+  - name: "auto_ownership_by_household_size_county"
+    description: "Vehicle ownership by household size and county (ACS categories)"
+    data_source: "households"
+    group_by: ["county", "num_persons_agg", "num_vehicles"]
+    weight_field: "sample_rate"
+    count_name: "households"
+    share_within: ["county", "num_persons_agg"]
+  
+  - name: "auto_ownership_by_county"
+    description: "Vehicle ownership by county"
+    data_source: "households"
+    group_by: ["county_name", "num_vehicles"]
+    weight_field: "sample_rate"
+    count_name: "households"
+    share_within: "county_name"
+  
+  # Person/CDAP summaries
+  - name: "cdap_by_person_type"
+    description: "Daily activity pattern by person type"
+    data_source: "persons"
+    group_by: ["person_type", "cdap"]
+    weight_field: "sample_rate"
+    count_name: "persons"
+    share_within: "person_type"
+  
+  - name: "cdap_by_share"
+    description: "Daily activity pattern regional shares"
+    data_source: "persons"
+    group_by: "cdap"
+    weight_field: "sample_rate"
+    count_name: "persons"
+  
+  # Tour summaries (replacing tour_summary.py)
+  - name: "tour_frequency_by_purpose"
+    description: "Tour frequency by purpose"
+    data_source: "individual_tours"
+    group_by: "tour_purpose"
+    weight_field: "sample_rate"
+    count_name: "tours"
+  
+  - name: "tour_mode_choice"
+    description: "Tour mode choice distribution"
+    data_source: "individual_tours"
+    group_by: "tour_mode"
+    weight_field: "sample_rate"
+    count_name: "tours"
+  
+  - name: "tour_mode_choice_aggregated"
+    description: "Tour mode choice (aggregated categories)"
+    data_source: "individual_tours"
+    group_by: "tour_mode_agg"
+    weight_field: "sample_rate"
+    count_name: "tours"
+  
+  - name: "tour_mode_by_purpose"
+    description: "Tour mode by purpose cross-tabulation"
+    data_source: "individual_tours"
+    group_by: ["tour_purpose", "tour_mode"]
+    weight_field: "sample_rate"
+    count_name: "tours"
+    share_within: "tour_purpose"
+  
+  - name: "tour_mode_by_purpose_aggregated"
+    description: "Tour mode by purpose (aggregated modes)"
+    data_source: "individual_tours"
+    group_by: ["tour_purpose", "tour_mode_agg"]
+    weight_field: "sample_rate"
+    count_name: "tours"
+    share_within: "tour_purpose"
+  
+  - name: "tour_start_time"
+    description: "Tour start time distribution"
+    data_source: "individual_tours"
+    group_by: "start_period"
+    weight_field: "sample_rate"
+    count_name: "tours"
+  
+  - name: "tour_end_time"
+    description: "Tour end time distribution"
+    data_source: "individual_tours"
+    group_by: "end_period"
+    weight_field: "sample_rate"
+    count_name: "tours"
+  
+  - name: "time_of_day_tours"
+    description: "Tour time-of-day matrix"
+    data_source: "individual_tours"
+    group_by: ["start_period", "end_period"]
+    weight_field: "sample_rate"
+    count_name: "tours"
+    calculate_share: false
+  
+  - name: "tour_distance"
+    description: "Tour distance distribution (binned)"
+    data_source: "individual_tours"
+    group_by: "tour_distance_bin"
+    weight_field: "sample_rate"
+    count_name: "tours"
+  
+  # Trip summaries (replacing trip_summary.py)
+  - name: "trip_purpose"
+    description: "Trip purpose distribution"
+    data_source: "individual_trips"
+    group_by: "destination_purpose"
+    weight_field: "sample_rate"
+    count_name: "trips"
+  
+  - name: "trip_mode_choice"
+    description: "Trip mode choice distribution"
+    data_source: "individual_trips"
+    group_by: "trip_mode"
+    weight_field: "sample_rate"
+    count_name: "trips"
+  
+  - name: "trip_mode_choice_aggregated"
+    description: "Trip mode choice (aggregated categories)"
+    data_source: "individual_trips"
+    group_by: "trip_mode_agg"
+    weight_field: "sample_rate"
+    count_name: "trips"
+  
+  - name: "trip_mode_by_purpose"
+    description: "Trip mode by purpose cross-tabulation"
+    data_source: "individual_trips"
+    group_by: ["destination_purpose", "trip_mode"]
+    weight_field: "sample_rate"
+    count_name: "trips"
+    share_within: "destination_purpose"
+  
+  - name: "trip_mode_by_purpose_aggregated"
+    description: "Trip mode by purpose (aggregated modes)"
+    data_source: "individual_trips"
+    group_by: ["destination_purpose", "trip_mode_agg"]
+    weight_field: "sample_rate"
+    count_name: "trips"
+    share_within: "destination_purpose"
+  
+  - name: "trip_distance"
+    description: "Trip distance distribution (binned)"
+    data_source: "individual_trips"
+    group_by: "trip_distance_bin"
+    weight_field: "sample_rate"
+    count_name: "trips"
 
 # File specifications (optional - defaults will be used if not specified)
 # Note: System will automatically find highest iteration number (e.g., _1.csv, _2.csv, etc.)

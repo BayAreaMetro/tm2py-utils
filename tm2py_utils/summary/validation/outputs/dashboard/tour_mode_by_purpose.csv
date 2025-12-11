@@ -141,153 +141,144 @@ Work-Based,TAXI - Taxi,100.0,0.030543677458766037,2023 TM2.2 v05
 Work-Based,TNC - Transportation Network Company,4300.0,1.3133781307269394,2023 TM2.2 v05
 Work-Based,WALK - Walk,97500.0,29.780085522296883,2023 TM2.2 v05
 Work-Based,WLK_TRN - Walk to Transit,21300.0,6.505803298717165,2023 TM2.2 v05
-Discretionary,BIKE - Bicycle,29040.0,3.5679182229211714,2015 TM2.2 Sprint 04
-Discretionary,KNRPRV_TRN - Kiss-and-Ride Private to Transit,4480.0,0.550422645960291,2015 TM2.2 Sprint 04
-Discretionary,KNRTNC_TRN - Kiss-and-Ride TNC to Transit,600.0,0.07371731865539612,2015 TM2.2 Sprint 04
-Discretionary,PNR_TRN - Park-and-Ride to Transit,7560.0,0.9288382150579909,2015 TM2.2 Sprint 04
-Discretionary,SOV_GP - Single Occupant Vehicle (General Purpose),249700.0,30.67869078042068,2015 TM2.2 Sprint 04
-Discretionary,SOV_PAY - Single Occupant Vehicle (Express/Toll),60.0,0.007371731865539611,2015 TM2.2 Sprint 04
-Discretionary,SR2_GP - Shared Ride 2 (General Purpose),152260.0,18.706998230784354,2015 TM2.2 Sprint 04
-Discretionary,SR2_HOV - Shared Ride 2 (HOV Lanes),17680.0,2.1722036563790055,2015 TM2.2 Sprint 04
-Discretionary,SR2_PAY - Shared Ride 2 (Express/Toll),60.0,0.007371731865539611,2015 TM2.2 Sprint 04
-Discretionary,SR3_GP - Shared Ride 3+ (General Purpose),112740.0,13.85148417534893,2015 TM2.2 Sprint 04
-Discretionary,SR3_HOV - Shared Ride 3+ (HOV Lanes),13440.0,1.651267937880873,2015 TM2.2 Sprint 04
-Discretionary,SR3_PAY - Shared Ride 3+ (Express/Toll),200.0,0.024572439551798702,2015 TM2.2 Sprint 04
-Discretionary,TAXI - Taxi,860.0,0.10566149007273443,2015 TM2.2 Sprint 04
-Discretionary,TNC - Transportation Network Company,4540.0,0.5577943778258305,2015 TM2.2 Sprint 04
-Discretionary,WALK - Walk,162960.0,20.021623746805584,2015 TM2.2 Sprint 04
-Discretionary,WLK_TRN - Walk to Transit,57740.0,7.094063298604285,2015 TM2.2 Sprint 04
-Eating Out,BIKE - Bicycle,2180.0,2.356247297881539,2015 TM2.2 Sprint 04
-Eating Out,KNRPRV_TRN - Kiss-and-Ride Private to Transit,480.0,0.5188067444876783,2015 TM2.2 Sprint 04
-Eating Out,KNRTNC_TRN - Kiss-and-Ride TNC to Transit,80.0,0.08646779074794639,2015 TM2.2 Sprint 04
-Eating Out,PNR_TRN - Park-and-Ride to Transit,820.0,0.8862948551664505,2015 TM2.2 Sprint 04
-Eating Out,SOV_GP - Single Occupant Vehicle (General Purpose),33860.0,36.59749243406831,2015 TM2.2 Sprint 04
-Eating Out,SOV_PAY - Single Occupant Vehicle (Express/Toll),40.0,0.043233895373973194,2015 TM2.2 Sprint 04
-Eating Out,SR2_GP - Shared Ride 2 (General Purpose),16540.0,17.877215737137917,2015 TM2.2 Sprint 04
-Eating Out,SR2_HOV - Shared Ride 2 (HOV Lanes),1500.0,1.621271076523995,2015 TM2.2 Sprint 04
-Eating Out,SR3_GP - Shared Ride 3+ (General Purpose),11060.0,11.954172070903589,2015 TM2.2 Sprint 04
-Eating Out,SR3_HOV - Shared Ride 3+ (HOV Lanes),1040.0,1.124081279723303,2015 TM2.2 Sprint 04
-Eating Out,TAXI - Taxi,60.0,0.06485084306095978,2015 TM2.2 Sprint 04
-Eating Out,TNC - Transportation Network Company,560.0,0.6052745352356248,2015 TM2.2 Sprint 04
-Eating Out,WALK - Walk,16820.0,18.179853004755728,2015 TM2.2 Sprint 04
-Eating Out,WLK_TRN - Walk to Transit,7480.0,8.084738434932987,2015 TM2.2 Sprint 04
-Escort,BIKE - Bicycle,7040.0,0.7556242486690709,2015 TM2.2 Sprint 04
-Escort,PNR_TRN - Park-and-Ride to Transit,40.0,0.00429331959471063,2015 TM2.2 Sprint 04
-Escort,SOV_GP - Single Occupant Vehicle (General Purpose),163820.0,17.583290400137386,2015 TM2.2 Sprint 04
-Escort,SOV_PAY - Single Occupant Vehicle (Express/Toll),60.0,0.006439979392065946,2015 TM2.2 Sprint 04
-Escort,SR2_GP - Shared Ride 2 (General Purpose),296320.0,31.80491155761635,2015 TM2.2 Sprint 04
-Escort,SR2_HOV - Shared Ride 2 (HOV Lanes),14120.0,1.5155418169328525,2015 TM2.2 Sprint 04
-Escort,SR2_PAY - Shared Ride 2 (Express/Toll),60.0,0.006439979392065946,2015 TM2.2 Sprint 04
-Escort,SR3_GP - Shared Ride 3+ (General Purpose),308700.0,33.13369397217929,2015 TM2.2 Sprint 04
-Escort,SR3_HOV - Shared Ride 3+ (HOV Lanes),11460.0,1.2300360638845955,2015 TM2.2 Sprint 04
-Escort,SR3_PAY - Shared Ride 3+ (Express/Toll),40.0,0.00429331959471063,2015 TM2.2 Sprint 04
-Escort,TAXI - Taxi,4480.0,0.4808517946075906,2015 TM2.2 Sprint 04
-Escort,TNC - Transportation Network Company,17240.0,1.8504207453202817,2015 TM2.2 Sprint 04
-Escort,WALK - Walk,107020.0,11.48677657564829,2015 TM2.2 Sprint 04
-Escort,WLK_TRN - Walk to Transit,1280.0,0.13738622703074016,2015 TM2.2 Sprint 04
-Maintenance,BIKE - Bicycle,16340.0,1.616285510801614,2015 TM2.2 Sprint 04
-Maintenance,KNRPRV_TRN - Kiss-and-Ride Private to Transit,6400.0,0.6330616443776212,2015 TM2.2 Sprint 04
-Maintenance,KNRTNC_TRN - Kiss-and-Ride TNC to Transit,1260.0,0.12463401123684419,2015 TM2.2 Sprint 04
-Maintenance,PNR_TRN - Park-and-Ride to Transit,11180.0,1.1058795600221571,2015 TM2.2 Sprint 04
-Maintenance,SOV_GP - Single Occupant Vehicle (General Purpose),236440.0,23.387671124475744,2015 TM2.2 Sprint 04
-Maintenance,SOV_PAY - Single Occupant Vehicle (Express/Toll),140.0,0.013848223470760467,2015 TM2.2 Sprint 04
-Maintenance,SR2_GP - Shared Ride 2 (General Purpose),289020.0,28.588668196565642,2015 TM2.2 Sprint 04
-Maintenance,SR2_HOV - Shared Ride 2 (HOV Lanes),25320.0,2.504550130568964,2015 TM2.2 Sprint 04
-Maintenance,SR2_PAY - Shared Ride 2 (Express/Toll),60.0,0.0059349529160402,2015 TM2.2 Sprint 04
-Maintenance,SR3_GP - Shared Ride 3+ (General Purpose),188480.0,18.643665426920947,2015 TM2.2 Sprint 04
-Maintenance,SR3_HOV - Shared Ride 3+ (HOV Lanes),16260.0,1.608372240246894,2015 TM2.2 Sprint 04
-Maintenance,SR3_PAY - Shared Ride 3+ (Express/Toll),60.0,0.0059349529160402,2015 TM2.2 Sprint 04
-Maintenance,TAXI - Taxi,3180.0,0.31455250455013056,2015 TM2.2 Sprint 04
-Maintenance,TNC - Transportation Network Company,13600.0,1.3452559943024451,2015 TM2.2 Sprint 04
-Maintenance,WALK - Walk,138140.0,13.66423993036322,2015 TM2.2 Sprint 04
-Maintenance,WLK_TRN - Walk to Transit,65080.0,6.437445596264936,2015 TM2.2 Sprint 04
-School,BIKE - Bicycle,28400.0,2.3743834127581307,2015 TM2.2 Sprint 04
-School,KNRPRV_TRN - Kiss-and-Ride Private to Transit,1400.0,0.11704706964300643,2015 TM2.2 Sprint 04
-School,KNRTNC_TRN - Kiss-and-Ride TNC to Transit,880.0,0.07357244377560405,2015 TM2.2 Sprint 04
-School,PNR_TRN - Park-and-Ride to Transit,400.0,0.033442019898001836,2015 TM2.2 Sprint 04
-School,SCHLBUS - School Bus,85380.0,7.138199147228493,2015 TM2.2 Sprint 04
-School,SOV_GP - Single Occupant Vehicle (General Purpose),7500.0,0.6270378730875344,2015 TM2.2 Sprint 04
-School,SOV_PAY - Single Occupant Vehicle (Express/Toll),20.0,0.0016721009949000921,2015 TM2.2 Sprint 04
-School,SR2_GP - Shared Ride 2 (General Purpose),212240.0,17.744335757879774,2015 TM2.2 Sprint 04
-School,SR2_HOV - Shared Ride 2 (HOV Lanes),13740.0,1.1487333834963631,2015 TM2.2 Sprint 04
-School,SR2_PAY - Shared Ride 2 (Express/Toll),100.0,0.008360504974500459,2015 TM2.2 Sprint 04
-School,SR3_GP - Shared Ride 3+ (General Purpose),622460.0,52.04079926427556,2015 TM2.2 Sprint 04
-School,SR3_HOV - Shared Ride 3+ (HOV Lanes),40460.0,3.3826603126828863,2015 TM2.2 Sprint 04
-School,SR3_PAY - Shared Ride 3+ (Express/Toll),280.0,0.02340941392860129,2015 TM2.2 Sprint 04
-School,TAXI - Taxi,2040.0,0.17055430147980938,2015 TM2.2 Sprint 04
-School,TNC - Transportation Network Company,12240.0,1.0233258088788564,2015 TM2.2 Sprint 04
-School,WALK - Walk,151040.0,12.627706713485495,2015 TM2.2 Sprint 04
-School,WLK_TRN - Walk to Transit,17520.0,1.4647604715324807,2015 TM2.2 Sprint 04
-Shop,BIKE - Bicycle,11080.0,1.8929169371647248,2015 TM2.2 Sprint 04
-Shop,KNRPRV_TRN - Kiss-and-Ride Private to Transit,3680.0,0.6286944340041685,2015 TM2.2 Sprint 04
-Shop,KNRTNC_TRN - Kiss-and-Ride TNC to Transit,540.0,0.0922540745549595,2015 TM2.2 Sprint 04
-Shop,PNR_TRN - Park-and-Ride to Transit,7360.0,1.257388868008337,2015 TM2.2 Sprint 04
-Shop,SOV_GP - Single Occupant Vehicle (General Purpose),152700.0,26.08740219359688,2015 TM2.2 Sprint 04
-Shop,SOV_PAY - Single Occupant Vehicle (Express/Toll),80.0,0.013667270304438447,2015 TM2.2 Sprint 04
-Shop,SR2_GP - Shared Ride 2 (General Purpose),171420.0,29.285543444835483,2015 TM2.2 Sprint 04
-Shop,SR2_HOV - Shared Ride 2 (HOV Lanes),6700.0,1.14463388799672,2015 TM2.2 Sprint 04
-Shop,SR2_PAY - Shared Ride 2 (Express/Toll),60.0,0.010250452728328835,2015 TM2.2 Sprint 04
-Shop,SR3_GP - Shared Ride 3+ (General Purpose),89980.0,15.372262274917142,2015 TM2.2 Sprint 04
-Shop,SR3_HOV - Shared Ride 3+ (HOV Lanes),3840.0,0.6560289746130454,2015 TM2.2 Sprint 04
-Shop,TAXI - Taxi,2280.0,0.3895172036764957,2015 TM2.2 Sprint 04
-Shop,TNC - Transportation Network Company,10660.0,1.821163768066423,2015 TM2.2 Sprint 04
-Shop,WALK - Walk,87660.0,14.975911436088426,2015 TM2.2 Sprint 04
-Shop,WLK_TRN - Walk to Transit,37300.0,6.372364779444426,2015 TM2.2 Sprint 04
-University,BIKE - Bicycle,13040.0,4.156042835288119,2015 TM2.2 Sprint 04
-University,KNRPRV_TRN - Kiss-and-Ride Private to Transit,5060.0,1.6126976032636409,2015 TM2.2 Sprint 04
-University,KNRTNC_TRN - Kiss-and-Ride TNC to Transit,300.0,0.09561448240693524,2015 TM2.2 Sprint 04
-University,PNR_TRN - Park-and-Ride to Transit,6120.0,1.9505354411014788,2015 TM2.2 Sprint 04
-University,SOV_GP - Single Occupant Vehicle (General Purpose),97200.0,30.979092299847018,2015 TM2.2 Sprint 04
-University,SOV_PAY - Single Occupant Vehicle (Express/Toll),100.0,0.03187149413564508,2015 TM2.2 Sprint 04
-University,SR2_GP - Shared Ride 2 (General Purpose),70820.0,22.571392146863843,2015 TM2.2 Sprint 04
-University,SR2_HOV - Shared Ride 2 (HOV Lanes),14340.0,4.570372259051505,2015 TM2.2 Sprint 04
-University,SR2_PAY - Shared Ride 2 (Express/Toll),140.0,0.04462009178990311,2015 TM2.2 Sprint 04
-University,SR3_GP - Shared Ride 3+ (General Purpose),14540.0,4.634115247322795,2015 TM2.2 Sprint 04
-University,SR3_HOV - Shared Ride 3+ (HOV Lanes),3140.0,1.0007649158592555,2015 TM2.2 Sprint 04
-University,TAXI - Taxi,4380.0,1.3959714431412544,2015 TM2.2 Sprint 04
-University,TNC - Transportation Network Company,21400.0,6.820499745028047,2015 TM2.2 Sprint 04
-University,WALK - Walk,21700.0,6.916114227434981,2015 TM2.2 Sprint 04
-University,WLK_TRN - Walk to Transit,41480.0,13.22029576746558,2015 TM2.2 Sprint 04
-Visiting,BIKE - Bicycle,14200.0,3.480392156862745,2015 TM2.2 Sprint 04
-Visiting,KNRPRV_TRN - Kiss-and-Ride Private to Transit,2620.0,0.6421568627450981,2015 TM2.2 Sprint 04
-Visiting,KNRTNC_TRN - Kiss-and-Ride TNC to Transit,380.0,0.09313725490196079,2015 TM2.2 Sprint 04
-Visiting,PNR_TRN - Park-and-Ride to Transit,3760.0,0.9215686274509804,2015 TM2.2 Sprint 04
-Visiting,SOV_GP - Single Occupant Vehicle (General Purpose),110800.0,27.15686274509804,2015 TM2.2 Sprint 04
-Visiting,SOV_PAY - Single Occupant Vehicle (Express/Toll),60.0,0.014705882352941175,2015 TM2.2 Sprint 04
-Visiting,SR2_GP - Shared Ride 2 (General Purpose),77440.0,18.980392156862745,2015 TM2.2 Sprint 04
-Visiting,SR2_HOV - Shared Ride 2 (HOV Lanes),7140.0,1.7500000000000002,2015 TM2.2 Sprint 04
-Visiting,SR2_PAY - Shared Ride 2 (Express/Toll),40.0,0.00980392156862745,2015 TM2.2 Sprint 04
-Visiting,SR3_GP - Shared Ride 3+ (General Purpose),58260.0,14.279411764705882,2015 TM2.2 Sprint 04
-Visiting,SR3_HOV - Shared Ride 3+ (HOV Lanes),6180.0,1.5147058823529411,2015 TM2.2 Sprint 04
-Visiting,SR3_PAY - Shared Ride 3+ (Express/Toll),120.0,0.02941176470588235,2015 TM2.2 Sprint 04
-Visiting,TAXI - Taxi,360.0,0.08823529411764706,2015 TM2.2 Sprint 04
-Visiting,TNC - Transportation Network Company,2180.0,0.5343137254901961,2015 TM2.2 Sprint 04
-Visiting,WALK - Walk,91720.0,22.480392156862745,2015 TM2.2 Sprint 04
-Visiting,WLK_TRN - Walk to Transit,32740.0,8.02450980392157,2015 TM2.2 Sprint 04
-Work,BIKE - Bicycle,42020.0,2.366124218706008,2015 TM2.2 Sprint 04
-Work,KNRPRV_TRN - Kiss-and-Ride Private to Transit,18300.0,1.0304634269947632,2015 TM2.2 Sprint 04
-Work,KNRTNC_TRN - Kiss-and-Ride TNC to Transit,320.0,0.018019032603187116,2015 TM2.2 Sprint 04
-Work,PNR_TRN - Park-and-Ride to Transit,43560.0,2.452840813108846,2015 TM2.2 Sprint 04
-Work,SOV_GP - Single Occupant Vehicle (General Purpose),938760.0,52.861084520524805,2015 TM2.2 Sprint 04
-Work,SOV_PAY - Single Occupant Vehicle (Express/Toll),1620.0,0.09122135255363478,2015 TM2.2 Sprint 04
-Work,SR2_GP - Shared Ride 2 (General Purpose),259240.0,14.597668787656962,2015 TM2.2 Sprint 04
-Work,SR2_HOV - Shared Ride 2 (HOV Lanes),90360.0,5.088124331324962,2015 TM2.2 Sprint 04
-Work,SR2_PAY - Shared Ride 2 (Express/Toll),780.0,0.0439213919702686,2015 TM2.2 Sprint 04
-Work,SR3_GP - Shared Ride 3+ (General Purpose),119600.0,6.734613435441185,2015 TM2.2 Sprint 04
-Work,SR3_HOV - Shared Ride 3+ (HOV Lanes),46720.0,2.630778760065319,2015 TM2.2 Sprint 04
-Work,SR3_PAY - Shared Ride 3+ (Express/Toll),320.0,0.018019032603187116,2015 TM2.2 Sprint 04
-Work,TAXI - Taxi,1200.0,0.06757137226195169,2015 TM2.2 Sprint 04
-Work,TNC - Transportation Network Company,15440.0,0.8694183231037784,2015 TM2.2 Sprint 04
-Work,WALK - Walk,43100.0,2.426938453741765,2015 TM2.2 Sprint 04
-Work,WLK_TRN - Walk to Transit,154560.0,8.703192747339378,2015 TM2.2 Sprint 04
-Work-Based,BIKE - Bicycle,4360.0,1.6557800394956708,2015 TM2.2 Sprint 04
-Work-Based,SOV_GP - Single Occupant Vehicle (General Purpose),110040.0,41.78945769406046,2015 TM2.2 Sprint 04
-Work-Based,SOV_PAY - Single Occupant Vehicle (Express/Toll),60.0,0.0227859638462707,2015 TM2.2 Sprint 04
-Work-Based,SR2_GP - Shared Ride 2 (General Purpose),45800.0,17.393285735986634,2015 TM2.2 Sprint 04
-Work-Based,SR2_HOV - Shared Ride 2 (HOV Lanes),1640.0,0.622816345131399,2015 TM2.2 Sprint 04
-Work-Based,SR3_GP - Shared Ride 3+ (General Purpose),23900.0,9.076408932097827,2015 TM2.2 Sprint 04
-Work-Based,SR3_HOV - Shared Ride 3+ (HOV Lanes),1160.0,0.4405286343612335,2015 TM2.2 Sprint 04
-Work-Based,TAXI - Taxi,380.0,0.14431110435971442,2015 TM2.2 Sprint 04
-Work-Based,TNC - Transportation Network Company,2240.0,0.850675983594106,2015 TM2.2 Sprint 04
-Work-Based,WALK - Walk,68300.0,25.938022178338144,2015 TM2.2 Sprint 04
-Work-Based,WLK_TRN - Walk to Transit,5440.0,2.065927388728543,2015 TM2.2 Sprint 04
+Discretionary,BIKE - Bicycle,27900.0,3.4335080853577495,2015 TM2.2 Sprint 04
+Discretionary,KNRPRV_TRN - Kiss-and-Ride Private to Transit,4240.0,0.5217947771296365,2015 TM2.2 Sprint 04
+Discretionary,KNRTNC_TRN - Kiss-and-Ride TNC to Transit,860.0,0.10583573309704891,2015 TM2.2 Sprint 04
+Discretionary,PNR_TRN - Park-and-Ride to Transit,7140.0,0.8786827143173594,2015 TM2.2 Sprint 04
+Discretionary,SOV_GP - Single Occupant Vehicle (General Purpose),250000.0,30.76620148170026,2015 TM2.2 Sprint 04
+Discretionary,SR2_GP - Shared Ride 2 (General Purpose),152140.0,18.72307957370351,2015 TM2.2 Sprint 04
+Discretionary,SR2_HOV - Shared Ride 2 (HOV Lanes),14380.0,1.769671909227399,2015 TM2.2 Sprint 04
+Discretionary,SR2_PAY - Shared Ride 2 (Express/Toll),80.0,0.009845184474144085,2015 TM2.2 Sprint 04
+Discretionary,SR3_GP - Shared Ride 3+ (General Purpose),116060.0,14.28290137586453,2015 TM2.2 Sprint 04
+Discretionary,SR3_HOV - Shared Ride 3+ (HOV Lanes),11900.0,1.4644711905289325,2015 TM2.2 Sprint 04
+Discretionary,SR3_PAY - Shared Ride 3+ (Express/Toll),80.0,0.009845184474144085,2015 TM2.2 Sprint 04
+Discretionary,TAXI - Taxi,880.0,0.10829702921558494,2015 TM2.2 Sprint 04
+Discretionary,TNC - Transportation Network Company,4280.0,0.5267173693667084,2015 TM2.2 Sprint 04
+Discretionary,WALK - Walk,164360.0,20.226931502129023,2015 TM2.2 Sprint 04
+Discretionary,WLK_TRN - Walk to Transit,58280.0,7.172216889413965,2015 TM2.2 Sprint 04
+Eating Out,BIKE - Bicycle,2320.0,2.5168149273161204,2015 TM2.2 Sprint 04
+Eating Out,KNRPRV_TRN - Kiss-and-Ride Private to Transit,240.0,0.2603601648947711,2015 TM2.2 Sprint 04
+Eating Out,KNRTNC_TRN - Kiss-and-Ride TNC to Transit,60.0,0.06509004122369277,2015 TM2.2 Sprint 04
+Eating Out,PNR_TRN - Park-and-Ride to Transit,900.0,0.9763506183553917,2015 TM2.2 Sprint 04
+Eating Out,SOV_GP - Single Occupant Vehicle (General Purpose),34120.0,37.01453677587329,2015 TM2.2 Sprint 04
+Eating Out,SR2_GP - Shared Ride 2 (General Purpose),15800.0,17.1403775222391,2015 TM2.2 Sprint 04
+Eating Out,SR2_HOV - Shared Ride 2 (HOV Lanes),1340.0,1.4536775873291388,2015 TM2.2 Sprint 04
+Eating Out,SR2_PAY - Shared Ride 2 (Express/Toll),20.0,0.021696680407897594,2015 TM2.2 Sprint 04
+Eating Out,SR3_GP - Shared Ride 3+ (General Purpose),10860.0,11.781297461488393,2015 TM2.2 Sprint 04
+Eating Out,SR3_HOV - Shared Ride 3+ (HOV Lanes),980.0,1.063137339986982,2015 TM2.2 Sprint 04
+Eating Out,TAXI - Taxi,60.0,0.06509004122369277,2015 TM2.2 Sprint 04
+Eating Out,TNC - Transportation Network Company,460.0,0.4990236493816446,2015 TM2.2 Sprint 04
+Eating Out,WALK - Walk,17320.0,18.789325233239314,2015 TM2.2 Sprint 04
+Eating Out,WLK_TRN - Walk to Transit,7700.0,8.353221957040573,2015 TM2.2 Sprint 04
+Escort,BIKE - Bicycle,7300.0,0.7782847882638918,2015 TM2.2 Sprint 04
+Escort,KNRPRV_TRN - Kiss-and-Ride Private to Transit,40.0,0.004264574182267901,2015 TM2.2 Sprint 04
+Escort,PNR_TRN - Park-and-Ride to Transit,40.0,0.004264574182267901,2015 TM2.2 Sprint 04
+Escort,SOV_GP - Single Occupant Vehicle (General Purpose),163460.0,17.427182395837775,2015 TM2.2 Sprint 04
+Escort,SR2_GP - Shared Ride 2 (General Purpose),301100.0,32.10158215702162,2015 TM2.2 Sprint 04
+Escort,SR2_HOV - Shared Ride 2 (HOV Lanes),12000.0,1.27937225468037,2015 TM2.2 Sprint 04
+Escort,SR2_PAY - Shared Ride 2 (Express/Toll),20.0,0.0021322870911339503,2015 TM2.2 Sprint 04
+Escort,SR3_GP - Shared Ride 3+ (General Purpose),316280.0,33.71998805919229,2015 TM2.2 Sprint 04
+Escort,SR3_HOV - Shared Ride 3+ (HOV Lanes),8960.0,0.9552646168280098,2015 TM2.2 Sprint 04
+Escort,SR3_PAY - Shared Ride 3+ (Express/Toll),20.0,0.0021322870911339503,2015 TM2.2 Sprint 04
+Escort,TAXI - Taxi,4780.0,0.509616614781014,2015 TM2.2 Sprint 04
+Escort,TNC - Transportation Network Company,16820.0,1.7932534436436522,2015 TM2.2 Sprint 04
+Escort,WALK - Walk,105720.0,11.27126956373406,2015 TM2.2 Sprint 04
+Escort,WLK_TRN - Walk to Transit,1420.0,0.15139238347051046,2015 TM2.2 Sprint 04
+Maintenance,BIKE - Bicycle,15760.0,1.563088885803265,2015 TM2.2 Sprint 04
+Maintenance,KNRPRV_TRN - Kiss-and-Ride Private to Transit,7100.0,0.7041834447463948,2015 TM2.2 Sprint 04
+Maintenance,KNRTNC_TRN - Kiss-and-Ride TNC to Transit,1220.0,0.12100053557614107,2015 TM2.2 Sprint 04
+Maintenance,PNR_TRN - Park-and-Ride to Transit,10060.0,0.9977585146688355,2015 TM2.2 Sprint 04
+Maintenance,SOV_GP - Single Occupant Vehicle (General Purpose),240880.0,23.890663122607265,2015 TM2.2 Sprint 04
+Maintenance,SR2_GP - Shared Ride 2 (General Purpose),289860.0,28.74853708368873,2015 TM2.2 Sprint 04
+Maintenance,SR2_HOV - Shared Ride 2 (HOV Lanes),20400.0,2.023287644060064,2015 TM2.2 Sprint 04
+Maintenance,SR2_PAY - Shared Ride 2 (Express/Toll),80.0,0.007934461349255153,2015 TM2.2 Sprint 04
+Maintenance,SR3_GP - Shared Ride 3+ (General Purpose),188180.0,18.663836708785432,2015 TM2.2 Sprint 04
+Maintenance,SR3_HOV - Shared Ride 3+ (HOV Lanes),15420.0,1.5293674250689306,2015 TM2.2 Sprint 04
+Maintenance,SR3_PAY - Shared Ride 3+ (Express/Toll),60.0,0.005950846011941365,2015 TM2.2 Sprint 04
+Maintenance,TAXI - Taxi,3100.0,0.3074603772836372,2015 TM2.2 Sprint 04
+Maintenance,TNC - Transportation Network Company,13900.0,1.3786126594330828,2015 TM2.2 Sprint 04
+Maintenance,WALK - Walk,137240.0,13.611568444647215,2015 TM2.2 Sprint 04
+Maintenance,WLK_TRN - Walk to Transit,65000.0,6.446749846269811,2015 TM2.2 Sprint 04
+School,BIKE - Bicycle,28560.0,2.3891584406893087,2015 TM2.2 Sprint 04
+School,KNRPRV_TRN - Kiss-and-Ride Private to Transit,1300.0,0.10875020913501757,2015 TM2.2 Sprint 04
+School,KNRTNC_TRN - Kiss-and-Ride TNC to Transit,660.0,0.05521164463777815,2015 TM2.2 Sprint 04
+School,PNR_TRN - Park-and-Ride to Transit,480.0,0.04015392337292956,2015 TM2.2 Sprint 04
+School,SCHLBUS - School Bus,84800.0,7.0938597958842236,2015 TM2.2 Sprint 04
+School,SOV_GP - Single Occupant Vehicle (General Purpose),7560.0,0.6324242931236407,2015 TM2.2 Sprint 04
+School,SR2_GP - Shared Ride 2 (General Purpose),216300.0,18.094361719926386,2015 TM2.2 Sprint 04
+School,SR2_HOV - Shared Ride 2 (HOV Lanes),11280.0,0.9436171992638447,2015 TM2.2 Sprint 04
+School,SR2_PAY - Shared Ride 2 (Express/Toll),120.0,0.01003848084323239,2015 TM2.2 Sprint 04
+School,SR3_GP - Shared Ride 3+ (General Purpose),627960.0,52.5313702526351,2015 TM2.2 Sprint 04
+School,SR3_HOV - Shared Ride 3+ (HOV Lanes),32380.0,2.7087167475322067,2015 TM2.2 Sprint 04
+School,SR3_PAY - Shared Ride 3+ (Express/Toll),120.0,0.01003848084323239,2015 TM2.2 Sprint 04
+School,TAXI - Taxi,1680.0,0.14053873180525348,2015 TM2.2 Sprint 04
+School,TNC - Transportation Network Company,12920.0,1.0808097707880207,2015 TM2.2 Sprint 04
+School,WALK - Walk,151800.0,12.698678266688972,2015 TM2.2 Sprint 04
+School,WLK_TRN - Walk to Transit,17480.0,1.4622720428308515,2015 TM2.2 Sprint 04
+Shop,BIKE - Bicycle,10480.0,1.8058379570596548,2015 TM2.2 Sprint 04
+Shop,KNRPRV_TRN - Kiss-and-Ride Private to Transit,3820.0,0.6582348278595307,2015 TM2.2 Sprint 04
+Shop,KNRTNC_TRN - Kiss-and-Ride TNC to Transit,560.0,0.09649515801082124,2015 TM2.2 Sprint 04
+Shop,PNR_TRN - Park-and-Ride to Transit,7640.0,1.3164696557190614,2015 TM2.2 Sprint 04
+Shop,SOV_GP - Single Occupant Vehicle (General Purpose),152600.0,26.29493055794879,2015 TM2.2 Sprint 04
+Shop,SR2_GP - Shared Ride 2 (General Purpose),172140.0,29.6619223213978,2015 TM2.2 Sprint 04
+Shop,SR2_HOV - Shared Ride 2 (HOV Lanes),5480.0,0.9442740462487508,2015 TM2.2 Sprint 04
+Shop,SR3_GP - Shared Ride 3+ (General Purpose),89180.0,15.366853913223283,2015 TM2.2 Sprint 04
+Shop,SR3_HOV - Shared Ride 3+ (HOV Lanes),3260.0,0.5617396698487094,2015 TM2.2 Sprint 04
+Shop,TAXI - Taxi,2280.0,0.3928731433297722,2015 TM2.2 Sprint 04
+Shop,TNC - Transportation Network Company,10780.0,1.8575317917083092,2015 TM2.2 Sprint 04
+Shop,WALK - Walk,85220.0,14.684495295861048,2015 TM2.2 Sprint 04
+Shop,WLK_TRN - Walk to Transit,36900.0,6.358341661784471,2015 TM2.2 Sprint 04
+University,BIKE - Bicycle,13200.0,4.183039675497528,2015 TM2.2 Sprint 04
+University,KNRPRV_TRN - Kiss-and-Ride Private to Transit,5040.0,1.5971606033717833,2015 TM2.2 Sprint 04
+University,KNRTNC_TRN - Kiss-and-Ride TNC to Transit,340.0,0.1077449613385727,2015 TM2.2 Sprint 04
+University,PNR_TRN - Park-and-Ride to Transit,5960.0,1.8887057928761566,2015 TM2.2 Sprint 04
+University,SOV_GP - Single Occupant Vehicle (General Purpose),97640.0,30.941817720877168,2015 TM2.2 Sprint 04
+University,SR2_GP - Shared Ride 2 (General Purpose),73760.0,23.374318671568005,2015 TM2.2 Sprint 04
+University,SR2_HOV - Shared Ride 2 (HOV Lanes),12740.0,4.037267080745342,2015 TM2.2 Sprint 04
+University,SR2_PAY - Shared Ride 2 (Express/Toll),80.0,0.02535175560907593,2015 TM2.2 Sprint 04
+University,SR3_GP - Shared Ride 3+ (General Purpose),14800.0,4.6900747876790465,2015 TM2.2 Sprint 04
+University,SR3_HOV - Shared Ride 3+ (HOV Lanes),3040.0,0.9633667131448852,2015 TM2.2 Sprint 04
+University,TAXI - Taxi,4420.0,1.400684497401445,2015 TM2.2 Sprint 04
+University,TNC - Transportation Network Company,22460.0,7.117505387248067,2015 TM2.2 Sprint 04
+University,WALK - Walk,21760.0,6.895677525668653,2015 TM2.2 Sprint 04
+University,WLK_TRN - Walk to Transit,40320.0,12.777284826974267,2015 TM2.2 Sprint 04
+Visiting,BIKE - Bicycle,14700.0,3.6068308960643827,2015 TM2.2 Sprint 04
+Visiting,KNRPRV_TRN - Kiss-and-Ride Private to Transit,2600.0,0.6379428795760134,2015 TM2.2 Sprint 04
+Visiting,KNRTNC_TRN - Kiss-and-Ride TNC to Transit,620.0,0.1521248405142801,2015 TM2.2 Sprint 04
+Visiting,PNR_TRN - Park-and-Ride to Transit,4080.0,1.0010795956423595,2015 TM2.2 Sprint 04
+Visiting,SOV_GP - Single Occupant Vehicle (General Purpose),111620.0,27.387378545490233,2015 TM2.2 Sprint 04
+Visiting,SR2_GP - Shared Ride 2 (General Purpose),76700.0,18.819314947492394,2015 TM2.2 Sprint 04
+Visiting,SR2_HOV - Shared Ride 2 (HOV Lanes),7100.0,1.742074786534498,2015 TM2.2 Sprint 04
+Visiting,SR2_PAY - Shared Ride 2 (Express/Toll),20.0,0.004907252919815488,2015 TM2.2 Sprint 04
+Visiting,SR3_GP - Shared Ride 3+ (General Purpose),58760.0,14.4175090784179,2015 TM2.2 Sprint 04
+Visiting,SR3_HOV - Shared Ride 3+ (HOV Lanes),5360.0,1.3151437825105508,2015 TM2.2 Sprint 04
+Visiting,SR3_PAY - Shared Ride 3+ (Express/Toll),40.0,0.009814505839630975,2015 TM2.2 Sprint 04
+Visiting,TAXI - Taxi,460.0,0.1128668171557562,2015 TM2.2 Sprint 04
+Visiting,TNC - Transportation Network Company,1640.0,0.40239473942487,2015 TM2.2 Sprint 04
+Visiting,WALK - Walk,90280.0,22.151339680047112,2015 TM2.2 Sprint 04
+Visiting,WLK_TRN - Walk to Transit,33580.0,8.239277652370202,2015 TM2.2 Sprint 04
+Work,BIKE - Bicycle,40560.0,2.2880868299617525,2015 TM2.2 Sprint 04
+Work,KNRPRV_TRN - Kiss-and-Ride Private to Transit,18060.0,1.0188078932226148,2015 TM2.2 Sprint 04
+Work,KNRTNC_TRN - Kiss-and-Ride TNC to Transit,460.0,0.025949702706666817,2015 TM2.2 Sprint 04
+Work,PNR_TRN - Park-and-Ride to Transit,40120.0,2.263265375198854,2015 TM2.2 Sprint 04
+Work,SOV_GP - Single Occupant Vehicle (General Purpose),946680.0,53.404488170320306,2015 TM2.2 Sprint 04
+Work,SR2_GP - Shared Ride 2 (General Purpose),266480.0,15.032775602766463,2015 TM2.2 Sprint 04
+Work,SR2_HOV - Shared Ride 2 (HOV Lanes),81200.0,4.580686651698578,2015 TM2.2 Sprint 04
+Work,SR2_PAY - Shared Ride 2 (Express/Toll),680.0,0.03836043008811616,2015 TM2.2 Sprint 04
+Work,SR3_GP - Shared Ride 3+ (General Purpose),122100.0,6.887953696704388,2015 TM2.2 Sprint 04
+Work,SR3_HOV - Shared Ride 3+ (HOV Lanes),42860.0,2.4178353434950863,2015 TM2.2 Sprint 04
+Work,SR3_PAY - Shared Ride 3+ (Express/Toll),240.0,0.01353897532521747,2015 TM2.2 Sprint 04
+Work,TAXI - Taxi,1320.0,0.07446436428869609,2015 TM2.2 Sprint 04
+Work,TNC - Transportation Network Company,15160.0,0.8552119413762369,2015 TM2.2 Sprint 04
+Work,WALK - Walk,42380.0,2.3907573928446517,2015 TM2.2 Sprint 04
+Work,WLK_TRN - Walk to Transit,154360.0,8.707817630002369,2015 TM2.2 Sprint 04
+Work-Based,BIKE - Bicycle,4500.0,1.696704622577483,2015 TM2.2 Sprint 04
+Work-Based,SOV_GP - Single Occupant Vehicle (General Purpose),108520.0,40.91697458713521,2015 TM2.2 Sprint 04
+Work-Based,SR2_GP - Shared Ride 2 (General Purpose),45860.0,17.291305331422972,2015 TM2.2 Sprint 04
+Work-Based,SR2_HOV - Shared Ride 2 (HOV Lanes),1500.0,0.5655682075258276,2015 TM2.2 Sprint 04
+Work-Based,SR3_GP - Shared Ride 3+ (General Purpose),25940.0,9.780559535479979,2015 TM2.2 Sprint 04
+Work-Based,SR3_HOV - Shared Ride 3+ (HOV Lanes),680.0,0.25639092074504183,2015 TM2.2 Sprint 04
+Work-Based,TAXI - Taxi,420.0,0.15835909810723173,2015 TM2.2 Sprint 04
+Work-Based,TNC - Transportation Network Company,2300.0,0.8672045848729357,2015 TM2.2 Sprint 04
+Work-Based,WALK - Walk,69400.0,26.166955734861624,2015 TM2.2 Sprint 04
+Work-Based,WLK_TRN - Walk to Transit,6100.0,2.299977377271699,2015 TM2.2 Sprint 04

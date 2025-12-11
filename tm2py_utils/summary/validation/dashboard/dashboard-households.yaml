@@ -50,3 +50,34 @@ layout:
       groupBy: dataset
       facet: dataset
     description: 'Share: vehicle ownership distribution within each income bracket, by dataset'
+
+  auto_ownership_by_household_size:
+  - type: bar
+    title: Auto Ownership by Household Size - Share (Model vs ACS)
+    props:
+      dataset: auto_ownership_by_household_size_acs.csv
+      x: num_persons_agg
+      y: share
+      columns: num_vehicles
+      groupBy: dataset
+      facet: dataset
+    description: 'Share: vehicle ownership by household size (1, 2, 3, 4+ persons) - Model vs ACS 2023 observed data'
+  - type: bar
+    title: Auto Ownership by Household Size - Total (Model vs ACS)
+    props:
+      dataset: auto_ownership_by_household_size_acs.csv
+      x: num_persons_agg
+      y: households
+      columns: num_vehicles
+      groupBy: dataset
+      facet: dataset
+    description: 'Total: households by vehicle ownership and household size - Model vs ACS 2023 observed data'
+  - type: bar
+    title: Auto Ownership by Household Size - Grouped by Vehicles
+    props:
+      dataset: auto_ownership_by_household_size_acs.csv
+      x: num_vehicles
+      y: share
+      groupBy: dataset
+      facet: num_persons_agg
+    description: 'Share: vehicle ownership distribution within each household size category'

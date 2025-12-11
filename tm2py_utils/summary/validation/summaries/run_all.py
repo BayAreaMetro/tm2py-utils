@@ -24,8 +24,7 @@ from enum import Enum
 import sys
 import os
 
-# Validation summary modules
-from . import household_summary, worker_summary, tour_summary, trip_summary
+# Validation summary modules (all summaries now config-driven)
 from ..data_model.ctramp_data_model_loader import load_data_model
 
 # Set up logging
@@ -532,74 +531,7 @@ class SummaryGenerator:
             logger.info(f"\nProcessing dataset: {display_name} ({dataset_name})")
             
             # Household summaries
-            # MIGRATION: Temporarily disabled to test config-driven summaries
-            # TODO: Remove after verifying config-driven summaries work identically
-            # if SummaryType.AUTO_OWNERSHIP in self.config.enabled_summaries:
-            #     if 'households' in data:
-            #         # Get weight field from data model
-            #         weight_col = None
-            #         if hasattr(self, 'data_model') and self.data_model:
-            #             weight_col = self.data_model.get_weight_field('households')
-            #         
-            #         all_summaries.update(
-            #             household_summary.generate_all_household_summaries(
-            #                 data['households'], display_name, weight_col
-            #             )
-            #         )
-            #     else:
-            #         logger.warning(f"  ⚠ No household data for {dataset_name}")
-            
-            # Worker summaries
-            if SummaryType.WORK_LOCATION in self.config.enabled_summaries:
-                if 'persons' in data:
-                    # Get weight field from data model
-                    weight_col = None
-                    if hasattr(self, 'data_model') and self.data_model:
-                        weight_col = self.data_model.get_weight_field('persons')
-                    
-                    all_summaries.update(
-                        worker_summary.generate_all_worker_summaries(
-                            data['persons'], display_name, weight_col
-                        )
-                    )
-                else:
-                    logger.warning(f"  ⚠ No person data for {dataset_name}")
-            
-            # Tour summaries
-            if (SummaryType.TOUR_FREQUENCY in self.config.enabled_summaries or 
-                SummaryType.TOUR_MODE in self.config.enabled_summaries or 
-                SummaryType.TOUR_TIME in self.config.enabled_summaries):
-                if 'individual_tours' in data:
-                    # Get weight field from data model
-                    weight_col = None
-                    if hasattr(self, 'data_model') and self.data_model:
-                        weight_col = self.data_model.get_weight_field('tours')
-                    
-                    all_summaries.update(
-                        tour_summary.generate_all_tour_summaries(
-                            data['individual_tours'], display_name, weight_col
-                        )
-                    )
-                else:
-                    logger.warning(f"  ⚠ No tour data for {dataset_name}")
-            
-            # Trip summaries
-            if SummaryType.TRIP_MODE in self.config.enabled_summaries:
-                if 'individual_trips' in data:
-                    # Get weight field from data model
-                    weight_col = None
-                    if hasattr(self, 'data_model') and self.data_model:
-                        weight_col = self.data_model.get_weight_field('trips')
-                    
-                    all_summaries.update(
-                        trip_summary.generate_all_trip_summaries(
-                            data['individual_trips'], display_name, weight_col
-                        )
-                    )
-                else:
-                    logger.warning(f"  ⚠ No trip data for {dataset_name}")
-            
-            # Config-driven custom summaries
+            # Config-driven summaries (all summaries now defined in validation_config.yaml)
             if hasattr(self, 'custom_summary_configs') and self.custom_summary_configs:
                 from .config_driven_summaries import generate_all_config_driven_summaries
                 
@@ -851,28 +783,28 @@ def main():
             for input_dir in config.input_directories
         }
         
-        # Load custom summary configurations if present
-        custom_summary_configs = config_data.get('custom_summaries', [])
-        if custom_summary_configs:
-            logger.info(f"Loaded {len(custom_summary_configs)} custom summary configurations")
+        # Load summary configurations
+        summary_configs = config_data.get('summaries', config_data.get('custom_summaries', []))
+        if summary_configs:
+            logger.info(f"Loaded {len(summary_configs)} summary configurations")
         
         # Filter summaries based on summary_type if specified
         generate_summaries = config_data.get('generate_summaries', 'all')
         if generate_summaries != 'all':
             filtered_configs = []
-            for summary_config in custom_summary_configs:
+            for summary_config in summary_configs:
                 summary_type = summary_config.get('summary_type', 'core')  # Default to 'core' if not specified
                 if generate_summaries == 'core' and summary_type == 'core':
                     filtered_configs.append(summary_config)
                 elif generate_summaries == 'validation' and summary_type == 'validation':
                     filtered_configs.append(summary_config)
-            logger.info(f"Filtered to {len(filtered_configs)} {generate_summaries} summaries (from {len(custom_summary_configs)} total)")
-            custom_summary_configs = filtered_configs
+            logger.info(f"Filtered to {len(filtered_configs)} {generate_summaries} summaries (from {len(summary_configs)} total)")
+            summary_configs = filtered_configs
         
         summary_generator = SummaryGenerator(
             config.summary_config, 
             data_loader.data_model,
-            custom_summary_configs=custom_summary_configs
+            custom_summary_configs=summary_configs
         )
         summary_generator.dataset_display_names = dataset_display_names
         
@@ -890,6 +822,56 @@ def main():
         if not all_datasets:
             logger.error("No datasets successfully loaded. Exiting.")
             sys.exit(1)
+        
+        # Copy population synthesizer summaries if configured
+        if 'popsyn_summaries' in config_data:
+            popsyn_config = config_data['popsyn_summaries']
+            copy_files = popsyn_config.get('copy_files', False)
+            
+            if copy_files:
+                popsyn_source = Path(popsyn_config.get('source_directory', ''))
+                popsyn_files = popsyn_config.get('files', [])
+                
+                if popsyn_source.exists() and popsyn_files:
+                    logger.info(f"Copying {len(popsyn_files)} population synthesizer summary files...")
+                    import shutil
+                    for filename in popsyn_files:
+                        src_file = popsyn_source / filename
+                        dst_file = config.output_directory / filename
+                        if src_file.exists():
+                            shutil.copy2(src_file, dst_file)
+                            logger.info(f"  ✓ Copied {filename}")
+                        else:
+                            logger.warning(f"  ⚠ PopSyn file not found: {filename}")
+                elif not popsyn_source.exists():
+                    logger.warning(f"PopSyn source directory not found: {popsyn_source}")
+            else:
+                logger.info("PopSyn file copying disabled (copy_files: false)")
+        
+        # Copy ACS observed data if configured
+        if 'acs_summaries' in config_data:
+            acs_config = config_data['acs_summaries']
+            copy_files = acs_config.get('copy_files', False)
+            
+            if copy_files:
+                acs_source = Path(acs_config.get('source_directory', ''))
+                acs_files = acs_config.get('files', [])
+                
+                if acs_source.exists() and acs_files:
+                    logger.info(f"Copying {len(acs_files)} ACS observed data files...")
+                    import shutil
+                    for filename in acs_files:
+                        src_file = acs_source / filename
+                        dst_file = config.output_directory / filename
+                        if src_file.exists():
+                            shutil.copy2(src_file, dst_file)
+                            logger.info(f"  ✓ Copied {filename}")
+                        else:
+                            logger.warning(f"  ⚠ ACS file not found: {filename}")
+                elif not acs_source.exists():
+                    logger.warning(f"ACS source directory not found: {acs_source}")
+            else:
+                logger.info("ACS file copying disabled (copy_files: false)")
         
         # Generate summaries from model outputs
         summaries = summary_generator.generate_all_summaries(all_datasets)

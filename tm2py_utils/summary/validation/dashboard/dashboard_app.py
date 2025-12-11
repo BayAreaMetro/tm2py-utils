@@ -348,7 +348,7 @@ def create_chart_from_config(
 
 def load_dashboard_config(config_path: Path) -> Dict[str, Any]:
     """Load dashboard configuration from YAML file."""
-    with open(config_path, 'r') as f:
+    with open(config_path, 'r', encoding='utf-8') as f:
         return yaml.safe_load(f)
 
 

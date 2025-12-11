@@ -4,18 +4,105 @@ Complete guide to creating, configuring, and deploying validation summaries for 
 
 ## Overview
 
-The validation summary system provides a flexible, config-driven framework for:
-- Generating statistics from CTRAMP model runs
-- Comparing model outputs to observed data (ACS, CTPP, travel surveys)
-- Creating interactive dashboards for validation
-- Managing multiple scenarios and datasets
+The validation summary system is a **data aggregation and comparison pipeline** that:
 
-**Key Features:**
-- **No coding required** - Define summaries in YAML
-- **34 pre-configured summaries** (21 core + 13 validation)
-- **Flexible aggregation** - Group, bin, weight, and filter data
-- **Multiple data sources** - Model runs, surveys, census data
-- **Interactive visualization** - Streamlit dashboard with 8 tabs
+1. **Reads raw data** from CTRAMP model outputs or household travel surveys formatted to match the [CTRAMP data model](data-model.md)
+2. **Aggregates and transforms** data according to user specifications in YAML configuration files
+3. **Combines datasets** into standardized CSVs for cross-scenario and model-vs-observed comparisons
+4. **Visualizes results** through a Streamlit dashboard (or any BI tool - Tableau, PowerBI, Shiny, etc.)
+
+### System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ INPUT DATA SOURCES (CTRAMP Data Model Format)              │
+├─────────────────────────────────────────────────────────────┤
+│ • Model Outputs: householdData_1.csv, personData_1.csv,    │
+│                  indivTourData_1.csv, indivTripData_1.csv   │
+│ • Travel Surveys: Munged to exactly match CTRAMP format    │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│ AGGREGATION ENGINE (Config-Driven)                         │
+├─────────────────────────────────────────────────────────────┤
+│ • Group by dimensions (mode, purpose, county, etc.)        │
+│ • Apply weights (sample_rate)                              │
+│ • Bin continuous variables (distance, income, age)         │
+│ • Aggregate categories (4+ person households)              │
+│ • Calculate shares within groups                           │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│ EXTERNAL DATA INTEGRATION (Preprocessed to Match Format)   │
+├─────────────────────────────────────────────────────────────┤
+│ • ACS: Preprocessed household/person summaries             │
+│ • CTPP: Journey-to-work tables matched to model geography  │
+│ • Other surveys: Aggregated to same dimensions as model    │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│ OUTPUT: Combined CSVs by Topic Area                        │
+├─────────────────────────────────────────────────────────────┤
+│ • Single CSV per summary with all datasets                 │
+│ • Common schema: dimensions + metrics + dataset column     │
+│ • Ready for any visualization tool                         │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│ VISUALIZATION (Streamlit Dashboard or Your Tool of Choice) │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Key Concepts
+
+**Data Model Alignment**: All input data must conform to the [CTRAMP data model](data-model.md). Model outputs already match this format. Household travel surveys must be transformed to match it exactly (same column names, same codes, same geography).
+
+**Aggregation Pipeline**: The system transforms raw microdata into summary statistics through:
+- **Grouping**: Combine records by categorical dimensions
+- **Binning**: Convert continuous variables to categories  
+- **Aggregation**: Map detailed categories to broader groups (e.g., 4+ person households)
+- **Weighting**: Apply sample expansion factors
+- **Share calculation**: Compute percentages within groups
+
+**External Data Integration**: For comparison with observed data (ACS, CTPP, surveys), you must **preprocess external data** to match the model's summary format - same columns, same categories, same geography. The system then merges them automatically.
+
+**Visualization Flexibility**: While we provide a Streamlit dashboard, the output CSVs can be used with any BI tool. The value is in the data preparation, not the visualization layer.
+
+### What This System Does
+
+✅ **Compiles** data from multiple model runs and surveys  
+✅ **Transforms** raw microdata into comparable summary statistics  
+✅ **Cleans** and standardizes data for cross-dataset comparison  
+✅ **Packages** results into analysis-ready CSV files  
+
+❌ Does NOT automatically convert ACS/CTPP raw data (you must preprocess)  
+❌ Does NOT validate data quality (assumes correct CTRAMP format)  
+❌ Does NOT provide statistical testing (just descriptive summaries)
+
+### Quick Navigation
+
+**Getting Started:**
+- **[Generate Summaries from Model Runs](generate-summaries.md)** - Run summaries on CTRAMP outputs, understand system workflow
+- **[CTRAMP Data Model Reference](data-model.md)** - Complete schema for households, persons, tours, trips
+
+**Advanced Configuration:**
+- **[Create Custom Summaries](custom-summaries.md)** - Define new aggregations, binning, and filtering
+- **[Integrate External Data](external-data.md)** - Add ACS, CTPP, or survey comparisons
+
+**Visualization:**
+- **[Deploy Dashboard](deploy-dashboard.md)** - Launch and customize Streamlit dashboard
+
+**Development:**
+- **[Development Tasks & Next Steps](validation-development.md)** - Ongoing work: data model updates, survey formatting, CTPP integration
+
+### Pre-Configured Summaries
+
+The system includes **25 pre-configured summaries** across 5 topic areas:
+- **Auto Ownership** (5 summaries) - Vehicle ownership by household characteristics
+- **Work Location** (3 summaries) - Journey to work patterns  
+- **CDAP** (2 summaries) - Coordinated Daily Activity Patterns
+- **Tours** (6 summaries) - Tour frequency, mode, purpose, timing
+- **Trips** (9 summaries) - Trip mode, purpose, distance, time-of-day
 
 ## Quick Start
 
@@ -52,10 +139,16 @@ Edit `validation_config.yaml` to add your model run directory:
 ```yaml
 input_directories:
   - path: "C:/model_runs/2023_base_year"
-    label: "2023 Base Year"
+    name: "2023_base_year"
+    display_name: "2023 Base Year"
+    source_type: "model"
+    iteration: 1  # Use iteration 1 files (_1.csv)
   
   - path: "C:/model_runs/2050_plan"
-    label: "2050 RTP"
+    name: "2050_plan"
+    display_name: "2050 RTP"
+    source_type: "model"
+    iteration: 1
 ```
 
 **Required files in directory:**
@@ -70,9 +163,8 @@ input_directories:
 #### Example 1: Simple Trip Mode Choice
 
 ```yaml
-custom_summaries:
+summaries:
   - name: "trip_mode_choice"
-    summary_type: "core"
     description: "Trip mode choice distribution"
     data_source: "individual_trips"
     group_by: "trip_mode"
@@ -92,41 +184,34 @@ Transit,95000,9.0,2023 Base Year
 #### Example 2: Tours by Purpose and Mode
 
 ```yaml
-custom_summaries:
+summaries:
   - name: "tour_mode_by_purpose"
-    summary_type: "core"
     description: "Tour mode choice by purpose"
     data_source: "individual_tours"
     group_by: ["tour_purpose", "tour_mode"]
     weight_field: "sample_rate"
-    aggregations:
-      tours: "count"
+    count_name: "tours"
     share_within: "tour_purpose"
 ```
 
 **Output:** Each purpose shows mode shares summing to 100%
 
-#### Example 3: Trip Distance with Multiple Metrics
+#### Example 3: Trip Distance Binning
 
 ```yaml
-custom_summaries:
-  - name: "trip_distance_stats"
-    summary_type: "validation"
-    description: "Trip distance statistics by mode"
+summaries:
+  - name: "trip_distance_distribution"
+    description: "Trip distance distribution (binned)"
     data_source: "individual_trips"
-    group_by: "trip_mode"
+    group_by: "trip_distance_bin"  # Uses binning_specs
     weight_field: "sample_rate"
-    aggregations:
-      trips: "count"
-      avg_distance:
-        column: "trip_distance_miles"
-        agg: "mean"
-      total_vmt:
-        column: "trip_distance_miles"
-        agg: "sum"
-      max_distance:
-        column: "trip_distance_miles"
-        agg: "max"
+    count_name: "trips"
+
+# Define bins in binning_specs section
+binning_specs:
+  trip_distance:
+    bins: [0, 1, 3, 5, 10, 20, 1000]
+    labels: ['0-1', '1-3', '3-5', '5-10', '10-20', '20+']
 ```
 
 ### Available Data Sources
@@ -174,29 +259,25 @@ Bike,320,11.6,2022 Travel Survey
 Add to `validation_config.yaml`:
 
 ```yaml
-observed_data_sources:
-  - name: "2022 Travel Survey"
-    directory: "C:/data/travel_survey_2022"
-    files:
-      trip_mode_choice: "survey_trip_mode.csv"
-      tour_mode_choice: "survey_tour_mode.csv"
-      trip_distance: "survey_trip_distance.csv"
+observed_summaries:
+  - name: "travel_survey_2022"
+    display_name: "2022 Travel Survey"
+    summaries:
+      trip_mode_choice:
+        file: "C:/data/travel_survey_2022/survey_trip_mode.csv"
+        columns:
+          trip_mode: "trip_mode"
+          trips: "trips"
+          share: "share"
 ```
 
-#### Step 3: Reference in Summary Definition
+**How it works:**
+- System loads observed data from specified files
+- Applies column mapping to match model output format
+- Adds `dataset` column with display_name ("2022 Travel Survey")
+- Merges with model summaries automatically by matching name
 
-```yaml
-custom_summaries:
-  - name: "trip_mode_choice"
-    data_source: "individual_trips"
-    group_by: "trip_mode"
-    weight_field: "sample_rate"
-    count_name: "trips"
-    observed_data: "2022 Travel Survey"
-    observed_file: "trip_mode_choice"
-```
-
-**Result:** Model and observed data combined in one CSV for side-by-side comparison in dashboard.
+**Result:** Combined CSV with model and observed data for side-by-side comparison.
 
 ---
 
@@ -252,12 +333,16 @@ output.to_csv("acs_auto_ownership_regional.csv", index=False)
 **Step 3: Configure as Observed Data**
 
 ```yaml
-observed_data_sources:
-  - name: "ACS 2019"
-    directory: "C:/data/acs_2019"
-    files:
-      auto_ownership_regional: "acs_auto_ownership_regional.csv"
-      auto_ownership_by_size: "acs_auto_by_size.csv"
+observed_summaries:
+  - name: "acs_2019"
+    display_name: "ACS 2019"
+    summaries:
+      auto_ownership_regional:
+        file: "C:/data/acs_2019/acs_auto_ownership_regional.csv"
+        columns:
+          num_vehicles: "num_vehicles"
+          households: "households"
+          share: "share"
 ```
 
 ### Preprocessing CTPP Data
@@ -321,135 +406,117 @@ acs_taz = acs_taz.groupby('taz')['value'].sum().reset_index()
 
 ## 4. Creating Custom Aggregations
 
-### Defining New Mode Groups
+### Aggregating Household Size (4+ Category)
 
-#### Step 1: Map Detailed Modes to Groups
-
-Create aggregation in preprocessing or post-processing:
+To match ACS categories that group 4+ person households:
 
 ```yaml
-# In validation_config.yaml, reference aggregated column
-custom_summaries:
-  - name: "tour_mode_aggregated"
-    data_source: "individual_tours"
-    group_by: "tour_mode_agg"  # Pre-created aggregated column
-    count_name: "tours"
-```
+# Define aggregation mapping
+aggregation_specs:
+  num_persons_agg:
+    apply_to: ["num_persons"]
+    mapping:
+      1: 1
+      2: 2
+      3: 3
+      4: 4
+      5: 4
+      6: 4
+      7: 4
+      8: 4
+      9: 4
+      10: 4
 
-#### Step 2: Create Aggregated Column
-
-Add to data model processing (if not in CTRAMP output):
-
-```python
-# In custom summary logic or preprocessing
-mode_aggregation = {
-    'DRIVEALONEFREE': 'Drive Alone',
-    'DRIVEALONEPAY': 'Drive Alone',
-    'SHARED2FREE': 'Carpool',
-    'SHARED2PAY': 'Carpool',
-    'SHARED3FREE': 'Carpool',
-    'SHARED3PAY': 'Carpool',
-    'WALK_LOC': 'Transit',
-    'WALK_LRF': 'Transit',
-    'WALK_EXP': 'Transit',
-    'WALK_HVY': 'Transit',
-    'WALK_COM': 'Transit',
-    'WALK': 'Walk',
-    'BIKE': 'Bike'
-}
-
-df['tour_mode_agg'] = df['tour_mode'].map(mode_aggregation)
-```
-
-### Aggregating Income Categories
-
-```yaml
-custom_summaries:
-  - name: "auto_ownership_by_income_group"
+# Use in summary
+summaries:
+  - name: "auto_ownership_by_household_size_acs"
+    description: "Vehicle ownership by household size (ACS categories)"
     data_source: "households"
-    group_by: ["income_group", "auto_ownership"]
-    bins:
-      income:
-        breaks: [0, 60000, 150000, 1000000000]
-        labels: ['Low', 'Medium', 'High']
-        bin_column: "income_group"
+    group_by: ["num_persons_agg", "num_vehicles"]
+    weight_field: "sample_rate"
+    count_name: "households"
+    share_within: "num_persons_agg"
 ```
 
-### Custom Purpose Groups
-
-Group related purposes:
-
-```yaml
-custom_summaries:
-  - name: "trips_by_purpose_group"
-    data_source: "individual_trips"
-    group_by: "purpose_group"
-    # Assumes purpose_group pre-created:
-    # Work/School, Shopping/Maintenance, Social/Recreation
-```
+**How it works:**
+- `aggregation_specs` section defines the mapping
+- `apply_to` specifies which column(s) to transform
+- `mapping` converts values (5→4, 6→4, etc.)
+- System creates new column `num_persons_agg` automatically
+- Use aggregated column in `group_by`
 
 ---
 
 ## 5. Creating Custom Bins
 
-Binning converts continuous variables to categories for analysis.
+Binning converts continuous variables to categories for analysis. Define bins once in `binning_specs`, then reference in summaries.
 
 ### Distance Bins
 
 ```yaml
-custom_summaries:
-  - name: "trips_by_distance_bin"
+# Define bins in binning_specs section
+binning_specs:
+  trip_distance:
+    bins: [0, 1, 3, 5, 10, 20, 1000]
+    labels: ['0-1', '1-3', '3-5', '5-10', '10-20', '20+']
+
+# Use in summary by referencing the binned column
+summaries:
+  - name: "trip_distance_distribution"
+    description: "Trip distance distribution (binned)"
     data_source: "individual_trips"
-    group_by: ["distance_bin", "trip_mode"]
+    group_by: "trip_distance_bin"  # Automatically created from trip_distance
     weight_field: "sample_rate"
     count_name: "trips"
-    bins:
-      distance:
-        breaks: [0, 1, 3, 5, 10, 20, 50, 1000]
-        labels: ['<1mi', '1-3mi', '3-5mi', '5-10mi', '10-20mi', '20-50mi', '50+mi']
-        source_column: "trip_distance_miles"
-        bin_column: "distance_bin"
 ```
 
+**How it works:**
+- System finds `trip_distance` column in data
+- Creates `trip_distance_bin` column using bins and labels
+- Use `_bin` suffix in `group_by`
+
 **Parameters:**
-- `breaks`: Bin boundaries (left-inclusive, right-exclusive)
-- `labels`: Display names for bins
-- `source_column`: Column to bin (default: bin name)
-- `bin_column`: Output column name (default: bin name + "_bin")
+- `bins`: Bin boundaries (left-inclusive, right-exclusive)
+- `labels`: Display names for bins (one less than bins length)
 
 ### Time of Day Bins
 
 ```yaml
-bins:
-  time_period:
-    breaks: [0, 6, 9, 15, 19, 24]
+binning_specs:
+  tour_start_hour:
+    bins: [0, 6, 9, 15, 19, 24]
     labels: ['Early AM', 'AM Peak', 'Midday', 'PM Peak', 'Evening']
-    source_column: "departure_hour"
 ```
 
 ### Age Bins
 
 ```yaml
-bins:
-  age_category:
-    breaks: [0, 18, 25, 35, 50, 65, 120]
-    labels: ['0-17', '18-24', '25-34', '35-49', '50-64', '65+']
-    source_column: "age"
+binning_specs:
+  worker_age:
+    bins: [0, 25, 35, 45, 55, 65, 120]
+    labels: ['<25', '25-34', '35-44', '45-54', '55-64', '65+']
 ```
 
-### Income Quartiles
+### Income Categories
 
 ```yaml
-bins:
-  income_quartile:
-    breaks: [0, 35000, 70000, 120000, 1000000000]
-    labels: ['Q1', 'Q2', 'Q3', 'Q4']
-    source_column: "household_income"
+binning_specs:
+  income_category:
+    bins: [0, 30000, 60000, 100000, 150000, 1000000000]
+    labels: ['<30K', '30-60K', '60-100K', '100-150K', '150K+']
 ```
 
-### Multi-Dimensional Binning
+### Using Bins in Summaries
 
 ```yaml
+summaries:
+  - name: "trips_by_distance_and_mode"
+    data_source: "individual_trips"
+    group_by: ["trip_distance_bin", "trip_mode"]
+    weight_field: "sample_rate"
+    count_name: "trips"
+    share_within: "trip_distance_bin"
+```
 custom_summaries:
   - name: "trip_distance_time_matrix"
     group_by: ["distance_bin", "time_bin", "trip_mode"]
@@ -879,39 +946,42 @@ python run_and_deploy_dashboard.py \
 
 ```bash
 # 1. Preprocess observed data to match model format
-python preprocess_acs_data.py
+# (Create CSV with same columns as model output + dataset column)
+python convert_acs_data.py
 
 # 2. Add to validation_config.yaml:
-#   observed_data_sources:
-#     - name: "ACS 2021"
-#       directory: "C:/data/acs_2021"
-#       files:
-#         auto_ownership: "acs_auto.csv"
+#   observed_summaries:
+#     - name: "acs_2023"
+#       display_name: "ACS 2023"
+#       summaries:
+#         auto_ownership_regional:
+#           file: "C:/data/acs_2023/acs_auto_ownership.csv"
+#           columns:
+#             num_vehicles: "num_vehicles"
+#             households: "households"
+#             share: "share"
 
-# 3. Reference in existing summary:
-#   custom_summaries:
-#     - name: "auto_ownership_regional"
-#       observed_data: "ACS 2021"
-#       observed_file: "auto_ownership"
-
-# 4. Regenerate summaries
+# 3. Regenerate summaries (system auto-merges by matching name)
 python -m tm2py_utils.summary.validation.summaries.run_all \
   --config validation_config.yaml
+
+# 4. Verify combined file includes observed data
+# Check outputs/dashboard/auto_ownership_regional.csv
 ```
 
 ### Workflow 3: Creating Complete New Analysis
 
 ```bash
-# 1. Define summary in validation_config.yaml
+# 1. Define summary in validation_config.yaml under summaries section
+
 # 2. Test generation
 python -m tm2py_utils.summary.validation.summaries.run_all \
-  --config validation_config.yaml \
-  --summary-name my_new_summary
+  --config validation_config.yaml
 
-# 3. Create dashboard YAML
-# dashboard/dashboard-9-my-analysis.yaml
+# 3. Create dashboard YAML (optional - for visualization)
+# dashboard/dashboard-households.yaml (or appropriate tab)
 
-# 4. Deploy
+# 4. Deploy dashboard
 python run_and_deploy_dashboard.py \
   --config validation_config.yaml \
   --launch-dashboard
