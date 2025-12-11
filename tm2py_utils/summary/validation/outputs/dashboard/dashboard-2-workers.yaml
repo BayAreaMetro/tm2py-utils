@@ -1,7 +1,0 @@
-header:
-  tab: Workers
-  title: Worker and Employment Statistics
-  description: Worker demographics and employment patterns (multi-run comparison)
-layout:
-  worker_overview: []
-  demographics: []
