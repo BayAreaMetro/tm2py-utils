@@ -1248,20 +1248,20 @@
 <tr>
 <td><code>hh_id</code></td>
 <td>Unique household identifier</td>
-<td>1, 2, 3, ...</td>
+<td>1562223, 1580323, ...</td>
 <td>Primary key</td>
 </tr>
 <tr>
 <td><code>home_mgra</code></td>
 <td>Home location MGRA</td>
-<td>1, 2, 3, ..., 1454</td>
+<td>3, 4, 5, ..., 1454</td>
 <td>Joins to geography lookup</td>
 </tr>
 <tr>
 <td><code>income</code></td>
-<td>Income category</td>
-<td>1, 2, 3, 4</td>
-<td>1=Low, 2=Med-Low, 3=Med-High, 4=High</td>
+<td>Annual household income (dollars)</td>
+<td>140705, 125256, 772355</td>
+<td>Continuous dollar amount</td>
 </tr>
 <tr>
 <td><code>autos</code></td>
@@ -1284,8 +1284,8 @@
 <tr>
 <td><code>sampleRate</code></td>
 <td>Sample expansion factor</td>
-<td>0.05, 0.5, 1.0</td>
-<td><strong>Percentage</strong> (0.05 = 5% sample)</td>
+<td>0.01, 0.05, 0.5, 1.0</td>
+<td><strong>Decimal fraction</strong> (0.01 = 1% sample)</td>
 </tr>
 </tbody>
 </table>
@@ -1322,9 +1322,9 @@
 </tbody>
 </table>
 <p><strong>Key Points:</strong>
-- <code>sampleRate</code> is the <strong>sampling percentage</strong>, not the expansion factor (system inverts it: 0.5 → weight of 2.0)
+- <code>sampleRate</code> is the <strong>sampling fraction</strong>, not the expansion factor (system inverts it: 0.01 → weight of 100.0)
 - <code>home_mgra</code> must exist in the geography lookup file to get county/district names
-- <code>income</code> categories represent quartiles (1=lowest, 4=highest)</p>
+- <code>income</code> is continuous in dollars, not categorical (binning must be done in postprocessing or summary config)</p>
 <p><strong>Official Documentation</strong>: https://bayareametro.github.io/tm2py/ctramp-outputs/household/</p>
 <hr />
 <h3 id="2-persons-persondata_iterationcsv">2. Persons (<code>personData_{iteration}.csv</code>)<a class="headerlink" href="#2-persons-persondata_iterationcsv" title="Permanent link">&para;</a></h3>
@@ -1343,13 +1343,13 @@
 <tr>
 <td><code>hh_id</code></td>
 <td>Household identifier</td>
-<td>1, 2, 3, ...</td>
+<td>1562223, 1580323, ...</td>
 <td>Foreign key to households</td>
 </tr>
 <tr>
 <td><code>person_id</code></td>
 <td>Unique person identifier</td>
-<td>1, 2, 3, ...</td>
+<td>3806279, 3841021, ...</td>
 <td>Primary key (globally unique)</td>
 </tr>
 <tr>
@@ -1361,62 +1361,62 @@
 <tr>
 <td><code>age</code></td>
 <td>Person age in years</td>
-<td>5, 25, 65, ...</td>
+<td>9, 12, 39, 47, 51</td>
 <td>Integer</td>
 </tr>
 <tr>
 <td><code>gender</code></td>
 <td>Gender</td>
-<td>1, 2</td>
-<td>1=Male, 2=Female</td>
+<td>"m", "f"</td>
+<td><strong>Text values</strong>: "m"=Male, "f"=Female</td>
 </tr>
 <tr>
 <td><code>type</code></td>
 <td>Person type classification</td>
-<td>1-8</td>
-<td>See person type codes below</td>
+<td><strong>Text values</strong></td>
+<td>See person type values below</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Person Type Codes</strong> (<code>type</code>):</p>
+<p><strong>Person Type Values</strong> (<code>type</code>) - <strong>Text Strings</strong>:</p>
 <table>
 <thead>
 <tr>
-<th>Code</th>
+<th>Value</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>1</td>
+<td>"Full-time worker"</td>
 <td>Full-time worker</td>
 </tr>
 <tr>
-<td>2</td>
+<td>"Part-time worker"</td>
 <td>Part-time worker</td>
 </tr>
 <tr>
-<td>3</td>
+<td>"University student"</td>
 <td>University student</td>
 </tr>
 <tr>
-<td>4</td>
+<td>"Non-worker"</td>
 <td>Non-working adult</td>
 </tr>
 <tr>
-<td>5</td>
+<td>"Retired"</td>
 <td>Retired adult</td>
 </tr>
 <tr>
-<td>6</td>
-<td>Driving-age student</td>
+<td>"Student of driving age"</td>
+<td>Driving-age student (high school)</td>
 </tr>
 <tr>
-<td>7</td>
-<td>School-age child</td>
+<td>"Student of non-driving age"</td>
+<td>School-age child (K-8)</td>
 </tr>
 <tr>
-<td>8</td>
+<td>"Child too young for school"</td>
 <td>Preschool child</td>
 </tr>
 </tbody>
@@ -1508,14 +1508,14 @@
 <tr>
 <td><code>person_type</code></td>
 <td>Person type classification</td>
-<td>1-8</td>
+<td>Text values</td>
 <td>Same as persons.type</td>
 </tr>
 <tr>
 <td><code>tour_id</code></td>
 <td>Tour sequence for this person</td>
-<td>1, 2, 3</td>
-<td>Primary key (unique per person)</td>
+<td>0, 1, 2, 3</td>
+<td>Primary key (0-indexed, unique per person)</td>
 </tr>
 <tr>
 <td><code>tour_category</code></td>
@@ -1532,13 +1532,13 @@
 <tr>
 <td><code>start_period</code></td>
 <td>Departure time period</td>
-<td>1-48</td>
-<td>30-minute intervals (1=3:00-3:30 AM, 14=9:30-10:00 AM)</td>
+<td>1-40</td>
+<td>30-minute intervals (1=5:00-5:30 AM, 7=8:00-8:30 AM)</td>
 </tr>
 <tr>
 <td><code>end_period</code></td>
 <td>Return time period</td>
-<td>1-48</td>
+<td>1-40</td>
 <td>Same scale as start_period</td>
 </tr>
 </tbody>
@@ -1606,11 +1606,12 @@
 </tr>
 </tbody>
 </table>
-<p><strong>Time Periods</strong> (1-48, 30-minute intervals):
-- 1 = 3:00-3:30 AM
-- 14 = 9:30-10:00 AM
-- 34 = 7:30-8:00 PM
-- 48 = 2:30-3:00 AM (next day)</p>
+<p><strong>Time Periods</strong> (1-40, 30-minute intervals starting at 5:00 AM):
+- 1 = 5:00-5:30 AM
+- 7 = 8:00-8:30 AM (typical morning commute)
+- 13 = 11:00-11:30 AM
+- 25 = 5:00-5:30 PM (typical evening commute)
+- 40 = 3:00-3:30 AM (next day)</p>
 <p><strong>Official Documentation</strong>: https://bayareametro.github.io/tm2py/ctramp-outputs/individual-tours/</p>
 <hr />
 <h3 id="4-individual-trips-indivtripdata_iterationcsv">4. Individual Trips (<code>indivTripData_{iteration}.csv</code>)<a class="headerlink" href="#4-individual-trips-indivtripdata_iterationcsv" title="Permanent link">&para;</a></h3>
@@ -1705,7 +1706,7 @@
 <tr>
 <td><code>stop_period</code></td>
 <td>Departure time period</td>
-<td>1-48</td>
+<td>1-40</td>
 </tr>
 <tr>
 <td><code>trip_mode</code></td>
@@ -1829,33 +1830,33 @@
 </tr>
 <tr>
 <td>9</td>
-<td>WALK</td>
-<td>Walk</td>
-</tr>
-<tr>
-<td>10</td>
-<td>BIKE</td>
-<td>Bicycle</td>
-</tr>
-<tr>
-<td>11</td>
-<td>WLK_TRN</td>
+<td>WALK_TRN</td>
 <td>Walk to Transit</td>
 </tr>
 <tr>
-<td>12</td>
+<td>10</td>
 <td>PNR_TRN</td>
 <td>Park-and-Ride to Transit</td>
 </tr>
 <tr>
+<td>11</td>
+<td>KNR_TRN</td>
+<td>Kiss-and-Ride to Transit</td>
+</tr>
+<tr>
+<td>12</td>
+<td>TNC_TRN</td>
+<td>TNC to Transit</td>
+</tr>
+<tr>
 <td>13</td>
-<td>KNRPRV_TRN</td>
-<td>Kiss-and-Ride (Private vehicle) to Transit</td>
+<td>WALK</td>
+<td>Walk</td>
 </tr>
 <tr>
 <td>14</td>
-<td>KNRTNC_TRN</td>
-<td>Kiss-and-Ride (TNC) to Transit</td>
+<td>BIKE</td>
+<td>Bicycle</td>
 </tr>
 <tr>
 <td>15</td>
@@ -1864,21 +1865,21 @@
 </tr>
 <tr>
 <td>16</td>
-<td>TNC</td>
-<td>Transportation Network Company (Uber/Lyft)</td>
+<td>TNC_SINGLE</td>
+<td>TNC Single (Uber/Lyft alone)</td>
 </tr>
 <tr>
 <td>17</td>
-<td>SCHLBUS</td>
-<td>School Bus</td>
+<td>TNC_SHARED</td>
+<td>TNC Shared (UberPool/Lyft Shared)</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Common Aggregations:</strong>
 - <strong>Auto</strong>: 1-8 (all SOV and shared ride modes)
-- <strong>Transit</strong>: 11-14 (all transit access modes)
-- <strong>Active</strong>: 9-10 (walk and bike)
-- <strong>TNC/Taxi</strong>: 15-16</p>
+- <strong>Transit</strong>: 9-12 (all transit access modes)
+- <strong>Active</strong>: 13-14 (walk and bike)
+- <strong>TNC/Taxi</strong>: 15-17 (taxi and TNC modes)</p>
 <hr />
 <h2 id="data-relationships">Data Relationships<a class="headerlink" href="#data-relationships" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>households (hh_id)
@@ -1896,13 +1897,18 @@
 - <code>households.home_mgra</code> → <code>geography.MAZ_SEQ</code> (for county/district)</p>
 <hr />
 <h2 id="sample-expansion-weighting">Sample Expansion (Weighting)<a class="headerlink" href="#sample-expansion-weighting" title="Permanent link">&para;</a></h2>
-<p><strong>CRITICAL</strong>: The <code>sampleRate</code> field is a <strong>percentage</strong>, not an expansion factor.</p>
+<p><strong>CRITICAL</strong>: The <code>sampleRate</code> field is a <strong>decimal fraction</strong>, not an expansion factor.</p>
 <ul>
-<li><strong>In CSVs</strong>: <code>sampleRate = 0.05</code> means 5% sample</li>
-<li><strong>Expansion factor</strong>: <code>1 / sampleRate = 1 / 0.05 = 20.0</code></li>
-<li><strong>Interpretation</strong>: Each record represents 20 actual households/persons/tours/trips</li>
+<li><strong>In CSVs</strong>: <code>sampleRate = 0.01</code> means 1% sample (typical for full region model)</li>
+<li><strong>Expansion factor</strong>: <code>1 / sampleRate = 1 / 0.01 = 100.0</code></li>
+<li><strong>Interpretation</strong>: Each record represents 100 actual households/persons/tours/trips</li>
 </ul>
 <p><strong>The system automatically inverts <code>sampleRate</code> to calculate weights.</strong></p>
+<p><strong>Common Values:</strong>
+- <code>0.01</code> = 1% sample (expansion factor 100) - typical for full model runs
+- <code>0.05</code> = 5% sample (expansion factor 20) - smaller test runs
+- <code>0.50</code> = 50% sample (expansion factor 2) - quick tests
+- <code>1.00</code> = 100% sample (expansion factor 1) - no sampling</p>
 <table>
 <thead>
 <tr>
@@ -2042,7 +2048,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="December 11, 2025 17:42:55 UTC">December 11, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="December 11, 2025 17:53:27 UTC">December 11, 2025</span>
   </span>
 
     
