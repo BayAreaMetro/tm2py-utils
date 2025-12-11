@@ -15,5 +15,10 @@ __pycache__/
 tm2py_utils/inputs/maz_taz/maz_taz_map.html
 
 # Validation system outputs (generated files)
-tm2py_utils/summary/validation/outputs/
+# Note: dashboard CSVs are committed for deployment, but per-dataset files are ignored
+tm2py_utils/summary/validation/outputs/*
+!tm2py_utils/summary/validation/outputs/dashboard/
+tm2py_utils/summary/validation/outputs/dashboard/*_2015*.csv
+tm2py_utils/summary/validation/outputs/dashboard/*_2023*.csv
+tm2py_utils/summary/validation/outputs/dashboard/summary_index.csv
 tm2py_utils/summary/validation/*.log

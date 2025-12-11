@@ -569,6 +569,32 @@ def main():
     data_dir = outputs_dir / "dashboard"  # CSVs are in outputs/dashboard folder
     dashboard_config_dir = validation_dir / "dashboard"  # YAML configs are in dashboard/ folder
     
+    # Check if data directory exists
+    if not data_dir.exists():
+        st.error("⚠️ Dashboard data directory not found!")
+        st.markdown(f"""
+        ### Setup Required
+        
+        The dashboard needs CSV files to display. Expected location:
+        ```
+        {data_dir}
+        ```
+        
+        **To generate the required CSV files:**
+        
+        1. Run the validation summaries:
+        ```bash
+        cd tm2py_utils/summary/validation
+        conda activate tm2py-utils
+        python -m tm2py_utils.summary.validation.summaries.run_all --config validation_config.yaml
+        ```
+        
+        2. For deployment, ensure CSV files are committed to the repository (you may need to update `.gitignore`)
+        
+        **For local development:** See [Generate Summaries documentation](https://github.com/BayAreaMetro/tm2py-utils/blob/main/tm2py_utils/docs/generate-summaries.md)
+        """)
+        return
+    
     # Find dashboard YAML files
     dashboard_files = sorted(dashboard_config_dir.glob("dashboard-*.yaml"))
     
