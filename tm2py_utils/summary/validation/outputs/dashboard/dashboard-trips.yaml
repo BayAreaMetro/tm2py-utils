@@ -1,0 +1,73 @@
+header:
+  tab: Trips
+  title: Trip Pattern Statistics
+  description: Trip mode choice, purpose, distance, and duration (multi-run comparison)
+layout:
+  trip_patterns:
+  - type: bar
+    title: Trips by Mode - Share
+    props:
+      dataset: trip_mode_choice_aggregated.csv
+      x: trip_mode_agg
+      y: share
+      groupBy: dataset
+    description: 'Share: trip mode distribution (aggregated categories)'
+  - type: bar
+    title: Trips by Mode - Total
+    props:
+      dataset: trip_mode_choice_aggregated.csv
+      x: trip_mode_agg
+      y: trips
+      groupBy: dataset
+    description: 'Total: trip mode distribution (aggregated categories)'
+  - type: bar
+    title: Trips by Purpose - Share
+    props:
+      dataset: trip_purpose.csv
+      x: destination_purpose
+      y: share
+      groupBy: dataset
+    description: 'Share: trip purpose distribution'
+  - type: bar
+    title: Trips by Purpose - Total
+    props:
+      dataset: trip_purpose.csv
+      x: destination_purpose
+      y: trips
+      groupBy: dataset
+    description: 'Total: trip purpose distribution'
+  - type: bar
+    title: Trips by Distance - Share
+    props:
+      dataset: trip_distance.csv
+      x: trip_distance_bin
+      y: share
+      groupBy: dataset
+    description: 'Share: trip distance distribution'
+  - type: bar
+    title: Trips by Distance - Total
+    props:
+      dataset: trip_distance.csv
+      x: trip_distance_bin
+      y: trips
+      groupBy: dataset
+    description: 'Total: trip distance distribution'
+  mode_purpose:
+  - type: bar
+    title: Trip Mode by Purpose - Share
+    props:
+      dataset: trip_mode_by_purpose_aggregated.csv
+      x: destination_purpose
+      y: share
+      columns: trip_mode_agg
+      groupBy: dataset
+    description: 'Share: mode choice by trip purpose (aggregated categories)'
+  - type: bar
+    title: Trip Mode by Purpose - Total
+    props:
+      dataset: trip_mode_by_purpose_aggregated.csv
+      x: destination_purpose
+      y: trips
+      columns: trip_mode_agg
+      groupBy: dataset
+    description: 'Total: mode choice by trip purpose (aggregated categories)'

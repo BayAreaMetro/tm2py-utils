@@ -20,21 +20,28 @@ logger = logging.getLogger(__name__)
 VARIABLE_LABELS = {}
 CATEGORICAL_ORDER = {}
 DATASET_ORDER = []
-variable_labels_path = Path(__file__).parent.parent / "data_model" / "variable_labels.yaml"
-if variable_labels_path.exists():
-    with open(variable_labels_path, 'r') as f:
-        config = yaml.safe_load(f) or {}
-        # Extract labels (all non-dict values)
-        VARIABLE_LABELS = {k: v for k, v in config.items() if not isinstance(v, dict)}
-        # Extract categorical ordering
-        CATEGORICAL_ORDER = config.get('categorical_order', {})
 
-# Load dataset order from validation config
-validation_config_path = Path(__file__).parent.parent / "validation_config.yaml"
-if validation_config_path.exists():
-    with open(validation_config_path, 'r') as f:
-        validation_config = yaml.safe_load(f) or {}
-        DATASET_ORDER = validation_config.get('dataset_order', [])
+try:
+    variable_labels_path = Path(__file__).parent.parent / "data_model" / "variable_labels.yaml"
+    if variable_labels_path.exists():
+        with open(variable_labels_path, 'r', encoding='utf-8') as f:
+            config = yaml.safe_load(f) or {}
+            # Extract labels (all non-dict values)
+            VARIABLE_LABELS = {k: v for k, v in config.items() if not isinstance(v, dict)}
+            # Extract categorical ordering
+            CATEGORICAL_ORDER = config.get('categorical_order', {})
+except Exception as e:
+    logger.warning(f"Could not load variable labels: {e}")
+
+try:
+    # Load dataset order from validation config
+    validation_config_path = Path(__file__).parent.parent / "validation_config.yaml"
+    if validation_config_path.exists():
+        with open(validation_config_path, 'r', encoding='utf-8') as f:
+            validation_config = yaml.safe_load(f) or {}
+            DATASET_ORDER = validation_config.get('dataset_order', [])
+except Exception as e:
+    logger.warning(f"Could not load validation config: {e}")
 
 # MTC Brand Colors
 MTC_COLORS = {
@@ -622,9 +629,20 @@ def main():
     
     # Load and render selected dashboard
     config_path = dashboard_names[selected_dashboard]
-    config = load_dashboard_config(config_path)
-    render_dashboard(config, data_dir)
+    
+    try:
+        config = load_dashboard_config(config_path)
+        render_dashboard(config, data_dir)
+    except Exception as e:
+        st.error(f"Error loading dashboard: {str(e)}")
+        st.exception(e)
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        st.error("Fatal error starting dashboard")
+        st.exception(e)
+        import traceback
+        st.code(traceback.format_exc())
