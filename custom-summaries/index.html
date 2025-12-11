@@ -13,6 +13,10 @@
       
       
       
+        <link rel="prev" href="../data-model/">
+      
+      
+        <link rel="next" href="../external-data/">
       
       
         
@@ -23,7 +27,7 @@
     
     
       
-        <title>Create Custom Summaries - tm2py-utils Documentation</title>
+        <title>Custom Summaries - tm2py-utils Documentation</title>
       
     
     
@@ -114,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Create Custom Summaries
+              Custom Summaries
             
           </span>
         </div>
@@ -264,10 +268,12 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../validation-system/" class="md-tabs__link">
           
   
@@ -288,7 +294,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../contributing/" class="md-tabs__link">
+        <a href="../code-flow/" class="md-tabs__link">
           
   
   
@@ -513,28 +519,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
-        
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   
@@ -552,7 +561,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -578,6 +587,786 @@
     
   
     Complete Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../generate-summaries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generate Summaries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CTRAMP Data Model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom Summaries
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom Summaries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#basic-summary-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Basic Summary Structure
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Basic Summary Structure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minimal-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimal Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#required-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Required Fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional Fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Sources
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#grouping-dimensions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Grouping Dimensions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Grouping Dimensions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#single-dimension" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Single Dimension
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multiple-dimensions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multiple Dimensions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cross-tabulations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cross-Tabulations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#share-calculations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Share Calculations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Share Calculations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#regional-shares-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Regional Shares (Default)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shares-within-groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shares Within Groups
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multiple-grouping-levels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multiple Grouping Levels
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#disable-share-calculation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Disable Share Calculation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filtering-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filtering Data
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Filtering Data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#simple-filters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Simple Filters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#complex-filters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complex Filters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filter-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filter Execution
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#binning-continuous-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Binning Continuous Variables
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Binning Continuous Variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#define-bins-globally" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Define Bins Globally
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-binned-columns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use Binned Columns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#binning-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Binning Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pre-configured-bins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pre-Configured Bins
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aggregating-categories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aggregating Categories
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Aggregating Categories">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#define-aggregations-globally" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Define Aggregations Globally
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-aggregated-columns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use Aggregated Columns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transportation-mode-aggregation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transportation Mode Aggregation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aggregation-vs-binning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aggregation vs. Binning
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Complete Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-1-simple-distribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 1: Simple Distribution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-2-cross-tabulation-with-shares" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 2: Cross-Tabulation with Shares
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-3-filtered-binned" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 3: Filtered + Binned
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-4-multi-level-grouping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 4: Multi-Level Grouping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-5-aggregated-categories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 5: Aggregated Categories
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-6-geographic-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 6: Geographic Summary
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Patterns
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pattern-1-regional-distribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 1: Regional Distribution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-2-conditional-distribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 2: Conditional Distribution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-3-filtered-subset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 3: Filtered Subset
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-4-multi-dimensional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern 4: Multi-Dimensional
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#empty-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Empty Output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#missing-columns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Missing Columns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wrong-data-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wrong Data Source
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shares-dont-add-to-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shares Don't Add to 1.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Best Practices
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../external-data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    External Data Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deploy-dashboard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deploy Dashboard
   
 
     
@@ -735,6 +1524,62 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code-flow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Code Flow & Execution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../validation-development/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development Tasks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
