@@ -113,6 +113,8 @@ See **[Development Tasks & Next Steps](validation-development.md)** for ongoing 
 - Fixing broken summaries and adding new validation targets
 - Integrating CTPP journey-to-work data
 
+**Technical Documentation**: For detailed code architecture and execution flow, see **[Code Flow and Execution Guide](code-flow.md)**
+
 ## Quick Start
 
 ### Generate Summaries from Model Run

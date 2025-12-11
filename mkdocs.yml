@@ -35,10 +35,17 @@ nav:
     - Quick Start: index.md#quick-start
   - Validation System:
     - Complete Guide: validation-system.md
+    - Generate Summaries: generate-summaries.md
+    - CTRAMP Data Model: data-model.md
+    - Custom Summaries: custom-summaries.md
+    - External Data Integration: external-data.md
+    - Deploy Dashboard: deploy-dashboard.md
     - Configuration Reference: configuration.md
     - Dashboard: dashboard.md
     - Summaries: summaries.md
   - Development:
+    - Code Flow & Execution: code-flow.md
+    - Development Tasks: validation-development.md
     - Contributing Guide: contributing.md
   - Reference:
     - Consolidation Proposal: ../summary/CONSOLIDATION_PROPOSAL.md
