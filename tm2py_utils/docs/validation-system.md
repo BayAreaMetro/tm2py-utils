@@ -104,6 +104,14 @@ The system includes **25 pre-configured summaries** across 5 topic areas:
 - **Tours** (6 summaries) - Tour frequency, mode, purpose, timing
 - **Trips** (9 summaries) - Trip mode, purpose, distance, time-of-day
 
+### Development Roadmap
+
+See **[Development Tasks & Next Steps](validation-development.md)** for ongoing work including:
+- Updating the data model with new postprocessed fields
+- Formatting 2023 household travel survey data
+- Fixing broken summaries and adding new validation targets
+- Integrating CTPP journey-to-work data
+
 ## Quick Start
 
 ### Generate Summaries from Model Run
