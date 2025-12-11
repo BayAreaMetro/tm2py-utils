@@ -47,7 +47,7 @@ Or use the deployment script:
 python run_and_deploy_dashboard.py --config validation_config.yaml --launch-dashboard
 ```
 
-View the live dashboard: [https://tm2-validation-dashboard.streamlit.app/](https://tm2-validation-dashboard.streamlit.app/)
+View the live dashboard: [https://tm2-dashboard.streamlit.app/](https://tm2-dashboard.streamlit.app/)
 
 **📚 New to the validation system?** Check out the **[Complete Validation System Guide](validation-system.md)** for step-by-step instructions on:
 - Creating summaries from model runs

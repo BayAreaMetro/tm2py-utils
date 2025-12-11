@@ -4,7 +4,7 @@ The tm2py-utils validation dashboard is an interactive web application for compa
 
 ## Live Dashboard
 
-View the deployed dashboard: **[https://tm2-validation-dashboard.streamlit.app/](https://tm2-validation-dashboard.streamlit.app/)**
+View the deployed dashboard: **[https://tm2-dashboard.streamlit.app/](https://tm2-dashboard.streamlit.app/)**
 
 ## Running Locally
 
@@ -195,7 +195,7 @@ Check that dashboard YAML files are in `dashboard/` directory (not `outputs/dash
 
 The dashboard auto-deploys to Streamlit Cloud when changes are pushed to the main branch on GitHub.
 
-**Live URL**: [https://tm2-validation-dashboard.streamlit.app/](https://tm2-validation-dashboard.streamlit.app/)
+**Live URL**: [https://tm2-dashboard.streamlit.app/](https://tm2-dashboard.streamlit.app/)
 
 ### Manual Deployment
 
@@ -203,7 +203,7 @@ To deploy your own instance:
 
 1. Create a Streamlit Cloud account
 2. Connect your GitHub repository
-3. Set main file: `tm2py_utils/summary/validation/dashboard/dashboard_app.py`
+3. Set main file: `tm2py_utils/summary/validation/streamlit_app.py`
 4. Deploy!
 
 ## Next Steps
