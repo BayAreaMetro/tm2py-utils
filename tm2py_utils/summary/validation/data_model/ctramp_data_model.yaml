@@ -1168,10 +1168,10 @@ summaries:
   auto_ownership_by_income:
     description: "Vehicle ownership by household income category"
     data_source: "households"
-    group_by: ["income_category_bin", "num_vehicles"]
+    group_by: ["income_category", "num_vehicles"]
     weight_field: "sample_rate"
     count_name: "households"
-    share_within: "income_category_bin"
+    share_within: "income_category"
   
   auto_ownership_by_household_size:
     description: "Vehicle ownership by household size"

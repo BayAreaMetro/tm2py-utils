@@ -70,6 +70,11 @@ def find_latest_iteration_file(ctramp_dir: Path, pattern: str) -> Optional[Path]
     Returns:
         Path to the file with highest iteration number, or None if not found
     """
+    # If no {iteration} placeholder, just look for exact match
+    if '{iteration}' not in pattern:
+        file_path = ctramp_dir / pattern
+        return file_path if file_path.exists() else None
+    
     # Extract base pattern (e.g., "personData_" and ".csv")
     base = pattern.split('{iteration}')[0]
     ext = pattern.split('{iteration}')[1]
@@ -122,6 +127,12 @@ def load_ctramp_data(ctramp_dir: Path, data_model: Dict[str, Any]) -> Dict[str, 
     
     for table_name, schema in input_schema.items():
         logger.info(f"Loading {table_name}...")
+        
+        # Skip geography_lookup - it's a static reference file, not CTRAMP output
+        if table_name == 'geography_lookup':
+            logger.info(f"  ℹ Skipping {table_name} (static reference file, not CTRAMP output)")
+            logger.info("")
+            continue
         
         # Find the file
         file_pattern = schema['file_pattern']
