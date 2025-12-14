@@ -6,7 +6,6 @@
 
 `tm2py-utils` provides a collection of utilities for working with Travel Model Two outputs, including:
 
-- **Validation Dashboard** - Interactive web dashboard for model validation and scenario comparison
 - **Summary Generation** - Automated summary statistics from CTRAMP model outputs
 - **PopulationSim Integration** - Synthetic population analysis and validation
 - **Network Analysis** - Tools for analyzing transportation networks
@@ -30,7 +29,7 @@ pip install -e .
 
 See [Installation Guide](install.md) for detailed instructions.
 
-### Running the Validation Dashboard
+### Generating Summaries
 
 ```bash
 # Navigate to validation directory
@@ -39,7 +38,7 @@ cd tm2py_utils/summary/validation
 # Generate summaries for a model run
 python summarize_model_run.py "C:/path/to/ctramp_output"
 
-# View summaries (use Excel, Python, R, or dashboard tools)
+# View summaries (use Excel, Python, R, or other analysis tools)
 ```
 
 **📚 New to the validation system?** Check out:
@@ -48,19 +47,6 @@ python summarize_model_run.py "C:/path/to/ctramp_output"
 - **[Summaries Guide](summaries.md)** - System documentation
 
 ## Key Features
-
-### 📊 Validation Dashboard
-
-Interactive web-based dashboard for comparing model runs and validating against observed data:
-
-- **Population** - Synthetic population demographics (from PopulationSim)
-- **Households** - Auto ownership patterns
-- **Activity Patterns** - Daily activity patterns (CDAP)
-- **Tours** - Tour frequency and mode choice
-- **Trips** - Trip mode and purpose analysis
-- **Journey to Work** - Commute patterns
-- **Time of Day** - Temporal distribution of travel
-- **Trip Characteristics** - Distance and travel time
 
 ### 📊 Summary Generation System
 

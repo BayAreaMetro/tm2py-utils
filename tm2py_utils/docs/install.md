@@ -31,9 +31,6 @@ conda activate tm2py-utils
 ```bash
 # Install required packages
 pip install -r requirements.txt
-
-# Install additional dashboard dependencies
-pip install streamlit plotly
 ```
 
 ### 4. Install tm2py-utils
@@ -77,20 +74,12 @@ If you get `ModuleNotFoundError`, ensure you've activated the conda environment:
 conda activate tm2py-utils
 ```
 
-### Streamlit Not Found
-
-If `streamlit` command is not recognized:
-
-```bash
-pip install streamlit
-```
-
 ### Permission Errors
 
 On Windows, you may need to run PowerShell as Administrator for some operations.
 
 ## Next Steps
 
-- [Run the Dashboard](dashboard.md)
-- [Generate Summaries](summaries.md)
-- [Configure Analysis](configuration.md)
+- [Generate Summaries](generate-summaries.md) - Run the summarizer
+- [Summaries Reference](summaries.md) - List of available summaries
+- [Configuration](configuration.md) - YAML data model documentation

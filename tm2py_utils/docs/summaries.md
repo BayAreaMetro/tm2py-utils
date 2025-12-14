@@ -1,6 +1,6 @@
 # Summary Generation System
 
-The tm2py-utils summary system generates aggregated statistics from CTRAMP model outputs for validation and comparison.
+The tm2py-utils summary system generates aggregated statistics from CTRAMP model outputs for validation.
 
 ## Overview
 
@@ -287,7 +287,7 @@ For very large model runs (> 10M persons), consider:
 
 ## Comparing Multiple Runs
 
-To compare multiple model runs:
+To analyze multiple model runs:
 
 1. Generate summaries for each run in separate output directories:
    ```bash
@@ -295,7 +295,7 @@ To compare multiple model runs:
    python summarize_model_run.py "run2/ctramp_output" --output "outputs/run2"
    ```
 
-2. Merge the CSVs manually or use a dashboard tool to compare
+2. Load and analyze the CSVs using Excel, Python (pandas), R, or other analysis tools
 
 ## Next Steps
 

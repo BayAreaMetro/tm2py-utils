@@ -15,7 +15,7 @@ The summary generation system reads raw CTRAMP outputs (CSV files) and produces 
 - Validates results for data quality issues
 - Saves individual CSV files for each summary
 
-**Output:** 30 CSV files ready for analysis in Excel, pandas, R, or dashboard tools.
+**Output:** 30 CSV files ready for analysis in Excel, pandas, R, or other analysis tools.
 
 ---
 
@@ -518,7 +518,7 @@ The tool uses ASCII-safe symbols and should work on all Windows terminals. If yo
 ## Next Steps
 
 - **Analyze summaries:** Use Excel, Python pandas, R, or BI tools
-- **Compare runs:** Generate summaries for multiple runs and compare
+- **Analyze results:** Load CSVs into Excel, Python, R, or other tools for analysis
 - **Add custom summaries:** Edit `ctramp_data_model.yaml` to add new analyses
 - **Validate data quality:** Review validation warnings and investigate issues
 

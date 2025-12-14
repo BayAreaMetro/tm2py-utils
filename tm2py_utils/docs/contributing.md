@@ -105,98 +105,7 @@ Walk-Transit-Walk,Work,156789,8.7,0.057
 
 ### 4. Update Documentation
 
-Add to appropriate section in `docs/summaries.md`.
-
-## Adding a Dashboard Tab
-
-### 1. Create YAML Configuration
-
-Create `dashboard/dashboard-N-mytab.yaml`:
-
-```yaml
-title: "My New Analysis"
-description: "Description of what this tab shows"
-
-sections:
-  - title: "Overview"
-    layout: "two_column"
-    charts:
-      - type: "bar"
-        title: "My Metric by Category"
-        data_file: "my_summary.csv"
-        x: "category"
-        y: "value"
-        color: "dataset"
-        orientation: "h"
-        facet_col: null
-      
-      - type: "line"
-        title: "Trend Over Time"
-        data_file: "my_trend.csv"
-        x: "year"
-        y: "value"
-        color: "category"
-```
-
-### 2. Generate Required Data
-
-Ensure summaries in YAML exist in `validation_config.yaml`:
-
-```yaml
-custom_summaries:
-  - name: "my_summary"
-    # ... configuration
-  
-  - name: "my_trend"
-    # ... configuration
-```
-
-### 3. Test Dashboard
-
-```bash
-cd tm2py_utils/summary/validation
-
-# Generate summaries
-python run_and_deploy_dashboard.py --config validation_config.yaml
-
-# Launch dashboard
-streamlit run dashboard/dashboard_app.py --server.port 8501
-```
-
-Visit http://localhost:8501 and check new tab appears.
-
-### 4. Dashboard YAML Reference
-
-**Chart Types:**
-- `bar` - Bar chart (vertical or horizontal)
-- `line` - Line chart
-- `scatter` - Scatter plot
-- `box` - Box plot
-- `histogram` - Histogram
-
-**Layout Options:**
-- `single_column` - One chart per row
-- `two_column` - Two charts per row
-- `three_column` - Three charts per row
-
-**Chart Properties:**
-```yaml
-- type: "bar"
-  title: "Chart Title"
-  data_file: "summary.csv"        # CSV filename (must exist in outputs/dashboard/)
-  x: "category_column"            # X-axis column
-  y: "value_column"               # Y-axis column
-  color: "dataset"                # Color by column
-  orientation: "h"                # "h" or "v"
-  facet_col: "another_category"   # Create subplots by column
-  facet_col_wrap: 3               # Number of facet columns
-  barmode: "group"                # "group", "stack", or "relative"
-  category_orders:                # Custom ordering
-    category_column: ["A", "B", "C"]
-  labels:                         # Custom axis labels
-    category_column: "Category"
-    value_column: "Count"
-```
+Add description to appropriate section in `docs/summaries.md`.
 
 ## Adding a Column Mapping
 
@@ -311,7 +220,6 @@ def test_my_summary_generation():
 When adding features, update relevant documentation:
 
 - `docs/summaries.md` - For new summaries or configuration options
-- `docs/dashboard.md` - For new dashboard tabs or features
 - `docs/configuration.md` - For new config parameters
 - `README.md` - For major features
 
@@ -338,8 +246,7 @@ git checkout -b feature/my-new-feature
 
 ### 2. Make Changes
 
-- Add summaries to `validation_config.yaml`
-- Create dashboard YAML files
+- Add summaries to `ctramp_data_model.yaml`
 - Update documentation
 
 ### 3. Test Changes
@@ -349,20 +256,16 @@ git checkout -b feature/my-new-feature
 pytest
 
 # Generate summaries
-python run_and_deploy_dashboard.py --config validation_config.yaml
-
-# Test dashboard
-streamlit run dashboard/dashboard_app.py
+python summarize_model_run.py "path/to/ctramp_output"
 ```
 
 ### 4. Commit
 
 ```bash
 git add .
-git commit -m "Add trip length analysis dashboard
+git commit -m "Add trip length analysis
 
 - Add trip_length_by_mode_purpose summary
-- Create dashboard-8-trip-length.yaml
 - Update summaries.md documentation"
 ```
 
@@ -412,7 +315,13 @@ custom_summaries:
     group_by: ["tour_mode"]
 ```
 
-### Comparison to Observed Data
+### Observed Data
+
+The external data files are provided for reference:
+- PopulationSim summaries in `outputs/populationsim/`
+- ACS data in `outputs/observed/`
+
+These can be used for manual validation checks.
 
 Add to `observed_data_sources` in config:
 

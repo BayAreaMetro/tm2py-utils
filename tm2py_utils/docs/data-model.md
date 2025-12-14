@@ -317,7 +317,7 @@ trips (tour_id, trip_id/stop_id)
 
 ## Preparing Travel Survey Data
 
-To compare model outputs with household travel surveys (e.g., NHTS, CHTS), you must **transform survey data to match this exact format**:
+To validate model outputs with household travel surveys (e.g., NHTS, CHTS), you must **transform survey data to match this exact format**:
 
 ### Required Steps:
 

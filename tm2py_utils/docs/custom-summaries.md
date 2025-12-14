@@ -676,7 +676,7 @@ share_within: ["county", "income"]  # Shares within each county×income combinat
 2. **Add descriptions** - Helps future users understand purpose
 3. **Start simple** - Test with single dimension before adding complexity
 4. **Check shares** - Verify they add to 1.0 within expected groups
-5. **Use aggregations** - For comparison with external data (ACS uses 4+ households)
+5. **Use aggregations** - For matching external data categories (ACS uses 4+ households)
 6. **Leverage bins** - Pre-configured bins for common variables
 7. **Filter early** - Reduces processing time
 8. **Test incrementally** - Add one feature at a time
@@ -703,6 +703,6 @@ Checks:
 ## Next Steps
 
 - **[Generate Summaries](generate-summaries.md)** - Run the summary generation
-- **[External Data Integration](external-data.md)** - Add ACS/CTPP comparisons
+- **[External Data Reference](external-data.md)** - Location of observed data files
 - **[Data Model Reference](data-model.md)** - See available columns
-- **[Deploy Dashboard](deploy-dashboard.md)** - Visualize your summaries
+- **[Configuration Guide](configuration.md)** - YAML documentation
