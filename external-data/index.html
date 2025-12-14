@@ -16,7 +16,7 @@
         <link rel="prev" href="../custom-summaries/">
       
       
-        <link rel="next" href="../deploy-dashboard/">
+        <link rel="next" href="../configuration/">
       
       
         
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#integrate-external-data-sources" class="md-skip">
+        <a href="#external-observed-data" class="md-skip">
           Skip to content
         </a>
       
@@ -274,7 +274,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../validation-system/" class="md-tabs__link">
+        <a href="../validation-system.md" class="md-tabs__link">
           
   
   
@@ -294,7 +294,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../code-flow/" class="md-tabs__link">
+        <a href="../code-flow.md" class="md-tabs__link">
           
   
   
@@ -579,7 +579,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../validation-system/" class="md-nav__link">
+      <a href="../validation-system.md" class="md-nav__link">
         
   
   
@@ -758,6 +758,45 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#populationsim-summaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PopulationSim Summaries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#acs-american-community-survey-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ACS (American Community Survey) Data
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-external-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other External Sources
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1210,7 +1249,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../deploy-dashboard/" class="md-nav__link">
+      <a href="../deploy-dashboard.md" class="md-nav__link">
         
   
   
@@ -1266,7 +1305,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../dashboard/" class="md-nav__link">
+      <a href="../dashboard.md" class="md-nav__link">
         
   
   
@@ -1383,7 +1422,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../code-flow/" class="md-nav__link">
+      <a href="../code-flow.md" class="md-nav__link">
         
   
   
@@ -1411,7 +1450,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../validation-development/" class="md-nav__link">
+      <a href="../validation-development.md" class="md-nav__link">
         
   
   
@@ -1618,6 +1657,45 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#populationsim-summaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PopulationSim Summaries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#acs-american-community-survey-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ACS (American Community Survey) Data
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-external-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other External Sources
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2074,53 +2152,69 @@
   
 
 
-<h1 id="integrate-external-data-sources">Integrate External Data Sources<a class="headerlink" href="#integrate-external-data-sources" title="Permanent link">&para;</a></h1>
-<p>Guide to integrating observed data from ACS, CTPP, and other external sources for model validation comparisons.</p>
+<h1 id="external-observed-data">External Observed Data<a class="headerlink" href="#external-observed-data" title="Permanent link">&para;</a></h1>
+<p>Reference guide for observed data sources used for model validation.</p>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>The validation system allows you to <strong>compare model outputs with observed data</strong> from external sources. This enables validation against real-world benchmarks like census data, employment surveys, and journey-to-work statistics.</p>
-<p><strong>Supported External Sources:</strong>
-- <strong>ACS</strong> (American Community Survey) - Household/person demographics
+<p>The summaries generated from CTRAMP model runs can be compared against observed data from external sources like census data, employment surveys, and synthetic population outputs.</p>
+<p><strong>Available External Data Sources:</strong></p>
+<h3 id="populationsim-summaries">PopulationSim Summaries<a class="headerlink" href="#populationsim-summaries" title="Permanent link">&para;</a></h3>
+<p>Pre-generated PopulationSim summary files are stored in:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>tm2py_utils/summary/validation/outputs/populationsim/
+</code></pre></div></p>
+<p><strong>Files included:</strong>
+- <code>households_by_county.csv</code> - Household distribution by county
+- <code>households_by_income.csv</code> - Household income distribution<br />
+- <code>households_by_workers.csv</code> - Household worker distribution
+- <code>household_size_regional.csv</code> - Regional household size distribution
+- <code>persons_by_age.csv</code> - Population age distribution</p>
+<p><strong>Source:</strong> These files are generated from PopulationSim output (<code>aggregate_summaries/</code>) and copied here for reference alongside CTRAMP model outputs.</p>
+<p>See the <a href="../tm2py_utils/summary/validation/outputs/populationsim/README.md">README</a> in that directory for more details.</p>
+<h3 id="acs-american-community-survey-data">ACS (American Community Survey) Data<a class="headerlink" href="#acs-american-community-survey-data" title="Permanent link">&para;</a></h3>
+<p>ACS observed data files are stored in:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>tm2py_utils/summary/validation/outputs/observed/
+</code></pre></div></p>
+<p><strong>Files included:</strong>
+- <code>acs_auto_ownership_by_household_size.csv</code>
+- <code>acs_auto_ownership_by_household_size_county.csv</code>
+- <code>acs_auto_ownership_by_household_size_regional.csv</code></p>
+<h3 id="other-external-sources">Other External Sources<a class="headerlink" href="#other-external-sources" title="Permanent link">&para;</a></h3>
+<p>Additional external data sources that may be useful for validation:
 - <strong>CTPP</strong> (Census Transportation Planning Products) - Journey-to-work patterns
-- <strong>External surveys</strong> - Employment surveys, regional studies, etc.
-- <strong>Other tabulated data</strong> - Any pre-aggregated statistics</p>
-<p><strong>Important:</strong> This is for <strong>pre-aggregated summary data from external sources</strong>, not household travel survey microdata. Household travel surveys should be formatted to match the <a href="../data-model/">CTRAMP data model</a> and processed as regular model inputs.</p>
-<p><strong>How it works:</strong>
-1. Preprocess external data to match model summary format
-2. Configure file paths and column mappings
-3. System automatically merges with model summaries
-4. Dashboard displays side-by-side comparisons</p>
+- <strong>External surveys</strong> - Employment surveys, regional studies
+- <strong>Other tabulated data</strong> - Pre-aggregated statistics</p>
+<p><strong>Note:</strong> This is for <strong>pre-aggregated summary data from external sources</strong>, not household travel survey microdata. Household travel surveys should be formatted to match the <a href="../data-model/">CTRAMP data model</a> and processed as model inputs</p>
 <hr />
 <h2 id="system-architecture">System Architecture<a class="headerlink" href="#system-architecture" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>┌──────────────────────────────────────────────┐
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│ EXTERNAL DATA (ACS/CTPP/Surveys)             │
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│ - Raw census tables                          │
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│ - Pre-aggregated summaries                   │
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│ - Different column names/formats             │
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>└──────────────────────────────────────────────┘
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>                    ↓
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>        YOU MUST PREPROCESS TO MATCH
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        MODEL SUMMARY FORMAT
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>                    ↓
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>┌──────────────────────────────────────────────┐
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│ PREPROCESSED EXTERNAL DATA                   │
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│ - Same columns as model summaries            │
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>│ - Same categories (1,2,3,4+ households)      │
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>│ - Same geography (counties match model)      │
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>│ - CSV format with dataset column             │
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>└──────────────────────────────────────────────┘
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>                    ↓
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>        observed_summaries CONFIG
-<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>        (file paths + column mapping)
-<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>                    ↓
-<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>┌──────────────────────────────────────────────┐
-<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>│ SYSTEM MERGES                                │
-<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>│ Model Summary + External Data → Combined CSV │
-<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>└──────────────────────────────────────────────┘
-<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>                    ↓
-<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>┌──────────────────────────────────────────────┐
-<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>│ DASHBOARD VISUALIZATION                      │
-<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>│ Model vs. Observed comparisons               │
-<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>└──────────────────────────────────────────────┘
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>┌──────────────────────────────────────────────┐
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>│ EXTERNAL DATA (ACS/CTPP/Surveys)             │
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>│ - Raw census tables                          │
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>│ - Pre-aggregated summaries                   │
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>│ - Different column names/formats             │
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>└──────────────────────────────────────────────┘
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>                    ↓
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        YOU MUST PREPROCESS TO MATCH
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        MODEL SUMMARY FORMAT
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>                    ↓
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>┌──────────────────────────────────────────────┐
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>│ PREPROCESSED EXTERNAL DATA                   │
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>│ - Same columns as model summaries            │
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>│ - Same categories (1,2,3,4+ households)      │
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>│ - Same geography (counties match model)      │
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>│ - CSV format with dataset column             │
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>└──────────────────────────────────────────────┘
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>                    ↓
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>        observed_summaries CONFIG
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>        (file paths + column mapping)
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>                    ↓
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>┌──────────────────────────────────────────────┐
+<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>│ SYSTEM MERGES                                │
+<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>│ Model Summary + External Data → Combined CSV │
+<a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a>└──────────────────────────────────────────────┘
+<a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a>                    ↓
+<a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a>┌──────────────────────────────────────────────┐
+<a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a>│ DASHBOARD VISUALIZATION                      │
+<a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a>│ Model vs. Observed comparisons               │
+<a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a>└──────────────────────────────────────────────┘
 </code></pre></div>
 <p><strong>Key principle:</strong> You preprocess external data to match model format. The system does NOT automatically convert ACS/CTPP raw data.</p>
 <hr />
@@ -2134,73 +2228,73 @@
 - <code>households</code> (count)
 - <code>share</code> (percentage)</p>
 <p><strong>Example file:</strong> <code>acs_auto_ownership_by_household_size_regional.csv</code></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>num_persons,num_vehicles,households,share
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>1,0,120000,0.30
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>1,1,180000,0.45
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>1,2,100000,0.25
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>2,0,80000,0.15
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>2,1,200000,0.38
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>2,2,250000,0.47
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>3,0,50000,0.10
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>3,1,150000,0.30
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>3,2,300000,0.60
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>4,0,40000,0.08
-<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>4,1,120000,0.24
-<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>4,2,340000,0.68
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>num_persons,num_vehicles,households,share
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>1,0,120000,0.30
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>1,1,180000,0.45
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>1,2,100000,0.25
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>2,0,80000,0.15
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>2,1,200000,0.38
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>2,2,250000,0.47
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>3,0,50000,0.10
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>3,1,150000,0.30
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>3,2,300000,0.60
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>4,0,40000,0.08
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>4,1,120000,0.24
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>4,2,340000,0.68
 </code></pre></div>
 <h3 id="step-2-configure-in-validation_configyaml">Step 2: Configure in validation_config.yaml<a class="headerlink" href="#step-2-configure-in-validation_configyaml" title="Permanent link">&para;</a></h3>
 <p>Add to <code>observed_summaries</code> section:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">observed_summaries</span><span class="p">:</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;acs_2023&quot;</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nt">display_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ACS</span><span class="nv"> </span><span class="s">2023&quot;</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="nt">summaries</span><span class="p">:</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">      </span><span class="nt">auto_ownership_by_household_size_acs</span><span class="p">:</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">        </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\path\\to\\acs_auto_ownership_by_household_size_regional.csv&quot;</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">        </span><span class="nt">columns</span><span class="p">:</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">          </span><span class="nt">num_persons_agg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_persons&quot;</span><span class="w">  </span><span class="c1"># Map &#39;num_persons&#39; to model&#39;s &#39;num_persons_agg&#39;</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">          </span><span class="nt">num_vehicles</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_vehicles&quot;</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">          </span><span class="nt">households</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;households&quot;</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">          </span><span class="nt">share</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;share&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">observed_summaries</span><span class="p">:</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;acs_2023&quot;</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="nt">display_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ACS</span><span class="nv"> </span><span class="s">2023&quot;</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="nt">summaries</span><span class="p">:</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">      </span><span class="nt">auto_ownership_by_household_size_acs</span><span class="p">:</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">        </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\path\\to\\acs_auto_ownership_by_household_size_regional.csv&quot;</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">        </span><span class="nt">columns</span><span class="p">:</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">          </span><span class="nt">num_persons_agg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_persons&quot;</span><span class="w">  </span><span class="c1"># Map &#39;num_persons&#39; to model&#39;s &#39;num_persons_agg&#39;</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">          </span><span class="nt">num_vehicles</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_vehicles&quot;</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">          </span><span class="nt">households</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;households&quot;</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">          </span><span class="nt">share</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;share&quot;</span>
 </code></pre></div>
 <h3 id="step-3-create-matching-model-summary">Step 3: Create Matching Model Summary<a class="headerlink" href="#step-3-create-matching-model-summary" title="Permanent link">&para;</a></h3>
 <p>Ensure you have a model summary with the <strong>same name and columns</strong>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">summaries</span><span class="p">:</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;auto_ownership_by_household_size_acs&quot;</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="nt">data_source</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;households&quot;</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="nt">group_by</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;num_persons_agg&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;num_vehicles&quot;</span><span class="p p-Indicator">]</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="nt">share_within</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_persons_agg&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">summaries</span><span class="p">:</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;auto_ownership_by_household_size_acs&quot;</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="nt">data_source</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;households&quot;</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="nt">group_by</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;num_persons_agg&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;num_vehicles&quot;</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="nt">share_within</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_persons_agg&quot;</span>
 </code></pre></div>
 <h3 id="step-4-regenerate-summaries">Step 4: Regenerate Summaries<a class="headerlink" href="#step-4-regenerate-summaries" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">conda</span> <span class="n">activate</span> <span class="n">tm2py-utils</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">cd </span><span class="n">C</span><span class="p">:\</span><span class="n">GitHub</span><span class="p">\</span><span class="n">tm2py-utils</span><span class="p">\</span><span class="n">tm2py_utils</span><span class="p">\</span><span class="n">summary</span><span class="p">\</span><span class="n">validation</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">python</span> <span class="n">-m</span> <span class="n">tm2py_utils</span><span class="p">.</span><span class="n">summary</span><span class="p">.</span><span class="n">validation</span><span class="p">.</span><span class="n">summaries</span><span class="p">.</span><span class="n">run_all</span> <span class="p">-</span><span class="n">-config</span> <span class="n">validation_config</span><span class="p">.</span><span class="n">yaml</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">conda</span> <span class="n">activate</span> <span class="n">tm2py-utils</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nb">cd </span><span class="n">C</span><span class="p">:\</span><span class="n">GitHub</span><span class="p">\</span><span class="n">tm2py-utils</span><span class="p">\</span><span class="n">tm2py_utils</span><span class="p">\</span><span class="n">summary</span><span class="p">\</span><span class="n">validation</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">python</span> <span class="n">-m</span> <span class="n">tm2py_utils</span><span class="p">.</span><span class="n">summary</span><span class="p">.</span><span class="n">validation</span><span class="p">.</span><span class="n">summaries</span><span class="p">.</span><span class="n">run_all</span> <span class="p">-</span><span class="n">-config</span> <span class="n">validation_config</span><span class="p">.</span><span class="n">yaml</span>
 </code></pre></div>
 <p><strong>Output:</strong> Combined CSV with model + ACS data:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>num_persons_agg,num_vehicles,households,share,dataset
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>1,0,150000,0.28,2023 TM2.2 v05
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>1,1,200000,0.37,2023 TM2.2 v05
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>1,2,190000,0.35,2023 TM2.2 v05
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>1,0,120000,0.30,ACS 2023
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>1,1,180000,0.45,ACS 2023
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>1,2,100000,0.25,ACS 2023
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>...
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>num_persons_agg,num_vehicles,households,share,dataset
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>1,0,150000,0.28,2023 TM2.2 v05
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>1,1,200000,0.37,2023 TM2.2 v05
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>1,2,190000,0.35,2023 TM2.2 v05
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>1,0,120000,0.30,ACS 2023
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>1,1,180000,0.45,ACS 2023
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>1,2,100000,0.25,ACS 2023
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>...
 </code></pre></div>
 <hr />
 <h2 id="configuration-details">Configuration Details<a class="headerlink" href="#configuration-details" title="Permanent link">&para;</a></h2>
 <h3 id="observed_summaries-structure">observed_summaries Structure<a class="headerlink" href="#observed_summaries-structure" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">observed_summaries</span><span class="p">:</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;source_identifier&quot;</span><span class="w">           </span><span class="c1"># Internal name (no spaces)</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="nt">display_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Display</span><span class="nv"> </span><span class="s">Name&quot;</span><span class="w">        </span><span class="c1"># Name shown in dashboards</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="nt">summaries</span><span class="p">:</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">      </span><span class="nt">summary_name_1</span><span class="p">:</span><span class="w">                   </span><span class="c1"># Must match a model summary name</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">        </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;path/to/file.csv&quot;</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">        </span><span class="nt">columns</span><span class="p">:</span><span class="w">                        </span><span class="c1"># Column mapping (model_col: file_col)</span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">          </span><span class="nt">model_column_1</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;file_column_1&quot;</span>
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">          </span><span class="nt">model_column_2</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;file_column_2&quot;</span>
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">      </span><span class="nt">summary_name_2</span><span class="p">:</span>
-<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">        </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;path/to/another_file.csv&quot;</span>
-<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">        </span><span class="nt">columns</span><span class="p">:</span>
-<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">observed_summaries</span><span class="p">:</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;source_identifier&quot;</span><span class="w">           </span><span class="c1"># Internal name (no spaces)</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="nt">display_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Display</span><span class="nv"> </span><span class="s">Name&quot;</span><span class="w">        </span><span class="c1"># Name shown in dashboards</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="nt">summaries</span><span class="p">:</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">      </span><span class="nt">summary_name_1</span><span class="p">:</span><span class="w">                   </span><span class="c1"># Must match a model summary name</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">        </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;path/to/file.csv&quot;</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">        </span><span class="nt">columns</span><span class="p">:</span><span class="w">                        </span><span class="c1"># Column mapping (model_col: file_col)</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">          </span><span class="nt">model_column_1</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;file_column_1&quot;</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">          </span><span class="nt">model_column_2</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;file_column_2&quot;</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">      </span><span class="nt">summary_name_2</span><span class="p">:</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">        </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;path/to/another_file.csv&quot;</span>
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">        </span><span class="nt">columns</span><span class="p">:</span>
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">...</span>
 </code></pre></div>
 <p><strong>Fields:</strong></p>
 <table>
@@ -2258,22 +2352,22 @@
 <h3 id="column-mapping">Column Mapping<a class="headerlink" href="#column-mapping" title="Permanent link">&para;</a></h3>
 <p>Maps external data column names to model column names.</p>
 <p><strong>Syntax:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">columns</span><span class="p">:</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">model_column_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;external_file_column_name&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">columns</span><span class="p">:</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">model_column_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;external_file_column_name&quot;</span>
 </code></pre></div>
 <p><strong>Example 1:</strong> Column names differ</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">columns</span><span class="p">:</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">num_persons_agg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;hh_size&quot;</span><span class="w">      </span><span class="c1"># Model uses &#39;num_persons_agg&#39;, file has &#39;hh_size&#39;</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nt">num_vehicles</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;vehicles&quot;</span><span class="w">        </span><span class="c1"># Model uses &#39;num_vehicles&#39;, file has &#39;vehicles&#39;</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nt">households</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;count&quot;</span><span class="w">             </span><span class="c1"># Model uses &#39;households&#39;, file has &#39;count&#39;</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="nt">share</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;percentage&quot;</span><span class="w">             </span><span class="c1"># Model uses &#39;share&#39;, file has &#39;percentage&#39;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nt">columns</span><span class="p">:</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">num_persons_agg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;hh_size&quot;</span><span class="w">      </span><span class="c1"># Model uses &#39;num_persons_agg&#39;, file has &#39;hh_size&#39;</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nt">num_vehicles</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;vehicles&quot;</span><span class="w">        </span><span class="c1"># Model uses &#39;num_vehicles&#39;, file has &#39;vehicles&#39;</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span><span class="nt">households</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;count&quot;</span><span class="w">             </span><span class="c1"># Model uses &#39;households&#39;, file has &#39;count&#39;</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span><span class="nt">share</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;percentage&quot;</span><span class="w">             </span><span class="c1"># Model uses &#39;share&#39;, file has &#39;percentage&#39;</span>
 </code></pre></div>
 <p><strong>Example 2:</strong> Column names match (no mapping needed)</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">columns</span><span class="p">:</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">num_persons_agg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_persons_agg&quot;</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="nt">num_vehicles</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_vehicles&quot;</span>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="nt">households</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;households&quot;</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="nt">share</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;share&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nt">columns</span><span class="p">:</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nt">num_persons_agg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_persons_agg&quot;</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="nt">num_vehicles</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_vehicles&quot;</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="nt">households</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;households&quot;</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">  </span><span class="nt">share</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;share&quot;</span>
 </code></pre></div>
 <p>Or omit <code>columns</code> entirely if all names match.</p>
 <hr />
@@ -2326,15 +2420,15 @@
 <h3 id="geography-alignment">Geography Alignment<a class="headerlink" href="#geography-alignment" title="Permanent link">&para;</a></h3>
 <p><strong>County names must match exactly:</strong></p>
 <p>Model geography:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>Alameda
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>Contra Costa
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>Marin
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>Napa
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>San Francisco
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>San Mateo
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>Santa Clara
-<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>Solano
-<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>Sonoma
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>Alameda
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>Contra Costa
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>Marin
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>Napa
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>San Francisco
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>San Mateo
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>Santa Clara
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>Solano
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>Sonoma
 </code></pre></div></p>
 <p>External data must use identical spelling and capitalization.</p>
 <hr />
@@ -2342,127 +2436,127 @@
 <h3 id="example-1-acs-household-size-by-vehicles">Example 1: ACS Household Size by Vehicles<a class="headerlink" href="#example-1-acs-household-size-by-vehicles" title="Permanent link">&para;</a></h3>
 <p><strong>Source:</strong> ACS Table B08201 (Household Size by Vehicles Available)</p>
 <p><strong>Raw ACS format:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>geography,grouping,universe,share
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>Bay Area,&quot;Total:&quot;,2490000,1.0
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>Bay Area,&quot;Total: 1-person household:&quot;,400000,0.161
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>Bay Area,&quot;Total: 1-person household: No vehicle available&quot;,120000,0.048
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>Bay Area,&quot;Total: 1-person household: 1 vehicle available&quot;,200000,0.080
-<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>Bay Area,&quot;Total: 1-person household: 2 vehicles available&quot;,80000,0.032
-<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>...
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>geography,grouping,universe,share
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>Bay Area,&quot;Total:&quot;,2490000,1.0
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>Bay Area,&quot;Total: 1-person household:&quot;,400000,0.161
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>Bay Area,&quot;Total: 1-person household: No vehicle available&quot;,120000,0.048
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>Bay Area,&quot;Total: 1-person household: 1 vehicle available&quot;,200000,0.080
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>Bay Area,&quot;Total: 1-person household: 2 vehicles available&quot;,80000,0.032
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>...
 </code></pre></div>
 <p><strong>Preprocessing script:</strong> <code>convert_acs_data.py</code></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="c1"># Load raw ACS data</span>
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;acs_raw.csv&#39;</span><span class="p">)</span>
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>
-<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="c1"># Parse grouping labels</span>
-<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_label</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
-<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>    <span class="k">if</span> <span class="s1">&#39;1-person household:&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="p">:</span>
-<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>        <span class="n">persons</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
-<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>    <span class="k">elif</span> <span class="s1">&#39;2-person household:&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="p">:</span>
-<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>        <span class="n">persons</span> <span class="o">=</span> <span class="s1">&#39;2&#39;</span>
-<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>    <span class="k">elif</span> <span class="s1">&#39;3-person household:&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="p">:</span>
-<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a>        <span class="n">persons</span> <span class="o">=</span> <span class="s1">&#39;3&#39;</span>
-<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a>    <span class="k">elif</span> <span class="s1">&#39;4-or-more-person household:&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="p">:</span>
-<a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a>        <span class="n">persons</span> <span class="o">=</span> <span class="s1">&#39;4+&#39;</span>  <span class="c1"># Aggregated</span>
-<a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a>        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
-<a id="__codelineno-12-18" name="__codelineno-12-18" href="#__codelineno-12-18"></a>
-<a id="__codelineno-12-19" name="__codelineno-12-19" href="#__codelineno-12-19"></a>    <span class="k">if</span> <span class="s1">&#39;No vehicle&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="p">:</span>
-<a id="__codelineno-12-20" name="__codelineno-12-20" href="#__codelineno-12-20"></a>        <span class="n">vehicles</span> <span class="o">=</span> <span class="mi">0</span>
-<a id="__codelineno-12-21" name="__codelineno-12-21" href="#__codelineno-12-21"></a>    <span class="k">elif</span> <span class="s1">&#39;1 vehicle&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="p">:</span>
-<a id="__codelineno-12-22" name="__codelineno-12-22" href="#__codelineno-12-22"></a>        <span class="n">vehicles</span> <span class="o">=</span> <span class="mi">1</span>
-<a id="__codelineno-12-23" name="__codelineno-12-23" href="#__codelineno-12-23"></a>    <span class="k">elif</span> <span class="s1">&#39;2 vehicles&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="p">:</span>
-<a id="__codelineno-12-24" name="__codelineno-12-24" href="#__codelineno-12-24"></a>        <span class="n">vehicles</span> <span class="o">=</span> <span class="mi">2</span>
-<a id="__codelineno-12-25" name="__codelineno-12-25" href="#__codelineno-12-25"></a>    <span class="k">elif</span> <span class="s1">&#39;3 vehicles&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="p">:</span>
-<a id="__codelineno-12-26" name="__codelineno-12-26" href="#__codelineno-12-26"></a>        <span class="n">vehicles</span> <span class="o">=</span> <span class="mi">3</span>
-<a id="__codelineno-12-27" name="__codelineno-12-27" href="#__codelineno-12-27"></a>    <span class="k">elif</span> <span class="s1">&#39;4 or more&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="p">:</span>
-<a id="__codelineno-12-28" name="__codelineno-12-28" href="#__codelineno-12-28"></a>        <span class="n">vehicles</span> <span class="o">=</span> <span class="mi">4</span>
-<a id="__codelineno-12-29" name="__codelineno-12-29" href="#__codelineno-12-29"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-12-30" name="__codelineno-12-30" href="#__codelineno-12-30"></a>        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
-<a id="__codelineno-12-31" name="__codelineno-12-31" href="#__codelineno-12-31"></a>
-<a id="__codelineno-12-32" name="__codelineno-12-32" href="#__codelineno-12-32"></a>    <span class="k">return</span> <span class="n">persons</span><span class="p">,</span> <span class="n">vehicles</span>
-<a id="__codelineno-12-33" name="__codelineno-12-33" href="#__codelineno-12-33"></a>
-<a id="__codelineno-12-34" name="__codelineno-12-34" href="#__codelineno-12-34"></a><span class="c1"># Extract detail rows</span>
-<a id="__codelineno-12-35" name="__codelineno-12-35" href="#__codelineno-12-35"></a><span class="n">records</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-12-36" name="__codelineno-12-36" href="#__codelineno-12-36"></a><span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-<a id="__codelineno-12-37" name="__codelineno-12-37" href="#__codelineno-12-37"></a>    <span class="n">persons</span><span class="p">,</span> <span class="n">vehicles</span> <span class="o">=</span> <span class="n">parse_label</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;grouping&#39;</span><span class="p">])</span>
-<a id="__codelineno-12-38" name="__codelineno-12-38" href="#__codelineno-12-38"></a>    <span class="k">if</span> <span class="n">persons</span> <span class="ow">and</span> <span class="n">vehicles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-12-39" name="__codelineno-12-39" href="#__codelineno-12-39"></a>        <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
-<a id="__codelineno-12-40" name="__codelineno-12-40" href="#__codelineno-12-40"></a>            <span class="s1">&#39;num_persons&#39;</span><span class="p">:</span> <span class="n">persons</span><span class="p">,</span>
-<a id="__codelineno-12-41" name="__codelineno-12-41" href="#__codelineno-12-41"></a>            <span class="s1">&#39;num_vehicles&#39;</span><span class="p">:</span> <span class="n">vehicles</span><span class="p">,</span>
-<a id="__codelineno-12-42" name="__codelineno-12-42" href="#__codelineno-12-42"></a>            <span class="s1">&#39;households&#39;</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;universe&#39;</span><span class="p">],</span>
-<a id="__codelineno-12-43" name="__codelineno-12-43" href="#__codelineno-12-43"></a>            <span class="s1">&#39;share&#39;</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;share&#39;</span><span class="p">]</span>
-<a id="__codelineno-12-44" name="__codelineno-12-44" href="#__codelineno-12-44"></a>        <span class="p">})</span>
-<a id="__codelineno-12-45" name="__codelineno-12-45" href="#__codelineno-12-45"></a>
-<a id="__codelineno-12-46" name="__codelineno-12-46" href="#__codelineno-12-46"></a><span class="n">result</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">records</span><span class="p">)</span>
-<a id="__codelineno-12-47" name="__codelineno-12-47" href="#__codelineno-12-47"></a>
-<a id="__codelineno-12-48" name="__codelineno-12-48" href="#__codelineno-12-48"></a><span class="c1"># Recalculate shares within household size</span>
-<a id="__codelineno-12-49" name="__codelineno-12-49" href="#__codelineno-12-49"></a><span class="n">result</span><span class="p">[</span><span class="s1">&#39;share&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;num_persons&#39;</span><span class="p">)[</span><span class="s1">&#39;households&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
-<a id="__codelineno-12-50" name="__codelineno-12-50" href="#__codelineno-12-50"></a>    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">/</span> <span class="n">x</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-<a id="__codelineno-12-51" name="__codelineno-12-51" href="#__codelineno-12-51"></a><span class="p">)</span>
-<a id="__codelineno-12-52" name="__codelineno-12-52" href="#__codelineno-12-52"></a>
-<a id="__codelineno-12-53" name="__codelineno-12-53" href="#__codelineno-12-53"></a><span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;acs_auto_ownership_by_household_size_regional.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="c1"># Load raw ACS data</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;acs_raw.csv&#39;</span><span class="p">)</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="c1"># Parse grouping labels</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_label</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>    <span class="k">if</span> <span class="s1">&#39;1-person household:&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="p">:</span>
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>        <span class="n">persons</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>    <span class="k">elif</span> <span class="s1">&#39;2-person household:&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="p">:</span>
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>        <span class="n">persons</span> <span class="o">=</span> <span class="s1">&#39;2&#39;</span>
+<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>    <span class="k">elif</span> <span class="s1">&#39;3-person household:&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="p">:</span>
+<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a>        <span class="n">persons</span> <span class="o">=</span> <span class="s1">&#39;3&#39;</span>
+<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a>    <span class="k">elif</span> <span class="s1">&#39;4-or-more-person household:&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="p">:</span>
+<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a>        <span class="n">persons</span> <span class="o">=</span> <span class="s1">&#39;4+&#39;</span>  <span class="c1"># Aggregated</span>
+<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a>        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+<a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a>
+<a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a>    <span class="k">if</span> <span class="s1">&#39;No vehicle&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="p">:</span>
+<a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a>        <span class="n">vehicles</span> <span class="o">=</span> <span class="mi">0</span>
+<a id="__codelineno-14-21" name="__codelineno-14-21" href="#__codelineno-14-21"></a>    <span class="k">elif</span> <span class="s1">&#39;1 vehicle&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="p">:</span>
+<a id="__codelineno-14-22" name="__codelineno-14-22" href="#__codelineno-14-22"></a>        <span class="n">vehicles</span> <span class="o">=</span> <span class="mi">1</span>
+<a id="__codelineno-14-23" name="__codelineno-14-23" href="#__codelineno-14-23"></a>    <span class="k">elif</span> <span class="s1">&#39;2 vehicles&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="p">:</span>
+<a id="__codelineno-14-24" name="__codelineno-14-24" href="#__codelineno-14-24"></a>        <span class="n">vehicles</span> <span class="o">=</span> <span class="mi">2</span>
+<a id="__codelineno-14-25" name="__codelineno-14-25" href="#__codelineno-14-25"></a>    <span class="k">elif</span> <span class="s1">&#39;3 vehicles&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="p">:</span>
+<a id="__codelineno-14-26" name="__codelineno-14-26" href="#__codelineno-14-26"></a>        <span class="n">vehicles</span> <span class="o">=</span> <span class="mi">3</span>
+<a id="__codelineno-14-27" name="__codelineno-14-27" href="#__codelineno-14-27"></a>    <span class="k">elif</span> <span class="s1">&#39;4 or more&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="p">:</span>
+<a id="__codelineno-14-28" name="__codelineno-14-28" href="#__codelineno-14-28"></a>        <span class="n">vehicles</span> <span class="o">=</span> <span class="mi">4</span>
+<a id="__codelineno-14-29" name="__codelineno-14-29" href="#__codelineno-14-29"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-14-30" name="__codelineno-14-30" href="#__codelineno-14-30"></a>        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+<a id="__codelineno-14-31" name="__codelineno-14-31" href="#__codelineno-14-31"></a>
+<a id="__codelineno-14-32" name="__codelineno-14-32" href="#__codelineno-14-32"></a>    <span class="k">return</span> <span class="n">persons</span><span class="p">,</span> <span class="n">vehicles</span>
+<a id="__codelineno-14-33" name="__codelineno-14-33" href="#__codelineno-14-33"></a>
+<a id="__codelineno-14-34" name="__codelineno-14-34" href="#__codelineno-14-34"></a><span class="c1"># Extract detail rows</span>
+<a id="__codelineno-14-35" name="__codelineno-14-35" href="#__codelineno-14-35"></a><span class="n">records</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-14-36" name="__codelineno-14-36" href="#__codelineno-14-36"></a><span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+<a id="__codelineno-14-37" name="__codelineno-14-37" href="#__codelineno-14-37"></a>    <span class="n">persons</span><span class="p">,</span> <span class="n">vehicles</span> <span class="o">=</span> <span class="n">parse_label</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;grouping&#39;</span><span class="p">])</span>
+<a id="__codelineno-14-38" name="__codelineno-14-38" href="#__codelineno-14-38"></a>    <span class="k">if</span> <span class="n">persons</span> <span class="ow">and</span> <span class="n">vehicles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-14-39" name="__codelineno-14-39" href="#__codelineno-14-39"></a>        <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+<a id="__codelineno-14-40" name="__codelineno-14-40" href="#__codelineno-14-40"></a>            <span class="s1">&#39;num_persons&#39;</span><span class="p">:</span> <span class="n">persons</span><span class="p">,</span>
+<a id="__codelineno-14-41" name="__codelineno-14-41" href="#__codelineno-14-41"></a>            <span class="s1">&#39;num_vehicles&#39;</span><span class="p">:</span> <span class="n">vehicles</span><span class="p">,</span>
+<a id="__codelineno-14-42" name="__codelineno-14-42" href="#__codelineno-14-42"></a>            <span class="s1">&#39;households&#39;</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;universe&#39;</span><span class="p">],</span>
+<a id="__codelineno-14-43" name="__codelineno-14-43" href="#__codelineno-14-43"></a>            <span class="s1">&#39;share&#39;</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;share&#39;</span><span class="p">]</span>
+<a id="__codelineno-14-44" name="__codelineno-14-44" href="#__codelineno-14-44"></a>        <span class="p">})</span>
+<a id="__codelineno-14-45" name="__codelineno-14-45" href="#__codelineno-14-45"></a>
+<a id="__codelineno-14-46" name="__codelineno-14-46" href="#__codelineno-14-46"></a><span class="n">result</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">records</span><span class="p">)</span>
+<a id="__codelineno-14-47" name="__codelineno-14-47" href="#__codelineno-14-47"></a>
+<a id="__codelineno-14-48" name="__codelineno-14-48" href="#__codelineno-14-48"></a><span class="c1"># Recalculate shares within household size</span>
+<a id="__codelineno-14-49" name="__codelineno-14-49" href="#__codelineno-14-49"></a><span class="n">result</span><span class="p">[</span><span class="s1">&#39;share&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;num_persons&#39;</span><span class="p">)[</span><span class="s1">&#39;households&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+<a id="__codelineno-14-50" name="__codelineno-14-50" href="#__codelineno-14-50"></a>    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">/</span> <span class="n">x</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<a id="__codelineno-14-51" name="__codelineno-14-51" href="#__codelineno-14-51"></a><span class="p">)</span>
+<a id="__codelineno-14-52" name="__codelineno-14-52" href="#__codelineno-14-52"></a>
+<a id="__codelineno-14-53" name="__codelineno-14-53" href="#__codelineno-14-53"></a><span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;acs_auto_ownership_by_household_size_regional.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </code></pre></div>
 <p><strong>Output:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>num_persons,num_vehicles,households,share
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>1,0,120000,0.30
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>1,1,200000,0.50
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>1,2,80000,0.20
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>2,0,80000,0.15
-<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>...
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>num_persons,num_vehicles,households,share
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>1,0,120000,0.30
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>1,1,200000,0.50
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>1,2,80000,0.20
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>2,0,80000,0.15
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>...
 </code></pre></div>
 <h3 id="example-2-ctpp-journey-to-work">Example 2: CTPP Journey to Work<a class="headerlink" href="#example-2-ctpp-journey-to-work" title="Permanent link">&para;</a></h3>
 <p><strong>Source:</strong> CTPP Table A302 (Place of Work by Residence)</p>
 <p><strong>Goal:</strong> Compare commute patterns</p>
 <p><strong>Preprocessing:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="c1"># Load CTPP data</span>
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="n">ctpp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;ctpp_work_flows.csv&#39;</span><span class="p">)</span>
-<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>
-<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="c1"># Map TAZs to counties</span>
-<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="n">taz_to_county</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;taz_county_lookup.csv&#39;</span><span class="p">)</span>
-<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>
-<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="c1"># Aggregate to county-to-county flows</span>
-<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="n">flows</span> <span class="o">=</span> <span class="n">ctpp</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
-<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>    <span class="n">taz_to_county</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;county&#39;</span><span class="p">:</span> <span class="s1">&#39;home_county&#39;</span><span class="p">}),</span>
-<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>    <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;residence_taz&#39;</span><span class="p">,</span>
-<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a>    <span class="n">right_on</span><span class="o">=</span><span class="s1">&#39;taz&#39;</span>
-<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="p">)</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
-<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a>    <span class="n">taz_to_county</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;county&#39;</span><span class="p">:</span> <span class="s1">&#39;work_county&#39;</span><span class="p">}),</span>
-<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a>    <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;workplace_taz&#39;</span><span class="p">,</span>
-<a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a>    <span class="n">right_on</span><span class="o">=</span><span class="s1">&#39;taz&#39;</span>
-<a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a><span class="p">)</span>
-<a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a>
-<a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a><span class="n">result</span> <span class="o">=</span> <span class="n">flows</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;home_county&#39;</span><span class="p">,</span> <span class="s1">&#39;work_county&#39;</span><span class="p">])[</span><span class="s1">&#39;workers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-<a id="__codelineno-14-21" name="__codelineno-14-21" href="#__codelineno-14-21"></a><span class="n">result</span><span class="p">[</span><span class="s1">&#39;share&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;home_county&#39;</span><span class="p">)[</span><span class="s1">&#39;workers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">/</span> <span class="n">x</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
-<a id="__codelineno-14-22" name="__codelineno-14-22" href="#__codelineno-14-22"></a>
-<a id="__codelineno-14-23" name="__codelineno-14-23" href="#__codelineno-14-23"></a><span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;ctpp_work_location_by_home_county.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="c1"># Load CTPP data</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="n">ctpp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;ctpp_work_flows.csv&#39;</span><span class="p">)</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="c1"># Map TAZs to counties</span>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="n">taz_to_county</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;taz_county_lookup.csv&#39;</span><span class="p">)</span>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="c1"># Aggregate to county-to-county flows</span>
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="n">flows</span> <span class="o">=</span> <span class="n">ctpp</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>    <span class="n">taz_to_county</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;county&#39;</span><span class="p">:</span> <span class="s1">&#39;home_county&#39;</span><span class="p">}),</span>
+<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a>    <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;residence_taz&#39;</span><span class="p">,</span>
+<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a>    <span class="n">right_on</span><span class="o">=</span><span class="s1">&#39;taz&#39;</span>
+<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a><span class="p">)</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+<a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a>    <span class="n">taz_to_county</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;county&#39;</span><span class="p">:</span> <span class="s1">&#39;work_county&#39;</span><span class="p">}),</span>
+<a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a>    <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;workplace_taz&#39;</span><span class="p">,</span>
+<a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a>    <span class="n">right_on</span><span class="o">=</span><span class="s1">&#39;taz&#39;</span>
+<a id="__codelineno-16-18" name="__codelineno-16-18" href="#__codelineno-16-18"></a><span class="p">)</span>
+<a id="__codelineno-16-19" name="__codelineno-16-19" href="#__codelineno-16-19"></a>
+<a id="__codelineno-16-20" name="__codelineno-16-20" href="#__codelineno-16-20"></a><span class="n">result</span> <span class="o">=</span> <span class="n">flows</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;home_county&#39;</span><span class="p">,</span> <span class="s1">&#39;work_county&#39;</span><span class="p">])[</span><span class="s1">&#39;workers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+<a id="__codelineno-16-21" name="__codelineno-16-21" href="#__codelineno-16-21"></a><span class="n">result</span><span class="p">[</span><span class="s1">&#39;share&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;home_county&#39;</span><span class="p">)[</span><span class="s1">&#39;workers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">/</span> <span class="n">x</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+<a id="__codelineno-16-22" name="__codelineno-16-22" href="#__codelineno-16-22"></a>
+<a id="__codelineno-16-23" name="__codelineno-16-23" href="#__codelineno-16-23"></a><span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;ctpp_work_location_by_home_county.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="example-3-external-employment-survey">Example 3: External Employment Survey<a class="headerlink" href="#example-3-external-employment-survey" title="Permanent link">&para;</a></h3>
 <p><strong>Source:</strong> Regional employment survey by industry</p>
 <p><strong>Goal:</strong> Compare employment distribution</p>
 <p><strong>Format to match model:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="n">survey</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;employment_survey.csv&#39;</span><span class="p">)</span>
-<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>
-<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="c1"># Map survey categories to model person_types</span>
-<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="n">category_map</span> <span class="o">=</span> <span class="p">{</span>
-<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>    <span class="s1">&#39;Full-time&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>    <span class="s1">&#39;Part-time&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>    <span class="s1">&#39;Student&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
-<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>    <span class="c1"># etc.</span>
-<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="p">}</span>
-<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a>
-<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a><span class="n">survey</span><span class="p">[</span><span class="s1">&#39;person_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">survey</span><span class="p">[</span><span class="s1">&#39;employment_category&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">category_map</span><span class="p">)</span>
-<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a>
-<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a><span class="n">result</span> <span class="o">=</span> <span class="n">survey</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;person_type&#39;</span><span class="p">)[</span><span class="s1">&#39;persons&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-<a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a><span class="n">result</span><span class="p">[</span><span class="s1">&#39;share&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;persons&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;persons&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-<a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a>
-<a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a><span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;survey_employment_distribution.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="n">survey</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;employment_survey.csv&#39;</span><span class="p">)</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="c1"># Map survey categories to model person_types</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="n">category_map</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>    <span class="s1">&#39;Full-time&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>    <span class="s1">&#39;Part-time&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>    <span class="s1">&#39;Student&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a>    <span class="c1"># etc.</span>
+<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a><span class="p">}</span>
+<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a>
+<a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a><span class="n">survey</span><span class="p">[</span><span class="s1">&#39;person_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">survey</span><span class="p">[</span><span class="s1">&#39;employment_category&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">category_map</span><span class="p">)</span>
+<a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a>
+<a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a><span class="n">result</span> <span class="o">=</span> <span class="n">survey</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;person_type&#39;</span><span class="p">)[</span><span class="s1">&#39;persons&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+<a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a><span class="n">result</span><span class="p">[</span><span class="s1">&#39;share&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;persons&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;persons&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<a id="__codelineno-17-17" name="__codelineno-17-17" href="#__codelineno-17-17"></a>
+<a id="__codelineno-17-18" name="__codelineno-17-18" href="#__codelineno-17-18"></a><span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;survey_employment_distribution.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </code></pre></div>
 <hr />
 <h2 id="complete-configuration-example">Complete Configuration Example<a class="headerlink" href="#complete-configuration-example" title="Permanent link">&para;</a></h2>
@@ -2473,98 +2567,98 @@
 <p><strong>External data:</strong>
 - ACS 2023 data, preprocessed to match model format</p>
 <p><strong>Configuration:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># validation_config.yaml</span>
-<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
-<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="c1"># Model summaries (generate from model data)</span>
-<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="nt">summaries</span><span class="p">:</span>
-<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;auto_ownership_by_household_size_acs&quot;</span>
-<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Vehicle</span><span class="nv"> </span><span class="s">ownership</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">household</span><span class="nv"> </span><span class="s">size</span><span class="nv"> </span><span class="s">(ACS</span><span class="nv"> </span><span class="s">categories)&quot;</span>
-<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="w">    </span><span class="nt">data_source</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;households&quot;</span>
-<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="w">    </span><span class="nt">group_by</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;num_persons_agg&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;num_vehicles&quot;</span><span class="p p-Indicator">]</span>
-<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="w">    </span><span class="nt">weight_field</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;sample_rate&quot;</span>
-<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="w">    </span><span class="nt">count_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;households&quot;</span>
-<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a><span class="w">    </span><span class="nt">share_within</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_persons_agg&quot;</span>
-<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a>
-<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;auto_ownership_by_household_size_county&quot;</span>
-<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Vehicle</span><span class="nv"> </span><span class="s">ownership</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">household</span><span class="nv"> </span><span class="s">size</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">county&quot;</span>
-<a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a><span class="w">    </span><span class="nt">data_source</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;households&quot;</span>
-<a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a><span class="w">    </span><span class="nt">group_by</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;county&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;num_persons_agg&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;num_vehicles&quot;</span><span class="p p-Indicator">]</span>
-<a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a><span class="w">    </span><span class="nt">weight_field</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;sample_rate&quot;</span>
-<a id="__codelineno-16-18" name="__codelineno-16-18" href="#__codelineno-16-18"></a><span class="w">    </span><span class="nt">count_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;households&quot;</span>
-<a id="__codelineno-16-19" name="__codelineno-16-19" href="#__codelineno-16-19"></a><span class="w">    </span><span class="nt">share_within</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;county&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;num_persons_agg&quot;</span><span class="p p-Indicator">]</span>
-<a id="__codelineno-16-20" name="__codelineno-16-20" href="#__codelineno-16-20"></a>
-<a id="__codelineno-16-21" name="__codelineno-16-21" href="#__codelineno-16-21"></a><span class="c1"># External data (load from preprocessed files)</span>
-<a id="__codelineno-16-22" name="__codelineno-16-22" href="#__codelineno-16-22"></a><span class="nt">observed_summaries</span><span class="p">:</span>
-<a id="__codelineno-16-23" name="__codelineno-16-23" href="#__codelineno-16-23"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;acs_2023&quot;</span>
-<a id="__codelineno-16-24" name="__codelineno-16-24" href="#__codelineno-16-24"></a><span class="w">    </span><span class="nt">display_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ACS</span><span class="nv"> </span><span class="s">2023&quot;</span>
-<a id="__codelineno-16-25" name="__codelineno-16-25" href="#__codelineno-16-25"></a><span class="w">    </span><span class="nt">summaries</span><span class="p">:</span>
-<a id="__codelineno-16-26" name="__codelineno-16-26" href="#__codelineno-16-26"></a><span class="w">      </span><span class="c1"># Regional comparison</span>
-<a id="__codelineno-16-27" name="__codelineno-16-27" href="#__codelineno-16-27"></a><span class="w">      </span><span class="nt">auto_ownership_by_household_size_acs</span><span class="p">:</span>
-<a id="__codelineno-16-28" name="__codelineno-16-28" href="#__codelineno-16-28"></a><span class="w">        </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\data\\acs\\acs_auto_ownership_by_household_size_regional.csv&quot;</span>
-<a id="__codelineno-16-29" name="__codelineno-16-29" href="#__codelineno-16-29"></a><span class="w">        </span><span class="nt">columns</span><span class="p">:</span>
-<a id="__codelineno-16-30" name="__codelineno-16-30" href="#__codelineno-16-30"></a><span class="w">          </span><span class="nt">num_persons_agg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_persons&quot;</span>
-<a id="__codelineno-16-31" name="__codelineno-16-31" href="#__codelineno-16-31"></a><span class="w">          </span><span class="nt">num_vehicles</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_vehicles&quot;</span>
-<a id="__codelineno-16-32" name="__codelineno-16-32" href="#__codelineno-16-32"></a><span class="w">          </span><span class="nt">households</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;households&quot;</span>
-<a id="__codelineno-16-33" name="__codelineno-16-33" href="#__codelineno-16-33"></a><span class="w">          </span><span class="nt">share</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;share&quot;</span>
-<a id="__codelineno-16-34" name="__codelineno-16-34" href="#__codelineno-16-34"></a>
-<a id="__codelineno-16-35" name="__codelineno-16-35" href="#__codelineno-16-35"></a><span class="w">      </span><span class="c1"># County-level comparison</span>
-<a id="__codelineno-16-36" name="__codelineno-16-36" href="#__codelineno-16-36"></a><span class="w">      </span><span class="nt">auto_ownership_by_household_size_county</span><span class="p">:</span>
-<a id="__codelineno-16-37" name="__codelineno-16-37" href="#__codelineno-16-37"></a><span class="w">        </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\data\\acs\\acs_auto_ownership_by_household_size_county.csv&quot;</span>
-<a id="__codelineno-16-38" name="__codelineno-16-38" href="#__codelineno-16-38"></a><span class="w">        </span><span class="nt">columns</span><span class="p">:</span>
-<a id="__codelineno-16-39" name="__codelineno-16-39" href="#__codelineno-16-39"></a><span class="w">          </span><span class="nt">county</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;county&quot;</span>
-<a id="__codelineno-16-40" name="__codelineno-16-40" href="#__codelineno-16-40"></a><span class="w">          </span><span class="nt">num_persons_agg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_persons&quot;</span>
-<a id="__codelineno-16-41" name="__codelineno-16-41" href="#__codelineno-16-41"></a><span class="w">          </span><span class="nt">num_vehicles</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_vehicles&quot;</span>
-<a id="__codelineno-16-42" name="__codelineno-16-42" href="#__codelineno-16-42"></a><span class="w">          </span><span class="nt">households</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;households&quot;</span>
-<a id="__codelineno-16-43" name="__codelineno-16-43" href="#__codelineno-16-43"></a><span class="w">          </span><span class="nt">share</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;share&quot;</span>
-<a id="__codelineno-16-44" name="__codelineno-16-44" href="#__codelineno-16-44"></a>
-<a id="__codelineno-16-45" name="__codelineno-16-45" href="#__codelineno-16-45"></a><span class="c1"># Aggregation spec (model and ACS must use same categories)</span>
-<a id="__codelineno-16-46" name="__codelineno-16-46" href="#__codelineno-16-46"></a><span class="nt">aggregation_specs</span><span class="p">:</span>
-<a id="__codelineno-16-47" name="__codelineno-16-47" href="#__codelineno-16-47"></a><span class="w">  </span><span class="nt">num_persons_agg</span><span class="p">:</span>
-<a id="__codelineno-16-48" name="__codelineno-16-48" href="#__codelineno-16-48"></a><span class="w">    </span><span class="nt">apply_to</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;num_persons&quot;</span><span class="p p-Indicator">]</span>
-<a id="__codelineno-16-49" name="__codelineno-16-49" href="#__codelineno-16-49"></a><span class="w">    </span><span class="nt">mapping</span><span class="p">:</span>
-<a id="__codelineno-16-50" name="__codelineno-16-50" href="#__codelineno-16-50"></a><span class="w">      </span><span class="nt">1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
-<a id="__codelineno-16-51" name="__codelineno-16-51" href="#__codelineno-16-51"></a><span class="w">      </span><span class="nt">2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
-<a id="__codelineno-16-52" name="__codelineno-16-52" href="#__codelineno-16-52"></a><span class="w">      </span><span class="nt">3</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
-<a id="__codelineno-16-53" name="__codelineno-16-53" href="#__codelineno-16-53"></a><span class="w">      </span><span class="nt">4</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span><span class="w">   </span><span class="c1"># 4+ aggregation</span>
-<a id="__codelineno-16-54" name="__codelineno-16-54" href="#__codelineno-16-54"></a><span class="w">      </span><span class="nt">5</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
-<a id="__codelineno-16-55" name="__codelineno-16-55" href="#__codelineno-16-55"></a><span class="w">      </span><span class="nt">6</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
-<a id="__codelineno-16-56" name="__codelineno-16-56" href="#__codelineno-16-56"></a><span class="w">      </span><span class="nt">7</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
-<a id="__codelineno-16-57" name="__codelineno-16-57" href="#__codelineno-16-57"></a><span class="w">      </span><span class="nt">8</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
-<a id="__codelineno-16-58" name="__codelineno-16-58" href="#__codelineno-16-58"></a><span class="w">      </span><span class="nt">9</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
-<a id="__codelineno-16-59" name="__codelineno-16-59" href="#__codelineno-16-59"></a><span class="w">      </span><span class="nt">10</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># validation_config.yaml</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="c1"># Model summaries (generate from model data)</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="nt">summaries</span><span class="p">:</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;auto_ownership_by_household_size_acs&quot;</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Vehicle</span><span class="nv"> </span><span class="s">ownership</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">household</span><span class="nv"> </span><span class="s">size</span><span class="nv"> </span><span class="s">(ACS</span><span class="nv"> </span><span class="s">categories)&quot;</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">    </span><span class="nt">data_source</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;households&quot;</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="w">    </span><span class="nt">group_by</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;num_persons_agg&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;num_vehicles&quot;</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="w">    </span><span class="nt">weight_field</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;sample_rate&quot;</span>
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="w">    </span><span class="nt">count_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;households&quot;</span>
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="w">    </span><span class="nt">share_within</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_persons_agg&quot;</span>
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a>
+<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;auto_ownership_by_household_size_county&quot;</span>
+<a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Vehicle</span><span class="nv"> </span><span class="s">ownership</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">household</span><span class="nv"> </span><span class="s">size</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">county&quot;</span>
+<a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a><span class="w">    </span><span class="nt">data_source</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;households&quot;</span>
+<a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a><span class="w">    </span><span class="nt">group_by</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;county&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;num_persons_agg&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;num_vehicles&quot;</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a><span class="w">    </span><span class="nt">weight_field</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;sample_rate&quot;</span>
+<a id="__codelineno-18-18" name="__codelineno-18-18" href="#__codelineno-18-18"></a><span class="w">    </span><span class="nt">count_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;households&quot;</span>
+<a id="__codelineno-18-19" name="__codelineno-18-19" href="#__codelineno-18-19"></a><span class="w">    </span><span class="nt">share_within</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;county&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;num_persons_agg&quot;</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-18-20" name="__codelineno-18-20" href="#__codelineno-18-20"></a>
+<a id="__codelineno-18-21" name="__codelineno-18-21" href="#__codelineno-18-21"></a><span class="c1"># External data (load from preprocessed files)</span>
+<a id="__codelineno-18-22" name="__codelineno-18-22" href="#__codelineno-18-22"></a><span class="nt">observed_summaries</span><span class="p">:</span>
+<a id="__codelineno-18-23" name="__codelineno-18-23" href="#__codelineno-18-23"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;acs_2023&quot;</span>
+<a id="__codelineno-18-24" name="__codelineno-18-24" href="#__codelineno-18-24"></a><span class="w">    </span><span class="nt">display_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ACS</span><span class="nv"> </span><span class="s">2023&quot;</span>
+<a id="__codelineno-18-25" name="__codelineno-18-25" href="#__codelineno-18-25"></a><span class="w">    </span><span class="nt">summaries</span><span class="p">:</span>
+<a id="__codelineno-18-26" name="__codelineno-18-26" href="#__codelineno-18-26"></a><span class="w">      </span><span class="c1"># Regional comparison</span>
+<a id="__codelineno-18-27" name="__codelineno-18-27" href="#__codelineno-18-27"></a><span class="w">      </span><span class="nt">auto_ownership_by_household_size_acs</span><span class="p">:</span>
+<a id="__codelineno-18-28" name="__codelineno-18-28" href="#__codelineno-18-28"></a><span class="w">        </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\data\\acs\\acs_auto_ownership_by_household_size_regional.csv&quot;</span>
+<a id="__codelineno-18-29" name="__codelineno-18-29" href="#__codelineno-18-29"></a><span class="w">        </span><span class="nt">columns</span><span class="p">:</span>
+<a id="__codelineno-18-30" name="__codelineno-18-30" href="#__codelineno-18-30"></a><span class="w">          </span><span class="nt">num_persons_agg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_persons&quot;</span>
+<a id="__codelineno-18-31" name="__codelineno-18-31" href="#__codelineno-18-31"></a><span class="w">          </span><span class="nt">num_vehicles</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_vehicles&quot;</span>
+<a id="__codelineno-18-32" name="__codelineno-18-32" href="#__codelineno-18-32"></a><span class="w">          </span><span class="nt">households</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;households&quot;</span>
+<a id="__codelineno-18-33" name="__codelineno-18-33" href="#__codelineno-18-33"></a><span class="w">          </span><span class="nt">share</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;share&quot;</span>
+<a id="__codelineno-18-34" name="__codelineno-18-34" href="#__codelineno-18-34"></a>
+<a id="__codelineno-18-35" name="__codelineno-18-35" href="#__codelineno-18-35"></a><span class="w">      </span><span class="c1"># County-level comparison</span>
+<a id="__codelineno-18-36" name="__codelineno-18-36" href="#__codelineno-18-36"></a><span class="w">      </span><span class="nt">auto_ownership_by_household_size_county</span><span class="p">:</span>
+<a id="__codelineno-18-37" name="__codelineno-18-37" href="#__codelineno-18-37"></a><span class="w">        </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;C:\\data\\acs\\acs_auto_ownership_by_household_size_county.csv&quot;</span>
+<a id="__codelineno-18-38" name="__codelineno-18-38" href="#__codelineno-18-38"></a><span class="w">        </span><span class="nt">columns</span><span class="p">:</span>
+<a id="__codelineno-18-39" name="__codelineno-18-39" href="#__codelineno-18-39"></a><span class="w">          </span><span class="nt">county</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;county&quot;</span>
+<a id="__codelineno-18-40" name="__codelineno-18-40" href="#__codelineno-18-40"></a><span class="w">          </span><span class="nt">num_persons_agg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_persons&quot;</span>
+<a id="__codelineno-18-41" name="__codelineno-18-41" href="#__codelineno-18-41"></a><span class="w">          </span><span class="nt">num_vehicles</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num_vehicles&quot;</span>
+<a id="__codelineno-18-42" name="__codelineno-18-42" href="#__codelineno-18-42"></a><span class="w">          </span><span class="nt">households</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;households&quot;</span>
+<a id="__codelineno-18-43" name="__codelineno-18-43" href="#__codelineno-18-43"></a><span class="w">          </span><span class="nt">share</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;share&quot;</span>
+<a id="__codelineno-18-44" name="__codelineno-18-44" href="#__codelineno-18-44"></a>
+<a id="__codelineno-18-45" name="__codelineno-18-45" href="#__codelineno-18-45"></a><span class="c1"># Aggregation spec (model and ACS must use same categories)</span>
+<a id="__codelineno-18-46" name="__codelineno-18-46" href="#__codelineno-18-46"></a><span class="nt">aggregation_specs</span><span class="p">:</span>
+<a id="__codelineno-18-47" name="__codelineno-18-47" href="#__codelineno-18-47"></a><span class="w">  </span><span class="nt">num_persons_agg</span><span class="p">:</span>
+<a id="__codelineno-18-48" name="__codelineno-18-48" href="#__codelineno-18-48"></a><span class="w">    </span><span class="nt">apply_to</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;num_persons&quot;</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-18-49" name="__codelineno-18-49" href="#__codelineno-18-49"></a><span class="w">    </span><span class="nt">mapping</span><span class="p">:</span>
+<a id="__codelineno-18-50" name="__codelineno-18-50" href="#__codelineno-18-50"></a><span class="w">      </span><span class="nt">1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<a id="__codelineno-18-51" name="__codelineno-18-51" href="#__codelineno-18-51"></a><span class="w">      </span><span class="nt">2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<a id="__codelineno-18-52" name="__codelineno-18-52" href="#__codelineno-18-52"></a><span class="w">      </span><span class="nt">3</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<a id="__codelineno-18-53" name="__codelineno-18-53" href="#__codelineno-18-53"></a><span class="w">      </span><span class="nt">4</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span><span class="w">   </span><span class="c1"># 4+ aggregation</span>
+<a id="__codelineno-18-54" name="__codelineno-18-54" href="#__codelineno-18-54"></a><span class="w">      </span><span class="nt">5</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<a id="__codelineno-18-55" name="__codelineno-18-55" href="#__codelineno-18-55"></a><span class="w">      </span><span class="nt">6</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<a id="__codelineno-18-56" name="__codelineno-18-56" href="#__codelineno-18-56"></a><span class="w">      </span><span class="nt">7</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<a id="__codelineno-18-57" name="__codelineno-18-57" href="#__codelineno-18-57"></a><span class="w">      </span><span class="nt">8</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<a id="__codelineno-18-58" name="__codelineno-18-58" href="#__codelineno-18-58"></a><span class="w">      </span><span class="nt">9</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<a id="__codelineno-18-59" name="__codelineno-18-59" href="#__codelineno-18-59"></a><span class="w">      </span><span class="nt">10</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
 </code></pre></div>
 <hr />
 <h2 id="execution-and-output">Execution and Output<a class="headerlink" href="#execution-and-output" title="Permanent link">&para;</a></h2>
 <h3 id="run-summary-generation">Run Summary Generation<a class="headerlink" href="#run-summary-generation" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">python</span> <span class="n">-m</span> <span class="n">tm2py_utils</span><span class="p">.</span><span class="n">summary</span><span class="p">.</span><span class="n">validation</span><span class="p">.</span><span class="n">summaries</span><span class="p">.</span><span class="n">run_all</span> <span class="p">-</span><span class="n">-config</span> <span class="n">validation_config</span><span class="p">.</span><span class="n">yaml</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">python</span> <span class="n">-m</span> <span class="n">tm2py_utils</span><span class="p">.</span><span class="n">summary</span><span class="p">.</span><span class="n">validation</span><span class="p">.</span><span class="n">summaries</span><span class="p">.</span><span class="n">run_all</span> <span class="p">-</span><span class="n">-config</span> <span class="n">validation_config</span><span class="p">.</span><span class="n">yaml</span>
 </code></pre></div>
 <p><strong>Log output:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>INFO - Loading data from 2023_version_05: A:\2023-tm22-dev-version-05\ctramp_output
-<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>INFO -   ✓ Loaded households: 2,490,000 records
-<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>...
-<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>INFO - Loading pre-aggregated summaries from acs_2023: ACS 2023
-<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>INFO -   ✓ Loaded auto_ownership_by_household_size_acs: 20 rows from acs_auto_ownership_by_household_size_regional.csv
-<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>INFO -   ✓ Loaded auto_ownership_by_household_size_county: 180 rows from acs_auto_ownership_by_household_size_county.csv
-<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>...
-<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>INFO - Combining multi-run summaries...
-<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>INFO -   ✓ Saved auto_ownership_by_household_size_acs.csv: 60 rows (3 datasets)
-<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a>INFO -   ✓ Saved auto_ownership_by_household_size_county.csv: 539 rows (3 datasets)
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>INFO - Loading data from 2023_version_05: A:\2023-tm22-dev-version-05\ctramp_output
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>INFO -   ✓ Loaded households: 2,490,000 records
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>...
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>INFO - Loading pre-aggregated summaries from acs_2023: ACS 2023
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>INFO -   ✓ Loaded auto_ownership_by_household_size_acs: 20 rows from acs_auto_ownership_by_household_size_regional.csv
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>INFO -   ✓ Loaded auto_ownership_by_household_size_county: 180 rows from acs_auto_ownership_by_household_size_county.csv
+<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a>...
+<a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a>INFO - Combining multi-run summaries...
+<a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a>INFO -   ✓ Saved auto_ownership_by_household_size_acs.csv: 60 rows (3 datasets)
+<a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a>INFO -   ✓ Saved auto_ownership_by_household_size_county.csv: 539 rows (3 datasets)
 </code></pre></div>
 <h3 id="output-file-structure">Output File Structure<a class="headerlink" href="#output-file-structure" title="Permanent link">&para;</a></h3>
 <p><strong>Combined file:</strong> <code>auto_ownership_by_household_size_acs.csv</code></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>num_persons_agg,num_vehicles,households,share,dataset
-<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>1,0,150000,0.28,2023 TM2.2 v05
-<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>1,1,200000,0.37,2023 TM2.2 v05
-<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>1,2,190000,0.35,2023 TM2.2 v05
-<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>1,0,130000,0.26,2015 TM2.2 Sprint 04
-<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>1,1,210000,0.42,2015 TM2.2 Sprint 04
-<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a>1,2,160000,0.32,2015 TM2.2 Sprint 04
-<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>1,0,120000,0.30,ACS 2023
-<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a>1,1,180000,0.45,ACS 2023
-<a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a>1,2,100000,0.25,ACS 2023
-<a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a>2,0,80000,0.15,2023 TM2.2 v05
-<a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a>2,1,200000,0.38,2023 TM2.2 v05
-<a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a>...
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>num_persons_agg,num_vehicles,households,share,dataset
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>1,0,150000,0.28,2023 TM2.2 v05
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>1,1,200000,0.37,2023 TM2.2 v05
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>1,2,190000,0.35,2023 TM2.2 v05
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>1,0,130000,0.26,2015 TM2.2 Sprint 04
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>1,1,210000,0.42,2015 TM2.2 Sprint 04
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>1,2,160000,0.32,2015 TM2.2 Sprint 04
+<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a>1,0,120000,0.30,ACS 2023
+<a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a>1,1,180000,0.45,ACS 2023
+<a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a>1,2,100000,0.25,ACS 2023
+<a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a>2,0,80000,0.15,2023 TM2.2 v05
+<a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a>2,1,200000,0.38,2023 TM2.2 v05
+<a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a>...
 </code></pre></div>
 <p><strong>Dataset column values:</strong>
 - <code>2023 TM2.2 v05</code> - From model run
@@ -2573,14 +2667,14 @@
 <hr />
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
 <h3 id="external-data-not-appearing">External Data Not Appearing<a class="headerlink" href="#external-data-not-appearing" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>WARNING - Summary file not found: C:\...\acs_data.csv
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>WARNING - Summary file not found: C:\...\acs_data.csv
 </code></pre></div>
 <p><strong>Solutions:</strong>
 1. Check file path is absolute (not relative)
 2. Verify file exists at specified location
 3. Check for typos in path</p>
 <h3 id="column-not-found">Column Not Found<a class="headerlink" href="#column-not-found" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>KeyError: &#39;num_persons_agg&#39;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>KeyError: &#39;num_persons_agg&#39;
 </code></pre></div>
 <p><strong>Cause:</strong> Column mapping incorrect</p>
 <p><strong>Solution:</strong> Verify column names in external file match <code>columns</code> mapping</p>
@@ -2589,7 +2683,7 @@
 <p><strong>Cause:</strong> External data not aggregated to match model</p>
 <p><strong>Solution:</strong> Preprocess external data to combine 4, 5, 6, 7+ → "4+"</p>
 <h3 id="wrong-summary-name">Wrong Summary Name<a class="headerlink" href="#wrong-summary-name" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>WARNING - No model summary found matching &#39;wrong_name&#39;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>WARNING - No model summary found matching &#39;wrong_name&#39;
 </code></pre></div>
 <p><strong>Cause:</strong> <code>observed_summaries</code> key doesn't match any model summary name</p>
 <p><strong>Solution:</strong> Ensure <code>summaries:</code> keys match <code>summaries[].name</code> in config exactly</p>
@@ -2597,7 +2691,7 @@
 <p><strong>Example:</strong> ACS share = 0.30, but model share calculated differently</p>
 <p><strong>Cause:</strong> Different <code>share_within</code> grouping</p>
 <p><strong>Model:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="nt">share_within</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;county&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;num_persons_agg&quot;</span><span class="p p-Indicator">]</span><span class="w">  </span><span class="c1"># Share within county × household size</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="nt">share_within</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;county&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;num_persons_agg&quot;</span><span class="p p-Indicator">]</span><span class="w">  </span><span class="c1"># Share within county × household size</span>
 </code></pre></div></p>
 <p><strong>External data:</strong> Share might be regional (not within groups)</p>
 <p><strong>Solution:</strong> Recalculate shares in preprocessing to match model's grouping</p>
@@ -2640,7 +2734,7 @@
 <h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong><a href="../generate-summaries/">Generate Summaries</a></strong> - Run the full summary generation</li>
-<li><strong><a href="../deploy-dashboard/">Deploy Dashboard</a></strong> - Visualize model vs. observed comparisons</li>
+<li><strong><a href="deploy-dashboard.md">Deploy Dashboard</a></strong> - Visualize model vs. observed comparisons</li>
 <li><strong><a href="../custom-summaries/">Custom Summaries</a></strong> - Create new summary definitions</li>
 <li><strong><a href="../data-model/">Data Model Reference</a></strong> - Understand model data format</li>
 </ul>
@@ -2666,7 +2760,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="December 11, 2025 17:42:55 UTC">December 11, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="December 14, 2025 21:06:32 UTC">December 14, 2025</span>
   </span>
 
     
