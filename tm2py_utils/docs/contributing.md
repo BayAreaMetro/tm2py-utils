@@ -1,6 +1,6 @@
 # Contributing to tm2py-utils
 
-Thank you for contributing to tm2py-utils! This guide helps you add summaries, dashboard visualizations, and other features.
+Thank you for contributing to tm2py-utils! This guide helps you add summaries, validation checks, and other features.
 
 ## Development Setup
 
@@ -33,45 +33,46 @@ pip install pytest black flake8 mypy
 ```
 tm2py_utils/
 ├── summary/
-│   ├── validation/
-│   │   ├── summaries/           # Summary generation
-│   │   │   ├── run_all.py       # Main runner
-│   │   │   └── custom.py        # Custom summary logic
-│   │   ├── dashboard/           # Dashboard YAML configs
-│   │   │   ├── dashboard-0-population.yaml
-│   │   │   ├── dashboard-1-households.yaml
-│   │   │   └── ...
-│   │   ├── data_model/          # Column mappings
-│   │   │   ├── ctramp_data_model.yaml
-│   │   │   └── variable_labels.yaml
-│   │   ├── validation_config.yaml
-│   │   └── run_and_deploy_dashboard.py
-│   └── core_summaries/          # DEPRECATED - Use validation/ instead
-├── inputs/                      # Input data processing
-├── misc/                        # Utilities
-└── docs/                        # Documentation
+│   ├── validation/                        # NEW: Simple validation toolkit
+│   │   ├── summarize_model_run.py        # Main tool
+│   │   ├── validate_summaries.py         # Quality checker
+│   │   ├── data_model/                   # Configuration
+│   │   │   ├── ctramp_data_model.yaml   # Edit this to add summaries!
+│   │   │   ├── variable_labels.yaml      # Display labels
+│   │   │   └── ctramp_data_model_loader.py
+│   │   ├── outputs/                      # Generated summaries
+│   │   ├── HOW_TO_SUMMARIZE.md          # User guide
+│   │   ├── README.md                     # Toolkit overview
+│   │   └── archived_validation_system/   # Old multi-dataset system
+│   └── core_summaries/                   # DEPRECATED
+├── inputs/                                # Input data processing
+├── misc/                                  # Utilities
+└── docs/                                  # Documentation
 ```
 
 ## Adding a New Summary
 
-### 1. Define in Configuration
+### 1. Define in ctramp_data_model.yaml
 
-Edit `validation_config.yaml`:
+Edit `tm2py_utils/summary/validation/data_model/ctramp_data_model.yaml`:
 
 ```yaml
-custom_summaries:
-  - name: "trip_length_by_mode_purpose"
-    summary_type: "validation"  # or "core"
-    description: "Trip distance by mode and purpose"
+summaries:
+  # ... existing summaries ...
+  
+  trip_distance_by_mode_purpose:
+    description: "Trip distance distribution by mode and purpose"
     data_source: "individual_trips"
-    group_by: ["trip_mode", "tour_purpose"]
-    weight_field: "sample_rate"
+    group_by:
+      - "trip_mode_name"
+      - "tour_purpose_name"
     aggregations:
-      trips: "count"
-      avg_distance:
+      trips:
+        column: "trip_id"
+        agg: "count"
+      mean_distance:
         column: "trip_distance_miles"
         agg: "mean"
-    share_within: "tour_purpose"
 ```
 
 ### 2. Test Generation
@@ -79,25 +80,26 @@ custom_summaries:
 ```bash
 cd tm2py_utils/summary/validation
 
-# Check summary appears in list
-python list_summaries.py | grep trip_length_by_mode_purpose
-
-# Generate just your summary
-python -m tm2py_utils.summary.validation.summaries.run_all \
-  --config validation_config.yaml
+# Generate summaries for a test run
+python summarize_model_run.py "A:/path/to/ctramp_output" --output "test_output"
 ```
 
 ### 3. Verify Output
 
-Check output file:
+Check the generated file:
+
 ```bash
-cat outputs/trip_length_by_mode_purpose.csv
+cat test_output/trip_distance_by_mode_purpose.csv
 ```
 
 Expected format:
 ```csv
-trip_mode,tour_purpose,trips,avg_distance,share,dataset
-Drive Alone,Work,150000,12.5,45.2,2023 TM2.2 v05
+trip_mode_name,tour_purpose_name,trips,mean_distance,share
+Drive Alone,Work,1234567,12.5,0.452
+Carpool 2,Work,234567,10.3,0.086
+Walk-Transit-Walk,Work,156789,8.7,0.057
+...
+```
 ...
 ```
 

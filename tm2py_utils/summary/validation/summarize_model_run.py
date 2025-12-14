@@ -38,6 +38,8 @@ logger = logging.getLogger(__name__)
 # ASCII-safe symbols for Windows compatibility
 CHECK = '[OK]'
 WARN = '[WARN]'
+ERROR = '[ERROR]'
+INFO = '[INFO]'
 INFO = '[INFO]'
 
 
@@ -59,7 +61,7 @@ def load_data_model() -> Dict[str, Any]:
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
     
-    logger.info(f"✓ Loaded configuration with {len(config.get('summaries', {}))} summary definitions")
+    logger.info(f"{CHECK} Loaded configuration with {len(config.get('summaries', {}))} summary definitions")  
     logger.info("")
     return config
 
@@ -135,7 +137,7 @@ def load_ctramp_data(ctramp_dir: Path, data_model: Dict[str, Any]) -> Dict[str, 
         
         # Skip geography_lookup - it's a static reference file, not CTRAMP output
         if table_name == 'geography_lookup':
-            logger.info(f"  ℹ Skipping {table_name} (static reference file, not CTRAMP output)")
+            logger.info(f"  {INFO} Skipping {table_name} (static reference file, not CTRAMP output)")
             logger.info("")
             continue
         
@@ -144,7 +146,7 @@ def load_ctramp_data(ctramp_dir: Path, data_model: Dict[str, Any]) -> Dict[str, 
         file_path = find_latest_iteration_file(ctramp_dir, file_pattern)
         
         if file_path is None:
-            logger.warning(f"  ⚠ File not found matching pattern: {file_pattern}")
+            logger.warning(f"  {WARN} File not found matching pattern: {file_pattern}")
             continue
         
         logger.info(f"  File: {file_path.name}")
@@ -158,12 +160,22 @@ def load_ctramp_data(ctramp_dir: Path, data_model: Dict[str, Any]) -> Dict[str, 
         optional_cols = schema['columns'].get('optional', {})
         all_col_mappings = {**required_cols, **optional_cols}
         
+        # Check for missing required columns
+        missing_required = []
+        for canonical_name, file_col_name in required_cols.items():
+            if file_col_name not in df.columns:
+                missing_required.append(f"{canonical_name} (expected '{file_col_name}')")
+        
+        if missing_required:
+            logger.warning(f"  {WARN} Missing required columns: {', '.join(missing_required)}")
+            logger.warning(f"  {WARN} Available columns: {', '.join(sorted(df.columns.tolist()))}")
+        
         # Only rename columns that exist in the file
         rename_map = {v: k for k, v in all_col_mappings.items() if v in df.columns}
         df = df.rename(columns=rename_map)
         
         logger.info(f"  Columns: {len(df.columns)}")
-        logger.info(f"  ✓ Loaded and standardized")
+        logger.info(f"  {CHECK} Loaded and standardized")
         logger.info("")
         
         data[table_name] = df
@@ -255,7 +267,7 @@ def apply_aggregations(data: Dict[str, pd.DataFrame], aggregation_specs: Dict[st
                 
                 agg_col = f"{col}_agg"
                 df[agg_col] = df[col].map(mapping)
-                logger.info(f"  ✓ Aggregated '{col}' → '{agg_col}' ({len(set(mapping.values()))} categories)")
+                logger.info(f"  {CHECK} Aggregated '{col}' -> '{agg_col}' ({len(set(mapping.values()))} categories)")
         
         logger.info("")
     
@@ -296,7 +308,7 @@ def apply_bins(data: Dict[str, pd.DataFrame], bin_configs: Dict[str, Any]) -> Di
                 include_lowest=True,
                 right=False
             )
-            logger.info(f"  ✓ Binned '{col}' → '{bin_col}' ({len(breaks)-1} bins)")
+            logger.info(f"  {CHECK} Binned '{col}' -> '{bin_col}' ({len(breaks)-1} bins)")
         
         logger.info("")
     
@@ -484,7 +496,7 @@ def generate_all_summaries(data: Dict[str, pd.DataFrame], summaries_config: Dict
         # Get source data
         data_source = summary_config['data_source']
         if data_source not in data:
-            logger.warning(f"  ⚠ Data source '{data_source}' not found, skipping")
+            logger.warning(f"  {WARN} Data source '{data_source}' not found, skipping")
             continue
         
         df = data[data_source]
@@ -505,11 +517,11 @@ def generate_all_summaries(data: Dict[str, pd.DataFrame], summaries_config: Dict
             # Save to CSV
             output_path = output_dir / f"{summary_name}.csv"
             summary_df.to_csv(output_path, index=False)
-            logger.info(f"  ✓ Saved: {output_path.name}")
+            logger.info(f"  {CHECK} Saved: {output_path.name}")
             
             summary_count += 1
         except Exception as e:
-            logger.error(f"  ✗ Failed: {e}")
+            logger.error(f"  {ERROR} Failed: {e}")
         
         logger.info("")
     
@@ -563,9 +575,9 @@ def main():
         sys.exit(1)
     
     logger.info("")
-    logger.info("╔" + "=" * 78 + "╗")
-    logger.info("║" + " CTRAMP Model Run Summarizer ".center(78) + "║")
-    logger.info("╚" + "=" * 78 + "╝")
+    logger.info("=" * 80)
+    logger.info(" CTRAMP Model Run Summarizer ".center(80))
+    logger.info("=" * 80)
     logger.info("")
     
     # Execute processing pipeline

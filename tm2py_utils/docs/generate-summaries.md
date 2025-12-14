@@ -1,103 +1,74 @@
 # Generate Summaries from Model Runs
 
-Guide to generating validation summaries from CTRAMP model outputs.
+Guide to generating validation summaries from CTRAMP model outputs using the new simple toolkit.
 
 ## Overview
 
-The summary generation system reads raw model outputs (CSV files) and produces **aggregated summary tables** for validation and comparison. The process is entirely **configuration-driven** - no coding required.
+The summary generation system reads raw CTRAMP outputs (CSV files) and produces **aggregated summary tables** for validation and analysis. The process is **configuration-driven** - add summaries by editing YAML, no Python coding required.
 
 **What it does:**
-- Loads model outputs (households, persons, tours, trips)
-- Applies weights (sample expansion)
-- Groups data by specified dimensions
-- Calculates counts and shares
-- Bins continuous variables (distance, time, age)
-- Aggregates categories (4+ household sizes, mode groups)
-- Combines multiple model runs into single CSVs
+- Loads CTRAMP output files (households, persons, tours, trips)
+- Applies value labels (mode 1 → "SOV_GP")
+- Creates aggregated categories (17 modes → 5 major groups)
+- Bins continuous variables (age → age groups, distance → bins)
+- Generates weighted frequency tables
+- Validates results for data quality issues
+- Saves individual CSV files for each summary
 
-**Output:** CSV files ready for visualization in dashboards or BI tools.
+**Output:** 30 CSV files ready for analysis in Excel, pandas, R, or dashboard tools.
 
 ---
 
 ## Quick Start
 
-### 1. Configure Input Data
+### 1. Run Summary Generation
 
-Edit `validation_config.yaml` to point to your model run directories:
+```bash
+cd tm2py_utils/summary/validation
 
-```yaml
-# Input datasets to analyze
-input_directories:
-  - path: "A:\\2023-tm22-dev-version-05\\ctramp_output"
-    name: "2023_version_05"
-    display_name: "2023 TM2.2 v05"
-    source_type: "model"
-    description: "2023 TM2.2 Development Version 05"
-    iteration: 1  # Use iteration 1 files
-    
-  - path: "A:\\2015-tm22-dev-sprint-04\\ctramp_output"
-    name: "2015_sprint_04"
-    display_name: "2015 TM2.2 Sprint 04"
-    source_type: "model"
-    description: "2015 TM2.2 Development Sprint 04"
-    iteration: 1
+# Generate all summaries for one model run
+python summarize_model_run.py "C:/path/to/ctramp_output"
 ```
 
-**Configuration Fields:**
+Summaries are saved to `outputs/` by default.
 
-| Field | Required | Description | Example |
-|-------|----------|-------------|---------|
-| `path` | ✅ | Directory containing CTRAMP outputs | `"A:\\model_run\\ctramp_output"` |
-| `name` | ✅ | Internal identifier (no spaces) | `"2023_version_05"` |
-| `display_name` | ✅ | Human-readable name for dashboards | `"2023 TM2.2 v05"` |
-| `source_type` | ⚠️ | Data source type | `"model"`, `"survey"` |
-| `description` | ⚠️ | Long description | `"Base year 2023 model"` |
-| `iteration` | ⚠️ | Which iteration files to load | `1` (uses `*_1.csv` files) |
+### 2. Specify Custom Output Location
 
-### 2. Set Output Location
-
-```yaml
-# Output location
-output_directory: "C:\\GitHub\\tm2py-utils\\tm2py_utils\\summary\\validation\\outputs\\dashboard"
+```bash
+python summarize_model_run.py "C:/path/to/ctramp_output" --output "my_results"
 ```
 
-All summary CSVs will be saved here.
+### 3. Enable Strict Validation
 
-### 3. Run Summary Generation
+Treat validation warnings as errors:
 
-From the **validation directory** (`tm2py_utils/summary/validation`):
-
-```powershell
-# Activate environment (required for dependencies)
-conda activate tm2py-utils
-
-# Generate all summaries
-python -m tm2py_utils.summary.validation.summaries.run_all --config validation_config.yaml
-```
-
-**Alternative (from workspace root):**
-
-```powershell
-cd C:\GitHub\tm2py-utils\tm2py_utils\summary\validation
-python -m tm2py_utils.summary.validation.summaries.run_all --config C:\GitHub\tm2py-utils\tm2py_utils\summary\validation\validation_config.yaml
+```bash
+python summarize_model_run.py "C:/path/to/ctramp_output" --strict
 ```
 
 ---
 
 ## Expected Input Files
 
-The system looks for these files in each `input_directories.path`:
+The system looks for these files in the CTRAMP output directory:
 
 ### Required Files
 
 | File Pattern | Description | Example |
 |-------------|-------------|---------|
-| `householdData_{iteration}.csv` | Household data | `householdData_1.csv` |
-| `personData_{iteration}.csv` | Person data | `personData_1.csv` |
-| `indivTourData_{iteration}.csv` | Individual tours | `indivTourData_1.csv` |
-| `indivTripData_{iteration}.csv` | Individual trips | `indivTripData_1.csv` |
+| `householdData_*.csv` | Household data | `householdData_3.csv` |
+| `personData_*.csv` | Person data | `personData_3.csv` |
+| `indivTourData_*.csv` | Individual tours | `indivTourData_3.csv` |
+| `indivTripData_*.csv` | Individual trips | `indivTripData_3.csv` |
 
 ### Optional Files
+
+| File Pattern | Description | Used For |
+|-------------|-------------|----------|
+| `wsLocResults.csv` | Work/school location | Commute summaries |
+| `jointTourData_*.csv` | Joint tours | Joint tour summaries |
+
+**Note:** The tool automatically detects the iteration number (e.g., `_1.csv`, `_3.csv`).
 
 | File Pattern | Description |
 |-------------|-------------|
@@ -126,345 +97,435 @@ One file per summary per dataset, with dataset name in filename:
 ```
 auto_ownership_regional_2023 TM2.2 v05.csv
 auto_ownership_regional_2015 TM2.2 Sprint 04.csv
-tour_mode_choice_2023 TM2.2 v05.csv
-tour_mode_choice_2015 TM2.2 Sprint 04.csv
+---
+
+## What Gets Generated
+
+The tool creates **30 individual CSV files**, one for each summary. Each file contains aggregated statistics ready for analysis.
+
+### Example Output Files
+
+```
+outputs/
+├── auto_ownership_regional.csv
+├── auto_ownership_by_income.csv
+├── auto_ownership_by_household_size.csv
+├── person_type_distribution.csv
+├── age_distribution.csv
+├── cdap_by_person_type.csv
+├── cdap_regional.csv
+├── tour_frequency_by_purpose.csv
+├── tour_mode_choice.csv
+├── tour_distance_distribution.csv
+├── trip_mode_choice.csv
+├── trip_distance_distribution.csv
+├── time_of_day_tours.csv
+└── ... (30 total)
 ```
 
-### 2. Combined Files
+### Example CSV Structure
 
-One file per summary with **all datasets merged** via `dataset` column:
-
-```
-auto_ownership_regional.csv  # Contains both 2023 and 2015 data
-tour_mode_choice.csv         # Contains both 2023 and 2015 data
-```
-
-**Combined File Structure:**
+**Simple distribution** (`auto_ownership_regional.csv`):
 
 ```csv
-num_vehicles,households,share,dataset
-0,150000,0.25,2023 TM2.2 v05
-1,200000,0.33,2023 TM2.2 v05
-2,180000,0.30,2023 TM2.2 v05
-0,120000,0.22,2015 TM2.2 Sprint 04
-1,190000,0.35,2015 TM2.2 Sprint 04
-2,175000,0.32,2015 TM2.2 Sprint 04
+num_vehicles,households,share
+0,150234.5,0.054
+1,823456.2,0.298
+2,1245678.3,0.450
+3,445632.1,0.161
+4+,102026.9,0.037
 ```
 
-The `dataset` column contains the `display_name` from your config.
+**Cross-tabulation** (`auto_ownership_by_income.csv`):
 
-**Dashboard Usage:**
-Combined files are what dashboards use - the `dataset` column enables filtering/comparison across runs.
+```csv
+income_category_bin,num_vehicles,households,share
+<30K,0,45623.2,0.421
+<30K,1,52341.6,0.483
+<30K,2,9234.5,0.085
+30-60K,0,32456.7,0.156
+30-60K,1,98234.5,0.472
+30-60K,2,65432.1,0.314
+...
+```
+
+**With aggregations** (`trip_distance_distribution.csv`):
+
+```csv
+trip_distance_bin,trips,share,mean_distance
+<1mi,8234567.2,0.342,0.45
+1-3mi,5632451.3,0.234,2.12
+3-5mi,3456234.1,0.143,4.03
+5-10mi,2345678.9,0.097,7.24
+10+mi,1987654.0,0.082,18.45
+```
 
 ---
 
 ## Pre-Configured Summaries
 
-The system includes **25 pre-configured summaries** across 5 topic areas:
+The system includes **30 pre-configured summaries** defined in `data_model/ctramp_data_model.yaml`:
 
-### Auto Ownership (5 summaries)
+### Household Summaries (3)
 
-| Summary Name | Description | Dimensions |
-|-------------|-------------|------------|
-| `auto_ownership_regional` | Vehicle ownership distribution | `num_vehicles` |
-| `auto_ownership_by_income` | Vehicles by income quartile | `income_category`, `num_vehicles` |
-| `auto_ownership_by_household_size` | Vehicles by household size | `num_persons`, `num_vehicles` |
-| `auto_ownership_by_county` | Vehicles by county | `county`, `num_vehicles` |
-| `auto_ownership_by_household_size_acs` | Vehicles by 1/2/3/4+ persons (ACS format) | `num_persons_agg`, `num_vehicles` |
+- Auto ownership (regional, by income, by household size)
 
-### Work Location (3 summaries)
+### Person & Activity Summaries (4)
 
-| Summary Name | Description | Dimensions |
-|-------------|-------------|------------|
-| `work_distance_by_county` | Commute distance distribution | `county`, `work_distance_bin` |
-| `workplace_destination_by_home_county` | Where residents work | `county` (home), `work_county` |
-| `work_location_by_income` | Work location by income | `income_category`, `work_county` |
+- Person type distribution
+- Age distribution
+- CDAP by person type
+- CDAP regional
 
-### CDAP - Coordinated Daily Activity Patterns (2 summaries)
+### Tour Summaries (9)
 
-| Summary Name | Description | Dimensions |
-|-------------|-------------|------------|
-| `cdap_by_person_type` | Activity pattern by person type | `person_type`, `cdap` |
-| `cdap_by_share` | Overall activity pattern distribution | `cdap` |
+- Tour frequency by purpose
+- Tour mode choice (overall and by purpose)
+- Tour distance distributions
+- Time of day patterns
+- Tour start/end times
 
-### Tours (6 summaries)
+### Trip Summaries (8)
 
-| Summary Name | Description | Dimensions |
-|-------------|-------------|------------|
-| `tour_frequency_by_purpose` | Tours per person by purpose | `tour_purpose`, `tours_per_person` |
-| `tour_mode_choice` | Tour mode distribution (17 modes) | `tour_mode` |
-| `tour_mode_choice_aggregated` | Tour mode aggregated (Auto/Transit/Active) | `tour_mode_agg` |
-| `tour_mode_by_purpose` | Mode choice by trip purpose | `tour_purpose`, `tour_mode` |
-| `tour_mode_by_purpose_aggregated` | Aggregated mode by purpose | `tour_purpose`, `tour_mode_agg` |
-| `tour_distance` | Tour distance distribution | `tour_distance_bin` |
+- Trip mode choice (overall and by purpose)
+- Trip purpose distribution
+- Trip distance distributions
+- Trip duration distributions
 
-### Trips (9 summaries)
+### Work/School Location (6)
 
-| Summary Name | Description | Dimensions |
-|-------------|-------------|------------|
-| `trip_mode_choice` | Trip mode distribution (17 modes) | `trip_mode` |
-| `trip_mode_choice_aggregated` | Trip mode aggregated | `trip_mode_agg` |
-| `trip_mode_by_purpose` | Mode by trip purpose | `trip_purpose`, `trip_mode` |
-| `trip_mode_by_purpose_aggregated` | Aggregated mode by purpose | `trip_purpose`, `trip_mode_agg` |
-| `trip_distance` | Trip distance distribution | `trip_distance_bin` |
-| `trip_purpose` | Trip purpose distribution | `trip_purpose` |
-| `time_of_day_tours` | Tour start time distribution | `start_period` |
-| `tour_start_time` | Tour departure time | `start_period_bin` |
-| `tour_end_time` | Tour arrival time | `end_period_bin` |
+- Average commute distance
+- Work distance by county
+- Workplace destinations
+- Work location patterns
+
+See `data_model/ctramp_data_model.yaml` for complete list with full definitions.
 
 ---
 
 ## Sample Expansion (Weighting)
 
-All summaries are **automatically weighted** using the household `sampleRate` field.
+Most summaries are **automatically weighted** by household sample rate.
 
 **How it works:**
 
-1. **Read `sampleRate`** from `householdData_1.csv` (value between 0 and 1)
-   - `0.05` = 5% sample
-   - `0.5` = 50% sample
-   - `1.0` = 100% sample (no expansion needed)
-
-2. **Calculate expansion factor** = `1 / sampleRate`
-   - `0.05` → weight of `20.0` (each record represents 20 households)
-   - `0.5` → weight of `2.0` (each record represents 2 households)
-   - `1.0` → weight of `1.0` (no expansion)
-
-3. **Apply to all related tables**:
-   - Households: Use `sampleRate` directly
-   - Persons: Inherit from household
-   - Tours: Inherit from household
-   - Trips: Inherit from household
+1. System reads sample rate from household data (typically 0.01 to 1.0)
+2. Applies expansion factor = `1 / sample_rate`
+3. Each household/person/tour/trip is counted with its weight
+4. Final counts represent full population estimates
 
 **Example:**
-
-```csv
-# householdData_1.csv
-hh_id,autos,sampleRate
-1,2,0.05
-2,1,0.05
-```
-
-**After weighting:**
-- Household 1 represents `1 / 0.05 = 20` actual households with 2 vehicles
-- Household 2 represents `20` actual households with 1 vehicle
-- Total: `40` households in the weighted summary
-
-**Output summary:**
-
-```csv
-num_vehicles,households,share
-1,20,0.50
-2,20,0.50
-```
-
-**No configuration needed** - weighting happens automatically based on the CTRAMP data model.
-
+- Sample rate: 0.5 (50% sample)
+- Expansion factor: 2.0
+- Each record represents 2 households in the full population
 ---
 
 ## Understanding Output Columns
 
-Summaries contain three types of columns:
+### Count Columns
 
-### 1. Dimension Columns
+Summaries include weighted counts appropriate to the data source:
 
-The grouping variables (from `group_by` in config):
+| Data Source | Count Column Name | Example Value |
+|------------|------------------|---------------|
+| households | `households` | 2,768,027 |
+| persons | `persons` | 7,442,845 |
+| individual_tours | `tours` | 12,345,678 |
+| individual_trips | `trips` | 25,678,901 |
+
+### Share Columns
+
+Most summaries include a `share` column showing the proportion within each group:
 
 ```csv
-num_vehicles,income_category  # Dimensions
-0,1
-0,2
-1,1
+tour_mode_name,tours,share
+Drive Alone,5234567,0.425
+Carpool 2,1987654,0.161
+Walk-Transit-Walk,987654,0.080
+...
 ```
 
-### 2. Metric Columns
+Shares sum to 1.0 (or 100%) within each grouping level.
 
-Calculated values:
+### Aggregation Columns
 
-| Column | Description | Calculation |
-|--------|-------------|-------------|
-| `households` | Weighted count | `sum(weight)` |
-| `persons` | Weighted count | `sum(weight)` |
-| `tours` | Weighted count | `sum(weight)` |
-| `trips` | Weighted count | `sum(weight)` |
-| `share` | Percentage within group | `count / total` |
-
-The metric name depends on the data source (households → `households`, tours → `tours`, etc.).
-
-### 3. Dataset Column
-
-Identifier for multi-run comparisons:
+Some summaries include calculated statistics:
 
 ```csv
-dataset
-2023 TM2.2 v05
-2015 TM2.2 Sprint 04
+trip_distance_bin,trips,share,mean_distance,total_distance
+<1mi,8234567,0.342,0.45,3705555
+1-3mi,5632451,0.234,2.12,11940396
+3-5mi,3456234,0.143,4.03,13928622
+...
 ```
 
 ---
 
 ## Command Line Options
 
-### Full Options
-
-```powershell
-python -m tm2py_utils.summary.validation.summaries.run_all --help
+```bash
+python summarize_model_run.py <ctramp_dir> [OPTIONS]
 ```
 
-### Key Arguments
+### Arguments
 
-| Argument | Description | Example |
-|----------|-------------|---------|
-| `--config PATH` | Configuration file | `--config validation_config.yaml` |
-| `--input-dirs DIR [DIR...]` | Input directories (alternative to config) | `--input-dirs path1 path2` |
-| `--output-dir PATH` | Output directory (alternative to config) | `--output-dir results/` |
-| `--summaries TYPE [TYPE...]` | Generate specific summary types only | `--summaries auto_ownership trip_mode` |
+| Option | Description | Default | Example |
+|--------|-------------|---------|---------|
+| `ctramp_dir` | Path to CTRAMP output directory | _(required)_ | `"A:/2015-tm22-dev/ctramp_output"` |
+| `--output DIR` | Output directory for summaries | `outputs/` | `--output "my_results"` |
+| `--strict` | Treat validation warnings as errors | `False` | `--strict` |
 
 ### Examples
 
-**Generate all summaries from config:**
+```bash
+# Basic usage
+python summarize_model_run.py "C:/model_run/ctramp_output"
 
-```powershell
-python -m tm2py_utils.summary.validation.summaries.run_all --config validation_config.yaml
+# Custom output location
+python summarize_model_run.py "C:/model_run/ctramp_output" --output "results_2024"
+
+# Strict validation mode
+python summarize_model_run.py "C:/model_run/ctramp_output" --strict
 ```
 
-**Generate only auto ownership and tour mode summaries:**
+---
 
-```powershell
-python -m tm2py_utils.summary.validation.summaries.run_all --config validation_config.yaml --summaries auto_ownership tour_mode
+## Validation
+
+The tool automatically validates all summaries after generation. Validation checks for:
+
+1. **Negative values** - Flags negative counts in non-negative fields
+2. **Share totals** - Verifies shares sum to ~1.0 within groups (±0.5%)
+3. **Zero totals** - Warns about suspiciously small totals (< 100)
+4. **Statistical outliers** - Identifies extreme values using IQR method
+5. **Logical consistency** - Domain-specific checks:
+   - Auto ownership > 10 vehicles
+   - Invalid time periods
+   - Household size = 0 or > 15
+   - Missing expected categories (age bins, etc.)
+
+### Example Validation Output
+
+```
+VALIDATION SUMMARY
+================================================================================
+  Checked 30 summaries
+  
+  ✓ 25 summaries passed all checks
+  ⚠ 5 summaries have warnings:
+    - tour_distance_distribution: 2 outliers detected (expected in large datasets)
+    - household_size_distribution: Maximum household size is 18 (valid but unusual)
+    - trip_mode_by_purpose: 12 groups have shares not summing to 1.0 (rounding)
+    
+[OK] Validation passed with 5 warnings
 ```
 
-**Use command line instead of config file:**
+Use `--strict` flag to fail on warnings:
 
-```powershell
-python -m tm2py_utils.summary.validation.summaries.run_all \
-  --input-dirs A:\model_2023\ctramp_output A:\model_2015\ctramp_output \
-  --output-dir C:\results\summaries
+```bash
+python summarize_model_run.py "path/to/ctramp" --strict
+# Exit code 1 if any warnings found
 ```
+
+---
+
+## Adding Custom Summaries
+
+To add a new summary, edit `data_model/ctramp_data_model.yaml` and add to the `summaries:` section.
+
+### Example: Trip Mode by Income
+
+```yaml
+summaries:
+  # ... existing summaries ...
+  
+  trip_mode_by_income:
+    description: "Trip mode distribution by income category"
+    data_source: "individual_trips"
+    group_by:
+      - "income_category_bin"
+      - "trip_mode_name"
+    aggregations:
+      trips:
+        column: "trip_id"
+        agg: "count"
+```
+
+Then run:
+
+```bash
+python summarize_model_run.py "path/to/ctramp_output"
+```
+
+The new summary `trip_mode_by_income.csv` will be generated automatically.
+
+See [HOW_TO_SUMMARIZE.md](../summary/validation/HOW_TO_SUMMARIZE.md) for detailed examples.
 
 ---
 
 ## Execution Log
 
-The script provides detailed logging of each step:
+The script provides detailed logging:
 
 ```
-INFO - Starting CTRAMP validation summary generation
-INFO - Input directories: 2
-INFO - Output directory: C:\...\outputs\dashboard
-INFO - Enabled summaries: ['auto_ownership', 'work_location', 'tour_frequency', 'tour_mode', 'tour_time', 'trip_mode']
+================================================================================
+STEP 1: Loading Data Model Configuration
+================================================================================
+Reading: data_model/ctramp_data_model.yaml
+[OK] Loaded configuration with 30 summary definitions
 
-INFO - Loading data from 2023_version_05: A:\2023-tm22-dev-version-05\ctramp_output
-INFO -   → Found iteration 1: householdData_1.csv
-INFO -   ✓ Loaded households: 2,490,000 records from householdData_1.csv
-INFO -     → Applied data model mapping for households
-INFO -     → Aggregated 'num_persons' into 4 categories (num_persons_agg)
-INFO -   → Found iteration 1: personData_1.csv
-INFO -   ✓ Loaded persons: 6,840,000 records from personData_1.csv
-...
-INFO - Generated auto_ownership_regional: 7 rows
-INFO - Generated auto_ownership_by_income: 28 rows
-...
-INFO - Saving 50 summary tables to C:\...\outputs\dashboard
-INFO -   ✓ Saved auto_ownership_regional.csv: 14 rows (2 datasets × 7 vehicle categories)
-...
-INFO - Combining multi-run summaries...
-INFO -   ℹ Combined 50 summaries into 25 multi-run tables
+================================================================================
+STEP 2: Loading CTRAMP Output Files
+================================================================================
+Source directory: A:\2015-tm22-dev-sprint-04\ctramp_output
+
+Loading persons...
+  File: personData_3.csv
+  Rows: 7,442,845
+  Columns: 21
+  [OK] Loaded and standardized
+
+Loading households...
+  File: householdData_3.csv
+  Rows: 2,768,027
+  Columns: 12
+  [OK] Loaded and standardized
+
+================================================================================
+STEP 3: Applying Value Labels
+================================================================================
+Processing persons:
+  [OK] Labeled 'person_type' -> 'person_type_name' (8 values)
+  [OK] Labeled 'cdap_activity' -> 'cdap_activity_name' (3 values)
+
+================================================================================
+STEP 4: Creating Aggregated Categories
+================================================================================
+Processing persons:
+  [OK] Aggregated 'age' -> 'age_bin' (8 categories)
+
+================================================================================
+STEP 5: Binning Continuous Variables
+================================================================================
+Processing persons:
+  [OK] Binned 'age' -> 'age_bin' (8 bins)
+
+================================================================================
+STEP 6: Generating Summaries
+================================================================================
+[1] auto_ownership_regional
+    Source: households (2,768,027 rows)
+  [OK] Saved: auto_ownership_regional.csv
+
+[2] auto_ownership_by_income
+    Source: households (2,768,027 rows)
+  [OK] Saved: auto_ownership_by_income.csv
+
+... (28 more summaries)
+
+[OK] Generated 30 summaries in outputs/
+
+================================================================================
+STEP 7: Validation
+================================================================================
+
+VALIDATION SUMMARY
+================================================================================
+  Checked 30 summaries
+  ✓ 25 summaries passed all checks
+  ⚠ 5 summaries have warnings (outliers expected)
+  
+[OK] Validation passed with 5 warnings
 ```
-
-**Key indicators:**
-- ✓ Success
-- ⚠ Warning (non-critical)
-- ✗ Error (critical)
-- → Processing step
 
 ---
 
 ## Troubleshooting
 
-### File Not Found Errors
+### File Not Found
 
 ```
-FileNotFoundError: Required file not found: householdData_1.csv in A:\model_run\ctramp_output
+[WARN] File not found matching pattern: wsLocResults.csv
 ```
+
+**Cause:** Optional file missing (work/school location data)
+
+**Solution:** This is normal if your model run doesn't include work location choice. Related summaries will be skipped.
+
+### Column Not Found
+
+```
+KeyError: 'trip_mode'
+```
+
+**Cause:** Expected column missing from CTRAMP output
 
 **Solutions:**
-1. Check that `path` in config points to correct directory
-2. Verify files exist: `householdData_1.csv`, `personData_1.csv`, etc.
-3. Check `iteration` value matches file suffix (`_1`, `_2`, `_3`, etc.)
-4. For final outputs, use `iteration: 1`
-
-### Missing Columns
-
-```
-KeyError: 'hh_id'
-```
-
-**Solutions:**
-1. Verify files match [CTRAMP data model](data-model.md)
-2. Check column names exactly match expected format
-3. Review `ctramp_data_model.yaml` for column mappings
+1. Check that files match expected CTRAMP format
+2. Review column mappings in `data_model/ctramp_data_model.yaml`
+3. Update YAML if your model uses different column names
 
 ### Empty Summaries
 
 ```
-WARNING - Generated auto_ownership_regional: 0 rows
+[WARN] person_type_distribution.csv: 0 rows (empty)
 ```
 
 **Causes:**
-- Data filtering removed all rows
 - Missing required columns
-- Incorrect data types
+- Data type mismatch (text vs. numeric)
+- All values filtered out
 
 **Solutions:**
-1. Check data has expected columns and values
-2. Review filter conditions in summary config
-3. Verify weighting columns exist (`sampleRate`)
+1. Check validation output for specific errors
+2. Verify data contains expected values
+3. Review filter conditions in summary definition
 
-### Memory Issues
+### Memory Errors
 
-For very large model runs (>5M households):
+For very large model runs (>10M persons):
 
-```python
-# In validation_config.yaml, process fewer datasets at once
-input_directories:
-  - path: "A:\\large_model\\ctramp_output"
-    iteration: 1
-# Comment out other datasets and run separately
-```
+**Solutions:**
+1. Run on machine with more RAM (minimum 8 GB recommended)
+2. Close other applications
+3. Comment out some summaries in YAML to process fewer at once
 
-### Encoding Errors
+### Unicode/Encoding Errors
 
-```
-UnicodeDecodeError: 'charmap' codec can't decode
-```
-
-**Solution:** Files should be UTF-8 encoded. The system handles this automatically for standard CTRAMP outputs.
+The tool uses ASCII-safe symbols and should work on all Windows terminals. If you see encoding errors, check that your terminal supports UTF-8.
 
 ---
 
-## Performance Tips
+## Performance
 
-**Typical runtime:** 2-5 minutes for 2 model runs with 2.5M households each
+**Typical runtime** for full Bay Area model (7.4M persons, 2.8M households):
 
-**Optimize:**
-1. **Use iteration numbers** - Don't rely on automatic highest-iteration detection
-2. **Generate subsets** - Use `--summaries` to generate only needed summaries
-3. **Reduce datasets** - Comment out unnecessary `input_directories` entries
-4. **SSD storage** - Put model outputs on fast storage
+- Loading data: ~2-3 minutes
+- Labeling & preprocessing: ~1-2 minutes
+- Generating summaries: ~3-5 minutes
+- Validation: ~30 seconds
+- **Total: ~7-11 minutes**
 
-**Memory usage:** ~2-4 GB for typical Bay Area model run
+**Memory usage:** ~2-4 GB
+
+**Tips to speed up:**
+1. Use SSD storage for CTRAMP output files
+2. Run with sufficient RAM (8+ GB recommended)
+3. Comment out unneeded summaries in YAML
 
 ---
 
 ## Next Steps
 
-After generating summaries:
+- **Analyze summaries:** Use Excel, Python pandas, R, or BI tools
+- **Compare runs:** Generate summaries for multiple runs and compare
+- **Add custom summaries:** Edit `ctramp_data_model.yaml` to add new analyses
+- **Validate data quality:** Review validation warnings and investigate issues
 
-- **[Deploy Dashboard](deploy-dashboard.md)** - Visualize summaries in Streamlit
-- **[Create Custom Summaries](custom-summaries.md)** - Define new aggregations
-- **[Integrate External Data](external-data.md)** - Add ACS/CTPP/survey comparisons
-- **[Data Model Reference](data-model.md)** - Understand required data format
+See also:
+- [HOW_TO_SUMMARIZE.md](../summary/validation/HOW_TO_SUMMARIZE.md) - Detailed user guide
+- [README.md](../summary/validation/README.md) - Toolkit overview
+- [PREPROCESSING_NOTES.md](../summary/validation/PREPROCESSING_NOTES.md) - Advanced summaries requiring preprocessing
 
 ---
 

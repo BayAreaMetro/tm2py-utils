@@ -1,567 +1,462 @@
 # Configuration Reference
 
-Complete reference for `validation_config.yaml` and related configuration files.
+Complete reference for `ctramp_data_model.yaml` and related configuration files used by the new validation toolkit.
 
-## validation_config.yaml
+## Overview
 
-Main configuration file for summary generation and dashboard deployment.
+The new validation system uses **YAML configuration files** to define:
+- Data file patterns and column mappings
+- Value labels (mode codes → mode names)
+- Aggregation rules (17 modes → 5 categories)
+- Binning specifications (age → age groups)
+- Summary definitions (what to generate)
 
-### Top-Level Settings
+**Main configuration file:** `data_model/ctramp_data_model.yaml`
 
-```yaml
-# Summary generation filter: "all", "core", or "validation"
-generate_summaries: "all"
+No Python coding required - just edit YAML to customize summaries.
 
-# Base directories for input data
-input_directories:
-  - path: "/path/to/model/run/outputs"
-    label: "2023 TM2.2 v05"
-  - path: "/path/to/another/run"
-    label: "2015 TM2.2 Sprint 04"
-
-# Output directory for generated summaries
-output_directory: "outputs"
-
-# Observed data for validation
-observed_data_sources:
-  - name: "ACS 2019"
-    directory: "/path/to/observed/data"
-    files:
-      auto_ownership: "acs_auto_ownership.csv"
-      household_size: "acs_household_size.csv"
-
-# Custom summary definitions
-custom_summaries:
-  - name: "my_summary"
-    # ... (see Custom Summaries section)
-```
-
-### Input Directories
-
-Each entry requires:
-
-```yaml
-input_directories:
-  - path: "/absolute/path/to/outputs"  # Absolute path to CTRAMP outputs
-    label: "Dataset Name"               # Display name in charts
-```
-
-**Expected files in directory:**
-- `householdData_1.csv`
-- `personData_1.csv`
-- `indivTourData_1.csv`
-- `indivTripData_1.csv`
-- `wsLocResults.csv`
-
-### Custom Summaries
-
-#### Required Fields
-
-```yaml
-custom_summaries:
-  - name: "summary_identifier"          # Unique name (becomes filename)
-    summary_type: "core"                # "core" or "validation"
-    description: "What this summarizes" # Human-readable description
-    data_source: "individual_trips"     # Data source (see below)
-```
-
-#### Data Sources
-
-Available options:
-
-- `households` - Household-level data
-- `persons` - Person-level data
-- `individual_tours` - Tour-level data
-- `individual_trips` - Trip-level data
-- `workplace_school` - Work/school location choice
-- `synthetic_population` - PopulationSim output
-
-#### Basic Grouping
-
-**Single column:**
-```yaml
-group_by: "trip_mode"
-count_name: "trips"  # Column name for counts
-```
-
-**Multiple columns:**
-```yaml
-group_by: ["income_category_bin", "trip_mode"]
-count_name: "trips"
-```
-
-#### Aggregations
-
-**Simple count:**
-```yaml
-count_name: "trips"
-```
-
-**Multiple aggregations:**
-```yaml
-aggregations:
-  trips: "count"                                    # Count rows
-  avg_distance:                                     # Mean
-    column: "trip_distance_miles"
-    agg: "mean"
-  total_time:                                       # Sum
-    column: "trip_time_minutes"
-    agg: "sum"
-  max_distance:                                     # Max
-    column: "trip_distance_miles"
-    agg: "max"
-  min_distance:                                     # Min
-    column: "trip_distance_miles"
-    agg: "min"
-```
-
-Available aggregation functions:
-- `count` - Count rows
-- `mean` - Average
-- `sum` - Total
-- `max` - Maximum value
-- `min` - Minimum value
-- `median` - Median value
-- `std` - Standard deviation
-
-#### Share Calculations
-
-Calculate percentages within groups:
-
-```yaml
-group_by: ["tour_purpose", "tour_mode"]
-share_within: "tour_purpose"  # Each purpose sums to 100%
-```
-
-Without `share_within`, shares calculated across all rows.
-
-#### Weighting
-
-Apply sample expansion factors:
-
-```yaml
-weight_field: "sample_rate"  # Column containing weights
-```
-
-#### Binning
-
-Discretize continuous variables:
-
-```yaml
-group_by: ["income_bin", "auto_ownership"]
-bins:
-  income:
-    breaks: [0, 30000, 60000, 100000, 150000, 1000000000]
-    labels: ['<30K', '30-60K', '60-100K', '100-150K', '150K+']
-  
-  distance:
-    breaks: [0, 5, 10, 20, 50, 1000]
-    labels: ['<5mi', '5-10mi', '10-20mi', '20-50mi', '50+mi']
-```
-
-**Note:** Column name in `group_by` must match bin name (e.g., `income_bin` references `income` bin definition).
-
-#### Filtering
-
-Apply filters before aggregation:
-
-```yaml
-filters:
-  tour_purpose: ["Work", "School"]    # Include only these values
-  trip_distance_miles: {">": 0}       # Distance greater than 0
-```
-
-**Available operators:**
-- `["value1", "value2"]` - Equals any of these
-- `{">": value}` - Greater than
-- `{"<": value}` - Less than
-- `{">=": value}` - Greater than or equal
-- `{"<=": value}` - Less than or equal
-
-#### Observed Data
-
-Compare to validation data:
-
-```yaml
-observed_data: "ACS 2019"      # Name from observed_data_sources
-observed_file: "auto_ownership" # File key from observed_data_sources
-```
-
-Observed data merged into output with `dataset` = observed data name.
-
-### Complete Summary Example
-
-```yaml
-custom_summaries:
-  - name: "trip_distance_by_mode_income"
-    summary_type: "validation"
-    description: "Trip distance distribution by mode and income category"
-    data_source: "individual_trips"
-    group_by: ["distance_bin", "trip_mode", "income_bin"]
-    weight_field: "sample_rate"
-    aggregations:
-      trips: "count"
-      avg_distance:
-        column: "trip_distance_miles"
-        agg: "mean"
-    bins:
-      distance:
-        breaks: [0, 5, 10, 20, 50, 1000]
-        labels: ['<5mi', '5-10mi', '10-20mi', '20-50mi', '50+mi']
-      income:
-        breaks: [0, 30000, 60000, 100000, 150000, 1000000000]
-        labels: ['<30K', '30-60K', '60-100K', '100-150K', '150K+']
-    filters:
-      trip_distance_miles: {">": 0}
-    share_within: "income_bin"
-```
+---
 
 ## ctramp_data_model.yaml
 
-Maps CTRAMP output file columns to standardized names.
+Location: `tm2py_utils/summary/validation/data_model/ctramp_data_model.yaml`
+
+### File Structure
+
+```yaml
+# 1. Data source definitions
+data_sources:
+  persons:
+    file_pattern: "personData_{iteration}.csv"
+    columns:
+      person_id: "person_id"
+      household_id: "hh_id"
+      # ... more columns
+
+# 2. Value mappings (codes to labels)
+value_mappings:
+  trip_mode:
+    type: categorical
+    values:
+      1: "SOV_GP"
+      2: "SOV_PAY"
+      # ... more values
+
+# 3. Aggregation rules
+aggregation_specs:
+  trip_mode_agg:
+    source_column: "trip_mode"
+    mapping:
+      "SOV_GP": "Auto"
+      "SOV_PAY": "Auto"
+      # ... more mappings
+
+# 4. Binning specifications
+binning_specs:
+  age:
+    breaks: [0, 5, 18, 25, 35, 45, 55, 65, 120]
+    labels: ['0-4', '5-17', '18-24', '25-34', '35-44', '45-54', '55-64', '65+']
+
+# 5. Summary definitions
+summaries:
+  auto_ownership_regional:
+    description: "Regional auto ownership distribution"
+    data_source: "households"
+    # ... more settings
+```
+
+---
+
+## Data Sources
+
+Define how to find and load CTRAMP output files.
 
 ### Structure
 
 ```yaml
-data_source_name:
-  file_pattern: "fileName_{iteration}.csv"  # {iteration} replaced with run iteration
-  columns:
-    standard_name: "ctramp_column_name"
+data_sources:
+  source_name:
+    file_pattern: "fileName_{iteration}.csv"
+    columns:
+      standardized_name: "ctramp_column_name"
 ```
 
 ### Example
 
 ```yaml
-individual_trips:
-  file_pattern: "indivTripData_{iteration}.csv"
-  columns:
-    trip_mode: "trip_mode"
-    tour_purpose: "tour_purpose"
-    trip_distance_miles: "trip_distance"
-    depart_period: "depart_period"
-    trip_time_minutes: "travelTime"
-    sample_rate: "sampleRate"
-
-households:
-  file_pattern: "householdData_{iteration}.csv"
-  columns:
-    household_id: "hh_id"
-    income: "income"
-    auto_ownership: "autos"
-    household_size: "size"
-    county: "county"
+data_sources:
+  individual_trips:
+    file_pattern: "indivTripData_{iteration}.csv"
+    columns:
+      trip_id: "trip_id"
+      trip_mode: "trip_mode"
+      tour_purpose: "tour_purpose"
+      trip_distance_miles: "trip_distance_miles"
+      depart_period: "depart_period"
 ```
 
-### Adding New Mappings
+The `{iteration}` placeholder is replaced automatically (e.g., `_1`, `_3`).
 
-1. Identify CTRAMP output file and column names
-2. Add to appropriate data source or create new section
-3. Use in `validation_config.yaml` summaries
+### Available Data Sources
 
-## variable_labels.yaml
+| Source Name | File Pattern | Description |
+|------------|-------------|-------------|
+| `persons` | `personData_{iteration}.csv` | Person-level data |
+| `households` | `householdData_{iteration}.csv` | Household-level data |
+| `individual_tours` | `indivTourData_{iteration}.csv` | Individual tour data |
+| `individual_trips` | `indivTripData_{iteration}.csv` | Individual trip data |
+| `joint_tours` | `jointTourData_{iteration}.csv` | Joint tour data |
+| `workplace_school_location` | `wsLocResults.csv` | Work/school location |
 
-Human-readable labels for variables used in charts.
+---
+
+## Value Mappings
+
+Map numeric codes to human-readable labels.
+
+### Categorical Mappings
+
+**Numeric to text:**
+```yaml
+value_mappings:
+  trip_mode:
+    type: categorical
+    values:
+      1: "SOV_GP"      # Drive alone, general purpose lanes
+      2: "SOV_PAY"     # Drive alone, toll lanes
+      3: "SR2_GP"      # Carpool 2, general purpose
+      4: "SR2_HOV"     # Carpool 2, HOV lanes
+      5: "SR2_PAY"     # Carpool 2, toll lanes
+      # ... more values
+```
+
+**Text values (already labeled):**
+
+```yaml
+value_mappings:
+  person_type:
+    type: categorical
+    text_values:
+      - "Full-time worker"
+      - "Part-time worker"
+      - "University student"
+      - "Non-worker"
+      # ... more values
+```
+
+The system auto-detects numeric vs. text and applies the appropriate mapping.
+
+### Common Value Mappings
+
+**Trip/Tour Modes:**
+- 1-17: Different mode combinations (SOV, HOV, Transit, Walk, Bike, etc.)
+
+**Tour Purpose:**
+- Work, University, School, Escort, Shopping, Maintenance, Eating Out, Visiting, Discretionary, Work-Based
+
+**Person Type:**
+- Full-time worker, Part-time worker, University student, Non-worker, Retired, Student (high school), Student (grade school), Pre-school
+
+**CDAP Activity:**
+- Mandatory, Non-mandatory, Home
+
+---
+
+## Aggregation Specs
+
+Group detailed categories into broader categories.
 
 ### Structure
 
 ```yaml
-column_name: "Display Label"
+aggregation_specs:
+  new_column_name:
+    source_column: "original_column"
+    mapping:
+      "original_value_1": "new_category"
+      "original_value_2": "new_category"
+      "original_value_3": "different_category"
 ```
 
-### Example
+### Example: Mode Aggregation
 
 ```yaml
-# Mode
-trip_mode: "Trip Mode"
-tour_mode: "Tour Mode"
-
-# Purpose
-tour_purpose: "Tour Purpose"
-trip_purpose: "Trip Purpose"
-
-# Geography
-county: "County"
-taz: "TAZ"
-
-# Household
-income_category_bin: "Income Category"
-auto_ownership: "Autos Owned"
-household_size: "Household Size"
-
-# Time
-depart_period: "Departure Period"
-arrive_period: "Arrival Period"
-
-# Distance/Time
-trip_distance_miles: "Distance (miles)"
-trip_time_minutes: "Travel Time (minutes)"
+aggregation_specs:
+  trip_mode_agg:
+    source_column: "trip_mode_name"
+    mapping:
+      "SOV_GP": "Auto"
+      "SOV_PAY": "Auto"
+      "SR2_GP": "Auto"
+      "SR2_HOV": "Auto"
+      "SR2_PAY": "Auto"
+      "SR3_GP": "Auto"
+      "SR3_HOV": "Auto"
+      "SR3_PAY": "Auto"
+      "Walk-Transit-Walk": "Transit"
+      "Walk-Transit-Drive": "Transit"
+      "Drive-Transit-Walk": "Transit"
+      "Drive-Transit-Drive": "Transit"
+      "Walk": "Active"
+      "Bike": "Active"
+      "School Bus": "School Bus"
 ```
 
-Labels automatically applied in dashboard charts.
+This creates a new column `trip_mode_agg` with 5 categories instead of 17.
 
-## Dashboard YAML Files
+---
 
-Located in `dashboard/` directory. Named `dashboard-N-title.yaml`.
+## Binning Specs
+
+Convert continuous variables into categorical bins.
 
 ### Structure
 
 ```yaml
-title: "Tab Title"
-description: "Tab description shown at top"
-
-sections:
-  - title: "Section Name"
-    layout: "two_column"  # single_column, two_column, three_column
-    charts:
-      - type: "bar"
-        title: "Chart Title"
-        # ... chart config
-      
-      - type: "line"
-        title: "Another Chart"
-        # ... chart config
+binning_specs:
+  column_name:
+    breaks: [0, 10, 20, 30, 100]     # Bin edges
+    labels: ['0-10', '10-20', '20-30', '30+']  # Bin labels
 ```
 
-### Chart Types
-
-#### Bar Chart
+### Example: Age Bins
 
 ```yaml
-- type: "bar"
-  title: "Trips by Mode"
-  data_file: "trip_mode_choice.csv"
-  x: "trip_mode"
-  y: "trips"
-  color: "dataset"
-  orientation: "h"  # "h" or "v"
-  barmode: "group"  # "group", "stack", "relative"
+binning_specs:
+  age:
+    breaks: [0, 5, 18, 25, 35, 45, 55, 65, 120]
+    labels: ['0-4', '5-17', '18-24', '25-34', '35-44', '45-54', '55-64', '65+']
 ```
 
-#### Line Chart
+Creates a new column `age_bin` with 8 age groups.
+
+### Example: Distance Bins
 
 ```yaml
-- type: "line"
-  title: "Mode Share Trend"
-  data_file: "mode_share_trend.csv"
-  x: "year"
-  y: "share"
-  color: "trip_mode"
+binning_specs:
+  trip_distance_miles:
+    breaks: [0, 1, 3, 5, 10, 50, 1000]
+    labels: ['<1mi', '1-3mi', '3-5mi', '5-10mi', '10-50mi', '50+mi']
 ```
 
-#### Scatter Plot
+**Note:** Number of labels must equal number of breaks minus 1.
+
+---
+
+## Summary Definitions
+
+Define what summaries to generate.
+
+### Basic Structure
 
 ```yaml
-- type: "scatter"
-  title: "Distance vs Time"
-  data_file: "trip_characteristics.csv"
-  x: "trip_distance_miles"
-  y: "trip_time_minutes"
-  color: "trip_mode"
+summaries:
+  summary_name:
+    description: "What this summary shows"
+    data_source: "individual_trips"   # Which data table
+    group_by: "trip_mode_name"        # Column(s) to group by
+    aggregations:                      # What to calculate
+      trips:
+        column: "trip_id"
+        agg: "count"
 ```
 
-#### Box Plot
+### Examples
+
+**Simple count:**
 
 ```yaml
-- type: "box"
-  title: "Distance Distribution"
-  data_file: "trip_distance.csv"
-  x: "trip_mode"
-  y: "trip_distance_miles"
-  color: "dataset"
+summaries:
+  auto_ownership_regional:
+    description: "Regional auto ownership distribution"
+    data_source: "households"
+    group_by: "num_vehicles"
+    aggregations:
+      households:
+        column: "household_id"
+        agg: "count"
 ```
 
-#### Histogram
+**Cross-tabulation:**
 
 ```yaml
-- type: "histogram"
-  title: "Trip Distance Distribution"
-  data_file: "trip_distance.csv"
-  x: "trip_distance_miles"
-  nbins: 50
+summaries:
+  auto_ownership_by_income:
+    description: "Auto ownership by income category"
+    data_source: "households"
+    group_by:
+      - "income_category_bin"
+      - "num_vehicles"
+    aggregations:
+      households:
+        column: "household_id"
+        agg: "count"
 ```
 
-### Chart Options
-
-#### Faceting
-
-Create subplots by category:
+**With multiple aggregations:**
 
 ```yaml
-facet_col: "county"        # Create subplot for each county
-facet_col_wrap: 2          # Number of columns
+summaries:
+  trip_distance_distribution:
+    description: "Trip distance statistics"
+    data_source: "individual_trips"
+    group_by: "trip_distance_bin"
+    aggregations:
+      trips:
+        column: "trip_id"
+        agg: "count"
+      mean_distance:
+        column: "trip_distance_miles"
+        agg: "mean"
+      total_distance:
+        column: "trip_distance_miles"
+        agg: "sum"
 ```
 
-#### Category Ordering
-
-Control order of categories:
+**With filters:**
 
 ```yaml
-category_orders:
-  trip_mode: ["Walk", "Bike", "Transit", "Drive Alone", "Carpool"]
-  income_category_bin: ['<30K', '30-60K', '60-100K', '100-150K', '150K+']
+summaries:
+  work_tour_mode:
+    description: "Work tour mode choice"
+    data_source: "individual_tours"
+    group_by: "tour_mode_name"
+    filters:
+      tour_purpose_name: ["Work"]
+    aggregations:
+      tours:
+        column: "tour_id"
+        agg: "count"
 ```
 
-#### Custom Labels
+### Available Aggregation Functions
 
-Override axis labels:
+| Function | Description | Example Use |
+|----------|-------------|-------------|
+| `count` | Count rows | Number of trips/tours/households |
+| `sum` | Sum values | Total distance traveled |
+| `mean` | Average | Average trip distance |
+| `median` | Median value | Median income |
+| `min` | Minimum | Shortest trip |
+| `max` | Maximum | Longest trip |
+| `std` | Standard deviation | Distance variability |
 
-```yaml
-labels:
-  trip_mode: "Travel Mode"
-  trips: "Number of Trips"
-  share: "Share (%)"
-```
+---
 
-### Complete Chart Example
+## Command Line Usage
 
-```yaml
-- type: "bar"
-  title: "Mode Choice by Income Category"
-  data_file: "trip_mode_by_income.csv"
-  x: "trip_mode"
-  y: "share"
-  color: "dataset"
-  orientation: "h"
-  barmode: "group"
-  facet_col: "income_category_bin"
-  facet_col_wrap: 3
-  category_orders:
-    trip_mode: ["Walk", "Bike", "Transit", "Drive Alone", "Carpool"]
-    income_category_bin: ['<30K', '30-60K', '60-100K', '100-150K', '150K+']
-  labels:
-    trip_mode: "Travel Mode"
-    share: "Mode Share (%)"
-```
-
-## Environment Variables
-
-Optional environment variables:
+Generate summaries using the configured YAML:
 
 ```bash
-# Dashboard port
-export STREAMLIT_SERVER_PORT=8501
-
-# Data directory override
-export TM2PY_UTILS_DATA_DIR="/path/to/data"
-
-# Log level
-export TM2PY_UTILS_LOG_LEVEL="DEBUG"  # DEBUG, INFO, WARNING, ERROR
+cd tm2py_utils/summary/validation
+python summarize_model_run.py "C:/path/to/ctramp_output"
 ```
+
+Options:
+
+```bash
+python summarize_model_run.py <ctramp_dir> [--output DIR] [--strict]
+```
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `ctramp_dir` | CTRAMP output directory | _(required)_ |
+| `--output DIR` | Output directory | `outputs/` |
+| `--strict` | Treat warnings as errors | `False` |
+
+---
 
 ## File Locations
 
 ```
 tm2py_utils/summary/validation/
-├── validation_config.yaml          # Main config
+├── summarize_model_run.py          # Main tool
+├── validate_summaries.py           # Validation tool
 ├── data_model/
-│   ├── ctramp_data_model.yaml     # Column mappings
-│   └── variable_labels.yaml       # Display labels
-├── dashboard/
-│   ├── dashboard-0-population.yaml
-│   ├── dashboard-1-households.yaml
-│   └── ...                         # Dashboard tab configs
-├── outputs/                        # Generated summaries
+│   ├── ctramp_data_model.yaml     # MAIN CONFIG - Edit this!
+│   ├── variable_labels.yaml        # Display labels
+│   └── ctramp_data_model_loader.py # Helper functions
+├── outputs/                         # Generated summaries
 │   ├── auto_ownership_regional.csv
-│   ├── trip_mode_choice.csv
-│   └── dashboard/                  # Copied for dashboard
-│       ├── auto_ownership_regional.csv
-│       └── ...
-└── summaries/
-    ├── run_all.py                  # Main runner
-    └── custom.py                   # Custom summary logic
+│   ├── tour_mode_choice.csv
+│   └── ...
+└── HOW_TO_SUMMARIZE.md             # User guide
 ```
 
-## Validation
+---
 
-Check configuration validity before running:
+## Quick Reference
 
-```bash
-cd tm2py_utils/summary/validation
+### Add a New Summary
 
-# Quick pre-flight check (recommended before every run)
-python check_config.py
-```
+1. Edit `data_model/ctramp_data_model.yaml`
+2. Add to `summaries:` section:
+   ```yaml
+   my_new_summary:
+     description: "What this shows"
+     data_source: "individual_trips"
+     group_by: "column_name"
+     aggregations:
+       trips:
+         column: "trip_id"
+         agg: "count"
+   ```
+3. Run: `python summarize_model_run.py "path/to/ctramp"`
 
-**Example output:**
+### Add a Column Mapping
 
-```
-================================================================================
-TM2PY VALIDATION SYSTEM - QUICK CHECK
-================================================================================
-
-📄 Loading configuration...
-  ✓ Configuration file is valid YAML
-
-📁 Checking input directories...
-  ✓ 2023 TM2.2 v05: A:\2023-tm22-dev-version-05\ctramp_output
-  ✓ 2015 TM2.2 Sprint 04: A:\2015-tm22-dev-sprint-04\ctramp_output
-
-📊 Counting configured summaries...
-  ✓ 29 active summaries configured
-
-📦 Found 110 output CSV files in outputs/dashboard/
-
-🎨 Checking dashboard configurations...
-  ✓ 8 dashboard files found
-
-================================================================================
-✅ BASIC CHECKS PASSED
-
-Next steps:
-  1. Generate summaries: python run_and_deploy_dashboard.py --config validation_config.yaml
-  2. Launch dashboard: streamlit run dashboard/dashboard_app.py
-```
-
-**Additional validation commands:**
-
-```bash
-# Generate single summary for testing
-python -m tm2py_utils.summary.validation.summaries.run_all \
-  --config validation_config.yaml --summary-name trip_mode_choice
-
-# Detailed validation (checks column availability - advanced)
-python validate_config.py
-```
-
-## Common Configurations
-
-### Core vs Validation Filter
+Edit `data_model/ctramp_data_model.yaml`, find the data source, add column:
 
 ```yaml
-# Generate only core summaries (fast)
-generate_summaries: "core"
-
-# Generate only validation summaries
-generate_summaries: "validation"
-
-# Generate all summaries
-generate_summaries: "all"
+data_sources:
+  individual_trips:
+    columns:
+      my_new_column: "ctramp_column_name"
 ```
 
-### Multiple Model Runs
+### Add a Value Label
+
+Edit `data_model/ctramp_data_model.yaml`, add to `value_mappings`:
 
 ```yaml
-input_directories:
-  - path: "/model/runs/2015_base"
-    label: "2015 Base Year"
-  
-  - path: "/model/runs/2023_v05"
-    label: "2023 TM2.2 v05"
-  
-  - path: "/model/runs/2023_v06_draft"
-    label: "2023 TM2.2 v06 (draft)"
+value_mappings:
+  my_column:
+    type: categorical
+    values:
+      1: "Label 1"
+      2: "Label 2"
 ```
 
-All runs compared side-by-side in dashboard.
+### Create an Aggregation
 
-### Custom Output Location
+Edit `data_model/ctramp_data_model.yaml`, add to `aggregation_specs`:
 
 ```yaml
-output_directory: "/shared/validation/outputs"
+aggregation_specs:
+  my_column_agg:
+    source_column: "my_column_name"
+    mapping:
+      "Value 1": "Category A"
+      "Value 2": "Category A"
+      "Value 3": "Category B"
 ```
+
+### Define Bins
+
+Edit `data_model/ctramp_data_model.yaml`, add to `binning_specs`:
+
+```yaml
+binning_specs:
+  my_numeric_column:
+    breaks: [0, 10, 20, 30, 100]
+    labels: ['0-10', '10-20', '20-30', '30+']
+```
+
+---
 
 ## See Also
 
-- [Summary System Guide](summaries.md)
-- [Dashboard Guide](dashboard.md)
-- [Contributing Guide](contributing.md)
+- [HOW_TO_SUMMARIZE.md](../summary/validation/HOW_TO_SUMMARIZE.md) - Complete user guide with examples
+- [README.md](../summary/validation/README.md) - Toolkit overview
+- [summaries.md](summaries.md) - Summary system documentation
+- [generate-summaries.md](generate-summaries.md) - Detailed generation guide

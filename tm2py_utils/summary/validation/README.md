@@ -55,7 +55,7 @@ The new toolkit follows these principles:
 2. **Transparent Logging** - Clear output showing every processing step
 3. **Configuration Over Code** - Add summaries by editing YAML, not writing Python
 4. **Simple Is Better** - ~350 lines of straightforward code, minimal classes
-5. **Junior Analyst Friendly** - Easy to understand, easy to modify
+5. **Easy to Understand** - Clear code structure, easy to modify and extend
 
 ## What It Does
 

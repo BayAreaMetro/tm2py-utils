@@ -36,31 +36,16 @@ See [Installation Guide](install.md) for detailed instructions.
 # Navigate to validation directory
 cd tm2py_utils/summary/validation
 
-# Launch dashboard
-streamlit run dashboard/dashboard_app.py --server.port 8501
+# Generate summaries for a model run
+python summarize_model_run.py "C:/path/to/ctramp_output"
+
+# View summaries (use Excel, Python, R, or dashboard tools)
 ```
 
-Or use the deployment script:
-
-```bash
-# Generate summaries and launch dashboard
-python run_and_deploy_dashboard.py --config validation_config.yaml --launch-dashboard
-```
-
-View the live dashboard: [https://tm2-dashboard.streamlit.app/](https://tm2-dashboard.streamlit.app/)
-
-**📚 New to the validation system?** Check out the **[Complete Validation System Guide](validation-system.md)** for step-by-step instructions on:
-- Creating summaries from model runs
-- Adding observed data (ACS, CTPP, surveys)
-- Custom aggregations and binning
-- Dashboard visualization
-- Deployment options
-
-**👨‍💻 Developer?** See **[Code Flow and Execution Guide](code-flow.md)** for detailed technical documentation on:
-- How code executes from configuration to outputs
-- Class architecture and processing pipeline
-- Function call hierarchy and data transformations
-- Performance optimization and error handling
+**📚 New to the validation system?** Check out:
+- **[HOW_TO_SUMMARIZE.md](../summary/validation/HOW_TO_SUMMARIZE.md)** - Complete user guide
+- **[README.md](../summary/validation/README.md)** - Toolkit overview  
+- **[Summaries Guide](summaries.md)** - System documentation
 
 ## Key Features
 
@@ -77,22 +62,27 @@ Interactive web-based dashboard for comparing model runs and validating against 
 - **Time of Day** - Temporal distribution of travel
 - **Trip Characteristics** - Distance and travel time
 
-### 🔧 Summary Generation
+### 📊 Summary Generation System
 
-Config-driven system for generating model validation summaries:
+Simple, transparent tool for generating validation summaries from CTRAMP model outputs:
 
-- **Core Summaries** (21) - Essential analysis matching legacy outputs
-- **Validation Summaries** (13) - Extended analysis for dashboard
-- **Custom Summaries** - Easy to add via YAML configuration
+- **30 configured summaries** covering households, tours, trips, and activity patterns
+- **Automatic validation** with built-in quality checks
+- **Config-driven** - Add summaries by editing YAML, no Python coding
+- **Fast** - Process full model run in ~10 minutes
 
 ```bash
-# Generate all summaries
-python -m tm2py_utils.summary.validation.summaries.run_all --config validation_config.yaml
+# Generate all summaries for one model run
+python summarize_model_run.py "C:/path/to/ctramp_output"
 
-# Generate only core summaries (fast)
-# Edit validation_config.yaml: generate_summaries: "core"
-python -m tm2py_utils.summary.validation.summaries.run_all --config validation_config.yaml
+# Custom output location
+python summarize_model_run.py "C:/path/to/ctramp_output" --output "my_results"
+
+# Strict validation mode (treat warnings as errors)
+python summarize_model_run.py "C:/path/to/ctramp_output" --strict
 ```
+
+See [Summaries Guide](summaries.md) for complete documentation.
 
 ### 🏘️ PopulationSim Integration
 
@@ -106,26 +96,30 @@ Analysis tools for synthetic population outputs:
 ## Documentation
 
 - [Installation Guide](install.md)
-- [Dashboard Guide](dashboard.md)
-- [Summary System](summaries.md)
+- [Summaries User Guide](../summary/validation/HOW_TO_SUMMARIZE.md) - **Start here for generating summaries**
+- [Summary System Documentation](summaries.md)
+- [Toolkit README](../summary/validation/README.md)
 - [Contributing](contributing.md)
-- [Consolidation Proposal](../summary/CONSOLIDATION_PROPOSAL.md) - Plan to consolidate summary systems
 
 ## Architecture
 
 ```
 tm2py_utils/
 ├── summary/
-│   ├── validation/              # Validation dashboard and summaries
-│   │   ├── dashboard/           # Dashboard YAML configs and app
-│   │   ├── summaries/           # Summary generation scripts
-│   │   ├── data_model/          # Data model definitions
-│   │   ├── outputs/             # Generated summary CSVs
-│   │   └── validation_config.yaml
-│   └── core_summaries/          # Legacy summary system (being deprecated)
-├── inputs/                      # Input data preparation tools
-├── requests/                    # Special analysis requests
-└── docs/                        # Documentation (this site)
+│   ├── validation/                        # NEW: Simple validation toolkit
+│   │   ├── summarize_model_run.py        # Main tool - generates summaries
+│   │   ├── validate_summaries.py         # Quality checker
+│   │   ├── data_model/                   # Configuration files
+│   │   │   ├── ctramp_data_model.yaml   # Summary definitions (edit here!)
+│   │   │   └── variable_labels.yaml      # Display labels
+│   │   ├── outputs/                      # Generated summary CSVs
+│   │   ├── HOW_TO_SUMMARIZE.md          # User guide
+│   │   ├── README.md                     # Toolkit overview
+│   │   └── archived_validation_system/   # Old multi-dataset comparison system
+│   └── core_summaries/                   # DEPRECATED (use validation/ instead)
+├── inputs/                                # Input data preparation tools
+├── requests/                              # Special analysis requests
+└── docs/                                  # Documentation (this site)
 ```
 
 ## Related Projects

@@ -1347,7 +1347,7 @@ summaries:
   auto_ownership_detailed:
     description: "Auto ownership by auto count, household size, and workers"
     data_source: "households"
-    group_by: ["autos", "num_persons", "workers"]
+    group_by: ["num_vehicles", "num_persons", "num_workers"]
     weight_field: "sample_rate"
     count_name: "households"
   
@@ -1364,8 +1364,8 @@ summaries:
   trip_distance_by_time_purpose:
     description: "Average trip distance by time period and tour purpose"
     data_source: "individual_trips"
-    filter: "trip_distance.notna() and time_period.notna()"
-    group_by: ["time_period", "tour_purpose"]
+    filter: "trip_distance.notna() and stop_period.notna()"
+    group_by: ["stop_period", "tour_purpose"]
     weight_field: "sample_rate"
     count_name: "trips"
     aggregations:
