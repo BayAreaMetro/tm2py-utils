@@ -35,6 +35,11 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# ASCII-safe symbols for Windows compatibility
+CHECK = '[OK]'
+WARN = '[WARN]'
+INFO = '[INFO]'
+
 
 def load_data_model() -> Dict[str, Any]:
     """
@@ -194,18 +199,24 @@ def apply_value_labels(data: Dict[str, pd.DataFrame], value_mappings: Dict[str, 
             if mapping_key in value_mappings:
                 mapping_dict = value_mappings[mapping_key]
                 
-                # Extract the actual mapping (could be under 'values' key or direct text_values)
-                if isinstance(mapping_dict, dict) and 'values' in mapping_dict:
-                    mapping = mapping_dict['values']
-                elif isinstance(mapping_dict, dict) and 'text_values' in mapping_dict:
-                    # For text_values, just copy the column if it's already text
-                    continue
-                else:
-                    continue
+                # Check if column is numeric or text
+                is_numeric = pd.api.types.is_numeric_dtype(df[col])
                 
-                label_col = f"{col}_name"
-                df[label_col] = df[col].map(mapping)
-                logger.info(f"  ✓ Labeled '{col}' → '{label_col}' ({len(mapping)} values)")
+                # Extract the actual mapping (could be under 'values' key or direct text_values)
+                if is_numeric and isinstance(mapping_dict, dict) and 'values' in mapping_dict:
+                    # Numeric column with numeric-to-text mapping
+                    mapping = mapping_dict['values']
+                    label_col = f"{col}_name"
+                    df[label_col] = df[col].map(mapping)
+                    logger.info(f"  [OK] Labeled '{col}' -> '{label_col}' ({len(mapping)} values)")
+                elif not is_numeric and isinstance(mapping_dict, dict) and 'text_values' in mapping_dict:
+                    # Text column - just copy it to _name column
+                    label_col = f"{col}_name"
+                    df[label_col] = df[col]
+                    logger.info(f"  [OK] Copied '{col}' -> '{label_col}' (already text values)")
+                else:
+                    # Column exists but mapping doesn't match data type
+                    continue
         
         logger.info("")
     
@@ -292,6 +303,72 @@ def apply_bins(data: Dict[str, pd.DataFrame], bin_configs: Dict[str, Any]) -> Di
     return data
 
 
+def expand_time_periods_summary(df: pd.DataFrame, summary_config: Dict[str, Any]) -> pd.DataFrame:
+    """
+    Special handler for 'persons touring by time' summary.
+    
+    For each tour, expand from start_period to end_period to show which time
+    periods the person is touring. This answers: "How many tours are actively
+    happening during time period X?"
+    
+    Args:
+        df: Tours dataframe with start_period, end_period
+        summary_config: Summary configuration
+    
+    Returns:
+        Summary with one row per time_period × group_by combination
+    """
+    group_cols = summary_config.get('group_by', [])
+    if isinstance(group_cols, str):
+        group_cols = [group_cols]
+    
+    weight_field = summary_config.get('weight_field', 'sample_rate')
+    count_name = summary_config.get('count_name', 'tours_active')
+    time_range = summary_config.get('time_range', [1, 40])
+    
+    # Prepare result container
+    results = []
+    
+    # For each time period, find tours active during that period
+    for time_period in range(time_range[0], time_range[1] + 1):
+        # Filter tours active during this time period
+        mask = (df['start_period'] <= time_period) & (df['end_period'] >= time_period)
+        active_tours = df[mask].copy()
+        
+        if len(active_tours) == 0:
+            continue
+        
+        # Group by purpose and sum weighted tours
+        if group_cols:
+            if weight_field in active_tours.columns:
+                period_summary = active_tours.groupby(group_cols)[weight_field].sum().reset_index()
+                period_summary = period_summary.rename(columns={weight_field: count_name})
+            else:
+                period_summary = active_tours.groupby(group_cols).size().reset_index(name=count_name)
+        else:
+            if weight_field in active_tours.columns:
+                period_summary = pd.DataFrame({
+                    count_name: [active_tours[weight_field].sum()]
+                })
+            else:
+                period_summary = pd.DataFrame({
+                    count_name: [len(active_tours)]
+                })
+        
+        period_summary['time_period'] = time_period
+        results.append(period_summary)
+    
+    if not results:
+        # Return empty dataframe with correct schema
+        cols = group_cols + ['time_period', count_name]
+        return pd.DataFrame(columns=cols)
+    
+    # Combine all time periods
+    summary = pd.concat(results, ignore_index=True)
+    
+    return summary
+
+
 def generate_summary(df: pd.DataFrame, summary_config: Dict[str, Any], summary_name: str) -> pd.DataFrame:
     """
     Generate a single summary based on configuration.
@@ -318,21 +395,66 @@ def generate_summary(df: pd.DataFrame, summary_config: Dict[str, Any], summary_n
     weight_field = summary_config.get('weight_field', None)
     count_name = summary_config.get('count_name', 'count')
     
-    # Generate weighted counts
+    # Build aggregation dictionary
+    agg_dict = {}
+    
+    # Add count/weighted count
     if weight_field and weight_field in df.columns:
-        summary = df.groupby(group_cols)[weight_field].sum().reset_index()
-        summary = summary.rename(columns={weight_field: count_name})
+        agg_dict[weight_field] = 'sum'
     else:
+        # For unweighted counts, we'll add after groupby
+        pass
+    
+    # Add custom aggregations if specified
+    if 'aggregations' in summary_config:
+        for agg_name, source_col in summary_config['aggregations'].items():
+            if source_col in df.columns:
+                # Check if it's a total or mean
+                if agg_name.startswith('total_') or agg_name.startswith('sum_'):
+                    agg_dict[source_col] = 'sum'
+                elif agg_name.startswith('mean_') or agg_name.startswith('avg_'):
+                    agg_dict[source_col] = 'mean'
+                else:
+                    # Default to mean
+                    agg_dict[source_col] = 'mean'
+    
+    # Generate summary
+    if agg_dict:
+        summary = df.groupby(group_cols).agg(agg_dict).reset_index()
+        
+        # Rename weight field to count name
+        if weight_field and weight_field in summary.columns:
+            summary = summary.rename(columns={weight_field: count_name})
+        
+        # Rename custom aggregations
+        if 'aggregations' in summary_config:
+            rename_map = {}
+            for agg_name, source_col in summary_config['aggregations'].items():
+                if source_col in summary.columns:
+                    rename_map[source_col] = agg_name
+            summary = summary.rename(columns=rename_map)
+    else:
+        # Simple count
         summary = df.groupby(group_cols).size().reset_index(name=count_name)
     
-    # Calculate shares if requested
+    # Calculate shares
+    # Don't calculate shares if we have aggregations (mean/sum calculations)
+    # because shares of counts don't make sense when showing averages
+    has_aggregations = 'aggregations' in summary_config and summary_config['aggregations']
+    
     if 'share_within' in summary_config:
+        # Calculate shares within groups
         share_within = summary_config['share_within']
         if isinstance(share_within, str):
             share_within = [share_within]
         
         totals = summary.groupby(share_within)[count_name].transform('sum')
         summary['share'] = summary[count_name] / totals
+    elif not has_aggregations and summary_config.get('calculate_share', True):
+        # Calculate overall shares (for distribution summaries without aggregations)
+        total = summary[count_name].sum()
+        if total > 0:
+            summary['share'] = summary[count_name] / total
     
     return summary
 
@@ -370,7 +492,14 @@ def generate_all_summaries(data: Dict[str, pd.DataFrame], summaries_config: Dict
         
         # Generate summary
         try:
-            summary_df = generate_summary(df, summary_config, summary_name)
+            # Check for special handler
+            special_handler = summary_config.get('special_handler', None)
+            
+            if special_handler == 'expand_time_periods':
+                summary_df = expand_time_periods_summary(df, summary_config)
+            else:
+                summary_df = generate_summary(df, summary_config, summary_name)
+            
             logger.info(f"  Result: {len(summary_df):,} rows × {len(summary_df.columns)} columns")
             
             # Save to CSV
@@ -385,6 +514,29 @@ def generate_all_summaries(data: Dict[str, pd.DataFrame], summaries_config: Dict
         logger.info("")
     
     logger.info(f"Generated {summary_count} summaries")
+    logger.info("")
+    
+    # Run validation on generated summaries
+    logger.info("=" * 80)
+    logger.info("STEP 7: Validating Summaries")
+    logger.info("=" * 80)
+    
+    try:
+        from validate_summaries import SummaryValidator
+        validator = SummaryValidator(output_dir)
+        issues, warnings = validator.validate_all()
+        
+        if issues:
+            logger.warning(f"{WARN} Validation found {len(issues)} issues - review outputs carefully")
+        elif warnings:
+            logger.info(f"{CHECK} Validation passed with {len(warnings)} warnings")
+        else:
+            logger.info(f"{CHECK} All validation checks passed")
+    except ImportError:
+        logger.info(f"{INFO} Validation skipped (validate_summaries.py not found)")
+    except Exception as e:
+        logger.warning(f"{WARN} Validation failed: {e}")
+    
     logger.info("")
 
 
@@ -443,7 +595,7 @@ def main():
         logger.info("=" * 80)
         logger.info("COMPLETE")
         logger.info("=" * 80)
-        logger.info(f"✓ All summaries saved to: {output_dir.absolute()}")
+        logger.info(f"{CHECK} All summaries saved to: {output_dir.absolute()}")
         logger.info("")
         
     except Exception as e:

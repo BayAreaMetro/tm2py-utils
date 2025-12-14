@@ -1331,3 +1331,89 @@ summaries:
     group_by: "trip_distance_bin"
     weight_field: "sample_rate"
     count_name: "trips"
+  
+  # =============================================================================
+  # ENHANCED MULTI-DIMENSIONAL SUMMARIES
+  # =============================================================================
+  
+  activity_pattern_detailed:
+    description: "Activity pattern by person type, IMF, INMF, and CDAP"
+    data_source: "persons"
+    filter: "cdap.notna() and imf_choice.notna() and inmf_choice.notna()"
+    group_by: ["person_type_name", "cdap", "imf_choice", "inmf_choice"]
+    weight_field: "sample_rate"
+    count_name: "persons"
+  
+  auto_ownership_detailed:
+    description: "Auto ownership by auto count, household size, and workers"
+    data_source: "households"
+    group_by: ["autos", "num_persons", "workers"]
+    weight_field: "sample_rate"
+    count_name: "households"
+  
+  trip_distance_by_mode_purpose:
+    description: "Average trip distance by mode and tour purpose"
+    data_source: "individual_trips"
+    filter: "trip_distance.notna()"
+    group_by: ["trip_mode_name", "tour_purpose"]
+    weight_field: "sample_rate"
+    count_name: "trips"
+    aggregations:
+      mean_trip_distance: "trip_distance"
+  
+  trip_distance_by_time_purpose:
+    description: "Average trip distance by time period and tour purpose"
+    data_source: "individual_trips"
+    filter: "trip_distance.notna() and time_period.notna()"
+    group_by: ["time_period", "tour_purpose"]
+    weight_field: "sample_rate"
+    count_name: "trips"
+    aggregations:
+      mean_trip_distance: "trip_distance"
+  
+  # =============================================================================
+  # TIME-OF-DAY SUMMARIES
+  # =============================================================================
+  
+  time_of_day_tours:
+    description: "Tour start/end times by purpose and mode"
+    data_source: "individual_tours"
+    group_by: ["tour_purpose", "tour_mode_name", "start_period", "end_period"]
+    weight_field: "sample_rate"
+    count_name: "tours"
+  
+  persons_touring_by_time:
+    description: "Number of persons touring at each 30-minute time period"
+    data_source: "individual_tours"
+    special_handler: "expand_time_periods"  # Requires special processing
+    group_by: ["tour_purpose"]
+    weight_field: "sample_rate"
+    count_name: "tours_active"
+    time_range: [1, 40]  # Time periods 1-40 (30-min intervals)
+  
+  # =============================================================================
+  # JOURNEY TO WORK SUMMARIES
+  # Note: These require wsLocResults.csv file which may not be present in all runs
+  # =============================================================================
+  
+  journey_to_work:
+    description: "Work location flows by home and work MAZ"
+    data_source: "workplace_school_location"
+    filter: "work_location.notna() and work_location > 0"
+    group_by: ["home_mgra", "work_location"]
+    weight_field: "sample_rate"
+    count_name: "workers"
+    calculate_share: false  # Flow matrix, not a distribution
+    aggregations:
+      mean_income: "income"
+      mean_work_distance: "work_location_distance"
+  
+  journey_to_work_employment:
+    description: "Journey to work by employment category"
+    data_source: "workplace_school_location"
+    filter: "work_location.notna() and work_location > 0"
+    group_by: ["employment_category", "work_segment"]
+    weight_field: "sample_rate"
+    count_name: "workers"
+    aggregations:
+      mean_work_distance: "work_location_distance"

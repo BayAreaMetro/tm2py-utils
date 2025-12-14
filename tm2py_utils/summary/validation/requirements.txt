@@ -1,4 +1,7 @@
-streamlit>=1.28.0
-plotly>=5.17.0
+# Core requirements for validation toolkit
 pandas>=2.0.0
 pyyaml>=6.0
+
+# Optional: for dashboard/visualization (not needed for summarize_model_run.py)
+streamlit>=1.28.0
+plotly>=5.17.0

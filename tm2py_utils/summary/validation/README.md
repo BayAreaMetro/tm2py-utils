@@ -12,16 +12,32 @@ python summarize_model_run.py "C:/model_runs/2015_base/ctramp_output"
 
 This generates CSV summaries (auto ownership, tour mode, trip distance, etc.) from your CTRAMP output directory.
 
+**Automatic validation** runs after summarization to check for:
+- Shares that don't sum to 1.0
+- Negative values in count fields
+- Missing data or zero totals
+- Statistical outliers
+- Logical inconsistencies (e.g., invalid time periods, impossible household sizes)
+
+**Manual validation** of existing summaries:
+
+```bash
+python validate_summaries.py "outputs/my_summaries"
+```
+
 ## What's Here
 
 | File/Directory | Purpose |
 |----------------|---------|
 | **summarize_model_run.py** | **Main tool** - Generates validation summaries for one model run |
+| **validate_summaries.py** | **Quality checker** - Validates summaries for errors and outliers |
 | **HOW_TO_SUMMARIZE.md** | **User guide** - Detailed instructions and examples |
+| **PREPROCESSING_NOTES.md** | **Implementation guide** - Preprocessing needed for advanced summaries |
 | **data_model/** | YAML configuration files |
-| ├── ctramp_data_model.yaml | **Summary definitions** - Edit this to add new summaries |
+| ├── ctramp_data_model.yaml | **Summary definitions** - Edit this to add new summaries (30 summaries defined) |
 | ├── variable_labels.yaml | Display names for dashboard |
 | └── ctramp_data_model_loader.py | Helper functions |
+| **observed_data_processing/** | Tools for processing ACS and survey data |
 | **archived_validation_system/** | Old multi-dataset comparison system (archived) |
 | **validation_config.yaml** | Legacy config (not used by new simple tool) |
 | **outputs/** | Generated summary CSV files |
@@ -59,9 +75,12 @@ The new toolkit follows these principles:
 6. Save individual CSV files
 
 ### Output
-- 23 standard summaries as separate CSV files
+- **30 summaries** as separate CSV files:
+  - 21 core validation summaries (always work)
+  - 9 enhanced summaries (some require preprocessing - see PREPROCESSING_NOTES.md)
 - Easy to load in Excel, pandas, R, or dashboard tools
 - Simple format: columns for categories, counts, and shares
+- Summaries with aggregations include mean/sum calculations (e.g., mean_trip_distance)
 
 ## Example Summaries
 
@@ -103,9 +122,13 @@ summaries:
     group_by: "income_category_bin"
     weight_field: "sample_rate"
     count_name: "tours"
+    aggregations:                    # Optional: calculate means/sums
+      mean_distance: "tour_distance"
 ```
 
 No Python code needed! The tool automatically picks up new summary definitions.
+
+**Note:** Some columns require preprocessing (geography joins, calculated fields). See `PREPROCESSING_NOTES.md` for details on what's available and what needs additional work.
 
 ## What About Comparison and Visualization?
 
@@ -137,14 +160,16 @@ The new simple tool focuses on ONE job: summarize ONE model run clearly and tran
 
 The main tool (`summarize_model_run.py`) is organized as simple functions:
 - `load_data_model()` - Read YAML config
-- `load_ctramp_data()` - Load CSV files
-- `apply_value_labels()` - Create human-readable labels
-- `apply_aggregations()` - Create simplified categories  
-- `apply_bins()` - Bin continuous variables
-- `generate_summary()` - Create one summary
-- `generate_all_summaries()` - Loop through all summaries
+- `find_latest_iteration_file()` - Auto-detect highest iteration number
+- `load_ctramp_data()` - Load CSV files with standardized column names
+- `apply_value_labels()` - Create human-readable labels (e.g., mode codes → mode names)
+- `apply_aggregations()` - Create simplified categories (e.g., 17 modes → 6 groups)
+- `apply_bins()` - Bin continuous variables (e.g., age → age groups)
+- `generate_summary()` - Create one summary with counts, shares, and aggregations
+- `expand_time_periods_summary()` - Special handler for time-of-day analysis
+- `generate_all_summaries()` - Loop through all summary definitions
 
-Total: ~350 lines with extensive logging and comments.
+Total: ~550 lines with extensive logging and comments.
 
 **Configuration Files:**
 
@@ -164,9 +189,10 @@ All configuration is in `data_model/ctramp_data_model.yaml`:
 ## Getting Help
 
 1. **Read the user guide:** [HOW_TO_SUMMARIZE.md](HOW_TO_SUMMARIZE.md)
-2. **Check example summaries:** See `data_model/ctramp_data_model.yaml`
-3. **Run with verbose logging:** The tool shows exactly what it's doing at each step
-4. **Inspect the code:** Only ~350 lines, written to be readable
+2. **Check preprocessing notes:** [PREPROCESSING_NOTES.md](PREPROCESSING_NOTES.md) - What columns are available and what needs preprocessing
+3. **Check example summaries:** See `data_model/ctramp_data_model.yaml` - 30 summary definitions with comments
+4. **Run with verbose logging:** The tool shows exactly what it's doing at each step
+5. **Inspect the code:** ~550 lines, written to be readable and well-commented
 
 ## Requirements
 
