@@ -12,6 +12,9 @@ __pycache__/
 *.dll
 *.exe
 
+# MkDocs build output
+site/
+
 tm2py_utils/inputs/maz_taz/maz_taz_map.html
 
 # Validation system outputs (generated files)
