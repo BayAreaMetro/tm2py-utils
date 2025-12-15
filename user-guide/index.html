@@ -1,0 +1,2129 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Utilities for Travel Model Two (TM2) analysis and validation">
+      
+      
+        <meta name="author" content="Bay Area Metro">
+      
+      
+      
+        <link rel="prev" href="../install/">
+      
+      
+        <link rel="next" href="../generate-summaries/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>User Guide - tm2py-utils Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.618322db.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../css/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="light-blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#how-to-summarize-a-model-run" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="tm2py-utils Documentation" class="md-header__button md-logo" aria-label="tm2py-utils Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            tm2py-utils Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              User Guide
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="light-blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="light-blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/BayAreaMetro/tm2py-utils" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    BayAreaMetro/tm2py-utils
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../install/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../generate-summaries/" class="md-tabs__link">
+          
+  
+  
+  Summary System
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../contributing/" class="md-tabs__link">
+          
+  
+  
+  Development
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="tm2py-utils Documentation" class="md-nav__button md-logo" aria-label="tm2py-utils Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    tm2py-utils Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/BayAreaMetro/tm2py-utils" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    BayAreaMetro/tm2py-utils
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.md#quick-start" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Start
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-you-need" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What You Need
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#command-line-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Command-Line Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Command-Line Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basic-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Basic Usage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#specify-output-directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Specify Output Directory
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-happens-when-you-run-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Happens When You Run It
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What Happens When You Run It">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-load-data-model-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Load Data Model Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-load-ctramp-output-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Load CTRAMP Output Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-apply-value-labels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: Apply Value Labels
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-create-aggregated-categories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4: Create Aggregated Categories
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-5-create-binned-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5: Create Binned Variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-6-generate-summaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6: Generate Summaries
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output Files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-summaries-are-generated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Summaries Are Generated
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What Summaries Are Generated">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#household-summaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Household Summaries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#person-summaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Person Summaries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tour-summaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tour Summaries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trip-summaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trip Summaries
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-new-summaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding New Summaries
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Adding New Summaries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-add-a-new-summary-for-tours-by-person-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: Add a new summary for tours by person type
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-add-filtered-summary-work-tours-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: Add filtered summary (work tours only)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-calculate-shares-within-categories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: Calculate shares within categories
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary-configuration-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary Configuration Reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#understanding-the-data-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Understanding the Data Flow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#file-not-found-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File Not Found Errors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#column-not-found-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Column Not Found Errors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#empty-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Empty Output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#memory-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Memory Errors
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#for-developers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For Developers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Summary System
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Summary System
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../generate-summaries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generate Summaries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../summaries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Summary Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CTRAMP Data Model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../custom-summaries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom Summaries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../external-data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    External Data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Start
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-you-need" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What You Need
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#command-line-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Command-Line Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Command-Line Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basic-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Basic Usage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#specify-output-directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Specify Output Directory
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-happens-when-you-run-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Happens When You Run It
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What Happens When You Run It">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-load-data-model-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Load Data Model Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-load-ctramp-output-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Load CTRAMP Output Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-apply-value-labels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: Apply Value Labels
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-create-aggregated-categories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4: Create Aggregated Categories
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-5-create-binned-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5: Create Binned Variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-6-generate-summaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6: Generate Summaries
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output Files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-summaries-are-generated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Summaries Are Generated
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What Summaries Are Generated">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#household-summaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Household Summaries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#person-summaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Person Summaries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tour-summaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tour Summaries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trip-summaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trip Summaries
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-new-summaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding New Summaries
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Adding New Summaries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-add-a-new-summary-for-tours-by-person-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: Add a new summary for tours by person type
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-add-filtered-summary-work-tours-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: Add filtered summary (work tours only)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-calculate-shares-within-categories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: Calculate shares within categories
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary-configuration-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary Configuration Reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#understanding-the-data-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Understanding the Data Flow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#file-not-found-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File Not Found Errors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#column-not-found-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Column Not Found Errors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#empty-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Empty Output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#memory-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Memory Errors
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#for-developers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For Developers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="how-to-summarize-a-model-run">How to Summarize a Model Run<a class="headerlink" href="#how-to-summarize-a-model-run" title="Permanent link">&para;</a></h1>
+<p>This guide explains how to generate validation summaries from a CTRAMP model run output directory.</p>
+<h2 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
+<p>Run one command pointing to your CTRAMP output directory:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python<span class="w"> </span>summarize_model_run.py<span class="w"> </span><span class="s2">&quot;C:/model_runs/2015_base/ctramp_output&quot;</span>
+</code></pre></div>
+<p>This creates a <code>summaries/</code> directory with CSV files for each summary (auto ownership, tour mode, trip distance, etc.).</p>
+<h2 id="what-you-need">What You Need<a class="headerlink" href="#what-you-need" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>CTRAMP Output Directory</strong> - Contains CSV files from your model run:</li>
+<li><code>householdData_1.csv</code> (or <code>_2.csv</code>, <code>_3.csv</code> for later iterations)</li>
+<li><code>personData_1.csv</code></li>
+<li><code>indivTourData_1.csv</code></li>
+<li>
+<p><code>indivTripData_1.csv</code></p>
+</li>
+<li>
+<p><strong>Python Environment</strong> with pandas and PyYAML installed</p>
+</li>
+</ol>
+<p>The tool automatically finds the highest iteration number if you have multiple (<code>_1.csv</code>, <code>_2.csv</code>, <code>_3.csv</code>).</p>
+<h2 id="command-line-options">Command-Line Options<a class="headerlink" href="#command-line-options" title="Permanent link">&para;</a></h2>
+<h3 id="basic-usage">Basic Usage<a class="headerlink" href="#basic-usage" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python<span class="w"> </span>summarize_model_run.py<span class="w"> </span>&lt;ctramp_dir&gt;
+</code></pre></div>
+<p>Example:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>python<span class="w"> </span>summarize_model_run.py<span class="w"> </span><span class="s2">&quot;A:/2023-tm22-dev-version-05/ctramp_output&quot;</span>
+</code></pre></div></p>
+<h3 id="specify-output-directory">Specify Output Directory<a class="headerlink" href="#specify-output-directory" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>python<span class="w"> </span>summarize_model_run.py<span class="w"> </span>&lt;ctramp_dir&gt;<span class="w"> </span>--output<span class="w"> </span>&lt;output_dir&gt;
+</code></pre></div>
+<p>Example:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python<span class="w"> </span>summarize_model_run.py<span class="w"> </span><span class="s2">&quot;A:/2023-tm22-dev-version-05/ctramp_output&quot;</span><span class="w"> </span>--output<span class="w"> </span><span class="s2">&quot;C:/summaries/2023_v05&quot;</span>
+</code></pre></div></p>
+<h2 id="what-happens-when-you-run-it">What Happens When You Run It<a class="headerlink" href="#what-happens-when-you-run-it" title="Permanent link">&para;</a></h2>
+<p>The tool executes a simple 6-step pipeline with transparent logging:</p>
+<h3 id="step-1-load-data-model-configuration">Step 1: Load Data Model Configuration<a class="headerlink" href="#step-1-load-data-model-configuration" title="Permanent link">&para;</a></h3>
+<p>Reads <code>data_model/ctramp_data_model.yaml</code> which defines:
+- File patterns to find (e.g., <code>personData_{iteration}.csv</code>)
+- Column name mappings (e.g., <code>hh_id</code> → <code>household_id</code>)
+- Value labels (e.g., mode 1 → "SOV_GP")
+- Binning specs (e.g., age → age groups)
+- Summary definitions (what to calculate)</p>
+<h3 id="step-2-load-ctramp-output-files">Step 2: Load CTRAMP Output Files<a class="headerlink" href="#step-2-load-ctramp-output-files" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Finds files matching patterns in your directory</li>
+<li>Uses highest iteration number if multiple exist</li>
+<li>Loads CSVs into memory</li>
+<li>Renames columns to standardized names</li>
+</ul>
+<p>Example output:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Loading households...
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>  File: householdData_1.csv
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>  Rows: 2,611,046
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>  Columns: 15
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>  ✓ Loaded and standardized
+</code></pre></div></p>
+<h3 id="step-3-apply-value-labels">Step 3: Apply Value Labels<a class="headerlink" href="#step-3-apply-value-labels" title="Permanent link">&para;</a></h3>
+<p>Creates human-readable columns (e.g., <code>person_type_name</code> from <code>person_type</code> codes):
+- 1 → "Full-time worker"
+- 2 → "Part-time worker"
+- etc.</p>
+<p>Example output:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>persons:
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>  ✓ Labeled &#39;person_type&#39; → &#39;person_type_name&#39; (8 values)
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>  ✓ Labeled &#39;gender&#39; → &#39;gender_name&#39; (2 values)
+</code></pre></div></p>
+<h3 id="step-4-create-aggregated-categories">Step 4: Create Aggregated Categories<a class="headerlink" href="#step-4-create-aggregated-categories" title="Permanent link">&para;</a></h3>
+<p>Simplifies detailed categories into broader groups:
+- 17 transportation modes → 5 major categories (Auto-SOV, Auto-Shared, Transit, Active, TNC/Taxi, School Bus)
+- Detailed household sizes → ACS-compatible categories (1, 2, 3, 4+)</p>
+<p>Example output:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>individual_tours:
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>  ✓ Aggregated &#39;tour_mode&#39; → &#39;tour_mode_agg&#39; (5 categories)
+</code></pre></div></p>
+<h3 id="step-5-create-binned-variables">Step 5: Create Binned Variables<a class="headerlink" href="#step-5-create-binned-variables" title="Permanent link">&para;</a></h3>
+<p>Converts continuous variables to categorical bins:
+- Age → age groups (0-4, 5-17, 18-24, 25-34, ...)
+- Distance → distance bands (0-5mi, 5-10mi, 10-20mi, ...)
+- Income → income categories (&lt;30K, 30-60K, 60-100K, ...)</p>
+<p>Example output:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>persons:
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>  ✓ Binned &#39;age&#39; → &#39;age_bin&#39; (8 bins)
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>individual_tours:
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>  ✓ Binned &#39;tour_distance&#39; → &#39;tour_distance_bin&#39; (5 bins)
+</code></pre></div></p>
+<h3 id="step-6-generate-summaries">Step 6: Generate Summaries<a class="headerlink" href="#step-6-generate-summaries" title="Permanent link">&para;</a></h3>
+<p>Creates weighted frequency tables and saves as CSV files.</p>
+<p>Example output:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>[1] auto_ownership_regional
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>  Source: households (2,611,046 rows)
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>  Result: 7 rows × 2 columns
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>  ✓ Saved: auto_ownership_regional.csv
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>[2] tour_mode_distribution
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>  Source: individual_tours (11,234,982 rows)
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>  Result: 17 rows × 2 columns
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>  ✓ Saved: tour_mode_distribution.csv
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>Generated 23 summaries
+</code></pre></div></p>
+<h2 id="output-files">Output Files<a class="headerlink" href="#output-files" title="Permanent link">&para;</a></h2>
+<p>Each summary is saved as a separate CSV file in the output directory.</p>
+<p>Example outputs:</p>
+<p><strong>auto_ownership_regional.csv:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>num_vehicles,households
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>0,423156.8
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>1,892341.2
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>2,945623.1
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>3,289432.7
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>4,52108.4
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>5,7284.2
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>6,1099.6
+</code></pre></div></p>
+<p><strong>tour_mode_by_purpose.csv:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>tour_purpose,tour_mode_name,tours,share
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>Work,SOV_GP - Single Occupant Vehicle (General Purpose),1823441.5,0.524
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>Work,SR2_GP - Shared Ride 2 (General Purpose),456782.3,0.131
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>Work,WLK_TRN - Walk to Transit,328901.2,0.094
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>...
+</code></pre></div></p>
+<h2 id="what-summaries-are-generated">What Summaries Are Generated<a class="headerlink" href="#what-summaries-are-generated" title="Permanent link">&para;</a></h2>
+<p>The tool generates 23 standard summaries organized by category:</p>
+<h3 id="household-summaries">Household Summaries<a class="headerlink" href="#household-summaries" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>auto_ownership_regional.csv</code> - Vehicle ownership distribution</li>
+<li><code>auto_ownership_by_income.csv</code> - Vehicles by income category</li>
+<li><code>auto_ownership_by_household_size.csv</code> - Vehicles by household size</li>
+<li><code>household_size_distribution.csv</code> - Household size distribution</li>
+<li><code>worker_distribution.csv</code> - Workers per household</li>
+</ul>
+<h3 id="person-summaries">Person Summaries<a class="headerlink" href="#person-summaries" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>person_type_distribution.csv</code> - Person type distribution</li>
+<li><code>age_distribution.csv</code> - Age distribution (binned)</li>
+<li><code>cdap_by_person_type.csv</code> - Daily activity pattern by person type</li>
+<li><code>cdap_regional.csv</code> - Regional daily activity patterns</li>
+</ul>
+<h3 id="tour-summaries">Tour Summaries<a class="headerlink" href="#tour-summaries" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>tour_frequency_by_purpose.csv</code> - Tours by purpose</li>
+<li><code>tour_mode_distribution.csv</code> - Tour mode (all 17 modes)</li>
+<li><code>tour_mode_aggregated.csv</code> - Tour mode (5 major categories)</li>
+<li><code>tour_mode_by_purpose.csv</code> - Mode × Purpose cross-tab</li>
+<li><code>tour_start_time.csv</code> - Departure time distribution</li>
+<li><code>tour_end_time.csv</code> - Arrival time distribution</li>
+<li><code>tour_distance_distribution.csv</code> - Distance distribution (binned)</li>
+</ul>
+<h3 id="trip-summaries">Trip Summaries<a class="headerlink" href="#trip-summaries" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>trip_purpose_distribution.csv</code> - Trip destination purposes</li>
+<li><code>trip_mode_distribution.csv</code> - Trip mode (all 17 modes)</li>
+<li><code>trip_mode_aggregated.csv</code> - Trip mode (5 major categories)</li>
+<li><code>trip_mode_by_purpose.csv</code> - Mode × Purpose cross-tab</li>
+<li><code>trip_distance_distribution.csv</code> - Distance distribution (binned)</li>
+</ul>
+<h2 id="adding-new-summaries">Adding New Summaries<a class="headerlink" href="#adding-new-summaries" title="Permanent link">&para;</a></h2>
+<p>You don't need to write Python code to add summaries! Just edit the YAML configuration.</p>
+<h3 id="example-add-a-new-summary-for-tours-by-person-type">Example: Add a new summary for tours by person type<a class="headerlink" href="#example-add-a-new-summary-for-tours-by-person-type" title="Permanent link">&para;</a></h3>
+<p>Edit <code>data_model/ctramp_data_model.yaml</code> and add to the <code>summaries:</code> section:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nt">summaries</span><span class="p">:</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="c1"># ... existing summaries ...</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="nt">tours_by_person_type</span><span class="p">:</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Number</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">tours</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">person</span><span class="nv"> </span><span class="s">type&quot;</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">    </span><span class="nt">data_source</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;individual_tours&quot;</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">    </span><span class="nt">group_by</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;person_type_name&quot;</span>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">    </span><span class="nt">weight_field</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;sample_rate&quot;</span>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="w">    </span><span class="nt">count_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;tours&quot;</span>
+</code></pre></div>
+<p>That's it! Next time you run the tool, it will generate <code>tours_by_person_type.csv</code>.</p>
+<h3 id="example-add-filtered-summary-work-tours-only">Example: Add filtered summary (work tours only)<a class="headerlink" href="#example-add-filtered-summary-work-tours-only" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="w">  </span><span class="nt">work_tour_modes</span><span class="p">:</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Mode</span><span class="nv"> </span><span class="s">choice</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">work</span><span class="nv"> </span><span class="s">tours</span><span class="nv"> </span><span class="s">only&quot;</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="nt">data_source</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;individual_tours&quot;</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="nt">filter</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;tour_purpose</span><span class="nv"> </span><span class="s">==</span><span class="nv"> </span><span class="s">&#39;Work&#39;&quot;</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">    </span><span class="nt">group_by</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;tour_mode_name&quot;</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">    </span><span class="nt">weight_field</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;sample_rate&quot;</span>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">    </span><span class="nt">count_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;tours&quot;</span>
+</code></pre></div>
+<h3 id="example-calculate-shares-within-categories">Example: Calculate shares within categories<a class="headerlink" href="#example-calculate-shares-within-categories" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="w">  </span><span class="nt">mode_by_income</span><span class="p">:</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Tour</span><span class="nv"> </span><span class="s">mode</span><span class="nv"> </span><span class="s">choice</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">household</span><span class="nv"> </span><span class="s">income</span><span class="nv"> </span><span class="s">(with</span><span class="nv"> </span><span class="s">shares)&quot;</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="nt">data_source</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;individual_tours&quot;</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">    </span><span class="nt">group_by</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;income_category_bin&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;tour_mode_agg&quot;</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">    </span><span class="nt">weight_field</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;sample_rate&quot;</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">    </span><span class="nt">count_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;tours&quot;</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="w">    </span><span class="nt">share_within</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;income_category_bin&quot;</span><span class="w">  </span><span class="c1"># This adds a &#39;share&#39; column</span>
+</code></pre></div>
+<h2 id="summary-configuration-reference">Summary Configuration Reference<a class="headerlink" href="#summary-configuration-reference" title="Permanent link">&para;</a></h2>
+<p>Each summary definition supports these fields:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Required</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>description</code></td>
+<td>No</td>
+<td>Human-readable description</td>
+<td><code>"Vehicle ownership by income"</code></td>
+</tr>
+<tr>
+<td><code>data_source</code></td>
+<td>Yes</td>
+<td>Which table to use</td>
+<td><code>"households"</code>, <code>"persons"</code>, <code>"individual_tours"</code>, <code>"individual_trips"</code></td>
+</tr>
+<tr>
+<td><code>group_by</code></td>
+<td>Yes</td>
+<td>Column(s) to group by</td>
+<td><code>"num_vehicles"</code> or <code>["income_category", "num_vehicles"]</code></td>
+</tr>
+<tr>
+<td><code>weight_field</code></td>
+<td>No</td>
+<td>Column with sampling weights</td>
+<td><code>"sample_rate"</code></td>
+</tr>
+<tr>
+<td><code>count_name</code></td>
+<td>No</td>
+<td>Name for count column in output</td>
+<td><code>"households"</code>, <code>"tours"</code>, <code>"trips"</code> (default: <code>"count"</code>)</td>
+</tr>
+<tr>
+<td><code>share_within</code></td>
+<td>No</td>
+<td>Calculate shares within these groups</td>
+<td><code>"income_category"</code> or <code>["county", "income"]</code></td>
+</tr>
+<tr>
+<td><code>filter</code></td>
+<td>No</td>
+<td>Pandas query to filter data</td>
+<td><code>"tour_purpose == 'Work'"</code> or <code>"age &gt;= 18"</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="understanding-the-data-flow">Understanding the Data Flow<a class="headerlink" href="#understanding-the-data-flow" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>CTRAMP CSV Files
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>       ↓
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>   Load Data (Step 2)
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>       ↓
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>householdData_1.csv  →  households dataframe (standardized columns)
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>personData_1.csv     →  persons dataframe
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>indivTourData_1.csv  →  individual_tours dataframe
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>indivTripData_1.csv  →  individual_trips dataframe
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>       ↓
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>   Apply Value Labels (Step 3)
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>       ↓
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a>person_type: 1,2,3... → person_type_name: &quot;Full-time worker&quot;, &quot;Part-time worker&quot;, ...
+<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a>tour_mode: 1,2,3...   → tour_mode_name: &quot;SOV_GP&quot;, &quot;SR2_GP&quot;, &quot;WALK&quot;, ...
+<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a>       ↓
+<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a>   Apply Aggregations (Step 4)
+<a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a>       ↓
+<a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a>tour_mode_name: 17 categories → tour_mode_agg: &quot;Auto-SOV&quot;, &quot;Auto-Shared&quot;, &quot;Transit&quot;, ...
+<a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a>num_persons: 1,2,3,4,5,6...   → num_persons_agg: &quot;1&quot;, &quot;2&quot;, &quot;3&quot;, &quot;4+&quot;
+<a id="__codelineno-15-19" name="__codelineno-15-19" href="#__codelineno-15-19"></a>       ↓
+<a id="__codelineno-15-20" name="__codelineno-15-20" href="#__codelineno-15-20"></a>   Apply Binning (Step 5)
+<a id="__codelineno-15-21" name="__codelineno-15-21" href="#__codelineno-15-21"></a>       ↓
+<a id="__codelineno-15-22" name="__codelineno-15-22" href="#__codelineno-15-22"></a>age: 0-100          → age_bin: &quot;0-4&quot;, &quot;5-17&quot;, &quot;18-24&quot;, &quot;25-34&quot;, ...
+<a id="__codelineno-15-23" name="__codelineno-15-23" href="#__codelineno-15-23"></a>tour_distance: 0-50 → tour_distance_bin: &quot;0-5mi&quot;, &quot;5-10mi&quot;, &quot;10-20mi&quot;, ...
+<a id="__codelineno-15-24" name="__codelineno-15-24" href="#__codelineno-15-24"></a>       ↓
+<a id="__codelineno-15-25" name="__codelineno-15-25" href="#__codelineno-15-25"></a>   Generate Summaries (Step 6)
+<a id="__codelineno-15-26" name="__codelineno-15-26" href="#__codelineno-15-26"></a>       ↓
+<a id="__codelineno-15-27" name="__codelineno-15-27" href="#__codelineno-15-27"></a>For each summary definition:
+<a id="__codelineno-15-28" name="__codelineno-15-28" href="#__codelineno-15-28"></a>  - Filter data if specified
+<a id="__codelineno-15-29" name="__codelineno-15-29" href="#__codelineno-15-29"></a>  - Group by specified columns
+<a id="__codelineno-15-30" name="__codelineno-15-30" href="#__codelineno-15-30"></a>  - Apply sample_rate weights
+<a id="__codelineno-15-31" name="__codelineno-15-31" href="#__codelineno-15-31"></a>  - Calculate shares if requested
+<a id="__codelineno-15-32" name="__codelineno-15-32" href="#__codelineno-15-32"></a>  - Save to CSV
+<a id="__codelineno-15-33" name="__codelineno-15-33" href="#__codelineno-15-33"></a>       ↓
+<a id="__codelineno-15-34" name="__codelineno-15-34" href="#__codelineno-15-34"></a>Individual CSV Files (one per summary)
+</code></pre></div>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<h3 id="file-not-found-errors">File Not Found Errors<a class="headerlink" href="#file-not-found-errors" title="Permanent link">&para;</a></h3>
+<p><strong>Problem:</strong> <code>File not found matching pattern: personData_{iteration}.csv</code></p>
+<p><strong>Solution:</strong> 
+- Check that your CTRAMP directory path is correct
+- Verify files exist: <code>ls &lt;ctramp_dir&gt;/*.csv</code>
+- Check file naming - should be <code>personData_1.csv</code> (or <code>_2.csv</code>, <code>_3.csv</code>)</p>
+<h3 id="column-not-found-errors">Column Not Found Errors<a class="headerlink" href="#column-not-found-errors" title="Permanent link">&para;</a></h3>
+<p><strong>Problem:</strong> <code>KeyError: 'tour_mode_agg'</code></p>
+<p><strong>Solution:</strong> This column is created in Step 4 (aggregations). Make sure:
+- The data model has the aggregation defined
+- The source column (<code>tour_mode</code>) exists in the data
+- The aggregation mapping is valid</p>
+<h3 id="empty-output">Empty Output<a class="headerlink" href="#empty-output" title="Permanent link">&para;</a></h3>
+<p><strong>Problem:</strong> Summary CSV files are created but have no data</p>
+<p><strong>Solution:</strong>
+- Check if filter is too restrictive (<code>filter: "tour_purpose == 'InvalidValue'"</code>)
+- Verify group_by columns exist in the data
+- Check if weight_field exists (if specified)</p>
+<h3 id="memory-errors">Memory Errors<a class="headerlink" href="#memory-errors" title="Permanent link">&para;</a></h3>
+<p><strong>Problem:</strong> <code>MemoryError</code> when loading large files</p>
+<p><strong>Solution:</strong>
+- Process data in chunks (would require code modification)
+- Use a machine with more RAM
+- Sample the data first for testing</p>
+<h2 id="for-developers">For Developers<a class="headerlink" href="#for-developers" title="Permanent link">&para;</a></h2>
+<p>If you need to modify the tool's behavior, see <code>summarize_model_run.py</code>.</p>
+<p>The code is structured as simple functions in a clear sequence:
+1. <code>load_data_model()</code> - Read YAML config
+2. <code>load_ctramp_data()</code> - Load and standardize CSV files
+3. <code>apply_value_labels()</code> - Create _name columns
+4. <code>apply_aggregations()</code> - Create _agg columns
+5. <code>apply_bins()</code> - Create _bin columns
+6. <code>generate_summary()</code> - Group, weight, calculate shares
+7. <code>generate_all_summaries()</code> - Loop through all summary configs</p>
+<p>Total code: ~350 lines with extensive comments and logging.</p>
+<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
+<p>After generating summaries:</p>
+<ol>
+<li><strong>Inspect the CSVs</strong> - Open in Excel or pandas to verify results</li>
+<li><strong>Compare across scenarios</strong> - Use simple pandas scripts to compare CSVs from different runs</li>
+<li><strong>Visualize</strong> - Create plots, dashboards, or reports from the summary CSVs</li>
+<li><strong>Validate</strong> - Compare to observed data (ACS, surveys, etc.)</li>
+</ol>
+<p>The summaries are simple CSV files - use them however you like!</p>
+
+
+
+
+
+
+
+  
+    
+  
+  
+    
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="December 15, 2025 15:49:10 UTC">December 15, 2025</span>
+  </span>
+
+    
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Created">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="December 13, 2025 18:13:17 UTC">December 13, 2025</span>
+  </span>
+
+    
+    
+    
+  </aside>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/BayAreaMetro/tm2py-utils" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://bayareametro.gov" target="_blank" rel="noopener" title="bayareametro.gov" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M351.9 280H161c2.9 64.5 17.2 123.9 37.5 167.4 11.4 24.5 23.7 41.8 35.1 52.4 11.2 10.5 18.9 12.2 22.9 12.2s11.7-1.7 22.9-12.2c11.4-10.6 23.7-28 35.1-52.4 20.3-43.5 34.6-102.9 37.5-167.4zm-191-48h190.9c-2.8-64.5-17.1-123.9-37.4-167.4-11.4-24.4-23.7-41.8-35.1-52.4C268.1 1.7 260.4 0 256.4 0s-11.7 1.7-22.9 12.2c-11.4 10.6-23.7 28-35.1 52.4-20.3 43.5-34.6 102.9-37.5 167.4m-48 0c3.5-85.6 25.6-165.1 57.9-217.3C78.7 47.3 10.9 131.2 1.5 232zM1.5 280c9.4 100.8 77.2 184.7 169.3 217.3-32.3-52.2-54.4-131.7-57.9-217.3zm398.4 0c-3.5 85.6-25.6 165.1-57.9 217.3 92.1-32.7 159.9-116.5 169.3-217.3zm111.4-48C501.9 131.2 434.1 47.3 342 14.7c32.3 52.2 54.4 131.7 57.9 217.3z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+    
+  </body>
+</html>
