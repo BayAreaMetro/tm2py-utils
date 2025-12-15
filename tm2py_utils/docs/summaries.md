@@ -299,6 +299,6 @@ To analyze multiple model runs:
 
 ## Next Steps
 
-- See [HOW_TO_SUMMARIZE.md](../summary/validation/HOW_TO_SUMMARIZE.md) for detailed user guide
+- See [HOW_TO_SUMMARIZE.md](user-guide.md) for detailed user guide
 - Check [README.md](../summary/validation/README.md) for toolkit overview
 - Review [data_model/ctramp_data_model.yaml](../summary/validation/data_model/ctramp_data_model.yaml) for all summary definitions

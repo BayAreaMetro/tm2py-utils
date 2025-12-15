@@ -359,7 +359,7 @@ python summarize_model_run.py "path/to/ctramp_output"
 
 The new summary `trip_mode_by_income.csv` will be generated automatically.
 
-See [HOW_TO_SUMMARIZE.md](../summary/validation/HOW_TO_SUMMARIZE.md) for detailed examples.
+See [User Guide](user-guide.md) for detailed examples.
 
 ---
 
@@ -523,7 +523,7 @@ The tool uses ASCII-safe symbols and should work on all Windows terminals. If yo
 - **Validate data quality:** Review validation warnings and investigate issues
 
 See also:
-- [HOW_TO_SUMMARIZE.md](../summary/validation/HOW_TO_SUMMARIZE.md) - Detailed user guide
+- [User Guide](user-guide.md) - Detailed user guide
 - [README.md](../summary/validation/README.md) - Toolkit overview
 - [PREPROCESSING_NOTES.md](../summary/validation/PREPROCESSING_NOTES.md) - Advanced summaries requiring preprocessing
 

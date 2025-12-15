@@ -456,7 +456,7 @@ binning_specs:
 
 ## See Also
 
-- [HOW_TO_SUMMARIZE.md](../summary/validation/HOW_TO_SUMMARIZE.md) - Complete user guide with examples
+- [HOW_TO_SUMMARIZE.md](user-guide.md) - Complete user guide with examples
 - [README.md](../summary/validation/README.md) - Toolkit overview
 - [summaries.md](summaries.md) - Summary system documentation
 - [generate-summaries.md](generate-summaries.md) - Detailed generation guide

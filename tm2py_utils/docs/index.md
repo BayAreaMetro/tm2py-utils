@@ -42,7 +42,7 @@ python summarize_model_run.py "C:/path/to/ctramp_output"
 ```
 
 **📚 New to the validation system?** Check out:
-- **[HOW_TO_SUMMARIZE.md](../summary/validation/HOW_TO_SUMMARIZE.md)** - Complete user guide
+- **[User Guide](user-guide.md)** - Complete user guide
 - **[README.md](../summary/validation/README.md)** - Toolkit overview  
 - **[Summaries Guide](summaries.md)** - System documentation
 
@@ -82,7 +82,7 @@ Analysis tools for synthetic population outputs:
 ## Documentation
 
 - [Installation Guide](install.md)
-- [Summaries User Guide](../summary/validation/HOW_TO_SUMMARIZE.md) - **Start here for generating summaries**
+- [Summaries User Guide](user-guide.md) - **Start here for generating summaries**
 - [Summary System Documentation](summaries.md)
 - [Toolkit README](../summary/validation/README.md)
 - [Contributing](contributing.md)
