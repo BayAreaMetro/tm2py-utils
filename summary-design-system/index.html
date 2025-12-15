@@ -1,0 +1,2819 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Utilities for Travel Model Two (TM2) analysis and validation">
+      
+      
+        <meta name="author" content="Bay Area Metro">
+      
+      
+      
+        <link rel="prev" href="../configuration/">
+      
+      
+        <link rel="next" href="../contributing/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>Design System Plan - tm2py-utils Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.618322db.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../css/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="light-blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#summary-design-system-plan" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="tm2py-utils Documentation" class="md-header__button md-logo" aria-label="tm2py-utils Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            tm2py-utils Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Design System Plan
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="light-blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="light-blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/BayAreaMetro/tm2py-utils" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    BayAreaMetro/tm2py-utils
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../install/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../generate-summaries/" class="md-tabs__link">
+          
+  
+  
+  Summary System
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../contributing/" class="md-tabs__link">
+          
+  
+  
+  Development
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="tm2py-utils Documentation" class="md-nav__button md-logo" aria-label="tm2py-utils Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    tm2py-utils Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/BayAreaMetro/tm2py-utils" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    BayAreaMetro/tm2py-utils
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.md#quick-start" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Summary System
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Summary System
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../generate-summaries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generate Summaries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../summaries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Summary Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CTRAMP Data Model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../custom-summaries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom Summaries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../external-data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    External Data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design System Plan
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design System Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-design-principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Design Principles
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Design Principles">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-modularity-and-selective-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Modularity and Selective Execution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-summary-tiering-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Summary Tiering System
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-data-model-separation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Data Model Separation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-shared-utilities-and-code-reuse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Shared Utilities and Code Reuse
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-multi-environment-compatibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Multi-Environment Compatibility
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-maintainability-and-accessibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Maintainability and Accessibility
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-flexible-data-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Flexible Data Sources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-output-standardization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Output Standardization
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#system-architecture-idea-needs-more-thinking-before-we-implement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        System Architecture Idea Needs More Thinking Before we implement
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="System Architecture Idea Needs More Thinking Before we implement">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#component-organization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Component Organization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#core-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Components
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Components">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-data-readers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Data Readers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-summary-utilities-summary_utilspy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Summary Utilities (summary_utils.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-summary-generators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Summary Generators
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-configuration-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Configuration System
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-output-writers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Output Writers
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open Questions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Open Questions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#integration-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integration Strategy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-boundaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Boundaries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enriched-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enriched Output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#visualization-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visualization Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#population-synthesizer-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Population Synthesizer Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#environment-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-roadmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Roadmap
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation Roadmap">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phase-1-foundation-current" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1: Foundation (Current)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-2-core-functionality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2: Core Functionality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-3-extended-capabilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3: Extended Capabilities
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-4-integration-deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4: Integration &amp; Deployment
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Next Steps">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#immediate-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Immediate Actions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#short-term-goals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Short-Term Goals
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#medium-term-goals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medium-Term Goals
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-history" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version History
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="References">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#column-naming" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Column Naming
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#code-naming" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code Naming
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extension-points" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extension Points
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Extension Points">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#adding-new-summaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding New Summaries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-aggregations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Aggregations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#new-data-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Data Sources
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quality-standards" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quality Standards
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quality Standards">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#code-quality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code Quality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#documentation-quality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentation Quality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-benchmarks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Benchmarks
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#future-directions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Future Directions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Future Directions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#near-term-enhancements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Near-Term Enhancements
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#long-term-vision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Long-Term Vision
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-history_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version History
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-design-principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Design Principles
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Design Principles">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-modularity-and-selective-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Modularity and Selective Execution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-summary-tiering-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Summary Tiering System
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-data-model-separation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Data Model Separation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-shared-utilities-and-code-reuse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Shared Utilities and Code Reuse
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-multi-environment-compatibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Multi-Environment Compatibility
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-maintainability-and-accessibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Maintainability and Accessibility
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-flexible-data-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Flexible Data Sources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-output-standardization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Output Standardization
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#system-architecture-idea-needs-more-thinking-before-we-implement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        System Architecture Idea Needs More Thinking Before we implement
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="System Architecture Idea Needs More Thinking Before we implement">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#component-organization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Component Organization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#core-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Components
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Components">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-data-readers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Data Readers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-summary-utilities-summary_utilspy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Summary Utilities (summary_utils.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-summary-generators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Summary Generators
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-configuration-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Configuration System
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-output-writers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Output Writers
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open Questions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Open Questions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#integration-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integration Strategy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-boundaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Boundaries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enriched-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enriched Output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#visualization-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visualization Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#population-synthesizer-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Population Synthesizer Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#environment-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-roadmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Roadmap
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation Roadmap">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phase-1-foundation-current" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1: Foundation (Current)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-2-core-functionality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2: Core Functionality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-3-extended-capabilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3: Extended Capabilities
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-4-integration-deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4: Integration &amp; Deployment
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Next Steps">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#immediate-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Immediate Actions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#short-term-goals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Short-Term Goals
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#medium-term-goals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medium-Term Goals
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-history" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version History
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="References">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#column-naming" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Column Naming
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#code-naming" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code Naming
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extension-points" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extension Points
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Extension Points">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#adding-new-summaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding New Summaries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-aggregations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Aggregations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#new-data-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Data Sources
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quality-standards" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quality Standards
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quality Standards">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#code-quality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code Quality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#documentation-quality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentation Quality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-benchmarks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Benchmarks
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#future-directions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Future Directions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Future Directions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#near-term-enhancements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Near-Term Enhancements
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#long-term-vision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Long-Term Vision
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-history_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version History
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="summary-design-system-plan">Summary Design System Plan<a class="headerlink" href="#summary-design-system-plan" title="Permanent link">&para;</a></h1>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>This document outlines the design principles, architecture decisions, and implementation strategy for the tm2py-utils summary validation system. It serves as the foundational guide for combining core summaries with validation capabilities while maintaining flexibility and maintainability.</p>
+<h2 id="core-design-principles">Core Design Principles<a class="headerlink" href="#core-design-principles" title="Permanent link">&para;</a></h2>
+<h3 id="1-modularity-and-selective-execution">1. Modularity and Selective Execution<a class="headerlink" href="#1-modularity-and-selective-execution" title="Permanent link">&para;</a></h3>
+<p><strong>Principle</strong>: Summaries should be independently executable and selectively runnable.</p>
+<ul>
+<li><strong>Run standalone</strong>: Summaries can be executed against old model runs without rerunning the model</li>
+<li><strong>Modular selection</strong>: Users can run only one summary or any combination they need</li>
+<li><strong>Configuration-driven</strong>: Summary selection specified in <code>scenario_config</code> via <code>final_components</code> array</li>
+</ul>
+<p><strong>Example</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Run only essential summaries</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">final_components</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;post_processor&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;network_summary&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Add core summaries</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">final_components</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;post_processor&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;network_summary&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;core_summary&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Run everything for major validation</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="n">final_components</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;post_processor&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;network_summary&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;rtp_summary&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;calibration_summary&quot;</span><span class="p">]</span>
+</code></pre></div></p>
+<p><strong>Implementation Requirements</strong>:
+- Each summary type is self-contained
+- Command-line option to run against processed survey data
+- Can run across multiple historical model runs</p>
+<h3 id="2-summary-tiering-system">2. Summary Tiering System<a class="headerlink" href="#2-summary-tiering-system" title="Permanent link">&para;</a></h3>
+<p><strong>Principle</strong>: Different summary types have different stability and execution requirements.</p>
+<p><strong>Summary Tiers</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Type</th>
+<th>Characteristics</th>
+<th>Configuration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Always Run</strong></td>
+<td>Core Summaries</td>
+<td>Stable, infrequently updated, essential validation</td>
+<td>Always executed, not configurable</td>
+</tr>
+<tr>
+<td><strong>Configurable</strong></td>
+<td>RTP Metrics</td>
+<td>Often changing, project-specific</td>
+<td>User-selectable via scenario_config</td>
+</tr>
+<tr>
+<td><strong>Configurable</strong></td>
+<td>TIP Metrics</td>
+<td>Project-specific transportation improvements</td>
+<td>User-selectable via scenario_config</td>
+</tr>
+<tr>
+<td><strong>Configurable</strong></td>
+<td>Calibration Summaries</td>
+<td>Detailed validation against observed data</td>
+<td>User-selectable via scenario_config</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Guiding Questions</strong>:
+- What is configurable via scenario_config and what is always run?
+- Core summary should always run - how do we enforce this?</p>
+<h3 id="3-data-model-separation">3. Data Model Separation<a class="headerlink" href="#3-data-model-separation" title="Permanent link">&para;</a></h3>
+<p><strong>Principle</strong>: Data models live in tm2py and are imported, not redefined in summary code.</p>
+<p><strong>Architecture</strong>:
+- Data models reside in tm2py data models folder
+- Summary system pivots off known data model and acceptable values
+- No hardcoded values or schema definitions in summary code
+- Fixed schemas ensure consistency</p>
+<p><strong>Data Models to Implement</strong>:
+- ✅ CTRAMP data model
+- ✅ CTRAMP extended data model
+- ⏳ Population synthesizer data model (pending)</p>
+<p><strong>Benefits</strong>:
+- Single source of truth for data structures
+- Easier to maintain and update schemas
+- Automatic validation against known models</p>
+<h3 id="4-shared-utilities-and-code-reuse">4. Shared Utilities and Code Reuse<a class="headerlink" href="#4-shared-utilities-and-code-reuse" title="Permanent link">&para;</a></h3>
+<p><strong>Principle</strong>: Common operations are extracted into reusable utility functions.</p>
+<p><strong>Implementation</strong>:
+- Create <code>summary_utils.py</code> (or similar) for shared functions
+- Common operations include:
+  - Binning continuous variables
+  - Calculating weighted averages
+  - Aggregating by geography or demographic groups
+  - Applying standard filters</p>
+<p><strong>Benefits</strong>:
+- Reduced code duplication
+- Consistent behavior across summaries
+- Easier testing and debugging
+- Single place to fix bugs or add features</p>
+<h3 id="5-multi-environment-compatibility">5. Multi-Environment Compatibility<a class="headerlink" href="#5-multi-environment-compatibility" title="Permanent link">&para;</a></h3>
+<p><strong>Principle</strong>: Code should work with the tm2py environment when possible, with graceful fallbacks.</p>
+<p><strong>Strategy</strong>:
+- <strong>Primary</strong>: Write code compatible with tm2py environment so it can live in tm2py
+- <strong>Fallback</strong>: Create controller script that switches environments
+  - Runs the model in tm2py environment
+  - Switches to summary environment
+  - Runs summaries
+- <strong>Current</strong>: Code can remain in tm2py-utils during development</p>
+<p><strong>Benefits</strong>:
+- Future integration with tm2py workflow
+- Flexibility during development
+- Clear migration path</p>
+<h3 id="6-maintainability-and-accessibility">6. Maintainability and Accessibility<a class="headerlink" href="#6-maintainability-and-accessibility" title="Permanent link">&para;</a></h3>
+<p><strong>Principle</strong>: Code should be easy to understand and maintain by a wide audience.</p>
+<p><strong>Requirements</strong>:
+- Clear file organization - easy to find where to update code
+- Comprehensive inline documentation
+- Examples for adding new summaries
+- Consistent patterns across all summary types
+- Well-documented extension points</p>
+<p><strong>Target Audience</strong>:
+- Transportation planners (light coding experience)
+- Data analysts (moderate Python skills)
+- Software developers (maintaining the system)</p>
+<h3 id="7-flexible-data-sources">7. Flexible Data Sources<a class="headerlink" href="#7-flexible-data-sources" title="Permanent link">&para;</a></h3>
+<p><strong>Principle</strong>: Summaries should work with both model outputs and external data sources.</p>
+<p><strong>Data Source Types</strong>:
+- <strong>Model Outputs</strong>: CTRAMP household/person/tour/trip data
+- <strong>Survey Data</strong>: Household travel surveys formatted to match model output structure
+- <strong>External Data</strong>: ACS, CTPP - match format of system outputs for calibration/validation</p>
+<p><strong>Implementation</strong>:
+- Command-line option to specify data source type
+- Adapters to normalize different input formats
+- Common output format regardless of input source</p>
+<h3 id="8-output-standardization">8. Output Standardization<a class="headerlink" href="#8-output-standardization" title="Permanent link">&para;</a></h3>
+<p><strong>Principle</strong>: All outputs follow consistent format for downstream integration.</p>
+<p><strong>Standards</strong>:
+- <strong>Format</strong>: CSV tables labeled with model run identifier
+- <strong>Combinability</strong>: CSV tables can be combined across model runs
+- <strong>Visualization Ready</strong>: Outputs designed for external visualization systems (Tableau, etc.)
+- <strong>Metadata</strong>: Include run information, timestamps, configuration used</p>
+<p><strong>File Naming</strong>: <code>{summary_type}_{model_run_id}_{timestamp}.csv</code></p>
+<h2 id="system-architecture-idea-needs-more-thinking-before-we-implement">System Architecture Idea Needs More Thinking Before we implement<a class="headerlink" href="#system-architecture-idea-needs-more-thinking-before-we-implement" title="Permanent link">&para;</a></h2>
+<h3 id="component-organization">Component Organization<a class="headerlink" href="#component-organization" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>tm2py (upstream dependency)
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>├── data_models/
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>│   ├── ctramp_data_model.py
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>│   ├── ctramp_extended_data_model.py
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>│   └── population_synthesizer_data_model.py
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>└── (other tm2py components)
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>tm2py-utils (summary system)
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>├── summary/
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>│   ├── core_summaries/        # Always-run summaries
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>│   ├── validation/             # Validation code being developed
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>│   ├── summary_utils.py        # Shared utility functions
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>│   ├── data_readers.py         # Import and validation
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>│   ├── summary_base.py         # Base classes
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>│   └── output_writers.py       # Standardized output
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>└── config/
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>    └── {scenario}/scenario_config.toml
+</code></pre></div>
+<h3 id="core-components">Core Components<a class="headerlink" href="#core-components" title="Permanent link">&para;</a></h3>
+<h4 id="1-data-readers">1. Data Readers<a class="headerlink" href="#1-data-readers" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Purpose</strong>: Load and validate model outputs and external data</li>
+<li><strong>Design</strong>: Abstract base class with implementations for different sources</li>
+<li><strong>Key Features</strong>: </li>
+<li>Automatic iteration detection</li>
+<li>Schema validation against tm2py data models</li>
+<li>Support for CTRAMP outputs, survey data, ACS/CTPP</li>
+<li>Error handling with clear messages</li>
+</ul>
+<h4 id="2-summary-utilities-summary_utilspy">2. Summary Utilities (<code>summary_utils.py</code>)<a class="headerlink" href="#2-summary-utilities-summary_utilspy" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Purpose</strong>: Shared functions used across all summary types</li>
+<li><strong>Functions</strong>:</li>
+<li>Bin continuous variables (distance, time, etc.)</li>
+<li>Calculate weighted averages</li>
+<li>Aggregate by geography/demographics</li>
+<li>Apply standard filters</li>
+<li>Format output tables</li>
+<li><strong>Design</strong>: Pure functions, well-tested, documented</li>
+</ul>
+<h4 id="3-summary-generators">3. Summary Generators<a class="headerlink" href="#3-summary-generators" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Purpose</strong>: Transform raw data into validation summaries</li>
+<li><strong>Design</strong>: </li>
+<li>Base class defining standard interface</li>
+<li>Plugin-based registry for different summary types</li>
+<li>Tier-based execution (always-run vs. configurable)</li>
+<li><strong>Types</strong>:</li>
+<li>Core Summaries (always executed)</li>
+<li>RTP Metrics (configurable)</li>
+<li>TIP Metrics (configurable)</li>
+<li>Calibration Summaries (configurable)</li>
+</ul>
+<h4 id="4-configuration-system">4. Configuration System<a class="headerlink" href="#4-configuration-system" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Purpose</strong>: Control which summaries run and with what parameters</li>
+<li><strong>Design</strong>: TOML-based with scenario-specific overrides</li>
+<li><strong>Key Elements</strong>:</li>
+<li><code>final_components</code>: Array of summaries to execute</li>
+<li>Summary-specific parameters</li>
+<li>Data source specifications</li>
+<li>Output locations</li>
+</ul>
+<h4 id="5-output-writers">5. Output Writers<a class="headerlink" href="#5-output-writers" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Purpose</strong>: Standardize output format across all summaries</li>
+<li><strong>Design</strong>: Consistent CSV format with metadata</li>
+<li><strong>Features</strong>: </li>
+<li>Model run labeling</li>
+<li>Timestamp inclusion</li>
+<li>Ready for cross-run comparison</li>
+<li>Visualization system compatibility</li>
+</ul>
+<h3 id="data-flow">Data Flow<a class="headerlink" href="#data-flow" title="Permanent link">&para;</a></h3>
+<p>```
+┌─────────────────────────────────────────────┐
+│  Data Sources                                │
+│  ├── CTRAMP Outputs                         │
+│  ├── Survey Data                            │
+│  └── External Data (ACS, CTPP)              │
+└──────────────────┬──────────────────────────┘
+                   ↓
+           ┌───────────────┐
+           │ Data Readers  │ ← tm2py Data Models
+           └───────┬───────┘
+                   ↓
+           ┌───────────────┐
+           │ Data Validation│
+           └───────┬───────┘
+                   ↓
+      ┌────────────────────────┐
+      │  Summary Selection     │ ← scenario_config.toml
+      │  (final_components)    │
+      └────────┬───────────────┘
+               ↓
+    ┌──────────────────────┐
+    │  Always-Run Tier     │
+    │  (Core Summaries)    │</p>
+<h2 id="open-questions">Open Questions<a class="headerlink" href="#open-questions" title="Permanent link">&para;</a></h2>
+<p>These questions need resolution to finalize the design:</p>
+<h3 id="integration-strategy">Integration Strategy<a class="headerlink" href="#integration-strategy" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Q</strong>: How can we combine the <code>core_summaries</code> code and the <code>validation</code> code we started?</li>
+<li><strong>Consideration</strong>: Lisa says this is a trivial problem - what's the simplest merge strategy?</li>
+<li><strong>Next Step</strong>: Map existing functionality and identify overlaps</li>
+</ul>
+<h3 id="configuration-boundaries">Configuration Boundaries<a class="headerlink" href="#configuration-boundaries" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Q</strong>: What is configurable via scenario_config and what is always run?</li>
+<li><strong>Current Thinking</strong>: Core summaries always run, others are configurable</li>
+<li><strong>Need to Define</strong>: Exact list of core vs. configurable summaries</li>
+</ul>
+<h3 id="enriched-output">Enriched Output<a class="headerlink" href="#enriched-output" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Q</strong>: Should CTRAMP write out parking costs and skims as enriched outputs?</li>
+<li><strong>Consideration</strong>: Makes data available for special analyses</li>
+<li><strong>Trade-off</strong>: Larger output files vs. easier analysis</li>
+<li><strong>Next Step</strong>: Define enriched output schema and opt-in mechanism</li>
+</ul>
+<h3 id="visualization-integration">Visualization Integration<a class="headerlink" href="#visualization-integration" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Q</strong>: How do we build the comparison/visualization system?</li>
+<li><strong>Current Thinking</strong>: Tableau as preferred platform</li>
+<li><strong>Ownership</strong>: Melody to take lead on Tableau integration</li>
+<li><strong>Requirement</strong>: Balance automation with transparency</li>
+<li><strong>Challenge</strong>: Avoid opaque pipeline, maintain auditability</li>
+</ul>
+<h3 id="population-synthesizer-integration">Population Synthesizer Integration<a class="headerlink" href="#population-synthesizer-integration" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Q</strong>: How do we add data models from the population synthesizer?</li>
+<li><strong>Status</strong>: Needs implementation</li>
+<li><strong>Location</strong>: Should live in tm2py data models folder</li>
+<li><strong>Next Step</strong>: Define PopSyn output schema</li>
+</ul>
+<h3 id="environment-management">Environment Management<a class="headerlink" href="#environment-management" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Q</strong>: Can we make everything work in tm2py environment?</li>
+<li><strong>Fallback</strong>: Controller script that switches environments</li>
+<li><strong>Current</strong>: Code lives in tm2py-utils</li>
+<li><strong>Decision Needed</strong>: Timeline for tm2py integration</li>
+</ul>
+<h2 id="implementation-roadmap">Implementation Roadmap<a class="headerlink" href="#implementation-roadmap" title="Permanent link">&para;</a></h2>
+<h3 id="phase-1-foundation-current">Phase 1: Foundation (Current)<a class="headerlink" href="#phase-1-foundation-current" title="Permanent link">&para;</a></h3>
+<ul>
+<li>✅ Document design principles</li>
+<li>⏳ Merge core_summaries and validation code</li>
+<li>⏳ Create <code>summary_utils.py</code> with shared functions</li>
+<li>⏳ Establish summary tier system</li>
+<li>⏳ Import tm2py data models</li>
+</ul>
+<h3 id="phase-2-core-functionality">Phase 2: Core Functionality<a class="headerlink" href="#phase-2-core-functionality" title="Permanent link">&para;</a></h3>
+<ul>
+<li>⏳ Implement always-run core summaries</li>
+<li>⏳ Build configurable summary selection</li>
+<li>⏳ Add command-line options for different data sources</li>
+<li>⏳ Standardize CSV output format</li>
+<li>⏳ Create scenario_config templates</li>
+</ul>
+<h3 id="phase-3-extended-capabilities">Phase 3: Extended Capabilities<a class="headerlink" href="#phase-3-extended-capabilities" title="Permanent link">&para;</a></h3>
+<ul>
+<li>⏳ Support for survey data inputs</li>
+<li>⏳ ACS/CTPP format matching</li>
+<li>⏳ Enriched output options</li>
+<li>⏳ Multi-run comparison utilities</li>
+<li>⏳ Population synthesizer integration</li>
+</ul>
+<h3 id="phase-4-integration-deployment">Phase 4: Integration &amp; Deployment<a class="headerlink" href="#phase-4-integration-deployment" title="Permanent link">&para;</a></h3>
+<ul>
+<li>⏳ Tableau visualization templates</li>
+<li>⏳ Controller script for environment switching</li>
+<li>⏳ Migration to tm2py environment</li>
+<li>⏳ Full documentation and examples</li>
+<li>⏳ User training and rollout</li>
+</ul>
+<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
+<h3 id="immediate-actions">Immediate Actions<a class="headerlink" href="#immediate-actions" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Code Consolidation</strong>: Merge core_summaries and validation code paths</li>
+<li><strong>Shared Utilities</strong>: Extract common functions to <code>summary_utils.py</code></li>
+<li><strong>Data Model Import</strong>: Set up imports from tm2py data models</li>
+<li><strong>Tier Definition</strong>: Finalize which summaries are always-run vs. configurable</li>
+</ol>
+<h3 id="short-term-goals">Short-Term Goals<a class="headerlink" href="#short-term-goals" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Configuration System</strong>: Implement <code>final_components</code> array processing</li>
+<li><strong>Output Standardization</strong>: Ensure all summaries produce compatible CSV format</li>
+<li><strong>Documentation</strong>: Create examples for adding new summaries</li>
+<li><strong>Testing</strong>: Build test suite for shared utilities</li>
+</ol>
+<h3 id="medium-term-goals">Medium-Term Goals<a class="headerlink" href="#medium-term-goals" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Survey Data Support</strong>: Implement adapters for household survey data</li>
+<li><strong>Visualization Prototype</strong>: Work with Melody on Tableau integration</li>
+<li><strong>Enriched Outputs</strong>: Define and implement optional enriched output schema</li>
+<li><strong>PopSyn Integration</strong>: Add population synthesizer data model support</li>
+</ol>
+<h2 id="version-history">Version History<a class="headerlink" href="#version-history" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Date</th>
+<th>Major Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.2</td>
+<td>Dec 2025</td>
+<td>Reorganized with principles from team discussion, added open questions and roadmap</td>
+</tr>
+<tr>
+<td>0.1</td>
+<td>Dec 2025</td>
+<td>Initial design system documentation</td>
+</tr>
+</tbody>
+</table>
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../generate-summaries/">Generate Summaries Guide</a></li>
+<li><a href="../custom-summaries/">Custom Summaries</a></li>
+<li><a href="../configuration/">Configuration</a></li>
+<li><a href="../data-model/">Data Model</a></li>
+<li><a href="../summary/validation/HOW_TO_SUMMARIZE.md">How to Summarize</a></li>
+<li>Summary output files: <code>{summary_name}_{scenario_id}.csv</code></li>
+<li>Configuration files: <code>{purpose}_config.toml</code></li>
+<li>Example: <code>auto_ownership_2015_base.csv</code>, <code>scenario_config.toml</code></li>
+</ul>
+<h3 id="column-naming">Column Naming<a class="headerlink" href="#column-naming" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Lowercase with underscores: <code>tour_mode</code>, <code>trip_distance</code></li>
+<li>Categorical suffixes: <code>_cat</code> for categories, <code>_grp</code> for groups</li>
+<li>Count columns: <code>n_*</code> prefix (e.g., <code>n_tours</code>, <code>n_trips</code>)</li>
+<li>Share columns: <code>share_*</code> prefix or <code>*_pct</code> suffix</li>
+</ul>
+<h3 id="code-naming">Code Naming<a class="headerlink" href="#code-naming" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Classes: PascalCase (e.g., <code>TourModeSummary</code>)</li>
+<li>Functions: snake_case (e.g., <code>calculate_mode_share</code>)</li>
+<li>Constants: UPPER_SNAKE_CASE (e.g., <code>DEFAULT_ITERATION</code>)</li>
+</ul>
+<h2 id="extension-points">Extension Points<a class="headerlink" href="#extension-points" title="Permanent link">&para;</a></h2>
+<h3 id="adding-new-summaries">Adding New Summaries<a class="headerlink" href="#adding-new-summaries" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Create summary class inheriting from <code>BaseSummary</code></li>
+<li>Implement required methods: <code>load_data()</code>, <code>calculate()</code>, <code>format_output()</code></li>
+<li>Register in summary registry</li>
+<li>Add configuration template</li>
+<li>Update documentation</li>
+</ol>
+<h3 id="custom-aggregations">Custom Aggregations<a class="headerlink" href="#custom-aggregations" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Define aggregation function with standard signature</li>
+<li>Add to aggregation registry</li>
+<li>Reference in configuration files</li>
+<li>Document in custom summaries guide</li>
+</ol>
+<h3 id="new-data-sources">New Data Sources<a class="headerlink" href="#new-data-sources" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Create reader class inheriting from <code>BaseDataReader</code></li>
+<li>Implement schema validation</li>
+<li>Add to data source registry</li>
+<li>Update data model documentation</li>
+</ol>
+<h2 id="quality-standards">Quality Standards<a class="headerlink" href="#quality-standards" title="Permanent link">&para;</a></h2>
+<h3 id="code-quality">Code Quality<a class="headerlink" href="#code-quality" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Type hints for all function signatures</li>
+<li>Docstrings following NumPy style</li>
+<li>Unit test coverage &gt; 80%</li>
+<li>Linting with flake8/black</li>
+</ul>
+<h3 id="documentation-quality">Documentation Quality<a class="headerlink" href="#documentation-quality" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Every summary has usage examples</li>
+<li>Configuration options fully documented</li>
+<li>Troubleshooting guide for common errors</li>
+<li>Changelog maintained for breaking changes</li>
+</ul>
+<h3 id="performance-benchmarks">Performance Benchmarks<a class="headerlink" href="#performance-benchmarks" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Process 1M household records in &lt; 2 minutes</li>
+<li>Memory usage &lt; 4GB for typical regional model</li>
+<li>Individual summaries complete in &lt; 30 seconds</li>
+</ul>
+<h2 id="future-directions">Future Directions<a class="headerlink" href="#future-directions" title="Permanent link">&para;</a></h2>
+<h3 id="near-term-enhancements">Near-Term Enhancements<a class="headerlink" href="#near-term-enhancements" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Parallel processing for multiple summaries</li>
+<li>Interactive visualization dashboard</li>
+<li>Automated comparison with observed data</li>
+<li>Summary templates for common validation tasks</li>
+</ul>
+<h3 id="long-term-vision">Long-Term Vision<a class="headerlink" href="#long-term-vision" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Real-time validation during model runs</li>
+<li>Machine learning-based anomaly detection</li>
+<li>Integration with calibration workflows</li>
+<li>Web-based validation report generator</li>
+</ul>
+<h2 id="version-history_1">Version History<a class="headerlink" href="#version-history_1" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Date</th>
+<th>Major Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.1</td>
+<td>TBD</td>
+<td>Initial design system documentation</td>
+</tr>
+</tbody>
+</table>
+<h2 id="references_1">References<a class="headerlink" href="#references_1" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../generate-summaries/">Generate Summaries Guide</a></li>
+<li><a href="../custom-summaries/">Custom Summaries</a></li>
+<li><a href="../configuration/">Configuration</a></li>
+<li><a href="../data-model/">Data Model</a></li>
+</ul>
+
+
+
+
+
+
+
+  
+    
+  
+  
+    
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="December 15, 2025 22:45:54 UTC">December 15, 2025</span>
+  </span>
+
+    
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Created">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="December 15, 2025 22:45:54 UTC">December 15, 2025</span>
+  </span>
+
+    
+    
+    
+  </aside>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/BayAreaMetro/tm2py-utils" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://bayareametro.gov" target="_blank" rel="noopener" title="bayareametro.gov" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M351.9 280H161c2.9 64.5 17.2 123.9 37.5 167.4 11.4 24.5 23.7 41.8 35.1 52.4 11.2 10.5 18.9 12.2 22.9 12.2s11.7-1.7 22.9-12.2c11.4-10.6 23.7-28 35.1-52.4 20.3-43.5 34.6-102.9 37.5-167.4zm-191-48h190.9c-2.8-64.5-17.1-123.9-37.4-167.4-11.4-24.4-23.7-41.8-35.1-52.4C268.1 1.7 260.4 0 256.4 0s-11.7 1.7-22.9 12.2c-11.4 10.6-23.7 28-35.1 52.4-20.3 43.5-34.6 102.9-37.5 167.4m-48 0c3.5-85.6 25.6-165.1 57.9-217.3C78.7 47.3 10.9 131.2 1.5 232zM1.5 280c9.4 100.8 77.2 184.7 169.3 217.3-32.3-52.2-54.4-131.7-57.9-217.3zm398.4 0c-3.5 85.6-25.6 165.1-57.9 217.3 92.1-32.7 159.9-116.5 169.3-217.3zm111.4-48C501.9 131.2 434.1 47.3 342 14.7c32.3 52.2 54.4 131.7 57.9 217.3z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+    
+  </body>
+</html>
