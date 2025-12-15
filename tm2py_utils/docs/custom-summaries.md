@@ -6,6 +6,9 @@ Guide to defining new validation summaries using YAML configuration.
 
 The validation system is **fully config-driven** - you can create new summaries without writing Python code. All summaries are defined in `validation_config.yaml` under the `summaries` section.
 
+!!! info "Design Principles"
+    This configuration-driven approach follows the [Data-Driven Configuration principle](summary-design-system.md#2-data-driven-configuration) from our design system. For a complete understanding of the system architecture, see the [Summary Design System Plan](summary-design-system.md).
+
 **What you can configure:**
 - Which data table to use (households, persons, tours, trips)
 - How to group data (dimensions)

@@ -6,6 +6,9 @@ Guide to generating validation summaries from CTRAMP model outputs using the new
 
 The summary generation system reads raw CTRAMP outputs (CSV files) and produces **aggregated summary tables** for validation and analysis. The process is **configuration-driven** - add summaries by editing YAML, no Python coding required.
 
+!!! tip "System Design"
+    To understand the architecture and design principles behind this system, see the [Summary Design System Plan](summary-design-system.md).
+
 **What it does:**
 - Loads CTRAMP output files (households, persons, tours, trips)
 - Applies value labels (mode 1 → "SOV_GP")

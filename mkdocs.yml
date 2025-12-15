@@ -41,6 +41,7 @@ nav:
     - Custom Summaries: custom-summaries.md
     - External Data: external-data.md
     - Configuration: configuration.md
+    - Design System Plan: summary-design-system.md
   - Development:
     - Contributing Guide: contributing.md
 

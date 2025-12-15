@@ -84,6 +84,7 @@ Analysis tools for synthetic population outputs:
 - [Installation Guide](install.md)
 - [Summaries User Guide](user-guide.md) - **Start here for generating summaries**
 - [Summary System Documentation](summaries.md)
+- [Summary Design System Plan](summary-design-system.md) - **Design principles and architecture**
 - [Toolkit README](../summary/validation/README.md)
 - [Contributing](contributing.md)
 

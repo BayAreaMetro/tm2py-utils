@@ -2,6 +2,9 @@
 
 Thank you for contributing to tm2py-utils! This guide helps you add summaries, validation checks, and other features.
 
+!!! info "Design Principles"
+    Before contributing, please review the [Summary Design System Plan](summary-design-system.md) to understand the architecture, design principles, and coding standards.
+
 ## Development Setup
 
 ### Prerequisites
