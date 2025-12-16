@@ -1,0 +1,146 @@
+trip_mode_name,tour_purpose,trips,mean_trip_distance
+BIKE - Bicycle,Discretionary,74686.0,1.8743360241544598
+BIKE - Bicycle,Eating Out,7480.0,1.6626696474598932
+BIKE - Bicycle,Escort,17090.0,1.9789628605032183
+BIKE - Bicycle,Maintenance,40081.0,2.299155907911479
+BIKE - Bicycle,School,59540.0,1.835137550386295
+BIKE - Bicycle,Shop,28492.0,2.168474476835603
+BIKE - Bicycle,University,31636.0,4.9628330587937795
+BIKE - Bicycle,Visiting,39513.0,1.7113533793435072
+BIKE - Bicycle,Work,99523.0,3.3981729710418698
+BIKE - Bicycle,Work-Based,9892.0,2.343071561969268
+KNRPRV_TRN - Kiss-and-Ride Private to Transit,Discretionary,7173.0,5.796982699567824
+KNRPRV_TRN - Kiss-and-Ride Private to Transit,Eating Out,550.0,6.007168643636364
+KNRPRV_TRN - Kiss-and-Ride Private to Transit,Escort,42.0,6.74848011904762
+KNRPRV_TRN - Kiss-and-Ride Private to Transit,Maintenance,10356.0,7.292986270954036
+KNRPRV_TRN - Kiss-and-Ride Private to Transit,School,1324.0,3.760699327039275
+KNRPRV_TRN - Kiss-and-Ride Private to Transit,Shop,4667.0,6.383832504178273
+KNRPRV_TRN - Kiss-and-Ride Private to Transit,University,5650.0,11.03665048141593
+KNRPRV_TRN - Kiss-and-Ride Private to Transit,Visiting,3587.0,6.801863851965431
+KNRPRV_TRN - Kiss-and-Ride Private to Transit,Work,22125.0,11.426856365333334
+KNRTNC_TRN - Kiss-and-Ride TNC to Transit,Discretionary,996.0,6.595820985943775
+KNRTNC_TRN - Kiss-and-Ride TNC to Transit,Eating Out,108.0,6.4637938055555555
+KNRTNC_TRN - Kiss-and-Ride TNC to Transit,Maintenance,304.0,8.888185611842104
+KNRTNC_TRN - Kiss-and-Ride TNC to Transit,School,757.0,3.474187486129458
+KNRTNC_TRN - Kiss-and-Ride TNC to Transit,Shop,140.0,8.112174935714286
+KNRTNC_TRN - Kiss-and-Ride TNC to Transit,University,252.0,9.281167857142856
+KNRTNC_TRN - Kiss-and-Ride TNC to Transit,Visiting,692.0,6.7392342008670525
+KNRTNC_TRN - Kiss-and-Ride TNC to Transit,Work,518.0,14.851805314671815
+PNR_TRN - Park-and-Ride to Transit,Discretionary,13660.0,7.837166390775987
+PNR_TRN - Park-and-Ride to Transit,Eating Out,1670.0,7.623005525748503
+PNR_TRN - Park-and-Ride to Transit,Escort,50.0,5.54639356
+PNR_TRN - Park-and-Ride to Transit,Maintenance,15962.0,7.3407239460593905
+PNR_TRN - Park-and-Ride to Transit,School,530.0,4.123579154716981
+PNR_TRN - Park-and-Ride to Transit,Shop,9638.0,6.939262690392197
+PNR_TRN - Park-and-Ride to Transit,University,10174.0,11.478966649007274
+PNR_TRN - Park-and-Ride to Transit,Visiting,6836.0,7.869263365125804
+PNR_TRN - Park-and-Ride to Transit,Work,66768.0,13.589707116163432
+SCHLBUS - School Bus,School,173770.0,4.150262098405939
+SOV_GP - Single Occupant Vehicle (General Purpose),Discretionary,900045.0,7.774460303003739
+SOV_GP - Single Occupant Vehicle (General Purpose),Eating Out,117122.0,6.715450314484042
+SOV_GP - Single Occupant Vehicle (General Purpose),Escort,1000301.0,4.321486843981962
+SOV_GP - Single Occupant Vehicle (General Purpose),Maintenance,1174864.0,5.702139742754906
+SOV_GP - Single Occupant Vehicle (General Purpose),School,20910.0,3.972153837254902
+SOV_GP - Single Occupant Vehicle (General Purpose),Shop,751371.0,4.368616252466491
+SOV_GP - Single Occupant Vehicle (General Purpose),University,293458.0,8.750087512529902
+SOV_GP - Single Occupant Vehicle (General Purpose),Visiting,513607.0,8.310728286405753
+SOV_GP - Single Occupant Vehicle (General Purpose),Work,3672374.0,10.866914058857022
+SOV_GP - Single Occupant Vehicle (General Purpose),Work-Based,286609.0,4.615240255323455
+SR2_GP - Shared Ride 2 (General Purpose),Discretionary,202261.0,7.326182643109646
+SR2_GP - Shared Ride 2 (General Purpose),Eating Out,18571.0,6.597336057509019
+SR2_GP - Shared Ride 2 (General Purpose),Escort,417643.0,3.8975139144053657
+SR2_GP - Shared Ride 2 (General Purpose),Maintenance,418595.0,5.6714117091054606
+SR2_GP - Shared Ride 2 (General Purpose),School,67356.0,3.9544572835530616
+SR2_GP - Shared Ride 2 (General Purpose),Shop,224689.0,4.424638766308097
+SR2_GP - Shared Ride 2 (General Purpose),University,123270.0,9.800808223144317
+SR2_GP - Shared Ride 2 (General Purpose),Visiting,119969.0,8.054131505772325
+SR2_GP - Shared Ride 2 (General Purpose),Work,425200.0,10.19709197792333
+SR2_GP - Shared Ride 2 (General Purpose),Work-Based,5782.0,4.890441066413006
+SR2_HOV - Shared Ride 2 (HOV Lanes),Discretionary,214292.0,7.777753729915255
+SR2_HOV - Shared Ride 2 (HOV Lanes),Eating Out,19660.0,6.919578774974567
+SR2_HOV - Shared Ride 2 (HOV Lanes),Escort,331082.0,4.038385562676316
+SR2_HOV - Shared Ride 2 (HOV Lanes),Maintenance,333116.0,5.921327086786585
+SR2_HOV - Shared Ride 2 (HOV Lanes),School,1033822.0,3.982730993258027
+SR2_HOV - Shared Ride 2 (HOV Lanes),Shop,178735.0,4.550971431846029
+SR2_HOV - Shared Ride 2 (HOV Lanes),University,125636.0,9.941829982210512
+SR2_HOV - Shared Ride 2 (HOV Lanes),Visiting,126875.0,8.305011705710344
+SR2_HOV - Shared Ride 2 (HOV Lanes),Work,325509.0,10.756530635008556
+SR2_HOV - Shared Ride 2 (HOV Lanes),Work-Based,86424.0,4.937151909527446
+SR2_PAY - Shared Ride 2 (Express/Toll),Discretionary,16.0,28.5192116875
+SR2_PAY - Shared Ride 2 (Express/Toll),Eating Out,1.0,9.613941
+SR2_PAY - Shared Ride 2 (Express/Toll),Escort,36.0,20.224098083333335
+SR2_PAY - Shared Ride 2 (Express/Toll),Maintenance,167.0,19.98996695209581
+SR2_PAY - Shared Ride 2 (Express/Toll),School,10.0,12.4544374
+SR2_PAY - Shared Ride 2 (Express/Toll),Shop,43.0,21.314083744186046
+SR2_PAY - Shared Ride 2 (Express/Toll),University,67.0,16.863355865671643
+SR2_PAY - Shared Ride 2 (Express/Toll),Visiting,5.0,39.4138052
+SR2_PAY - Shared Ride 2 (Express/Toll),Work,360.0,22.440232519444447
+SR3_GP - Shared Ride 3+ (General Purpose),Discretionary,113869.0,7.154607853269986
+SR3_GP - Shared Ride 3+ (General Purpose),Eating Out,9662.0,6.588418117367005
+SR3_GP - Shared Ride 3+ (General Purpose),Escort,283523.0,3.4213144535328706
+SR3_GP - Shared Ride 3+ (General Purpose),Maintenance,185156.0,5.489884624414008
+SR3_GP - Shared Ride 3+ (General Purpose),School,98647.0,3.81762236378197
+SR3_GP - Shared Ride 3+ (General Purpose),Shop,74173.0,4.459155522791312
+SR3_GP - Shared Ride 3+ (General Purpose),University,19302.0,9.749770210237282
+SR3_GP - Shared Ride 3+ (General Purpose),Visiting,60097.0,7.861045833851939
+SR3_GP - Shared Ride 3+ (General Purpose),Work,127519.0,9.975307059324493
+SR3_GP - Shared Ride 3+ (General Purpose),Work-Based,3261.0,4.886954344986201
+SR3_HOV - Shared Ride 3+ (HOV Lanes),Discretionary,121697.0,7.706344708259036
+SR3_HOV - Shared Ride 3+ (HOV Lanes),Eating Out,10522.0,7.0219165091237405
+SR3_HOV - Shared Ride 3+ (HOV Lanes),Escort,224068.0,3.5300855954040737
+SR3_HOV - Shared Ride 3+ (HOV Lanes),Maintenance,148446.0,5.746474682665751
+SR3_HOV - Shared Ride 3+ (HOV Lanes),School,1516276.0,3.8411477963978853
+SR3_HOV - Shared Ride 3+ (HOV Lanes),Shop,59202.0,4.644797349717915
+SR3_HOV - Shared Ride 3+ (HOV Lanes),University,20172.0,10.099178623488003
+SR3_HOV - Shared Ride 3+ (HOV Lanes),Visiting,63341.0,8.246468201465087
+SR3_HOV - Shared Ride 3+ (HOV Lanes),Work,102259.0,11.009662360809317
+SR3_HOV - Shared Ride 3+ (HOV Lanes),Work-Based,46447.0,4.961875925592611
+SR3_PAY - Shared Ride 3+ (Express/Toll),Discretionary,5.0,48.7744804
+SR3_PAY - Shared Ride 3+ (Express/Toll),Escort,20.0,11.60571545
+SR3_PAY - Shared Ride 3+ (Express/Toll),Maintenance,66.0,21.33468856060606
+SR3_PAY - Shared Ride 3+ (Express/Toll),School,18.0,15.20925588888889
+SR3_PAY - Shared Ride 3+ (Express/Toll),Shop,21.0,17.85978923809524
+SR3_PAY - Shared Ride 3+ (Express/Toll),University,10.0,17.670886799999998
+SR3_PAY - Shared Ride 3+ (Express/Toll),Visiting,1.0,9.068368
+SR3_PAY - Shared Ride 3+ (Express/Toll),Work,153.0,23.086452973856208
+SR3_PAY - Shared Ride 3+ (Express/Toll),Work-Based,1.0,10.025116
+TAXI - Taxi,Discretionary,2096.0,2.1827421245229006
+TAXI - Taxi,Eating Out,316.0,2.5181192341772154
+TAXI - Taxi,Escort,10678.0,1.7155846179996255
+TAXI - Taxi,Maintenance,9288.0,2.2074764276485785
+TAXI - Taxi,School,5059.0,1.887049692824669
+TAXI - Taxi,Shop,8274.0,1.9877773408266861
+TAXI - Taxi,University,7576.0,3.027678044746568
+TAXI - Taxi,Visiting,1289.0,2.391287815360745
+TAXI - Taxi,Work,4305.0,3.7330598406504065
+TAXI - Taxi,Work-Based,499.0,0.8619605531062124
+TNC - Transportation Network Company,Discretionary,10815.0,3.0783819863153026
+TNC - Transportation Network Company,Eating Out,1567.0,3.4539799744735165
+TNC - Transportation Network Company,Escort,32962.0,2.3289811649778533
+TNC - Transportation Network Company,Maintenance,36540.0,2.9571959775588397
+TNC - Transportation Network Company,School,17246.0,2.7183177636553406
+TNC - Transportation Network Company,Shop,31016.0,2.558639133640702
+TNC - Transportation Network Company,University,38709.0,4.8374176539822775
+TNC - Transportation Network Company,Visiting,6524.0,3.287497217811159
+TNC - Transportation Network Company,Work,27668.0,4.902669659317623
+TNC - Transportation Network Company,Work-Based,1339.0,2.029730060492905
+WALK - Walk,Discretionary,488893.0,0.851678706755875
+WALK - Walk,Eating Out,65891.0,0.7392001967491766
+WALK - Walk,Escort,277697.0,0.9636920779842778
+WALK - Walk,Maintenance,424545.0,0.9054451780046873
+WALK - Walk,School,477488.0,0.8335734616681466
+WALK - Walk,Shop,268336.0,0.924452436672679
+WALK - Walk,University,84790.0,1.6955005227503244
+WALK - Walk,Visiting,303994.0,0.8458294133700007
+WALK - Walk,Work,215912.0,1.0047111466106562
+WALK - Walk,Work-Based,157121.0,0.6273341041935833
+WLK_TRN - Walk to Transit,Discretionary,109490.0,3.9348650793588456
+WLK_TRN - Walk to Transit,Eating Out,14037.0,3.769432199971504
+WLK_TRN - Walk to Transit,Escort,3037.0,4.388392939743167
+WLK_TRN - Walk to Transit,Maintenance,116087.0,4.486946658204622
+WLK_TRN - Walk to Transit,School,25628.0,2.8683503481738724
+WLK_TRN - Walk to Transit,Shop,65729.0,3.732044369608544
+WLK_TRN - Walk to Transit,University,74195.0,7.075050838991846
+WLK_TRN - Walk to Transit,Visiting,57423.0,4.171754562231162
+WLK_TRN - Walk to Transit,Work,281160.0,7.546046780644473
+WLK_TRN - Walk to Transit,Work-Based,11221.0,6.299874950271811

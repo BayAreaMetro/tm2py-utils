@@ -1,0 +1,391 @@
+tour_purpose,tours_active,time_period
+Discretionary,3582.0,1
+Eating Out,266.0,1
+Escort,373.0,1
+Maintenance,1434.0,1
+School,3597.0,1
+Shop,864.0,1
+University,208.0,1
+Visiting,1030.0,1
+Work,34751.0,1
+Work-Based,196.0,1
+Discretionary,8695.0,2
+Eating Out,516.0,2
+Escort,1655.0,2
+Maintenance,3817.0,2
+School,7965.0,2
+Shop,1994.0,2
+University,385.0,2
+Visiting,2355.0,2
+Work,65198.0,2
+Work-Based,348.0,2
+Discretionary,15618.0,3
+Eating Out,833.0,3
+Escort,5578.0,3
+Maintenance,7835.0,3
+School,13551.0,3
+Shop,3480.0,3
+University,607.0,3
+Visiting,3802.0,3
+Work,143735.0,3
+Work-Based,766.0,3
+Discretionary,25078.0,4
+Eating Out,1163.0,4
+Escort,13339.0,4
+Maintenance,14914.0,4
+School,20994.0,4
+Shop,5224.0,4
+University,3475.0,4
+Visiting,5589.0,4
+Work,237263.0,4
+Work-Based,1409.0,4
+Discretionary,37008.0,5
+Eating Out,1503.0,5
+Escort,20036.0,5
+Maintenance,27009.0,5
+School,110046.0,5
+Shop,7321.0,5
+University,7858.0,5
+Visiting,7884.0,5
+Work,387004.0,5
+Work-Based,2286.0,5
+Discretionary,53513.0,6
+Eating Out,1865.0,6
+Escort,55948.0,6
+Maintenance,48221.0,6
+School,408843.0,6
+Shop,9962.0,6
+University,27201.0,6
+Visiting,10801.0,6
+Work,597236.0,6
+Work-Based,3469.0,6
+Discretionary,82834.0,7
+Eating Out,2475.0,7
+Escort,159214.0,7
+Maintenance,88218.0,7
+School,779332.0,7
+Shop,13614.0,7
+University,51910.0,7
+Visiting,15017.0,7
+Work,864148.0,7
+Work-Based,5005.0,7
+Discretionary,109824.0,8
+Eating Out,3257.0,8
+Escort,174443.0,8
+Maintenance,130362.0,8
+School,981454.0,8
+Shop,19562.0,8
+University,69623.0,8
+Visiting,21700.0,8
+Work,1060483.0,8
+Work-Based,7197.0,8
+Discretionary,133859.0,9
+Eating Out,4089.0,9
+Escort,110872.0,9
+Maintenance,174307.0,9
+School,1089968.0,9
+Shop,29065.0,9
+University,90956.0,9
+Visiting,32726.0,9
+Work,1199356.0,9
+Work-Based,10112.0,9
+Discretionary,154847.0,10
+Eating Out,5145.0,10
+Escort,46670.0,10
+Maintenance,214677.0,10
+School,1107189.0,10
+Shop,45075.0,10
+University,108816.0,10
+Visiting,47365.0,10
+Work,1274574.0,10
+Work-Based,13444.0,10
+Discretionary,171709.0,11
+Eating Out,6379.0,11
+Escort,34091.0,11
+Maintenance,255289.0,11
+School,1115976.0,11
+Shop,70480.0,11
+University,123358.0,11
+Visiting,61787.0,11
+Work,1318374.0,11
+Work-Based,17321.0,11
+Discretionary,170617.0,12
+Eating Out,7960.0,12
+Escort,31856.0,12
+Maintenance,288568.0,12
+School,1121691.0,12
+Shop,102605.0,12
+University,135401.0,12
+Visiting,75631.0,12
+Work,1344881.0,12
+Work-Based,21932.0,12
+Discretionary,169400.0,13
+Eating Out,9406.0,13
+Escort,32517.0,13
+Maintenance,311502.0,13
+School,1124210.0,13
+Shop,132476.0,13
+University,144688.0,13
+Visiting,88998.0,13
+Work,1367186.0,13
+Work-Based,27966.0,13
+Discretionary,168160.0,14
+Eating Out,17215.0,14
+Escort,33511.0,14
+Maintenance,321714.0,14
+School,1122770.0,14
+Shop,146697.0,14
+University,150222.0,14
+Visiting,100051.0,14
+Work,1386129.0,14
+Work-Based,35343.0,14
+Discretionary,160024.0,15
+Eating Out,25113.0,15
+Escort,34781.0,15
+Maintenance,311081.0,15
+School,1117394.0,15
+Shop,142876.0,15
+University,153098.0,15
+Visiting,111112.0,15
+Work,1401457.0,15
+Work-Based,73865.0,15
+Discretionary,154247.0,16
+Eating Out,27606.0,16
+Escort,36334.0,16
+Maintenance,294804.0,16
+School,1105887.0,16
+Shop,134106.0,16
+University,153420.0,16
+Visiting,122128.0,16
+Work,1413048.0,16
+Work-Based,118654.0,16
+Discretionary,150171.0,17
+Eating Out,26708.0,17
+Escort,38086.0,17
+Maintenance,277300.0,17
+School,1087548.0,17
+Shop,127657.0,17
+University,142254.0,17
+Visiting,118985.0,17
+Work,1420763.0,17
+Work-Based,125630.0,17
+Discretionary,147599.0,18
+Eating Out,23311.0,18
+Escort,40421.0,18
+Maintenance,266832.0,18
+School,1063493.0,18
+Shop,125396.0,18
+University,137436.0,18
+Visiting,115842.0,18
+Work,1423861.0,18
+Work-Based,81078.0,18
+Discretionary,145441.0,19
+Eating Out,19168.0,19
+Escort,82375.0,19
+Maintenance,257046.0,19
+School,1033931.0,19
+Shop,124543.0,19
+University,133923.0,19
+Visiting,113594.0,19
+Work,1421423.0,19
+Work-Based,48209.0,19
+Discretionary,144396.0,20
+Eating Out,15465.0,20
+Escort,157247.0,20
+Maintenance,247040.0,20
+School,998420.0,20
+Shop,114101.0,20
+University,129090.0,20
+Visiting,109269.0,20
+Work,1411515.0,20
+Work-Based,32597.0,20
+Discretionary,144078.0,21
+Eating Out,13856.0,21
+Escort,179035.0,21
+Maintenance,236541.0,21
+School,903680.0,21
+Shop,107940.0,21
+University,123068.0,21
+Visiting,106190.0,21
+Work,1391281.0,21
+Work-Based,23543.0,21
+Discretionary,145849.0,22
+Eating Out,12218.0,22
+Escort,155986.0,22
+Maintenance,224344.0,22
+School,669324.0,22
+Shop,103049.0,22
+University,115660.0,22
+Visiting,104044.0,22
+Work,1361634.0,22
+Work-Based,18025.0,22
+Discretionary,161831.0,23
+Eating Out,12726.0,23
+Escort,92150.0,23
+Maintenance,209762.0,23
+School,451895.0,23
+Shop,98066.0,23
+University,107267.0,23
+Visiting,103626.0,23
+Work,1305427.0,23
+Work-Based,14241.0,23
+Discretionary,179331.0,24
+Eating Out,15901.0,24
+Escort,72889.0,24
+Maintenance,188528.0,24
+School,316629.0,24
+Shop,90760.0,24
+University,97836.0,24
+Visiting,104098.0,24
+Work,1231725.0,24
+Work-Based,11524.0,24
+Discretionary,201569.0,25
+Eating Out,17827.0,25
+Escort,44766.0,25
+Maintenance,161258.0,25
+School,240481.0,25
+Shop,80846.0,25
+University,105020.0,25
+Visiting,105189.0,25
+Work,1127130.0,25
+Work-Based,9708.0,25
+Discretionary,214727.0,26
+Eating Out,22542.0,26
+Escort,35313.0,26
+Maintenance,146524.0,26
+School,175963.0,26
+Shop,69091.0,26
+University,107729.0,26
+Visiting,107243.0,26
+Work,970496.0,26
+Work-Based,8236.0,26
+Discretionary,228057.0,27
+Eating Out,29859.0,27
+Escort,30956.0,27
+Maintenance,126681.0,27
+School,113491.0,27
+Shop,67321.0,27
+University,107777.0,27
+Visiting,117655.0,27
+Work,774676.0,27
+Work-Based,7367.0,27
+Discretionary,242157.0,28
+Eating Out,35242.0,28
+Escort,28158.0,28
+Maintenance,121901.0,28
+School,61759.0,28
+Shop,62991.0,28
+University,106167.0,28
+Visiting,141736.0,28
+Work,602465.0,28
+Work-Based,7198.0,28
+Discretionary,269821.0,29
+Eating Out,35858.0,29
+Escort,25378.0,29
+Maintenance,119463.0,29
+School,35036.0,29
+Shop,56706.0,29
+University,103116.0,29
+Visiting,158402.0,29
+Work,480558.0,29
+Work-Based,7025.0,29
+Discretionary,246618.0,30
+Eating Out,32913.0,30
+Escort,22437.0,30
+Maintenance,105911.0,30
+School,21173.0,30
+Shop,56441.0,30
+University,92250.0,30
+Visiting,172251.0,30
+Work,403127.0,30
+Work-Based,6938.0,30
+Discretionary,214655.0,31
+Eating Out,26148.0,31
+Escort,19325.0,31
+Maintenance,87461.0,31
+School,13083.0,31
+Shop,52886.0,31
+University,82621.0,31
+Visiting,160374.0,31
+Work,332578.0,31
+Work-Based,6824.0,31
+Discretionary,177295.0,32
+Eating Out,18907.0,32
+Escort,16671.0,32
+Maintenance,69479.0,32
+School,8626.0,32
+Shop,43724.0,32
+University,73077.0,32
+Visiting,146917.0,32
+Work,285697.0,32
+Work-Based,6658.0,32
+Discretionary,137731.0,33
+Eating Out,13533.0,33
+Escort,14201.0,33
+Maintenance,53449.0,33
+School,6244.0,33
+Shop,29138.0,33
+University,63040.0,33
+Visiting,122021.0,33
+Work,248484.0,33
+Work-Based,6562.0,33
+Discretionary,46212.0,35
+Eating Out,4430.0,35
+Escort,10246.0,35
+Maintenance,29764.0,35
+School,4522.0,35
+Shop,13682.0,35
+University,43694.0,35
+Visiting,69063.0,35
+Work,188322.0,35
+Work-Based,5751.0,35
+Discretionary,35525.0,36
+Eating Out,2121.0,36
+Escort,8626.0,36
+Maintenance,21752.0,36
+School,3916.0,36
+Shop,9366.0,36
+University,34748.0,36
+Visiting,49077.0,36
+Work,161618.0,36
+Work-Based,5202.0,36
+Discretionary,25268.0,37
+Eating Out,1497.0,37
+Escort,7286.0,37
+Maintenance,15576.0,37
+School,3263.0,37
+Shop,6229.0,37
+University,26411.0,37
+Visiting,29250.0,37
+Work,135767.0,37
+Work-Based,4458.0,37
+Discretionary,17631.0,38
+Eating Out,1041.0,38
+Escort,6140.0,38
+Maintenance,10670.0,38
+School,2596.0,38
+Shop,4080.0,38
+University,19018.0,38
+Visiting,18231.0,38
+Work,109896.0,38
+Work-Based,3406.0,38
+Discretionary,11292.0,39
+Eating Out,678.0,39
+Escort,5529.0,39
+Maintenance,6811.0,39
+School,1809.0,39
+Shop,2370.0,39
+University,12277.0,39
+Visiting,7000.0,39
+Work,83093.0,39
+Work-Based,2308.0,39
+Discretionary,6046.0,40
+Eating Out,424.0,40
+Escort,4397.0,40
+Maintenance,3626.0,40
+School,977.0,40
+Shop,1073.0,40
+University,6031.0,40
+Visiting,4126.0,40
+Work,51283.0,40
+Work-Based,1970.0,40
