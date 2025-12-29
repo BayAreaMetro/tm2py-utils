@@ -182,6 +182,74 @@ def load_ctramp_data(ctramp_dir: Path, data_model: Dict[str, Any]) -> Dict[str, 
     
     return data
 
+def load_enriched_output(enriched_output_dir: Path, data_model):
+    """
+    Load enriched output files into dataframe with proper name
+
+    Args: 
+        enriched_output_dir: Directory containing enriched output parquet files
+
+    """
+    logger.info("=" * 80)
+    logger.info("STEP 2: Loading Enriched Output Files")
+    logger.info("=" * 80)
+    logger.info(f"Source directory: {enriched_output_dir}")
+    logger.info("")    
+
+    data = {}
+    input_schema = data_model['enriched_input_schema']
+    
+    for table_name, schema in input_schema.items():
+        logger.info(f"Loading {table_name}...")
+        
+        # Skip geography_lookup - it's a static reference file, not CTRAMP output
+        if table_name == 'geography_lookup':
+            logger.info(f"  {INFO} Skipping {table_name} (static reference file, not CTRAMP output)")
+            logger.info("")
+            continue
+        
+        # Find the file
+        file_pattern = schema['file_pattern']
+        file_path = enriched_output_dir / file_pattern
+        
+        if file_path is None:
+            logger.warning(f"  {WARN} File not found matching pattern: {file_pattern}")
+            continue
+        
+        logger.info(f"  File: {file_path.name}")
+        
+        # Load the CSV
+        df = pd.read_parquet(file_path)
+        logger.info(f"  Rows: {len(df):,}")
+        
+        # TODO: Determine if we need to standardized the columns
+        # Rename columns to canonical names
+        required_cols = schema['columns']['required']
+        optional_cols = schema['columns'].get('optional', {})
+        all_col_mappings = {**required_cols, **optional_cols}
+        
+        # Check for missing required columns
+        missing_required = []
+        for canonical_name, file_col_name in required_cols.items():
+            if file_col_name not in df.columns:
+                missing_required.append(f"{canonical_name} (expected '{file_col_name}')")
+        
+        if missing_required:
+            logger.warning(f"  {WARN} Missing required columns: {', '.join(missing_required)}")
+            logger.warning(f"  {WARN} Available columns: {', '.join(sorted(df.columns.tolist()))}")
+        
+        # Only rename columns that exist in the file
+        rename_map = {v: k for k, v in all_col_mappings.items() if v in df.columns}
+        df = df.rename(columns=rename_map)
+        
+        logger.info(f"  Columns: {len(df.columns)}")
+        logger.info(f"  {CHECK} Loaded and standardized")
+        logger.info("")
+
+        data[table_name] = df
+
+    return data
+
 
 def apply_value_labels(data: Dict[str, pd.DataFrame], value_mappings: Dict[str, Dict]) -> Dict[str, pd.DataFrame]:
     """
@@ -495,11 +563,21 @@ def generate_all_summaries(data: Dict[str, pd.DataFrame], summaries_config: Dict
         
         # Get source data
         data_source = summary_config['data_source']
-        if data_source not in data:
-            logger.warning(f"  {WARN} Data source '{data_source}' not found, skipping")
-            continue
+        if isinstance(data_source, list):
+            # Use the first available data source
+            for src in data_source:
+                if src in data:
+                    df = data[src]
+                    break
+            else:
+                logger.warning(f"  {WARN} None of the data sources {data_source} found, skipping")
+                continue
+        else:
+            if data_source not in data:
+                logger.warning(f"  {WARN} Data source '{data_source}' not found, skipping")
+                continue
         
-        df = data[data_source]
+            df = data[data_source]
         logger.info(f"  Source: {data_source} ({len(df):,} rows)")
         
         # Generate summary
@@ -562,7 +640,8 @@ def main():
     )
     parser.add_argument('ctramp_dir', type=str, help='Path to CTRAMP output directory')
     parser.add_argument('--output', type=str, help='Output directory for summaries (default: ./summaries)')
-    
+    parser.add_argument('--enriched', action = 'store_true', help = 'Use enriched output mode')
+
     args = parser.parse_args()
     
     # Convert paths
@@ -586,21 +665,35 @@ def main():
         data_model = load_data_model()
         
         # 2. Load CTRAMP files
-        data = load_ctramp_data(ctramp_dir, data_model)
+
+        if args.enriched:
+            data = load_enriched_output(ctramp_dir, data_model) 
+
+            if not data:
+                logger.error("ERROR: No data files loaded. Check file patterns and directory.")
+                sys.exit(1)
+            
+            logger.info("=" * 80)
+            logger.info("Skipping Steps 3 to 5")
+            logger.info("=" * 80)
+
+        else:
+            data = load_ctramp_data(ctramp_dir, data_model)
+            
+            if not data:
+                logger.error("ERROR: No data files loaded. Check file patterns and directory.")
+                sys.exit(1)
+            
+            # 3. Apply value labels
+            data = apply_value_labels(data, data_model.get('value_mappings', {}))
+            
+            # 4. Apply aggregations
+            data = apply_aggregations(data, data_model.get('aggregation_specs', {}))
+            
+            # 5. Apply bins
+            data = apply_bins(data, data_model.get('binning_specs', {}))
         
-        if not data:
-            logger.error("ERROR: No data files loaded. Check file patterns and directory.")
-            sys.exit(1)
-        
-        # 3. Apply value labels
-        data = apply_value_labels(data, data_model.get('value_mappings', {}))
-        
-        # 4. Apply aggregations
-        data = apply_aggregations(data, data_model.get('aggregation_specs', {}))
-        
-        # 5. Apply bins
-        data = apply_bins(data, data_model.get('binning_specs', {}))
-        
+            
         # 6. Generate summaries
         generate_all_summaries(data, data_model.get('summaries', {}), output_dir)
         

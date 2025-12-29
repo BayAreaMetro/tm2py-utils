@@ -197,6 +197,184 @@ input_schema:
       district_name: "DistName"      # Planning district name
 
 # ==============================================================================
+# ENRICHED INPUT SCHEMA - Define what the enriched output files look like
+# ==============================================================================
+enriched_input_schema:
+  # Enriched Persons file schema
+  persons:
+    file_pattern: persons.parquet
+    columns:
+      required:
+        household_id: "hh_id"        # Household identifier (foreign key)
+        person_id: "person_id"       # Unique person identifier across all households
+        person_number: "person_num"  # Person number within household (1 to size)
+        age: "age"                   # Person's age in years
+        gender: "gender"             # Gender
+        person_type_name: "type"     # Person type
+        num_vehicles: "autos"        # Number of vehicles owned (0-6+) - pulled from household
+        num_persons: "size"          # Household size (1-15 persons)
+        maz_node: "MAZ_NODE"         # MAZ identifier
+        taz_node: "TAZ_NODE"         # TAZ Identifier
+        county_id: "MTCCountyID"     # County ID
+        kids_no_driver: "kidsNoDr"   # Indicate if household have kids with no driver (0 - no kids, 1 - kids)        
+
+      # Optional columns your model might have
+      optional:
+        value_of_time: "value_of_time"           # Value of time in $/hour
+        transit_subsidy_choice: "transitSubsidy_choice"  # Transit subsidy selected (0/1)
+        transit_subsidy_percent: "transitSubsidy_percent"  # Percent subsidy (0-100)
+        transit_pass_choice: "transitPass_choice"  # Transit pass type selected
+        reimb_pct: "reimb_pct"                   # Reimbursement percentage for work travel
+        naics_code: "naicsCode"                  # NAICS industry code for workplace
+        pre_telecommute_cdap: "preTelecommuteCdap"  # CDAP before telecommute choice
+        telecommute: "telecommute"               # Telecommute frequency choice
+        cdap: "cdap"                             # Coordinated Daily Activity Pattern
+        work_dc_logsum: "workDCLogsum"           # Work destination choice logsum
+        school_dc_logsum: "schoolDCLogsum"       # School destination choice logsum
+        imf_choice: "imf_choice"                 # Individual Maintenance Tour frequency
+        inmf_choice: "inmf_choice"               # Individual Non-Maintenance Tour frequency
+        free_parking_choice: "fp_choice"         # Free parking at work (0/1)
+        sample_rate: "sampleRate"                # Sampling expansion factor
+
+  # Enriched household file schema
+  households:
+    file_pattern: households.parquet
+    columns:
+      required:
+        household_id: "hh_id"                 # Unique household identifier
+        home_mgra: "home_MAZ_SEQ"                 # Home location MGRA (Micro Analysis Zone)
+        income: "income"                      # Income 
+        income_category_name: "incQ"          # Income category
+        num_vehicles: "autos"                 # Number of vehicles owned (0-6+)
+        num_persons: "size"                   # Household size (1-15 persons)
+        num_workers: "workers"                # Number of workers (0 to size)
+        sample_rate: "sampleRate"             # Sample expansion factor
+        maz_node: "MAZ_NODE"                  # MAZ identifier
+        taz_node: "TAZ_NODE"                  # TAZ Identifier
+        county_id: "MTCCountyID"              # County ID
+        district_id: "DistID"                 # District ID
+        auto_sufficiency: "autoSuff"          # Auto Sufficiency (0-2)
+        auto_sufficiency_name: "autoSuff_label"   # Auto Sufficency Label
+        kids_no_driver: "kidsNoDr"            # Indicate if household have kids with no driver (0 - no kids, 1 - kids)        
+
+      optional:
+        automated_vehicles: "automated_vehicles"  # Number of autonomous vehicles
+        transponder: "transponder"                # Has toll transponder (0/1)
+        pre_et_cdap_pattern: "pre_et_cdap_pattern"  # Pre-employment/transit CDAP
+        cdap_pattern: "cdap_pattern"              # Coordinated Daily Activity Pattern
+        jtf_choice: "jtf_choice"                  # Joint tour frequency choice
+
+  #Enriched tours file schema
+  tours:
+    file_pattern: tours.parquet
+    columns:
+      required:
+        household_id: "hh_id"                    # Household identifier
+        person_id: "person_id"                   # Unique person identifier
+        person_number: "person_num"              # Person number within household
+        tour_id: "tour_id"                       # Tour sequence number for this person
+        tour_category: "tour_category"           # MANDATORY, INDIVIDUAL_NON_MANDATORY, or AT_WORK
+        tour_purpose: "tour_purpose"             # Specific purpose (Work, School, Shop, etc.)
+        start_period: "start_period"             # Tour departure time period (1-48)
+        end_period: "end_period"                 # Tour arrival time period (1-48)
+        num_participants: "num_participants"       # Number of participants on tour
+        income_category_name: "incQ"             # Income Category Name
+      
+      # Spatial and travel attributes (11 optional)
+      optional:
+        origin_maz: "origin_MAZ_NODE"            # Origin MAZ (home or workplace)
+        origin_taz: "origin_TAZ_NODE"            # Origin TAZ (home or workplace)
+        origin_district_id: "origin_DistID"      # Origin District ID
+        origin_county: "origin_CountyID"         # Origin County ID
+        destination_maz: "destination_MAZ_NODE"  # Destination MAZ
+        destination_taz: "destination_TAZ_NODE"  # Destination TAZ
+        destination_district_id: "destination_DistID" # Destination District ID
+        destination_county: "destination_CountyID"
+        tour_mode: "tour_mode"                   # Primary tour mode (1-17)
+        tour_mode_name: "tour_mode_label"         # Primary tour mode names
+        tour_distance: "tour_distance"           # Total round-trip distance in miles
+        tour_time: "tour_time"                   # Total round-trip time in minutes
+        tour_cost: "tour_cost"                   # Total round-trip cost in dollars
+        num_ob_stops: "num_ob_stops"             # Number of outbound stops (0-3)
+        num_ib_stops: "num_ib_stops"             # Number of inbound stops (0-3)
+        atwork_freq: "atWork_freq"               # At-work subtour frequency (0-3)
+        dest_choice_logsum: "dcLogsum"           # Destination choice logsum
+        sample_rate: "sampleRate"                # Household sampling rate
+        av_available: "avAvailable"              # Autonomous vehicle available (0/1)
+        
+
+  # Enriched trips file schema
+  trips:
+    file_pattern: trips.parquet
+    columns:
+      required:
+        household_id: "hh_id"                    # Household identifier
+        person_id: "person_id"                   # Person identifier
+        person_number: "person_num"              # Person number within household
+        tour_id: "tour_id"                       # Tour identifier within person
+        num_participants: "num_participants"       # Number of participants on tour
+        income_category_name: "incQ"             # Income Category Name
+        auto_sufficiency: "autoSuff"          # Auto Sufficiency (0-2)
+        auto_sufficiency_name: "autoSuff_label"   # Auto Sufficency Label
+  
+      # Trip sequencing and context (15 optional)
+      optional:
+        stop_id: "stop_id"                       # Stop/trip sequence ID (0-based, -1 for direct trips)
+        inbound: "inbound"                       # Trip direction (0=outbound, 1=inbound)
+        tour_purpose: "tour_purpose"             # Primary purpose of parent tour
+        origin_purpose: "orig_purpose"           # Purpose at trip origin
+        destination_purpose: "dest_purpose"      # Purpose at trip destination
+        origin_maz: "origin_MAZ_NODE"            # Origin MAZ (home or workplace)
+        origin_taz: "origin_TAZ_NODE"            # Origin TAZ (home or workplace)
+        origin_district_id: "origin_DistID"      # Origin District ID
+        origin_county: "origin_CountyID"         # Origin County ID
+        destination_maz: "destination_MAZ_NODE"  # Destination MAZ
+        destination_taz: "destination_TAZ_NODE"  # Destination TAZ
+        destination_district_id: "destination_DistID" # Destination District ID
+        destination_county: "destination_CountyID"
+        trip_distance: "trip_dist"               # Trip distance in miles
+        trip_time: "trip_time"                   # Trip time in minutes
+        trip_cost: 'trip_cost'                   # Trip cost in dollars
+        parking_mgra: "parking_MAZ_SEQ"             # Parking location MGRA (for auto modes)
+        stop_period: "stop_period"               # Trip departure time period (1-48)
+        trip_mode: "trip_mode"                   # Trip-specific transportation mode (1-17)
+        trip_mode_name: "trip_mode_label"
+        tour_mode: "tour_mode"                   # Parent tour transportation mode (1-17)
+        tranpath_rnum: "tranpath_rnum"           # Transit path choice random number (0.0-1.0, -999 for non-transit)
+        sample_rate: "sampleRate"                # Household sampling rate
+        av_available: "avAvailable"              # Autonomous vehicle availability (0/1)
+
+  # Enriched work-school file schema
+  workplace_school_location:
+    file_pattern: work_school_locations.parquet
+    columns:
+      required:
+        household_id: "hh_id"                     # Household identifier
+        home_mgra: "HOME_MAZ_NODE"                    # Home location MGRA
+        home_taz: "HOME_TAZ_NODE"
+        home_district: "HOME_DistID"
+        home_county: "HOME_CountyID"
+        income: "Income"                         # Household income in dollars
+        person_id: "PersonID"                    # Person identifier
+        person_number: "PersonNum"               # Person number within household
+        person_type: "PersonType"                # Person type classification (1-8)
+        person_age: "PersonAge"                  # Person age in years
+        employment_category: "EmploymentCategory" # Employment status (1-4)
+        student_category: "StudentCategory"      # Student status (1-4)
+      optional:
+        work_segment: "WorkSegment"              # Work location choice market segment (1-4, -1 for non-workers)
+        school_segment: "SchoolSegment"          # School location choice market segment (1-3, -1 for non-students)
+        work_location: "WORK_MAZ_NODE"            # Chosen work location MGRA (0 if no work)
+        work_location_distance: "WorkLocationDistance"  # Home to work distance in miles
+        work_location_logsum: "WorkLocationLogsum"      # Work location choice logsum (-999.0 for non-workers)
+        school_location: "SCH_MAZ_NODE"        # Chosen school location MGRA (0 if no school)
+        school_location_distance: "SchoolLocationDistance"  # Home to school distance in miles
+        school_location_logsum: "SchoolLocationLogsum"    # School location choice logsum (-999.0 for non-students)
+
+
+  
+
+# ==============================================================================
 # INTERNAL SCHEMA - Standardized column names used within the code
 # ==============================================================================
 internal_schema:
@@ -389,11 +567,25 @@ weight_fields:
     calculate_weighted: true
     default_value: 1.0
     invert: true
+
+  tours:
+    field: "sample_rate"
+    description: "Tour sampling rate"
+    calculate_weighted: true
+    default_value: 1.0
+    invert: true
   
   individual_trips:
     field: "sample_rate"
     description: "Trip sampling rate - inherited from household, will be inverted"
     calculate_weighted: true
+    default_value: 1.0
+    invert: true
+
+  trips:
+    field: "sample_rate"
+    description: "Trip sampling rate"
+    ccalculate_weighted: true
     default_value: 1.0
     invert: true
   
@@ -1236,14 +1428,18 @@ summaries:
   
   tour_frequency_by_purpose:
     description: "Number of tours by purpose"
-    data_source: "individual_tours"
+    data_source: 
+      - individual_tours
+      - tours
     group_by: "tour_purpose"
     weight_field: "sample_rate"
     count_name: "tours"
   
   tour_mode_distribution:
     description: "Tour mode choice distribution (all 17 modes)"
-    data_source: "individual_tours"
+    data_source: 
+      - individual_tours
+      - tours
     filter: "tour_mode.notna()"
     group_by: "tour_mode_name"
     weight_field: "sample_rate"
@@ -1251,7 +1447,9 @@ summaries:
   
   tour_mode_aggregated:
     description: "Tour mode choice (aggregated to major categories)"
-    data_source: "individual_tours"
+    data_source: 
+      - individual_tours
+      - tours
     filter: "tour_mode.notna()"
     group_by: "tour_mode_agg"
     weight_field: "sample_rate"
@@ -1259,7 +1457,9 @@ summaries:
   
   tour_mode_by_purpose:
     description: "Tour mode by purpose cross-tabulation"
-    data_source: "individual_tours"
+    data_source: 
+      - individual_tours
+      - tours
     filter: "tour_mode.notna()"
     group_by: ["tour_purpose", "tour_mode_name"]
     weight_field: "sample_rate"
@@ -1268,21 +1468,27 @@ summaries:
   
   tour_start_time:
     description: "Tour departure time distribution (30-min periods)"
-    data_source: "individual_tours"
+    data_source: 
+      - individual_tours
+      - tours
     group_by: "start_period"
     weight_field: "sample_rate"
     count_name: "tours"
   
   tour_end_time:
     description: "Tour arrival time distribution (30-min periods)"
-    data_source: "individual_tours"
+    data_source: 
+      - individual_tours
+      - tours
     group_by: "end_period"
     weight_field: "sample_rate"
     count_name: "tours"
   
   tour_distance_distribution:
     description: "Tour distance distribution (binned)"
-    data_source: "individual_tours"
+    data_source: 
+      - individual_tours
+      - tours
     filter: "tour_distance.notna()"
     group_by: "tour_distance_bin"
     weight_field: "sample_rate"
@@ -1294,14 +1500,18 @@ summaries:
   
   trip_purpose_distribution:
     description: "Trip destination purpose distribution"
-    data_source: "individual_trips"
+    data_source:
+      - individual_trips
+      - trips
     group_by: "destination_purpose"
     weight_field: "sample_rate"
     count_name: "trips"
   
   trip_mode_distribution:
     description: "Trip mode choice distribution (all 17 modes)"
-    data_source: "individual_trips"
+    data_source:
+      - individual_trips
+      - trips
     filter: "trip_mode.notna()"
     group_by: "trip_mode_name"
     weight_field: "sample_rate"
@@ -1309,7 +1519,9 @@ summaries:
   
   trip_mode_aggregated:
     description: "Trip mode choice (aggregated to major categories)"
-    data_source: "individual_trips"
+    data_source:
+      - individual_trips
+      - trips
     filter: "trip_mode.notna()"
     group_by: "trip_mode_agg"
     weight_field: "sample_rate"
@@ -1317,7 +1529,9 @@ summaries:
   
   trip_mode_by_purpose:
     description: "Trip mode by destination purpose"
-    data_source: "individual_trips"
+    data_source:
+      - individual_trips
+      - trips
     filter: "trip_mode.notna()"
     group_by: ["destination_purpose", "trip_mode_name"]
     weight_field: "sample_rate"
@@ -1326,7 +1540,9 @@ summaries:
   
   trip_distance_distribution:
     description: "Trip distance distribution (binned)"
-    data_source: "individual_trips"
+    data_source:
+      - individual_trips
+      - trips
     filter: "trip_distance.notna()"
     group_by: "trip_distance_bin"
     weight_field: "sample_rate"
@@ -1353,7 +1569,9 @@ summaries:
   
   trip_distance_by_mode_purpose:
     description: "Average trip distance by mode and tour purpose"
-    data_source: "individual_trips"
+    data_source:
+      - individual_trips
+      - trips
     filter: "trip_distance.notna()"
     group_by: ["trip_mode_name", "tour_purpose"]
     weight_field: "sample_rate"
@@ -1363,7 +1581,9 @@ summaries:
   
   trip_distance_by_time_purpose:
     description: "Average trip distance by time period and tour purpose"
-    data_source: "individual_trips"
+    data_source:
+      - individual_trips
+      - trips
     filter: "trip_distance.notna() and stop_period.notna()"
     group_by: ["stop_period", "tour_purpose"]
     weight_field: "sample_rate"
@@ -1377,14 +1597,18 @@ summaries:
   
   time_of_day_tours:
     description: "Tour start/end times by purpose and mode"
-    data_source: "individual_tours"
+    data_source: 
+      - individual_tours
+      - tours
     group_by: ["tour_purpose", "tour_mode_name", "start_period", "end_period"]
     weight_field: "sample_rate"
     count_name: "tours"
   
   persons_touring_by_time:
     description: "Number of persons touring at each 30-minute time period"
-    data_source: "individual_tours"
+    data_source: 
+      - individual_tours
+      - tours
     special_handler: "expand_time_periods"  # Requires special processing
     group_by: ["tour_purpose"]
     weight_field: "sample_rate"
