@@ -1,0 +1,21 @@
+# Core packages for CityPhi visualization
+cityphi-emme>=25.0.0
+cityphi-engine>=25.0.0
+cityphi-studio>=25.0.0
+
+# Data processing
+pandas>=2.0.0
+numpy>=1.24.0
+geopandas>=0.14.0
+pyproj>=3.4.0
+
+# Visualization support
+bokeh>=3.0.0
+
+# Jupyter
+jupyter>=1.0.0
+ipykernel>=6.0.0
+
+# Geospatial
+shapely>=2.0.0
+fiona>=1.9.0
