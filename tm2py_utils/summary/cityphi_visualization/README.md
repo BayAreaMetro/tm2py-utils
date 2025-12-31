@@ -22,38 +22,104 @@ This package provides a Jupyter notebook tutorial for visualizing MTC travel mod
 
 ## Installation
 
-### 1. Create Virtual Environment
+### Automated Setup (Recommended)
+
+Run the setup script to automatically create the environment and install packages:
 
 ```powershell
-# Create environment
-python -m venv cityphi_work
+cd tm2py_utils/summary/cityphi_visualization
+.\setup_env.ps1
+```
 
-# Activate
-.\cityphi_work\Scripts\Activate.ps1
+The script will:
+- Create a virtual environment
+- Install all Python packages from requirements.txt
+- Optionally install CityPhi from your EMME installation
+- Provide next steps
 
-# Install packages
+### Manual Setup
+
+**Step 1: Create and Activate Virtual Environment**
+
+```powershell
+# Navigate to this directory
+cd tm2py_utils/summary/cityphi_visualization
+
+# Create virtual environment (can use any name)
+python -m venv venv
+
+# Activate (Windows PowerShell)
+.\venv\Scripts\Activate.ps1
+
+# Or activate (Windows Command Prompt)
+.\venv\Scripts\activate.bat
+```
+
+**Step 2: Install Python Packages**
+
+```powershell
 pip install -r requirements.txt
 ```
 
-### 2. Install CityPhi
+**Step 3: Install CityPhi from EMME**
 
-CityPhi must be installed from your EMME installation:
+CityPhi cannot be installed from PyPI. Install it from your local EMME installation:
 
 ```powershell
-# Adjust path to your EMME installation
-pip install "C:\Program Files\INRO\Emme\Emme 4.6.2\Python312-64\Lib\site-packages\cityphi_*"
+# Find your EMME installation path - common locations:
+# C:\Program Files\INRO\Emme\Emme 4.6.2\Python312-64\Lib\site-packages\
+# C:\Program Files\INRO\Emme\Emme 4.6.1\Python311-64\Lib\site-packages\
+
+# Install all CityPhi packages (adjust path to your EMME version)
+pip install "C:\Program Files\INRO\Emme\Emme 4.6.2\Python312-64\Lib\site-packages\cityphi_emme-"*.whl
+pip install "C:\Program Files\INRO\Emme\Emme 4.6.2\Python312-64\Lib\site-packages\cityphi_engine-"*.whl
+pip install "C:\Program Files\INRO\Emme\Emme 4.6.2\Python312-64\Lib\site-packages\cityphi_studio-"*.whl
+
+# Or install all at once with wildcard:
+pip install "C:\Program Files\INRO\Emme\Emme 4.6.2\Python312-64\Lib\site-packages\cityphi_"*.whl
 ```
+
+**Step 4: Verify Installation**
+
+Open the notebook and run the first code cell to verify all packages are installed correctly.
+
+### Alternative: Use Existing Environment
+
+If you already have an environment with CityPhi installed:
+1. Activate that environment
+2. Install any missing packages: `pip install -r requirements.txt`
+3. Select that kernel when running the notebook
 
 ## Data Requirements
 
-The notebook expects the following data structure:
+The notebook supports flexible data path configuration. See `data/README.md` for details.
+
+### Quick Setup (Recommended)
+
+Place your data files in the `data/` directory:
 
 ```
 data/
-├── maz_shapefile/          # MAZ zone boundaries (.shp, .dbf, etc.)
-└── ctramp_output/
+├── maz_shapes/             # MAZ zone boundaries (.shp, .dbf, etc.)
+└── trips/
     └── indiv_trip.csv      # Individual trip records from CTRAMP
 ```
+
+### Alternative Setup
+
+**Option 1: Environment Variables** (best for teams)
+```powershell
+$env:CITYPHI_MAZ_DATA = "C:\your\path\to\maz_shapefiles"
+$env:CITYPHI_TRIP_DATA = "C:\your\path\to\trip_data"
+jupyter notebook
+```
+
+**Option 2: Edit Notebook**
+Uncomment and modify the absolute path configuration in the second code cell.
+
+### Data Details
+
+### Data Details
 
 ### MAZ Shapefile
 - Should contain MAZ zone geometries
@@ -67,20 +133,35 @@ Expected columns:
 
 ## Usage
 
-1. Update data paths in the notebook:
-   ```python
-   maz_shapefile_path = "path/to/your/maz/shapefile"
-   trip_data_path = "path/to/your/ctramp_output"
-   ```
+### Quick Start
 
-2. Launch Jupyter:
+1. **Set up Python environment** (see Installation above)
+
+2. **Set up your data** (see Data Requirements section)
+
+3. **Launch Jupyter:**
    ```powershell
+   # Make sure your virtual environment is activated
    jupyter notebook notebooks/MTC_CityPhi_Tutorial.ipynb
    ```
 
-3. Select the `cityphi_work` kernel
+4. **Select your kernel:**
+   - In Jupyter: Kernel → Change kernel → Select your environment
+   - In VS Code: Click kernel selector (top right) → Select your Python environment
 
-4. Run cells sequentially
+5. **Run the verification cell** to check that all packages are installed
+
+6. **Run cells sequentially** through the tutorial
+
+### Portable Setup
+
+The notebook now uses relative paths by default, making it work across different machines without modification. Simply:
+- Clone the repository
+- Set up the virtual environment
+- Place data in `data/maz_shapes/` and `data/trips/`
+- Run the notebook
+
+For team projects where data is in different locations, use environment variables.
 
 ## Notes
 
@@ -90,13 +171,40 @@ Expected columns:
 
 ## Troubleshooting
 
-**Kernel Selection Issues:**
-- Ensure you're using the Python interpreter from `cityphi_work` environment
-- In VS Code: Click kernel selector → Python Environments → Choose cityphi_work
+### Environment Issues
 
-**CityPhi Not Found:**
-- Verify CityPhi is installed from EMME
-- Check that cityphi packages are in your environment
+**"CityPhi not found" error:**
+- CityPhi must be installed manually from your EMME installation (see Installation Step 3)
+- Verify EMME is installed and locate the cityphi wheel files
+- Make sure you're using the correct Python version (match EMME's Python version)
+
+**"Module not found" errors:**
+- Ensure your virtual environment is activated
+- Run: `pip install -r requirements.txt`
+- Check the verification cell output in the notebook
+
+**Wrong Python version:**
+- CityPhi requires Python 3.11 or 3.12 (depending on EMME version)
+- Create a new environment with the correct Python version:
+  ```powershell
+  py -3.12 -m venv venv  # Use Python 3.12
+  ```
+
+**Kernel not showing in Jupyter/VS Code:**
+- Install ipykernel in your environment: `pip install ipykernel`
+- Register the kernel: `python -m ipykernel install --user --name=cityphi_env`
+- Restart Jupyter/VS Code
+
+### Data Issues
+
+**"No such file or directory" for data paths:**
+- Check that data is in the `data/` folder (see data/README.md)
+- Or set environment variables before launching Jupyter
+- Or edit the configuration cell with absolute paths
+
+**Shapefile coordinate system errors:**
+- Ensure your shapefile has a `.prj` file
+- CityPhi will reproject to Web Mercator automatically
 
 **Data Loading Errors:**
 - Verify shapefile paths

@@ -1,21 +1,31 @@
-# Core packages for CityPhi visualization
-cityphi-emme>=25.0.0
-cityphi-engine>=25.0.0
-cityphi-studio>=25.0.0
+# =============================================================================
+# CityPhi Visualization Requirements
+# =============================================================================
+# 
+# NOTE: CityPhi packages (cityphi-emme, cityphi-engine, cityphi-studio) are NOT
+# included here because they must be installed manually from your EMME installation.
+# See README.md for CityPhi installation instructions.
+#
+# This file contains all other required packages that can be installed via pip.
+# =============================================================================
 
 # Data processing
 pandas>=2.0.0
 numpy>=1.24.0
+
+# Geospatial data handling
 geopandas>=0.14.0
+shapely>=2.0.0
+fiona>=1.9.0
 pyproj>=3.4.0
 
 # Visualization support
 bokeh>=3.0.0
 
-# Jupyter
+# Jupyter notebook support
 jupyter>=1.0.0
 ipykernel>=6.0.0
+ipython>=8.0.0
 
-# Geospatial
-shapely>=2.0.0
-fiona>=1.9.0
+# Optional but recommended
+matplotlib>=3.7.0  # For additional plotting if needed
