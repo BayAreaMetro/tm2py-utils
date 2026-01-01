@@ -16,79 +16,82 @@ This package provides a Jupyter notebook tutorial for visualizing MTC travel mod
 
 ## Prerequisites
 
-- Python 3.11+
-- CityPhi (from EMME installation)
+- Python 3.11 or 3.12
+- **CityPhi** from one of these sources:
+  - Bentley OpenPaths CITYPHI installation (e.g., `C:\Program Files\Bentley\OpenPathsCITYPHI 24.01.00\`)
+  - INRO EMME installation with CityPhi packages (e.g., `C:\Program Files\INRO\Emme\`)
 - Windows OS (CityPhi requirement)
 
 ## Installation
 
-### Automated Setup (Recommended)
+### Step 1: Locate Your CityPhi Installation
 
-Run the setup script to automatically create the environment and install packages:
+First, find where CityPhi is installed on your system:
 
-```powershell
-cd tm2py_utils/summary/cityphi_visualization
-.\setup_env.ps1
-```
+**Common locations:**
+- Bentley: `C:\Program Files\Bentley\OpenPathsCITYPHI 24.01.00\Python311\`
+- EMME: `C:\Program Files\INRO\Emme\Emme 4.6.2\Python312-64\`
 
-The script will:
-- Create a virtual environment
-- Install all Python packages from requirements.txt
-- Optionally install CityPhi from your EMME installation
-- Provide next steps
+### Step 2: Choose Your Setup Method
 
-### Manual Setup
+#### Method A: Use CityPhi Python Directly (Recommended - Simplest)
 
-**Step 1: Create and Activate Virtual Environment**
+Use the Python that comes with your CityPhi installation:
 
-```powershell
-# Navigate to this directory
-cd tm2py_utils/summary/cityphi_visualization
+1. **In VS Code (when opening the notebook):**
+   - Click kernel selector (top-right)
+   - Select "Python Environments"
+   - Click "Enter interpreter path..."
+   - Enter path to your CityPhi Python (e.g., `C:\Program Files\Bentley\OpenPathsCITYPHI 24.01.00\Python311\python.exe`)
 
-# Create virtual environment (can use any name)
-python -m venv venv
+2. **Install missing packages into that Python:**
+   ```powershell
+   # Use the full path to the CityPhi Python
+   & "C:\Program Files\Bentley\OpenPathsCITYPHI 24.01.00\Python311\python.exe" -m pip install pandas geopandas numpy bokeh jupyter ipykernel
+   ```
 
-# Activate (Windows PowerShell)
-.\venv\Scripts\Activate.ps1
+**Pros:** CityPhi is already there, simplest setup
+**Cons:** Installs packages into the CityPhi installation
 
-# Or activate (Windows Command Prompt)
-.\venv\Scripts\activate.bat
-```
+#### Method B: Create Virtual Environment (Cleaner but More Steps)
 
-**Step 2: Install Python Packages**
+Create an isolated environment and install CityPhi from your installation:
 
-```powershell
-pip install -r requirements.txt
-```
+1. **Create virtual environment:**
+   ```powershell
+   cd tm2py_utils/summary/cityphi_visualization
+   
+   # Use your CityPhi Python to create the venv
+   & "C:\Program Files\Bentley\OpenPathsCITYPHI 24.01.00\Python311\python.exe" -m venv venv
+   
+   # Activate
+   .\venv\Scripts\Activate.ps1
+   ```
 
-**Step 3: Install CityPhi from EMME**
+2. **Install Python packages:**
+   ```powershell
+   pip install -r requirements.txt
+   ```
 
-CityPhi cannot be installed from PyPI. Install it from your local EMME installation:
+3. **Install CityPhi packages:**
+   
+   **For Bentley OpenPaths:**
+   ```powershell
+   # Find and install CityPhi wheels
+   pip install "C:\Program Files\Bentley\OpenPathsCITYPHI 24.01.00\Python311\Lib\site-packages\cityphi_"*.whl
+   ```
+   
+   **For EMME:**
+   ```powershell
+   pip install "C:\Program Files\INRO\Emme\Emme 4.6.2\Python312-64\Lib\site-packages\cityphi_"*.whl
+   ```
 
-```powershell
-# Find your EMME installation path - common locations:
-# C:\Program Files\INRO\Emme\Emme 4.6.2\Python312-64\Lib\site-packages\
-# C:\Program Files\INRO\Emme\Emme 4.6.1\Python311-64\Lib\site-packages\
+**Pros:** Clean, isolated environment
+**Cons:** More setup steps, need to locate CityPhi wheel files
 
-# Install all CityPhi packages (adjust path to your EMME version)
-pip install "C:\Program Files\INRO\Emme\Emme 4.6.2\Python312-64\Lib\site-packages\cityphi_emme-"*.whl
-pip install "C:\Program Files\INRO\Emme\Emme 4.6.2\Python312-64\Lib\site-packages\cityphi_engine-"*.whl
-pip install "C:\Program Files\INRO\Emme\Emme 4.6.2\Python312-64\Lib\site-packages\cityphi_studio-"*.whl
+### Step 3: Verify Installation
 
-# Or install all at once with wildcard:
-pip install "C:\Program Files\INRO\Emme\Emme 4.6.2\Python312-64\Lib\site-packages\cityphi_"*.whl
-```
-
-**Step 4: Verify Installation**
-
-Open the notebook and run the first code cell to verify all packages are installed correctly.
-
-### Alternative: Use Existing Environment
-
-If you already have an environment with CityPhi installed:
-1. Activate that environment
-2. Install any missing packages: `pip install -r requirements.txt`
-3. Select that kernel when running the notebook
+Open the notebook and run the first code cell (cell 8) - it will verify all packages are installed correctly.
 
 ## Data Requirements
 
