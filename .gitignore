@@ -11,6 +11,7 @@ __pycache__/
 .Ruserdata
 *.dll
 *.exe
+*.html
 
 # Virtual environments
 .venv/
