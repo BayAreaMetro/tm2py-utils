@@ -22,7 +22,7 @@ CATEGORICAL_ORDER = {}
 DATASET_ORDER = []
 
 try:
-    variable_labels_path = Path(__file__).parent / "data_model" / "variable_labels.yaml"
+    variable_labels_path = Path(__file__).parent.parent / "data_model" / "variable_labels.yaml"
     if variable_labels_path.exists():
         with open(variable_labels_path, 'r', encoding='utf-8') as f:
             config = yaml.safe_load(f) or {}

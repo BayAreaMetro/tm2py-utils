@@ -1,0 +1,73 @@
+﻿header:
+  tab: Tours
+  title: Tour Pattern Statistics
+  description: Tour frequency, mode choice, distance, and duration (multi-run comparison)
+layout:
+  tour_patterns:
+  - type: bar
+    title: Tours by Purpose - Share
+    props:
+      dataset: tour_frequency_by_purpose.csv
+      x: tour_purpose
+      y: share
+      groupBy: dataset
+    description: 'Share: tours by purpose'
+  - type: bar
+    title: Tours by Purpose - Total
+    props:
+      dataset: tour_frequency_by_purpose.csv
+      x: tour_purpose
+      y: tours
+      groupBy: dataset
+    description: 'Total: tours by purpose'
+  - type: bar
+    title: Tours by Distance - Share
+    props:
+      dataset: tour_distance.csv
+      x: tour_distance_bin
+      y: share
+      groupBy: dataset
+    description: 'Share: tour distance distribution'
+  - type: bar
+    title: Tours by Distance - Total
+    props:
+      dataset: tour_distance.csv
+      x: tour_distance_bin
+      y: tours
+      groupBy: dataset
+    description: 'Total: tour distance distribution'
+  mode_choice:
+  - type: bar
+    title: Tours by Mode - Share
+    props:
+      dataset: tour_mode_choice_aggregated.csv
+      x: tour_mode_agg
+      y: share
+      groupBy: dataset
+    description: 'Share: tour mode distribution (aggregated categories)'
+  - type: bar
+    title: Tours by Mode - Total
+    props:
+      dataset: tour_mode_choice_aggregated.csv
+      x: tour_mode_agg
+      y: tours
+      groupBy: dataset
+    description: 'Total: tour mode distribution (aggregated categories)'
+  - type: bar
+    title: Tour Mode by Purpose - Share
+    props:
+      dataset: tour_mode_by_purpose_aggregated.csv
+      x: tour_purpose
+      y: share
+      columns: tour_mode_agg
+      groupBy: dataset
+    description: 'Share: mode choice by tour purpose (aggregated categories)'
+  - type: bar
+    title: Tour Mode by Purpose - Total
+    props:
+      dataset: tour_mode_by_purpose_aggregated.csv
+      x: tour_purpose
+      y: tours
+      columns: tour_mode_agg
+      groupBy: dataset
+    description: 'Total: mode choice by tour purpose (aggregated categories)'
