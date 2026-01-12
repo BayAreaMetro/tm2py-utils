@@ -657,12 +657,15 @@ value_mappings:
       - "INDIVIDUAL_NON_MANDATORY"
       - "AT_WORK"
   
-  # Transportation Mode (17-mode standardized dictionary)
-  # Source: https://bayareametro.github.io/tm2py/ctramp-outputs/data-dictionaries/#mode-dictionary
+  # Transportation Mode Dictionary
+  # Supports both TM1 (21 modes) and TM2 (17 modes) formats
+  # TM2 Source: https://bayareametro.github.io/tm2py/ctramp-outputs/data-dictionaries/#mode-dictionary
+  # TM1 Source: https://github.com/BayAreaMetro/modeling-website/wiki/DataDictionary
   # Used for both tour_mode and trip_mode
   transportation_mode:
     type: categorical
     values:
+      # Modes 1-17: TM2 Standard (also present in TM1)
       1: "SOV_GP - Single Occupant Vehicle (General Purpose)"
       2: "SOV_PAY - Single Occupant Vehicle (Express/Toll)"
       3: "SR2_GP - Shared Ride 2 (General Purpose)"
@@ -680,6 +683,11 @@ value_mappings:
       15: "TAXI - Taxi"
       16: "TNC - Transportation Network Company"
       17: "SCHLBUS - School Bus"
+      # Modes 18-21: TM1 Legacy (for backward compatibility with TM1 CTRAMP format)
+      18: "WLK_LOC - Walk to Local Transit"
+      19: "WLK_LRF - Walk to Light Rail/Ferry"
+      20: "WLK_EXP - Walk to Express Bus"
+      21: "WLK_HVY - Walk to Heavy Rail"
 
 # ==============================================================================
 # AGGREGATION SPECS - Simplify categorical variables by grouping values
@@ -687,7 +695,8 @@ value_mappings:
 # Similar to binning for continuous variables, but for categorical variables
 # This allows you to reduce granular categories into broader groups for analysis
 aggregation_specs:
-  # Aggregate 17 transportation modes into simpler categories
+  # Aggregate transportation modes into simpler categories
+  # Supports both TM1 (21 modes) and TM2 (17 modes) formats
   # Applied to tour_mode and trip_mode columns
   transportation_mode:
     # Map from original value (or ID) to aggregated category
@@ -702,13 +711,18 @@ aggregation_specs:
       8: "Auto - Shared"        # SR3_PAY
       9: "Active"               # WALK
       10: "Active"              # BIKE
-      11: "Transit"             # WLK_TRN
+      11: "Transit"             # WLK_TRN (TM2) / WLK_LOC (TM1)
       12: "Transit"             # PNR_TRN
       13: "Transit"             # KNRPRV_TRN
       14: "Transit"             # KNRTNC_TRN
       15: "TNC/Taxi"            # TAXI
       16: "TNC/Taxi"            # TNC
       17: "School Bus"          # SCHLBUS
+      # TM1 Legacy modes (18-21)
+      18: "Transit"             # WLK_LOC - Walk to Local Transit
+      19: "Transit"             # WLK_LRF - Walk to Light Rail/Ferry
+      20: "Transit"             # WLK_EXP - Walk to Express Bus
+      21: "Transit"             # WLK_HVY - Walk to Heavy Rail
     # Columns to apply this aggregation to
     apply_to:
       - tour_mode

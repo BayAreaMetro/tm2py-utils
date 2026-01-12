@@ -11,13 +11,6 @@ __pycache__/
 .Ruserdata
 *.dll
 *.exe
-*.html
-
-# Virtual environments
-.venv/
-venv/
-env/
-ENV/
 
 # MkDocs build output
 site/

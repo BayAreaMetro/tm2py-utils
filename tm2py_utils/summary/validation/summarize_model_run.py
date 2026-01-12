@@ -69,6 +69,7 @@ def load_data_model() -> Dict[str, Any]:
 def find_latest_iteration_file(ctramp_dir: Path, pattern: str) -> Optional[Path]:
     """
     Find the file matching the pattern with the highest iteration number.
+    Supports both model format (personData_{iteration}.csv) and survey format (PersonData.csv).
     
     Args:
         ctramp_dir: Directory containing CTRAMP output files
@@ -86,10 +87,24 @@ def find_latest_iteration_file(ctramp_dir: Path, pattern: str) -> Optional[Path]
     base = pattern.split('{iteration}')[0]
     ext = pattern.split('{iteration}')[1]
     
-    # Find all matching files
+    # Find all matching files with iteration numbers (model format)
     matches = list(ctramp_dir.glob(f"{base}*{ext}"))
     
+    # If no matches with iteration, try survey format (CamelCase, no iteration)
     if not matches:
+        # Try converting to CamelCase survey format
+        # e.g., "personData_" -> "PersonData"
+        survey_patterns = [
+            base.rstrip('_'),  # Remove trailing underscore
+            base.rstrip('_').title().replace('Data', 'Data'),  # Title case
+            base.rstrip('_')[0].upper() + base.rstrip('_')[1:],  # Capitalize first letter
+        ]
+        
+        for survey_base in survey_patterns:
+            survey_file = ctramp_dir / f"{survey_base}{ext}"
+            if survey_file.exists():
+                return survey_file
+        
         return None
     
     # If there's only one match, return it
