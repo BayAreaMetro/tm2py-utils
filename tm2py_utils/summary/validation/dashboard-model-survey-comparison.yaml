@@ -1,0 +1,114 @@
+header:
+  tab: Model vs Survey
+  title: Model vs Survey Comparison
+  description: Compare TM1 model outputs with BATS survey data
+
+layout:
+  household_patterns:
+  - type: bar
+    title: Household Size Distribution - Share
+    props:
+      dataset: household_size_distribution.csv
+      x: num_persons
+      y: share
+      groupBy: dataset
+    description: 'Share: households by number of persons'
+  - type: bar
+    title: Household Size Distribution - Total
+    props:
+      dataset: household_size_distribution.csv
+      x: num_persons
+      y: households
+      groupBy: dataset
+    description: 'Total: household counts by size'
+  
+  auto_ownership:
+  - type: bar
+    title: Auto Ownership - Share
+    props:
+      dataset: auto_ownership_regional.csv
+      x: num_vehicles
+      y: share
+      groupBy: dataset
+    description: 'Share: households by number of vehicles owned'
+  - type: bar
+    title: Auto Ownership by Household Size - Share
+    props:
+      dataset: auto_ownership_by_household_size.csv
+      x: num_vehicles
+      y: share
+      groupBy: dataset
+      facet: num_persons_agg
+    description: 'Share: auto ownership by household size'
+  
+  workers:
+  - type: bar
+    title: Worker Distribution - Share
+    props:
+      dataset: worker_distribution.csv
+      x: num_workers
+      y: share
+      groupBy: dataset
+    description: 'Share: households by number of workers'
+  - type: bar
+    title: Worker Distribution - Total
+    props:
+      dataset: worker_distribution.csv
+      x: num_workers
+      y: households
+      groupBy: dataset
+    description: 'Total: household counts by workers'
+  
+  person_characteristics:
+  - type: bar
+    title: Person Type Distribution - Share
+    props:
+      dataset: person_type_distribution.csv
+      x: person_type_name
+      y: share
+      groupBy: dataset
+    description: 'Share: persons by type'
+  - type: bar
+    title: Age Distribution - Share
+    props:
+      dataset: age_distribution.csv
+      x: age_bin
+      y: share
+      groupBy: dataset
+    description: 'Share: persons by age group'
+  
+  tour_patterns:
+  - type: bar
+    title: Tour Frequency by Purpose - Share
+    props:
+      dataset: tour_frequency_by_purpose.csv
+      x: tour_purpose
+      y: share
+      groupBy: dataset
+    description: 'Share: tours by purpose'
+  - type: bar
+    title: Tour Mode Choice - Share
+    props:
+      dataset: tour_mode_aggregated.csv
+      x: tour_mode_agg
+      y: share
+      groupBy: dataset
+    description: 'Share: tours by mode (aggregated)'
+  
+  trip_patterns:
+  - type: bar
+    title: Trip Purpose Distribution - Share
+    props:
+      dataset: trip_purpose_distribution.csv
+      x: destination_purpose
+      y: share
+      groupBy: dataset
+    description: 'Share: trips by purpose'
+  - type: bar
+    title: Trip Mode Choice - Share
+    props:
+      dataset: trip_mode_aggregated.csv
+      x: trip_mode_agg
+      y: share
+      groupBy: dataset
+    description: 'Share: trips by mode (aggregated)'
