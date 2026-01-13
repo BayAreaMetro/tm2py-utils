@@ -48,17 +48,57 @@ Example:
 python summarize_model_run.py "A:/2023-tm22-dev-version-05/ctramp_output" --output "C:/summaries/2023_v05"
 ```
 
+### Specify Data Model Configuration
+
+```bash
+python summarize_model_run.py <ctramp_dir> --config <config_file>
+```
+
+**Use this when you need a different data model:**
+
+```bash
+# TM1 model or BATS survey (default - no flag needed)
+python summarize_model_run.py "M:/Model_One/OUTPUT/ctramp_csv"
+
+# TM2 model (requires explicit config)
+python summarize_model_run.py "M:/Model_Two/OUTPUT/ctramp" --config data_model/tm2_data_model.yaml
+
+# Custom config for specialized analysis
+python summarize_model_run.py "E:/my_model/output" --config my_custom_config.yaml
+```
+
+**Available configs:**
+- `ctramp_data_model.yaml` (default) - TM1 format, also works for BATS survey data
+- `tm2_data_model.yaml` - TM2 format (when created)
+- `survey_data_model.yaml` - Specialized survey config (when needed)
+
+**The config file determines:**
+- File naming patterns (e.g., `personData_1.csv` vs `personData.csv`)
+- Geography system (TAZ vs MGRA)
+- Time representation (hour vs period)
+- Mode definitions (17 vs 21 modes)
+- Available summaries
+
 ## What Happens When You Run It
 
 The tool executes a simple 6-step pipeline with transparent logging:
 
 ### Step 1: Load Data Model Configuration
-Reads `data_model/ctramp_data_model.yaml` which defines:
-- File patterns to find (e.g., `personData_{iteration}.csv`)
-- Column name mappings (e.g., `hh_id` → `household_id`)
-- Value labels (e.g., mode 1 → "SOV_GP")
-- Binning specs (e.g., age → age groups)
-- Summary definitions (what to calculate)
+Reads the config file (default: `data_model/ctramp_data_model.yaml`, or specify with `--config`) which defines:
+- **Metadata**: Model type (TM1/TM2/survey), version, description
+- **File patterns**: How to find files (e.g., `personData_{iteration}.csv` vs `personData.csv`)
+- **Column mappings**: Standardize column names (e.g., `hh_id` → `household_id`)
+- **Value labels**: Human-readable labels (e.g., mode 1 → "SOV_GP")
+- **Binning specs**: Group continuous variables (e.g., age → age groups)
+- **Summary definitions**: What to calculate (30 summaries defined)
+
+Example output:
+```
+Config File: ctramp_data_model.yaml
+Data Model Type: tm1
+Version: 1.0
+Description: TM1 (Travel Model One) CTRAMP output format - also compatible with BATS survey data
+```
 
 ### Step 2: Load CTRAMP Output Files
 - Finds files matching patterns in your directory

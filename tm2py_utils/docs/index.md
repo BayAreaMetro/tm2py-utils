@@ -35,8 +35,11 @@ See [Installation Guide](install.md) for detailed instructions.
 # Navigate to validation directory
 cd tm2py_utils/summary/validation
 
-# Generate summaries for a model run
+# Generate summaries for TM1 model or BATS survey (uses default config)
 python summarize_model_run.py "C:/path/to/ctramp_output"
+
+# Generate summaries for TM2 model (specify config)
+python summarize_model_run.py "C:/path/to/ctramp_output" --config data_model/tm2_data_model.yaml
 
 # View summaries (use Excel, Python, R, or other analysis tools)
 ```

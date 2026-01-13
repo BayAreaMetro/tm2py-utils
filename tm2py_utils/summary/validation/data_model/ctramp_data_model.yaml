@@ -2,6 +2,12 @@
 # This file defines the entire data model separate from code
 # Customize this for your specific ABM implementation
 
+# Metadata
+metadata:
+  data_model_type: "tm1"  # Options: tm2, tm1, survey
+  version: "1.0"
+  description: "TM1 (Travel Model One) CTRAMP output format - also compatible with BATS survey data"
+
 # ==============================================================================
 # INPUT SCHEMA - Define what your actual CSV files look like
 # ==============================================================================

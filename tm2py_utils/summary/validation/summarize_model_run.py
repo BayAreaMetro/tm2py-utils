@@ -43,10 +43,13 @@ INFO = '[INFO]'
 INFO = '[INFO]'
 
 
-def load_data_model() -> Dict[str, Any]:
+def load_data_model(config_path: Optional[Path] = None) -> Dict[str, Any]:
     """
     Load the CTRAMP data model configuration from YAML.
     This defines file patterns, column mappings, value labels, and summaries.
+    
+    Args:
+        config_path: Path to config file. If None, uses default ctramp_data_model.yaml
     
     Returns:
         Dictionary containing complete data model configuration
@@ -55,11 +58,29 @@ def load_data_model() -> Dict[str, Any]:
     logger.info("STEP 1: Loading Data Model Configuration")
     logger.info("=" * 80)
     
-    config_path = Path(__file__).parent / 'data_model' / 'ctramp_data_model.yaml'
-    logger.info(f"Reading: {config_path}")
+    # Use provided path or default
+    if config_path is None:
+        config_path = Path(__file__).parent / 'data_model' / 'ctramp_data_model.yaml'
+    
+    logger.info(f"Config File: {config_path}")
+    
+    if not config_path.exists():
+        logger.error(f"{ERROR} Config file not found: {config_path}")
+        sys.exit(1)
     
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
+    
+    # Extract and display metadata
+    metadata = config.get('metadata', {})
+    data_model_type = metadata.get('data_model_type', 'unknown')
+    version = metadata.get('version', 'unknown')
+    description = metadata.get('description', '')
+    
+    logger.info(f"Data Model Type: {data_model_type}")
+    logger.info(f"Version: {version}")
+    if description:
+        logger.info(f"Description: {description}")
     
     logger.info(f"{CHECK} Loaded configuration with {len(config.get('summaries', {}))} summary definitions")  
     logger.info("")
@@ -655,6 +676,8 @@ def main():
     )
     parser.add_argument('ctramp_dir', type=str, help='Path to CTRAMP output directory')
     parser.add_argument('--output', type=str, help='Output directory for summaries (default: ./summaries)')
+    parser.add_argument('--config', type=str, 
+                        help='Path to data model config YAML file (default: ctramp_data_model.yaml)')
     parser.add_argument('--enriched', action = 'store_true', help = 'Use enriched output mode')
 
     args = parser.parse_args()
@@ -662,6 +685,7 @@ def main():
     # Convert paths
     ctramp_dir = Path(args.ctramp_dir)
     output_dir = Path(args.output) if args.output else Path('./summaries')
+    config_path = Path(args.config) if args.config else None
     
     # Validate input directory
     if not ctramp_dir.exists():
@@ -677,7 +701,7 @@ def main():
     # Execute processing pipeline
     try:
         # 1. Load data model configuration
-        data_model = load_data_model()
+        data_model = load_data_model(config_path)
         
         # 2. Load CTRAMP files
 

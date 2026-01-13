@@ -7,10 +7,19 @@ Simple, transparent tools for summarizing and validating activity-based travel m
 **Summarize a model run in one command:**
 
 ```bash
+# TM1 model or BATS survey (uses default config)
 python summarize_model_run.py "C:/model_runs/2015_base/ctramp_output"
+
+# TM2 model (specify TM2 config)
+python summarize_model_run.py "C:/model_runs/2023_tm2/ctramp_output" --config data_model/tm2_data_model.yaml
 ```
 
 This generates CSV summaries (auto ownership, tour mode, trip distance, etc.) from your CTRAMP output directory.
+
+**Which config to use?**
+- **TM1 Model** or **BATS Survey**: Use default (no `--config` needed) - uses `ctramp_data_model.yaml` (TM1 format)
+- **TM2 Model**: Add `--config data_model/tm2_data_model.yaml`
+- **Custom**: Create your own YAML config and specify with `--config`
 
 **Automatic validation** runs after summarization to check for:
 - Shares that don't sum to 1.0

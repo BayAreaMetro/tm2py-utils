@@ -29,11 +29,14 @@ The summary generation system reads raw CTRAMP outputs (CSV files) and produces 
 ```bash
 cd tm2py_utils/summary/validation
 
-# Generate all summaries for one model run
+# TM1 model or BATS survey (uses default config)
 python summarize_model_run.py "C:/path/to/ctramp_output"
+
+# TM2 model (specify TM2 config)
+python summarize_model_run.py "C:/path/to/ctramp_output" --config data_model/tm2_data_model.yaml
 ```
 
-Summaries are saved to `outputs/` by default.
+Summaries are saved to `summaries/` by default.
 
 ### 2. Specify Custom Output Location
 
@@ -41,12 +44,32 @@ Summaries are saved to `outputs/` by default.
 python summarize_model_run.py "C:/path/to/ctramp_output" --output "my_results"
 ```
 
-### 3. Enable Strict Validation
-
-Treat validation warnings as errors:
+### 3. Use Different Data Model Configuration
 
 ```bash
-python summarize_model_run.py "C:/path/to/ctramp_output" --strict
+# Available configs:
+# - ctramp_data_model.yaml (default) - TM1 format, also works for BATS survey
+# - tm2_data_model.yaml - TM2 format
+# - survey_data_model.yaml - Specialized survey config
+# - custom.yaml - Your own custom configuration
+
+python summarize_model_run.py "C:/path/to/ctramp_output" --config my_custom_config.yaml
+```
+
+**The config file determines:**
+
+- **Metadata**: Model type (TM1/TM2/survey), version, description
+- **File patterns**: How to find files (e.g., `personData_{iteration}.csv` vs `personData.csv`)
+- **Geography system**: TAZ (TM1) vs MGRA (TM2)
+- **Time representation**: Hour (TM1) vs period (TM2)
+- **Mode definitions**: 21 modes (TM1) vs 17 modes (TM2)
+- **Available summaries**: Which summaries can be generated
+
+### 4. Combine Options
+
+```bash
+# TM2 model with custom output directory
+python summarize_model_run.py "C:/path/to/tm2_output" --config data_model/tm2_data_model.yaml --output "results/tm2_summaries"
 ```
 
 ---

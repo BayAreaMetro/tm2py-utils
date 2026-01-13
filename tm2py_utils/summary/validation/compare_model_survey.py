@@ -126,11 +126,11 @@ def main():
     # Data directory inputs
     survey_dir = st.sidebar.text_input(
         "Survey Summaries Directory",
-        value=r"E:\processed_bats_tm1\summaries"
+        value=r"E:\processed_bats_tm1\summaries_test"
     )
     model_dir = st.sidebar.text_input(
         "Model Summaries Directory",
-        value=r"M:\Application\Model One\RTP2025\IncrementalProgress\2023_TM161_IPA_35\OUTPUT\summaries"
+        value=r"M:\Application\Model One\RTP2025\IncrementalProgress\2023_TM161_IPA_35\OUTPUT\summaries_test"
     )
     
     survey_path = Path(survey_dir)

@@ -1,6 +1,6 @@
 # CTRAMP Data Model Reference
 
-This document describes the **required data format** for the validation summary system. All input data must conform to this structure, whether from model outputs or household travel surveys.
+This document describes the **data formats** supported by the validation summary system. The system supports multiple model formats (TM1, TM2) and survey data through configuration files.
 
 ## Overview
 
@@ -13,11 +13,37 @@ The CTRAMP (Coordinated Travel-Regional Activity Modeling Platform) data model c
 
 These tables have a **hierarchical relationship**: households contain persons, persons make tours, tours consist of trips.
 
+## Data Model Configuration
+
+The system uses **YAML configuration files** to adapt to different data formats. The config file specifies:
+
+- **Metadata**: Model type (TM1/TM2/survey), version, description
+- **File patterns**: Expected filenames (e.g., `personData_1.csv` vs `personData.csv`)
+- **Column mappings**: How to standardize column names
+- **Value labels**: Decode numeric codes to readable labels
+- **Geography system**: TAZ (TM1) vs MGRA (TM2)
+- **Mode definitions**: 21 modes (TM1) vs 17 modes (TM2)
+
+**Available configs:**
+
+- `ctramp_data_model.yaml` (default) - **TM1 format**, also compatible with BATS survey data
+- `tm2_data_model.yaml` - TM2 format with MGRA geography and 48 time periods
+- `survey_data_model.yaml` - Specialized for travel survey data
+
+**Usage:**
+```bash
+# TM1 or survey (default)
+python summarize_model_run.py "path/to/output"
+
+# TM2 (explicit config)
+python summarize_model_run.py "path/to/output" --config data_model/tm2_data_model.yaml
+```
+
 ## Core Data Files
 
-### Required Files
+### TM1 Format (Default)
 
-The system expects these files in each model output directory:
+Expected files for TM1 models and BATS survey:
 
 | File Pattern | Description | Required |
 |-------------|-------------|----------|
@@ -27,7 +53,29 @@ The system expects these files in each model output directory:
 | `indivTripData_{iteration}.csv` | Individual trip segments | ✅ |
 | `wsLocResults.csv` | Workplace and school location choices | ⚠️ Optional |
 
-**Note**: `{iteration}` is typically `1` for final model outputs (e.g., `householdData_1.csv`).
+**TM1-specific features:**
+- Geography: **TAZ** (Traffic Analysis Zones, ~1,454 zones)
+- Time: **Hour of day** (0-23) in `start_hour`, `end_hour`
+- Modes: **21 transportation modes** (includes detailed transit submodes)
+- File pattern: May use `_final` suffix instead of iteration number
+
+### TM2 Format
+
+Expected files for TM2 models (when using `--config data_model/tm2_data_model.yaml`):
+
+| File Pattern | Description | Required |
+|-------------|-------------|----------|
+| `householdData_{iteration}.csv` | Same structure, different geography | ✅ |
+| `personData_{iteration}.csv` | Same structure | ✅ |
+| `indivTourData_{iteration}.csv` | Different time/geography columns | ✅ |
+| `indivTripData_{iteration}.csv` | Different time/geography columns | ✅ |
+
+**TM2-specific features:**
+- Geography: **MGRA** (Micro Geographic Analysis Zones, ~40,000 zones)
+- Time: **Half-hour periods** (1-48) in `start_period`, `end_period`
+- Modes: **17 transportation modes** (consolidated transit modes)
+
+**Note**: `{iteration}` is typically `1` for final model outputs (e.g., `householdData_1.csv`). The system auto-detects the highest iteration if multiple exist.
 
 ### Geography Reference File
 
