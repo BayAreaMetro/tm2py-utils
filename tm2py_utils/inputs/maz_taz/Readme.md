@@ -64,6 +64,9 @@ The shapefiles have the following fields:
 
 ## Revision History
 
+### Version 2.6
+* Updated the MAZ/TAZ boundaries to reflect edits/feedback fron Sonoma County and San Mateo/Santa Clara
+
 ### Version 2.5
 * Manual fixes incorporated into [blocks_mazs_tazs_2.5](blocks_mazs_tazs_2.3.csv). Fixes were to addresses MAZs that were nested within another MAZ. See [excel](https://mtcdrive.box.com/s/rg8k2rcs39y45l3do82gmdsyk8jrslm2) for more details about the changes made.
 
