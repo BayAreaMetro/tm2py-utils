@@ -1,15 +1,15 @@
-01/20/2026 12:34:41 PM - INFO - Reading M:\Data\Census\Geography\tl_2020_06_tabblock10\tl_2020_06_tabblock10_9CBA.shp; Read 109,228 rows
-01/20/2026 12:34:41 PM - DEBUG -   STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10   ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry
+01/28/2026 02:53:30 PM - INFO - Reading M:\Data\Census\Geography\tl_2020_06_tabblock10\tl_2020_06_tabblock10_9CBA.shp; Read 109,228 rows
+01/28/2026 02:53:30 PM - DEBUG -   STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10   ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry
 0        06        055    201700      4004  060552017004004  Block 4004   G5040    R   None   None          S   3905437     25696  +38.6157155  -122.4410306  POLYGON ((-122.46066 38.61807, -122.46062 38.6...
 1        06        055    201700      1013  060552017001013  Block 1013   G5040    R   None   None          S  18373208      5143  +38.5070999  -122.3259045  POLYGON ((-122.35414 38.50768, -122.35408 38.5...
 2        06        055    201700      4007  060552017004007  Block 4007   G5040    R   None   None          S   2002844     10132  +38.6007413  -122.4727415  POLYGON ((-122.4883 38.59902, -122.48826 38.60...
 3        06        055    201700      4023  060552017004023  Block 4023   G5040    R   None   None          S   2057198     46714  +38.5912077  -122.4592519  POLYGON ((-122.47466 38.59312, -122.47346 38.5...
 4        06        055    201403      1023  060552014031023  Block 1023   G5040    R   None   None          S  20642906     45470  +38.3680728  -122.1517456  POLYGON ((-122.1789 38.38562, -122.17748 38.38...
-01/20/2026 12:34:41 PM - INFO - Reading crosswalk file: blocks_mazs_tazs_2.6.csv
-01/20/2026 12:34:41 PM - INFO - Starting iteration 1 of 5
-01/20/2026 12:34:41 PM - INFO - Join block shapefile to crosswalk csv resulting in 109224 rows
-01/20/2026 12:34:41 PM - DEBUG - blocks_maz_gdf.type:<class 'geopandas.geodataframe.GeoDataFrame'>
-01/20/2026 12:34:41 PM - DEBUG - blocks_maz_gdf.dtypes:
+01/28/2026 02:53:30 PM - INFO - Reading crosswalk file: blocks_mazs_tazs_2.6.csv
+01/28/2026 02:53:30 PM - INFO - Starting iteration 1 of 5
+01/28/2026 02:53:30 PM - INFO - Join block shapefile to crosswalk csv resulting in 109224 rows
+01/28/2026 02:53:30 PM - DEBUG - blocks_maz_gdf.type:<class 'geopandas.geodataframe.GeoDataFrame'>
+01/28/2026 02:53:30 PM - DEBUG - blocks_maz_gdf.dtypes:
 STATEFP10       object
 COUNTYFP10      object
 TRACTCE10       object
@@ -29,76 +29,76 @@ geometry      geometry
 maz              int64
 taz              int64
 dtype: object
-01/20/2026 12:34:41 PM - INFO - blocks_maz_df has length 109,224
-01/20/2026 12:34:41 PM - DEBUG - 
+01/28/2026 02:53:30 PM - INFO - blocks_maz_df has length 109,224
+01/28/2026 02:53:30 PM - DEBUG - 
   STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10   ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 0        06        055    201700      4004  060552017004004  Block 4004   G5040    R   None   None          S   3905437     25696  +38.6157155  -122.4410306  POLYGON ((-122.46066 38.61807, -122.46062 38.6...  610054  600102  060552017004   06055201700          06055
 1        06        055    201700      1013  060552017001013  Block 1013   G5040    R   None   None          S  18373208      5143  +38.5070999  -122.3259045  POLYGON ((-122.35414 38.50768, -122.35408 38.5...  611025  600006  060552017001   06055201700          06055
 2        06        055    201700      4007  060552017004007  Block 4007   G5040    R   None   None          S   2002844     10132  +38.6007413  -122.4727415  POLYGON ((-122.4883 38.59902, -122.48826 38.60...  610857  600102  060552017004   06055201700          06055
 3        06        055    201700      4023  060552017004023  Block 4023   G5040    R   None   None          S   2057198     46714  +38.5912077  -122.4592519  POLYGON ((-122.47466 38.59312, -122.47346 38.5...  611028  600102  060552017004   06055201700          06055
 4        06        055    201403      1023  060552014031023  Block 1023   G5040    R   None   None          S  20642906     45470  +38.3680728  -122.1517456  POLYGON ((-122.1789 38.38562, -122.17748 38.38...  610051  600097  060552014031   06055201403          06055
-01/20/2026 12:34:41 PM - INFO - Reading E:\GitHub\tm2\tm2py-utils\tm2py_utils\inputs\maz_taz\tl_2020_06_tabblock10_9CBA_neighbors.csv
-01/20/2026 12:34:42 PM - DEBUG - blocks_neighbor_df has length 725774
-01/20/2026 12:34:42 PM - DEBUG - 
+01/28/2026 02:53:30 PM - INFO - Reading E:\GitHub\tm2\tm2py-utils\tm2py_utils\inputs\maz_taz\tl_2020_06_tabblock10_9CBA_neighbors.csv
+01/28/2026 02:53:31 PM - DEBUG - blocks_neighbor_df has length 725774
+01/28/2026 02:53:31 PM - DEBUG - 
        src_GEOID10      nbr_GEOID10  LENGTH  NODE_COUNT nbr_GEOID10_BG          GEOID10       maz       taz
 0  060014001001000  060014001001001 1838.32           0   060014001001  060014001001001 333453.00 301054.00
 1  060014001001000  060014001001002 1291.63           0   060014001001  060014001001002 333453.00 301054.00
 2  060014001001000  060014001001003  148.32           0   060014001001  060014001001003 333453.00 301054.00
 3  060014001001000  060014001001004  560.54           0   060014001001  060014001001004 333453.00 301054.00
 4  060014001001000  060014001001005  180.17           0   060014001001  060014001001005 333453.00 301054.00
-01/20/2026 12:34:42 PM - INFO - Number of unique GEOID10: 109224
-01/20/2026 12:34:42 PM - INFO -   Min: 060014001001000
-01/20/2026 12:34:42 PM - INFO -   Max: 060979901000010
-01/20/2026 12:34:42 PM - INFO - 
-01/20/2026 12:34:42 PM - INFO - Number of unique maz: 41424
-01/20/2026 12:34:42 PM - INFO -    Min: 10001
-01/20/2026 12:34:42 PM - INFO -    Max: 814506
-01/20/2026 12:34:42 PM - INFO - 
-01/20/2026 12:34:42 PM - INFO - Number of unique taz: 5116
-01/20/2026 12:34:42 PM - INFO -    Min: 1
-01/20/2026 12:34:42 PM - INFO -    Max: 800210
-01/20/2026 12:34:42 PM - INFO - 
-01/20/2026 12:34:42 PM - INFO - Verified one taz per maz
-01/20/2026 12:34:42 PM - INFO - Verified one GEOID10_COUNTY per maz
-01/20/2026 12:34:42 PM - WARNING - Multiple GEOID10_TRACT for a single maz: 1
-01/20/2026 12:34:42 PM - WARNING - 
+01/28/2026 02:53:31 PM - INFO - Number of unique GEOID10: 109224
+01/28/2026 02:53:31 PM - INFO -   Min: 060014001001000
+01/28/2026 02:53:31 PM - INFO -   Max: 060979901000010
+01/28/2026 02:53:31 PM - INFO - 
+01/28/2026 02:53:31 PM - INFO - Number of unique maz: 41434
+01/28/2026 02:53:31 PM - INFO -    Min: 10001
+01/28/2026 02:53:31 PM - INFO -    Max: 814506
+01/28/2026 02:53:31 PM - INFO - 
+01/28/2026 02:53:31 PM - INFO - Number of unique taz: 5116
+01/28/2026 02:53:31 PM - INFO -    Min: 1
+01/28/2026 02:53:31 PM - INFO -    Max: 800210
+01/28/2026 02:53:31 PM - INFO - 
+01/28/2026 02:53:31 PM - INFO - Verified one taz per maz
+01/28/2026 02:53:31 PM - INFO - Verified one GEOID10_COUNTY per maz
+01/28/2026 02:53:31 PM - WARNING - Multiple GEOID10_TRACT for a single maz: 1
+01/28/2026 02:53:31 PM - WARNING - 
         GEOID10_TRACT
 maz                  
 718685              2
-01/20/2026 12:34:42 PM - INFO - move_small_block_to_neighbor for GEOID10_TRACT
-01/20/2026 12:34:42 PM - INFO - Attempting to fix maz 718685
-01/20/2026 12:34:42 PM - DEBUG - 
+01/28/2026 02:53:31 PM - INFO - move_small_block_to_neighbor for GEOID10_TRACT
+01/28/2026 02:53:31 PM - INFO - Attempting to fix maz 718685
+01/28/2026 02:53:31 PM - DEBUG - 
       STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10  ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 6811         06        097    151700      2027  060971517002027  Block 2027   G5040    U  79498      U          S      745         0  +38.4513053  -122.6505353  POLYGON ((-122.65069 38.45153, -122.65042 38.4...  718685  700241  060971517002   06097151700          06097
 21393        06        097    151503      3011  060971515033011  Block 3011   G5040    U  79498      U          S     9718         0  +38.4493144  -122.6504966  POLYGON ((-122.6512 38.44946, -122.65111 38.44...  718685  700241  060971515033   06097151503          06097
 22359        06        097    151700      2025  060971517002025  Block 2025   G5040    U  79498      U          S     2262         0  +38.4501556  -122.6511791  POLYGON ((-122.65182 38.44977, -122.65163 38.4...  718685  700241  060971517002   06097151700          06097
 28171        06        097    151503      3000  060971515033000  Block 3000   G5040    U  79498      U          S    11892         0  +38.4502211  -122.6505315  POLYGON ((-122.65144 38.44966, -122.65126 38.4...  718685  700241  060971515033   06097151503          06097
 92988        06        097    151700      2029  060971517002029  Block 2029   G5040    U  79498      U          S     1170         0  +38.4496373  -122.6522423  POLYGON ((-122.65312 38.44968, -122.65293 38.4...  718685  700241  060971517002   06097151700          06097
-01/20/2026 12:34:42 PM - DEBUG - group 06097151503 has 2 rows and 83.8 percent of land
-01/20/2026 12:34:42 PM - DEBUG - 
+01/28/2026 02:53:31 PM - DEBUG - group 06097151503 has 2 rows and 83.8 percent of land
+01/28/2026 02:53:31 PM - DEBUG - 
       STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10  ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 21393        06        097    151503      3011  060971515033011  Block 3011   G5040    U  79498      U          S     9718         0  +38.4493144  -122.6504966  POLYGON ((-122.6512 38.44946, -122.65111 38.44...  718685  700241  060971515033   06097151503          06097
 28171        06        097    151503      3000  060971515033000  Block 3000   G5040    U  79498      U          S    11892         0  +38.4502211  -122.6505315  POLYGON ((-122.65144 38.44966, -122.65126 38.4...  718685  700241  060971515033   06097151503          06097
-01/20/2026 12:34:42 PM - DEBUG - group 06097151700 has 3 rows and 16.2 percent of land
-01/20/2026 12:34:42 PM - DEBUG - 
+01/28/2026 02:53:31 PM - DEBUG - group 06097151700 has 3 rows and 16.2 percent of land
+01/28/2026 02:53:31 PM - DEBUG - 
       STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10  ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 6811         06        097    151700      2027  060971517002027  Block 2027   G5040    U  79498      U          S      745         0  +38.4513053  -122.6505353  POLYGON ((-122.65069 38.45153, -122.65042 38.4...  718685  700241  060971517002   06097151700          06097
 22359        06        097    151700      2025  060971517002025  Block 2025   G5040    U  79498      U          S     2262         0  +38.4501556  -122.6511791  POLYGON ((-122.65182 38.44977, -122.65163 38.4...  718685  700241  060971517002   06097151700          06097
 92988        06        097    151700      2029  060971517002029  Block 2029   G5040    U  79498      U          S     1170         0  +38.4496373  -122.6522423  POLYGON ((-122.65312 38.44968, -122.65293 38.4...  718685  700241  060971517002   06097151700          06097
-01/20/2026 12:34:42 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:43 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:43 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:43 PM - INFO - ====> moved 0 blocks to neighbor
-01/20/2026 12:34:43 PM - WARNING - Multiple GEOID10_BG for a single maz: 3
-01/20/2026 12:34:43 PM - WARNING - 
+01/28/2026 02:53:31 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:31 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:31 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:31 PM - INFO - ====> moved 0 blocks to neighbor
+01/28/2026 02:53:31 PM - WARNING - Multiple GEOID10_BG for a single maz: 3
+01/28/2026 02:53:31 PM - WARNING - 
         GEOID10_BG
 maz               
 216206           2
 411035           2
 718685           2
-01/20/2026 12:34:43 PM - INFO - move_small_block_to_neighbor for GEOID10_BG
-01/20/2026 12:34:43 PM - INFO - Attempting to fix maz 216206
-01/20/2026 12:34:43 PM - DEBUG - 
+01/28/2026 02:53:31 PM - INFO - move_small_block_to_neighbor for GEOID10_BG
+01/28/2026 02:53:31 PM - INFO - Attempting to fix maz 216206
+01/28/2026 02:53:31 PM - DEBUG - 
        STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10  ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 11906         06        085    512001      2007  060855120012007  Block 2007   G5040    U  79039      U          S     3263         0  +37.2436298  -121.7652776  POLYGON ((-121.76557 37.24401, -121.76549 37.2...  216206  200728  060855120012   06085512001          06085
 12044         06        085    512001      2002  060855120012002  Block 2002   G5040    U  79039      U          S    16684         0  +37.2457243  -121.7654735  POLYGON ((-121.76662 37.2461, -121.76644 37.24...  216206  200728  060855120012   06085512001          06085
@@ -125,8 +125,8 @@ maz
 99179         06        085    512001      1052  060855120011052  Block 1052   G5040    U  79039      U          S    24680         0  +37.2365885  -121.7556065  POLYGON ((-121.75789 37.23662, -121.75746 37.2...  216206  200728  060855120011   06085512001          06085
 103463        06        085    512001      2001  060855120012001  Block 2001   G5040    U  79039      U          S    27634         0  +37.2443967  -121.7640703  POLYGON ((-121.76504 37.24324, -121.76482 37.2...  216206  200728  060855120012   06085512001          06085
 104808        06        085    512001      1059  060855120011059  Block 1059   G5040    U  79039      U          S     4288         0  +37.2439604  -121.7721982  POLYGON ((-121.77267 37.2442, -121.77262 37.24...  216206  200728  060855120011   06085512001          06085
-01/20/2026 12:34:43 PM - DEBUG - group 060855120011 has 13 rows and 97.9 percent of land
-01/20/2026 12:34:43 PM - DEBUG - 
+01/28/2026 02:53:31 PM - DEBUG - group 060855120011 has 13 rows and 97.9 percent of land
+01/28/2026 02:53:31 PM - DEBUG - 
        STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10  ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 21509         06        085    512001      1050  060855120011050  Block 1050   G5040    U  79039      U          S    41933         0  +37.2416994  -121.7601453  POLYGON ((-121.76198 37.24175, -121.7619 37.24...  216206  200728  060855120011   06085512001          06085
 23924         06        085    512001      1056  060855120011056  Block 1056   G5040    R   None   None          S   509163         0  +37.2381222  -121.7272736  POLYGON ((-121.73696 37.23519, -121.73468 37.2...  216206  200728  060855120011   06085512001          06085
@@ -141,8 +141,8 @@ maz
 98758         06        085    512001      1047  060855120011047  Block 1047   G5040    U  79039      U          S  7441716         0  +37.2455109  -121.7489457  POLYGON ((-121.77142 37.24943, -121.77126 37.2...  216206  200728  060855120011   06085512001          06085
 99179         06        085    512001      1052  060855120011052  Block 1052   G5040    U  79039      U          S    24680         0  +37.2365885  -121.7556065  POLYGON ((-121.75789 37.23662, -121.75746 37.2...  216206  200728  060855120011   06085512001          06085
 104808        06        085    512001      1059  060855120011059  Block 1059   G5040    U  79039      U          S     4288         0  +37.2439604  -121.7721982  POLYGON ((-121.77267 37.2442, -121.77262 37.24...  216206  200728  060855120011   06085512001          06085
-01/20/2026 12:34:43 PM - DEBUG - group 060855120012 has 12 rows and 2.1 percent of land
-01/20/2026 12:34:43 PM - DEBUG - 
+01/28/2026 02:53:31 PM - DEBUG - group 060855120012 has 12 rows and 2.1 percent of land
+01/28/2026 02:53:31 PM - DEBUG - 
        STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10  ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 11906         06        085    512001      2007  060855120012007  Block 2007   G5040    U  79039      U          S     3263         0  +37.2436298  -121.7652776  POLYGON ((-121.76557 37.24401, -121.76549 37.2...  216206  200728  060855120012   06085512001          06085
 12044         06        085    512001      2002  060855120012002  Block 2002   G5040    U  79039      U          S    16684         0  +37.2457243  -121.7654735  POLYGON ((-121.76662 37.2461, -121.76644 37.24...  216206  200728  060855120012   06085512001          06085
@@ -156,20 +156,20 @@ maz
 79099         06        085    512001      2009  060855120012009  Block 2009   G5040    U  79039      U          S     3462         0  +37.2443349  -121.7650013  POLYGON ((-121.76537 37.24467, -121.7653 37.24...  216206  200728  060855120012   06085512001          06085
 82100         06        085    512001      2010  060855120012010  Block 2010   G5040    U  79039      U          S     6259         0  +37.2436699  -121.7646364  POLYGON ((-121.76515 37.24396, -121.76502 37.2...  216206  200728  060855120012   06085512001          06085
 103463        06        085    512001      2001  060855120012001  Block 2001   G5040    U  79039      U          S    27634         0  +37.2443967  -121.7640703  POLYGON ((-121.76504 37.24324, -121.76482 37.2...  216206  200728  060855120012   06085512001          06085
-01/20/2026 12:34:43 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:43 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:43 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:43 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:43 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:43 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:43 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:43 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:43 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:43 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:43 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:43 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:43 PM - INFO - Attempting to fix maz 411035
-01/20/2026 12:34:43 PM - DEBUG - 
+01/28/2026 02:53:32 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:32 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:32 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:32 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:32 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:32 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:32 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:32 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:32 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:32 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:32 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:32 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:32 PM - INFO - Attempting to fix maz 411035
+01/28/2026 02:53:32 PM - DEBUG - 
        STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10  ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 25346         06        013    380000      3022  060133800003022  Block 3022   G5040    U  78904      U          S     3601         0  +37.9150326  -122.3507655  POLYGON ((-122.35338 37.91385, -122.35308 37.9...  411035  400461  060133800003   06013380000          06013
 27225         06        013    380000      3025  060133800003025  Block 3025   G5040    U  78904      U          S     8504         0  +37.9123882  -122.3544954  POLYGON ((-122.35466 37.91049, -122.35464 37.9...  411035  400461  060133800003   06013380000          06013
@@ -177,78 +177,78 @@ maz
 81305         06        013    380000      3021  060133800003021  Block 3021   G5040    U  78904      U          S   124067         0  +37.9150409  -122.3541402  POLYGON ((-122.35593 37.9162, -122.35593 37.91...  411035  400461  060133800003   06013380000          06013
 98942         06        013    380000      3024  060133800003024  Block 3024   G5040    U  78904      U          S      181         0  +37.9165355  -122.3537033  POLYGON ((-122.35387 37.91651, -122.35363 37.9...  411035  400461  060133800003   06013380000          06013
 106968        06        013    380000      3023  060133800003023  Block 3023   G5040    U  78904      U          S     2806         0  +37.9162669  -122.3537142  POLYGON ((-122.3541 37.91627, -122.35407 37.91...  411035  400461  060133800003   06013380000          06013
-01/20/2026 12:34:43 PM - DEBUG - group 060133800001 has 1 rows and 0.3 percent of land
-01/20/2026 12:34:43 PM - DEBUG - 
+01/28/2026 02:53:32 PM - DEBUG - group 060133800001 has 1 rows and 0.3 percent of land
+01/28/2026 02:53:32 PM - DEBUG - 
       STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10  ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 45110        06        013    380000      1030  060133800001030  Block 1030   G5040    U  78904      U          S      377         0  +37.9140469  -122.3534531  POLYGON ((-122.35363 37.91432, -122.35342 37.9...  411035  400461  060133800001   06013380000          06013
-01/20/2026 12:34:43 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:43 PM - DEBUG - group 060133800003 has 5 rows and 99.7 percent of land
-01/20/2026 12:34:43 PM - DEBUG - 
+01/28/2026 02:53:32 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:32 PM - DEBUG - group 060133800003 has 5 rows and 99.7 percent of land
+01/28/2026 02:53:32 PM - DEBUG - 
        STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10  ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 25346         06        013    380000      3022  060133800003022  Block 3022   G5040    U  78904      U          S     3601         0  +37.9150326  -122.3507655  POLYGON ((-122.35338 37.91385, -122.35308 37.9...  411035  400461  060133800003   06013380000          06013
 27225         06        013    380000      3025  060133800003025  Block 3025   G5040    U  78904      U          S     8504         0  +37.9123882  -122.3544954  POLYGON ((-122.35466 37.91049, -122.35464 37.9...  411035  400461  060133800003   06013380000          06013
 81305         06        013    380000      3021  060133800003021  Block 3021   G5040    U  78904      U          S   124067         0  +37.9150409  -122.3541402  POLYGON ((-122.35593 37.9162, -122.35593 37.91...  411035  400461  060133800003   06013380000          06013
 98942         06        013    380000      3024  060133800003024  Block 3024   G5040    U  78904      U          S      181         0  +37.9165355  -122.3537033  POLYGON ((-122.35387 37.91651, -122.35363 37.9...  411035  400461  060133800003   06013380000          06013
 106968        06        013    380000      3023  060133800003023  Block 3023   G5040    U  78904      U          S     2806         0  +37.9162669  -122.3537142  POLYGON ((-122.3541 37.91627, -122.35407 37.91...  411035  400461  060133800003   06013380000          06013
-01/20/2026 12:34:43 PM - INFO - Attempting to fix maz 718685
-01/20/2026 12:34:43 PM - DEBUG - 
+01/28/2026 02:53:32 PM - INFO - Attempting to fix maz 718685
+01/28/2026 02:53:32 PM - DEBUG - 
       STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10  ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 6811         06        097    151700      2027  060971517002027  Block 2027   G5040    U  79498      U          S      745         0  +38.4513053  -122.6505353  POLYGON ((-122.65069 38.45153, -122.65042 38.4...  718685  700241  060971517002   06097151700          06097
 21393        06        097    151503      3011  060971515033011  Block 3011   G5040    U  79498      U          S     9718         0  +38.4493144  -122.6504966  POLYGON ((-122.6512 38.44946, -122.65111 38.44...  718685  700241  060971515033   06097151503          06097
 22359        06        097    151700      2025  060971517002025  Block 2025   G5040    U  79498      U          S     2262         0  +38.4501556  -122.6511791  POLYGON ((-122.65182 38.44977, -122.65163 38.4...  718685  700241  060971517002   06097151700          06097
 28171        06        097    151503      3000  060971515033000  Block 3000   G5040    U  79498      U          S    11892         0  +38.4502211  -122.6505315  POLYGON ((-122.65144 38.44966, -122.65126 38.4...  718685  700241  060971515033   06097151503          06097
 92988        06        097    151700      2029  060971517002029  Block 2029   G5040    U  79498      U          S     1170         0  +38.4496373  -122.6522423  POLYGON ((-122.65312 38.44968, -122.65293 38.4...  718685  700241  060971517002   06097151700          06097
-01/20/2026 12:34:43 PM - DEBUG - group 060971515033 has 2 rows and 83.8 percent of land
-01/20/2026 12:34:43 PM - DEBUG - 
+01/28/2026 02:53:32 PM - DEBUG - group 060971515033 has 2 rows and 83.8 percent of land
+01/28/2026 02:53:32 PM - DEBUG - 
       STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10  ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 21393        06        097    151503      3011  060971515033011  Block 3011   G5040    U  79498      U          S     9718         0  +38.4493144  -122.6504966  POLYGON ((-122.6512 38.44946, -122.65111 38.44...  718685  700241  060971515033   06097151503          06097
 28171        06        097    151503      3000  060971515033000  Block 3000   G5040    U  79498      U          S    11892         0  +38.4502211  -122.6505315  POLYGON ((-122.65144 38.44966, -122.65126 38.4...  718685  700241  060971515033   06097151503          06097
-01/20/2026 12:34:43 PM - DEBUG - group 060971517002 has 3 rows and 16.2 percent of land
-01/20/2026 12:34:43 PM - DEBUG - 
+01/28/2026 02:53:32 PM - DEBUG - group 060971517002 has 3 rows and 16.2 percent of land
+01/28/2026 02:53:32 PM - DEBUG - 
       STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10  ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 6811         06        097    151700      2027  060971517002027  Block 2027   G5040    U  79498      U          S      745         0  +38.4513053  -122.6505353  POLYGON ((-122.65069 38.45153, -122.65042 38.4...  718685  700241  060971517002   06097151700          06097
 22359        06        097    151700      2025  060971517002025  Block 2025   G5040    U  79498      U          S     2262         0  +38.4501556  -122.6511791  POLYGON ((-122.65182 38.44977, -122.65163 38.4...  718685  700241  060971517002   06097151700          06097
 92988        06        097    151700      2029  060971517002029  Block 2029   G5040    U  79498      U          S     1170         0  +38.4496373  -122.6522423  POLYGON ((-122.65312 38.44968, -122.65293 38.4...  718685  700241  060971517002   06097151700          06097
-01/20/2026 12:34:43 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:43 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:43 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:43 PM - INFO - ====> moved 0 blocks to neighbor
-01/20/2026 12:34:43 PM - WARNING - Multiple GEOID10_TRACT for a single taz: 3
-01/20/2026 12:34:43 PM - WARNING - 
+01/28/2026 02:53:32 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:32 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:32 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:32 PM - INFO - ====> moved 0 blocks to neighbor
+01/28/2026 02:53:32 PM - WARNING - Multiple GEOID10_TRACT for a single taz: 3
+01/28/2026 02:53:32 PM - WARNING - 
         GEOID10_TRACT
 taz                  
 327                 2
 100377              2
 700241              2
-01/20/2026 12:34:43 PM - INFO - splitting taz for tract
-01/20/2026 12:34:43 PM - INFO - Attempting to fix taz    327
-01/20/2026 12:34:43 PM - DEBUG - 
+01/28/2026 02:53:32 PM - INFO - splitting taz for tract
+01/28/2026 02:53:32 PM - INFO - Attempting to fix taz    327
+01/28/2026 02:53:32 PM - DEBUG - 
                ALAND10  ALAND10_pct
 GEOID10_TRACT                      
 06075017902       4650         0.01
 06075023103     748028         0.99
-01/20/2026 12:34:43 PM - INFO - Tract/taz portion too small -- skipping
-01/20/2026 12:34:43 PM - INFO - Attempting to fix taz 100377
-01/20/2026 12:34:43 PM - DEBUG - 
+01/28/2026 02:53:32 PM - INFO - Tract/taz portion too small -- skipping
+01/28/2026 02:53:32 PM - INFO - Attempting to fix taz 100377
+01/28/2026 02:53:32 PM - DEBUG - 
                ALAND10  ALAND10_pct
 GEOID10_TRACT                      
 06081600401     519845         0.56
 06081600402     402364         0.44
-01/20/2026 12:34:43 PM - INFO -   group 06081600401 has  23 rows and 56.4 percent of land
-01/20/2026 12:34:43 PM - DEBUG - find_next_unused_taz_id for 100377 returning 100380
-01/20/2026 12:34:43 PM - INFO -   group 06081600402 has  30 rows and 43.6 percent of land => new taz 100380
-01/20/2026 12:34:43 PM - INFO - Attempting to fix taz 700241
-01/20/2026 12:34:43 PM - DEBUG - 
+01/28/2026 02:53:32 PM - INFO -   group 06081600401 has  23 rows and 56.4 percent of land
+01/28/2026 02:53:32 PM - DEBUG - find_next_unused_taz_id for 100377 returning 100380
+01/28/2026 02:53:32 PM - INFO -   group 06081600402 has  30 rows and 43.6 percent of land => new taz 100380
+01/28/2026 02:53:32 PM - INFO - Attempting to fix taz 700241
+01/28/2026 02:53:32 PM - DEBUG - 
                ALAND10  ALAND10_pct
 GEOID10_TRACT                      
 06097151503     977478         1.00
 06097151700       4177         0.00
-01/20/2026 12:34:43 PM - INFO - Tract/taz portion too small -- skipping
-01/20/2026 12:34:43 PM - INFO - Verified one GEOID10_COUNTY per taz
-01/20/2026 12:34:44 PM - INFO - Starting iteration 2 of 5
-01/20/2026 12:34:44 PM - INFO - Join block shapefile to crosswalk csv resulting in 109224 rows
-01/20/2026 12:34:44 PM - DEBUG - blocks_maz_gdf.type:<class 'geopandas.geodataframe.GeoDataFrame'>
-01/20/2026 12:34:44 PM - DEBUG - blocks_maz_gdf.dtypes:
+01/28/2026 02:53:32 PM - INFO - Tract/taz portion too small -- skipping
+01/28/2026 02:53:32 PM - INFO - Verified one GEOID10_COUNTY per taz
+01/28/2026 02:53:32 PM - INFO - Starting iteration 2 of 5
+01/28/2026 02:53:33 PM - INFO - Join block shapefile to crosswalk csv resulting in 109224 rows
+01/28/2026 02:53:33 PM - DEBUG - blocks_maz_gdf.type:<class 'geopandas.geodataframe.GeoDataFrame'>
+01/28/2026 02:53:33 PM - DEBUG - blocks_maz_gdf.dtypes:
 STATEFP10       object
 COUNTYFP10      object
 TRACTCE10       object
@@ -268,76 +268,76 @@ geometry      geometry
 maz              int64
 taz              int64
 dtype: object
-01/20/2026 12:34:44 PM - INFO - blocks_maz_df has length 109,224
-01/20/2026 12:34:44 PM - DEBUG - 
+01/28/2026 02:53:33 PM - INFO - blocks_maz_df has length 109,224
+01/28/2026 02:53:33 PM - DEBUG - 
   STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10   ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 0        06        055    201700      4004  060552017004004  Block 4004   G5040    R   None   None          S   3905437     25696  +38.6157155  -122.4410306  POLYGON ((-122.46066 38.61807, -122.46062 38.6...  610054  600102  060552017004   06055201700          06055
 1        06        055    201700      1013  060552017001013  Block 1013   G5040    R   None   None          S  18373208      5143  +38.5070999  -122.3259045  POLYGON ((-122.35414 38.50768, -122.35408 38.5...  611025  600006  060552017001   06055201700          06055
 2        06        055    201700      4007  060552017004007  Block 4007   G5040    R   None   None          S   2002844     10132  +38.6007413  -122.4727415  POLYGON ((-122.4883 38.59902, -122.48826 38.60...  610857  600102  060552017004   06055201700          06055
 3        06        055    201700      4023  060552017004023  Block 4023   G5040    R   None   None          S   2057198     46714  +38.5912077  -122.4592519  POLYGON ((-122.47466 38.59312, -122.47346 38.5...  611028  600102  060552017004   06055201700          06055
 4        06        055    201403      1023  060552014031023  Block 1023   G5040    R   None   None          S  20642906     45470  +38.3680728  -122.1517456  POLYGON ((-122.1789 38.38562, -122.17748 38.38...  610051  600097  060552014031   06055201403          06055
-01/20/2026 12:34:44 PM - INFO - Reading E:\GitHub\tm2\tm2py-utils\tm2py_utils\inputs\maz_taz\tl_2020_06_tabblock10_9CBA_neighbors.csv
-01/20/2026 12:34:45 PM - DEBUG - blocks_neighbor_df has length 725774
-01/20/2026 12:34:45 PM - DEBUG - 
+01/28/2026 02:53:33 PM - INFO - Reading E:\GitHub\tm2\tm2py-utils\tm2py_utils\inputs\maz_taz\tl_2020_06_tabblock10_9CBA_neighbors.csv
+01/28/2026 02:53:34 PM - DEBUG - blocks_neighbor_df has length 725774
+01/28/2026 02:53:34 PM - DEBUG - 
        src_GEOID10      nbr_GEOID10  LENGTH  NODE_COUNT nbr_GEOID10_BG          GEOID10       maz       taz
 0  060014001001000  060014001001001 1838.32           0   060014001001  060014001001001 333453.00 301054.00
 1  060014001001000  060014001001002 1291.63           0   060014001001  060014001001002 333453.00 301054.00
 2  060014001001000  060014001001003  148.32           0   060014001001  060014001001003 333453.00 301054.00
 3  060014001001000  060014001001004  560.54           0   060014001001  060014001001004 333453.00 301054.00
 4  060014001001000  060014001001005  180.17           0   060014001001  060014001001005 333453.00 301054.00
-01/20/2026 12:34:45 PM - INFO - Number of unique GEOID10: 109224
-01/20/2026 12:34:45 PM - INFO -   Min: 060014001001000
-01/20/2026 12:34:45 PM - INFO -   Max: 060979901000010
-01/20/2026 12:34:45 PM - INFO - 
-01/20/2026 12:34:45 PM - INFO - Number of unique maz: 41424
-01/20/2026 12:34:45 PM - INFO -    Min: 10001
-01/20/2026 12:34:45 PM - INFO -    Max: 814506
-01/20/2026 12:34:45 PM - INFO - 
-01/20/2026 12:34:45 PM - INFO - Number of unique taz: 5117
-01/20/2026 12:34:45 PM - INFO -    Min: 1
-01/20/2026 12:34:45 PM - INFO -    Max: 800210
-01/20/2026 12:34:45 PM - INFO - 
-01/20/2026 12:34:45 PM - INFO - Verified one taz per maz
-01/20/2026 12:34:45 PM - INFO - Verified one GEOID10_COUNTY per maz
-01/20/2026 12:34:45 PM - WARNING - Multiple GEOID10_TRACT for a single maz: 1
-01/20/2026 12:34:45 PM - WARNING - 
+01/28/2026 02:53:34 PM - INFO - Number of unique GEOID10: 109224
+01/28/2026 02:53:34 PM - INFO -   Min: 060014001001000
+01/28/2026 02:53:34 PM - INFO -   Max: 060979901000010
+01/28/2026 02:53:34 PM - INFO - 
+01/28/2026 02:53:34 PM - INFO - Number of unique maz: 41434
+01/28/2026 02:53:34 PM - INFO -    Min: 10001
+01/28/2026 02:53:34 PM - INFO -    Max: 814506
+01/28/2026 02:53:34 PM - INFO - 
+01/28/2026 02:53:34 PM - INFO - Number of unique taz: 5117
+01/28/2026 02:53:34 PM - INFO -    Min: 1
+01/28/2026 02:53:34 PM - INFO -    Max: 800210
+01/28/2026 02:53:34 PM - INFO - 
+01/28/2026 02:53:34 PM - INFO - Verified one taz per maz
+01/28/2026 02:53:34 PM - INFO - Verified one GEOID10_COUNTY per maz
+01/28/2026 02:53:34 PM - WARNING - Multiple GEOID10_TRACT for a single maz: 1
+01/28/2026 02:53:34 PM - WARNING - 
         GEOID10_TRACT
 maz                  
 718685              2
-01/20/2026 12:34:45 PM - INFO - move_small_block_to_neighbor for GEOID10_TRACT
-01/20/2026 12:34:45 PM - INFO - Attempting to fix maz 718685
-01/20/2026 12:34:45 PM - DEBUG - 
+01/28/2026 02:53:34 PM - INFO - move_small_block_to_neighbor for GEOID10_TRACT
+01/28/2026 02:53:34 PM - INFO - Attempting to fix maz 718685
+01/28/2026 02:53:34 PM - DEBUG - 
       STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10  ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 6811         06        097    151700      2027  060971517002027  Block 2027   G5040    U  79498      U          S      745         0  +38.4513053  -122.6505353  POLYGON ((-122.65069 38.45153, -122.65042 38.4...  718685  700241  060971517002   06097151700          06097
 21393        06        097    151503      3011  060971515033011  Block 3011   G5040    U  79498      U          S     9718         0  +38.4493144  -122.6504966  POLYGON ((-122.6512 38.44946, -122.65111 38.44...  718685  700241  060971515033   06097151503          06097
 22359        06        097    151700      2025  060971517002025  Block 2025   G5040    U  79498      U          S     2262         0  +38.4501556  -122.6511791  POLYGON ((-122.65182 38.44977, -122.65163 38.4...  718685  700241  060971517002   06097151700          06097
 28171        06        097    151503      3000  060971515033000  Block 3000   G5040    U  79498      U          S    11892         0  +38.4502211  -122.6505315  POLYGON ((-122.65144 38.44966, -122.65126 38.4...  718685  700241  060971515033   06097151503          06097
 92988        06        097    151700      2029  060971517002029  Block 2029   G5040    U  79498      U          S     1170         0  +38.4496373  -122.6522423  POLYGON ((-122.65312 38.44968, -122.65293 38.4...  718685  700241  060971517002   06097151700          06097
-01/20/2026 12:34:45 PM - DEBUG - group 06097151503 has 2 rows and 83.8 percent of land
-01/20/2026 12:34:45 PM - DEBUG - 
+01/28/2026 02:53:34 PM - DEBUG - group 06097151503 has 2 rows and 83.8 percent of land
+01/28/2026 02:53:34 PM - DEBUG - 
       STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10  ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 21393        06        097    151503      3011  060971515033011  Block 3011   G5040    U  79498      U          S     9718         0  +38.4493144  -122.6504966  POLYGON ((-122.6512 38.44946, -122.65111 38.44...  718685  700241  060971515033   06097151503          06097
 28171        06        097    151503      3000  060971515033000  Block 3000   G5040    U  79498      U          S    11892         0  +38.4502211  -122.6505315  POLYGON ((-122.65144 38.44966, -122.65126 38.4...  718685  700241  060971515033   06097151503          06097
-01/20/2026 12:34:45 PM - DEBUG - group 06097151700 has 3 rows and 16.2 percent of land
-01/20/2026 12:34:45 PM - DEBUG - 
+01/28/2026 02:53:34 PM - DEBUG - group 06097151700 has 3 rows and 16.2 percent of land
+01/28/2026 02:53:34 PM - DEBUG - 
       STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10  ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 6811         06        097    151700      2027  060971517002027  Block 2027   G5040    U  79498      U          S      745         0  +38.4513053  -122.6505353  POLYGON ((-122.65069 38.45153, -122.65042 38.4...  718685  700241  060971517002   06097151700          06097
 22359        06        097    151700      2025  060971517002025  Block 2025   G5040    U  79498      U          S     2262         0  +38.4501556  -122.6511791  POLYGON ((-122.65182 38.44977, -122.65163 38.4...  718685  700241  060971517002   06097151700          06097
 92988        06        097    151700      2029  060971517002029  Block 2029   G5040    U  79498      U          S     1170         0  +38.4496373  -122.6522423  POLYGON ((-122.65312 38.44968, -122.65293 38.4...  718685  700241  060971517002   06097151700          06097
-01/20/2026 12:34:45 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:45 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:45 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:45 PM - INFO - ====> moved 0 blocks to neighbor
-01/20/2026 12:34:45 PM - WARNING - Multiple GEOID10_BG for a single maz: 3
-01/20/2026 12:34:45 PM - WARNING - 
+01/28/2026 02:53:34 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:34 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:34 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:34 PM - INFO - ====> moved 0 blocks to neighbor
+01/28/2026 02:53:34 PM - WARNING - Multiple GEOID10_BG for a single maz: 3
+01/28/2026 02:53:34 PM - WARNING - 
         GEOID10_BG
 maz               
 216206           2
 411035           2
 718685           2
-01/20/2026 12:34:45 PM - INFO - move_small_block_to_neighbor for GEOID10_BG
-01/20/2026 12:34:45 PM - INFO - Attempting to fix maz 216206
-01/20/2026 12:34:45 PM - DEBUG - 
+01/28/2026 02:53:34 PM - INFO - move_small_block_to_neighbor for GEOID10_BG
+01/28/2026 02:53:34 PM - INFO - Attempting to fix maz 216206
+01/28/2026 02:53:34 PM - DEBUG - 
        STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10  ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 11906         06        085    512001      2007  060855120012007  Block 2007   G5040    U  79039      U          S     3263         0  +37.2436298  -121.7652776  POLYGON ((-121.76557 37.24401, -121.76549 37.2...  216206  200728  060855120012   06085512001          06085
 12044         06        085    512001      2002  060855120012002  Block 2002   G5040    U  79039      U          S    16684         0  +37.2457243  -121.7654735  POLYGON ((-121.76662 37.2461, -121.76644 37.24...  216206  200728  060855120012   06085512001          06085
@@ -364,8 +364,8 @@ maz
 99179         06        085    512001      1052  060855120011052  Block 1052   G5040    U  79039      U          S    24680         0  +37.2365885  -121.7556065  POLYGON ((-121.75789 37.23662, -121.75746 37.2...  216206  200728  060855120011   06085512001          06085
 103463        06        085    512001      2001  060855120012001  Block 2001   G5040    U  79039      U          S    27634         0  +37.2443967  -121.7640703  POLYGON ((-121.76504 37.24324, -121.76482 37.2...  216206  200728  060855120012   06085512001          06085
 104808        06        085    512001      1059  060855120011059  Block 1059   G5040    U  79039      U          S     4288         0  +37.2439604  -121.7721982  POLYGON ((-121.77267 37.2442, -121.77262 37.24...  216206  200728  060855120011   06085512001          06085
-01/20/2026 12:34:45 PM - DEBUG - group 060855120011 has 13 rows and 97.9 percent of land
-01/20/2026 12:34:45 PM - DEBUG - 
+01/28/2026 02:53:34 PM - DEBUG - group 060855120011 has 13 rows and 97.9 percent of land
+01/28/2026 02:53:34 PM - DEBUG - 
        STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10  ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 21509         06        085    512001      1050  060855120011050  Block 1050   G5040    U  79039      U          S    41933         0  +37.2416994  -121.7601453  POLYGON ((-121.76198 37.24175, -121.7619 37.24...  216206  200728  060855120011   06085512001          06085
 23924         06        085    512001      1056  060855120011056  Block 1056   G5040    R   None   None          S   509163         0  +37.2381222  -121.7272736  POLYGON ((-121.73696 37.23519, -121.73468 37.2...  216206  200728  060855120011   06085512001          06085
@@ -380,8 +380,8 @@ maz
 98758         06        085    512001      1047  060855120011047  Block 1047   G5040    U  79039      U          S  7441716         0  +37.2455109  -121.7489457  POLYGON ((-121.77142 37.24943, -121.77126 37.2...  216206  200728  060855120011   06085512001          06085
 99179         06        085    512001      1052  060855120011052  Block 1052   G5040    U  79039      U          S    24680         0  +37.2365885  -121.7556065  POLYGON ((-121.75789 37.23662, -121.75746 37.2...  216206  200728  060855120011   06085512001          06085
 104808        06        085    512001      1059  060855120011059  Block 1059   G5040    U  79039      U          S     4288         0  +37.2439604  -121.7721982  POLYGON ((-121.77267 37.2442, -121.77262 37.24...  216206  200728  060855120011   06085512001          06085
-01/20/2026 12:34:45 PM - DEBUG - group 060855120012 has 12 rows and 2.1 percent of land
-01/20/2026 12:34:45 PM - DEBUG - 
+01/28/2026 02:53:34 PM - DEBUG - group 060855120012 has 12 rows and 2.1 percent of land
+01/28/2026 02:53:34 PM - DEBUG - 
        STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10  ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 11906         06        085    512001      2007  060855120012007  Block 2007   G5040    U  79039      U          S     3263         0  +37.2436298  -121.7652776  POLYGON ((-121.76557 37.24401, -121.76549 37.2...  216206  200728  060855120012   06085512001          06085
 12044         06        085    512001      2002  060855120012002  Block 2002   G5040    U  79039      U          S    16684         0  +37.2457243  -121.7654735  POLYGON ((-121.76662 37.2461, -121.76644 37.24...  216206  200728  060855120012   06085512001          06085
@@ -395,20 +395,20 @@ maz
 79099         06        085    512001      2009  060855120012009  Block 2009   G5040    U  79039      U          S     3462         0  +37.2443349  -121.7650013  POLYGON ((-121.76537 37.24467, -121.7653 37.24...  216206  200728  060855120012   06085512001          06085
 82100         06        085    512001      2010  060855120012010  Block 2010   G5040    U  79039      U          S     6259         0  +37.2436699  -121.7646364  POLYGON ((-121.76515 37.24396, -121.76502 37.2...  216206  200728  060855120012   06085512001          06085
 103463        06        085    512001      2001  060855120012001  Block 2001   G5040    U  79039      U          S    27634         0  +37.2443967  -121.7640703  POLYGON ((-121.76504 37.24324, -121.76482 37.2...  216206  200728  060855120012   06085512001          06085
-01/20/2026 12:34:45 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:45 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:45 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:45 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:45 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:46 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:46 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:46 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:46 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:46 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:46 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:46 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:46 PM - INFO - Attempting to fix maz 411035
-01/20/2026 12:34:46 PM - DEBUG - 
+01/28/2026 02:53:34 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:34 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:34 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:34 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:34 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:34 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:34 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:34 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:34 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:34 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:35 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:35 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:35 PM - INFO - Attempting to fix maz 411035
+01/28/2026 02:53:35 PM - DEBUG - 
        STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10  ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 25346         06        013    380000      3022  060133800003022  Block 3022   G5040    U  78904      U          S     3601         0  +37.9150326  -122.3507655  POLYGON ((-122.35338 37.91385, -122.35308 37.9...  411035  400461  060133800003   06013380000          06013
 27225         06        013    380000      3025  060133800003025  Block 3025   G5040    U  78904      U          S     8504         0  +37.9123882  -122.3544954  POLYGON ((-122.35466 37.91049, -122.35464 37.9...  411035  400461  060133800003   06013380000          06013
@@ -416,80 +416,80 @@ maz
 81305         06        013    380000      3021  060133800003021  Block 3021   G5040    U  78904      U          S   124067         0  +37.9150409  -122.3541402  POLYGON ((-122.35593 37.9162, -122.35593 37.91...  411035  400461  060133800003   06013380000          06013
 98942         06        013    380000      3024  060133800003024  Block 3024   G5040    U  78904      U          S      181         0  +37.9165355  -122.3537033  POLYGON ((-122.35387 37.91651, -122.35363 37.9...  411035  400461  060133800003   06013380000          06013
 106968        06        013    380000      3023  060133800003023  Block 3023   G5040    U  78904      U          S     2806         0  +37.9162669  -122.3537142  POLYGON ((-122.3541 37.91627, -122.35407 37.91...  411035  400461  060133800003   06013380000          06013
-01/20/2026 12:34:46 PM - DEBUG - group 060133800001 has 1 rows and 0.3 percent of land
-01/20/2026 12:34:46 PM - DEBUG - 
+01/28/2026 02:53:35 PM - DEBUG - group 060133800001 has 1 rows and 0.3 percent of land
+01/28/2026 02:53:35 PM - DEBUG - 
       STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10  ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 45110        06        013    380000      1030  060133800001030  Block 1030   G5040    U  78904      U          S      377         0  +37.9140469  -122.3534531  POLYGON ((-122.35363 37.91432, -122.35342 37.9...  411035  400461  060133800001   06013380000          06013
-01/20/2026 12:34:46 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:46 PM - DEBUG - group 060133800003 has 5 rows and 99.7 percent of land
-01/20/2026 12:34:46 PM - DEBUG - 
+01/28/2026 02:53:35 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:35 PM - DEBUG - group 060133800003 has 5 rows and 99.7 percent of land
+01/28/2026 02:53:35 PM - DEBUG - 
        STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10  ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 25346         06        013    380000      3022  060133800003022  Block 3022   G5040    U  78904      U          S     3601         0  +37.9150326  -122.3507655  POLYGON ((-122.35338 37.91385, -122.35308 37.9...  411035  400461  060133800003   06013380000          06013
 27225         06        013    380000      3025  060133800003025  Block 3025   G5040    U  78904      U          S     8504         0  +37.9123882  -122.3544954  POLYGON ((-122.35466 37.91049, -122.35464 37.9...  411035  400461  060133800003   06013380000          06013
 81305         06        013    380000      3021  060133800003021  Block 3021   G5040    U  78904      U          S   124067         0  +37.9150409  -122.3541402  POLYGON ((-122.35593 37.9162, -122.35593 37.91...  411035  400461  060133800003   06013380000          06013
 98942         06        013    380000      3024  060133800003024  Block 3024   G5040    U  78904      U          S      181         0  +37.9165355  -122.3537033  POLYGON ((-122.35387 37.91651, -122.35363 37.9...  411035  400461  060133800003   06013380000          06013
 106968        06        013    380000      3023  060133800003023  Block 3023   G5040    U  78904      U          S     2806         0  +37.9162669  -122.3537142  POLYGON ((-122.3541 37.91627, -122.35407 37.91...  411035  400461  060133800003   06013380000          06013
-01/20/2026 12:34:46 PM - INFO - Attempting to fix maz 718685
-01/20/2026 12:34:46 PM - DEBUG - 
+01/28/2026 02:53:35 PM - INFO - Attempting to fix maz 718685
+01/28/2026 02:53:35 PM - DEBUG - 
       STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10  ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 6811         06        097    151700      2027  060971517002027  Block 2027   G5040    U  79498      U          S      745         0  +38.4513053  -122.6505353  POLYGON ((-122.65069 38.45153, -122.65042 38.4...  718685  700241  060971517002   06097151700          06097
 21393        06        097    151503      3011  060971515033011  Block 3011   G5040    U  79498      U          S     9718         0  +38.4493144  -122.6504966  POLYGON ((-122.6512 38.44946, -122.65111 38.44...  718685  700241  060971515033   06097151503          06097
 22359        06        097    151700      2025  060971517002025  Block 2025   G5040    U  79498      U          S     2262         0  +38.4501556  -122.6511791  POLYGON ((-122.65182 38.44977, -122.65163 38.4...  718685  700241  060971517002   06097151700          06097
 28171        06        097    151503      3000  060971515033000  Block 3000   G5040    U  79498      U          S    11892         0  +38.4502211  -122.6505315  POLYGON ((-122.65144 38.44966, -122.65126 38.4...  718685  700241  060971515033   06097151503          06097
 92988        06        097    151700      2029  060971517002029  Block 2029   G5040    U  79498      U          S     1170         0  +38.4496373  -122.6522423  POLYGON ((-122.65312 38.44968, -122.65293 38.4...  718685  700241  060971517002   06097151700          06097
-01/20/2026 12:34:46 PM - DEBUG - group 060971515033 has 2 rows and 83.8 percent of land
-01/20/2026 12:34:46 PM - DEBUG - 
+01/28/2026 02:53:35 PM - DEBUG - group 060971515033 has 2 rows and 83.8 percent of land
+01/28/2026 02:53:35 PM - DEBUG - 
       STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10  ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 21393        06        097    151503      3011  060971515033011  Block 3011   G5040    U  79498      U          S     9718         0  +38.4493144  -122.6504966  POLYGON ((-122.6512 38.44946, -122.65111 38.44...  718685  700241  060971515033   06097151503          06097
 28171        06        097    151503      3000  060971515033000  Block 3000   G5040    U  79498      U          S    11892         0  +38.4502211  -122.6505315  POLYGON ((-122.65144 38.44966, -122.65126 38.4...  718685  700241  060971515033   06097151503          06097
-01/20/2026 12:34:46 PM - DEBUG - group 060971517002 has 3 rows and 16.2 percent of land
-01/20/2026 12:34:46 PM - DEBUG - 
+01/28/2026 02:53:35 PM - DEBUG - group 060971517002 has 3 rows and 16.2 percent of land
+01/28/2026 02:53:35 PM - DEBUG - 
       STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10  ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 6811         06        097    151700      2027  060971517002027  Block 2027   G5040    U  79498      U          S      745         0  +38.4513053  -122.6505353  POLYGON ((-122.65069 38.45153, -122.65042 38.4...  718685  700241  060971517002   06097151700          06097
 22359        06        097    151700      2025  060971517002025  Block 2025   G5040    U  79498      U          S     2262         0  +38.4501556  -122.6511791  POLYGON ((-122.65182 38.44977, -122.65163 38.4...  718685  700241  060971517002   06097151700          06097
 92988        06        097    151700      2029  060971517002029  Block 2029   G5040    U  79498      U          S     1170         0  +38.4496373  -122.6522423  POLYGON ((-122.65312 38.44968, -122.65293 38.4...  718685  700241  060971517002   06097151700          06097
-01/20/2026 12:34:46 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:46 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:46 PM - DEBUG -   No neighbors in same block group with maz/taz
-01/20/2026 12:34:46 PM - INFO - ====> moved 0 blocks to neighbor
-01/20/2026 12:34:46 PM - WARNING - Multiple GEOID10_TRACT for a single taz: 2
-01/20/2026 12:34:46 PM - WARNING - 
+01/28/2026 02:53:35 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:35 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:35 PM - DEBUG -   No neighbors in same block group with maz/taz
+01/28/2026 02:53:35 PM - INFO - ====> moved 0 blocks to neighbor
+01/28/2026 02:53:35 PM - WARNING - Multiple GEOID10_TRACT for a single taz: 2
+01/28/2026 02:53:35 PM - WARNING - 
         GEOID10_TRACT
 taz                  
 327                 2
 700241              2
-01/20/2026 12:34:46 PM - INFO - splitting taz for tract
-01/20/2026 12:34:46 PM - INFO - Attempting to fix taz    327
-01/20/2026 12:34:46 PM - DEBUG - 
+01/28/2026 02:53:35 PM - INFO - splitting taz for tract
+01/28/2026 02:53:35 PM - INFO - Attempting to fix taz    327
+01/28/2026 02:53:35 PM - DEBUG - 
                ALAND10  ALAND10_pct
 GEOID10_TRACT                      
 06075017902       4650         0.01
 06075023103     748028         0.99
-01/20/2026 12:34:46 PM - INFO - Tract/taz portion too small -- skipping
-01/20/2026 12:34:46 PM - INFO - Attempting to fix taz 700241
-01/20/2026 12:34:46 PM - DEBUG - 
+01/28/2026 02:53:35 PM - INFO - Tract/taz portion too small -- skipping
+01/28/2026 02:53:35 PM - INFO - Attempting to fix taz 700241
+01/28/2026 02:53:35 PM - DEBUG - 
                ALAND10  ALAND10_pct
 GEOID10_TRACT                      
 06097151503     977478         1.00
 06097151700       4177         0.00
-01/20/2026 12:34:46 PM - INFO - Tract/taz portion too small -- skipping
-01/20/2026 12:34:46 PM - INFO - Verified one GEOID10_COUNTY per taz
-01/20/2026 12:34:46 PM - INFO - No blocks moved or tazs split -- exiting iterations
-01/20/2026 12:34:46 PM - INFO - Skipping write of blocks_mazs_tazs_2.6.csv since it's the same as the input file
-01/20/2026 12:34:46 PM - INFO - Number of blocks per maz: 
-01/20/2026 12:34:46 PM - INFO -    Min: 1
-01/20/2026 12:34:46 PM - INFO -    Max: 89
-01/20/2026 12:34:46 PM - INFO -   Mean: 2.5891270760911547
-01/20/2026 12:34:46 PM - INFO - 
-01/20/2026 12:34:46 PM - INFO - Number of maz per taz: 
-01/20/2026 12:34:46 PM - INFO -    Min: 1
-01/20/2026 12:34:46 PM - INFO -    Max: 118
-01/20/2026 12:34:46 PM - INFO -   Mean: 8.095368379910104
-01/20/2026 12:34:46 PM - INFO - 
-01/20/2026 12:34:46 PM - INFO - Number of blocks without maz/taz: 1972
-01/20/2026 12:34:46 PM - INFO - Number of blocks without maz/taz with land area: 0
-01/20/2026 12:34:46 PM - INFO - Number of blocks with maz/taz without land area: 0
-01/20/2026 12:34:46 PM - INFO - maz_taz_county_check:
+01/28/2026 02:53:35 PM - INFO - Tract/taz portion too small -- skipping
+01/28/2026 02:53:35 PM - INFO - Verified one GEOID10_COUNTY per taz
+01/28/2026 02:53:35 PM - INFO - No blocks moved or tazs split -- exiting iterations
+01/28/2026 02:53:35 PM - INFO - Skipping write of blocks_mazs_tazs_2.6.csv since it's the same as the input file
+01/28/2026 02:53:35 PM - INFO - Number of blocks per maz: 
+01/28/2026 02:53:35 PM - INFO -    Min: 1
+01/28/2026 02:53:35 PM - INFO -    Max: 89
+01/28/2026 02:53:35 PM - INFO -   Mean: 2.5885021962639376
+01/28/2026 02:53:35 PM - INFO - 
+01/28/2026 02:53:35 PM - INFO - Number of maz per taz: 
+01/28/2026 02:53:35 PM - INFO -    Min: 1
+01/28/2026 02:53:35 PM - INFO -    Max: 118
+01/28/2026 02:53:35 PM - INFO -   Mean: 8.097322649990229
+01/28/2026 02:53:35 PM - INFO - 
+01/28/2026 02:53:35 PM - INFO - Number of blocks without maz/taz: 1972
+01/28/2026 02:53:35 PM - INFO - Number of blocks without maz/taz with land area: 0
+01/28/2026 02:53:35 PM - INFO - Number of blocks with maz/taz without land area: 0
+01/28/2026 02:53:35 PM - INFO - maz_taz_county_check:
                    maz             taz        
                    min     max     min     max
 GEOID10_COUNTY                                
@@ -502,9 +502,9 @@ GEOID10_COUNTY
 06085           210037  219787  200001  201487
 06095           510002  520521  500001  500287
 06097           710009  720388  700001  700387
-01/20/2026 12:34:46 PM - INFO - Dissolving blocks into MAZs and TAZs
-01/20/2026 12:35:01 PM - DEBUG - blocks_maz_gdf.crs:EPSG:4326
-01/20/2026 12:35:01 PM - DEBUG - blocks_maz_gdf:
+01/28/2026 02:53:35 PM - INFO - Dissolving blocks into MAZs and TAZs
+01/28/2026 02:53:50 PM - DEBUG - blocks_maz_gdf.crs:EPSG:4326
+01/28/2026 02:53:50 PM - DEBUG - blocks_maz_gdf:
        STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10   ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz
 0             06        055    201700      4004  060552017004004  Block 4004   G5040    R   None   None          S   3905437     25696  +38.6157155  -122.4410306  POLYGON ((-122.46066 38.61807, -122.46062 38.6...  610054  600102
 1             06        055    201700      1013  060552017001013  Block 1013   G5040    R   None   None          S  18373208      5143  +38.5070999  -122.3259045  POLYGON ((-122.35414 38.50768, -122.35408 38.5...  611025  600006
@@ -519,12 +519,12 @@ GEOID10_COUNTY
 109223        06        085    504102      1003  060855041021003  Block 1003   G5040    U  79039      U          S      1886         0  +37.3685613  -121.8075930  POLYGON ((-121.80817 37.36835, -121.80801 37.3...  215989  201027
 
 [109224 rows x 18 columns]
-01/20/2026 12:35:01 PM - INFO - Calculated part count for mazs
-01/20/2026 12:35:04 PM - INFO - Calculated perimeter length for mazs
-01/20/2026 12:35:04 PM - INFO - Calculated perim*perim/area for mazs
-01/20/2026 12:35:04 PM - INFO - Calculated acres for mazs
-01/20/2026 12:35:04 PM - INFO - Creating centroids for maz
-01/20/2026 12:35:06 PM - DEBUG - maz_or_taz_gdf with crs EPSG:4326:
+01/28/2026 02:53:50 PM - INFO - Calculated part count for mazs
+01/28/2026 02:53:52 PM - INFO - Calculated perimeter length for mazs
+01/28/2026 02:53:52 PM - INFO - Calculated perim*perim/area for mazs
+01/28/2026 02:53:52 PM - INFO - Calculated acres for mazs
+01/28/2026 02:53:52 PM - INFO - Creating centroids for maz
+01/28/2026 02:53:54 PM - DEBUG - maz_or_taz_gdf with crs EPSG:4326:
           maz COUNTYFP10                                           geometry  ALAND10  AWATER10  blockcount     taz  partcount  PERIM_MI  AREA_SQMI  psq_overa  acres                     centroid
 9       10001        075  POLYGON ((-122.44169 37.75084, -122.44062 37.7...    16958         0           1      56          1      0.34       0.01      17.64   4.19  POINT (-122.44108 37.75007)
 10      10002        075  POLYGON ((-122.43955 37.75096, -122.43848 37.7...    16823         0           1      56          1      0.34       0.01      17.64   4.16   POINT (-122.43893 37.7502)
@@ -532,14 +532,14 @@ GEOID10_COUNTY
 12      10004        075  POLYGON ((-122.43765 37.7543, -122.4366 37.754...    16415         0           1      53          1      0.34       0.01      17.80   4.06  POINT (-122.43705 37.75353)
 13      10005        075  POLYGON ((-122.43455 37.75609, -122.43233 37.7...    17523         0           1      48          1      0.35       0.01      18.58   4.33   POINT (-122.4334 37.75576)
 ...       ...        ...                                                ...      ...       ...         ...     ...        ...       ...        ...        ...    ...                          ...
-41428  814481        041  POLYGON ((-122.54542 38.06406, -122.54538 38.0...    35637         0           2  800058          1      0.64       0.01      29.39   8.81   POINT (-122.54331 38.0634)
-41429  814495        041  POLYGON ((-122.5497 38.07292, -122.54967 38.07...   277108         0           3  800090          1      1.72       0.11      27.72  68.47  POINT (-122.55248 38.07487)
-41430  814497        041  POLYGON ((-122.61571 38.10367, -122.61548 38.1...   229095         0           4  800055          1      1.57       0.09      27.77  56.61  POINT (-122.61214 38.10305)
-41431  814500        041  POLYGON ((-122.50724 37.88898, -122.50712 37.8...   308470         0           9  800007          1      1.69       0.12      23.88  76.22   POINT (-122.5093 37.89108)
-41432  814506        041  POLYGON ((-122.54926 37.91258, -122.54915 37.9...    53655         0           3  800008          1      1.03       0.02      51.38  13.26   POINT (-122.5508 37.91318)
+41438  814481        041  POLYGON ((-122.54542 38.06406, -122.54538 38.0...    35637         0           2  800058          1      0.64       0.01      29.39   8.81   POINT (-122.54331 38.0634)
+41439  814495        041  POLYGON ((-122.5497 38.07292, -122.54967 38.07...   277108         0           3  800090          1      1.72       0.11      27.72  68.47  POINT (-122.55248 38.07487)
+41440  814497        041  POLYGON ((-122.61571 38.10367, -122.61548 38.1...   229095         0           4  800055          1      1.57       0.09      27.77  56.61  POINT (-122.61214 38.10305)
+41441  814500        041  POLYGON ((-122.50724 37.88898, -122.50712 37.8...   308470         0           9  800007          1      1.69       0.12      23.88  76.22   POINT (-122.5093 37.89108)
+41442  814506        041  POLYGON ((-122.54926 37.91258, -122.54915 37.9...    53655         0           3  800008          1      1.03       0.02      51.38  13.26   POINT (-122.5508 37.91318)
 
-[41424 rows x 13 columns]
-01/20/2026 12:35:06 PM - DEBUG - Final version of maz_or_taz_gdf for maz len=41,424:
+[41434 rows x 13 columns]
+01/28/2026 02:53:54 PM - DEBUG - Final version of maz_or_taz_gdf for maz len=41,434:
        MAZ_NODE COUNTYFP10                                           geometry  ALAND10  AWATER10  blockcount  TAZ_NODE  partcount  PERIM_MI  AREA_SQMI  psq_overa  acres   MAZ_X  MAZ_Y  MAZ_SEQ
 0         10001        075  POLYGON ((-122.44169 37.75084, -122.44062 37.7...    16958         0           1        56          1      0.34       0.01      17.64   4.19 -122.44  37.75        1
 1         10002        075  POLYGON ((-122.43955 37.75096, -122.43848 37.7...    16823         0           1        56          1      0.34       0.01      17.64   4.16 -122.44  37.75        2
@@ -547,30 +547,30 @@ GEOID10_COUNTY
 3         10004        075  POLYGON ((-122.43765 37.7543, -122.4366 37.754...    16415         0           1        53          1      0.34       0.01      17.80   4.06 -122.44  37.75        4
 4         10005        075  POLYGON ((-122.43455 37.75609, -122.43233 37.7...    17523         0           1        48          1      0.35       0.01      18.58   4.33 -122.43  37.76        5
 ...         ...        ...                                                ...      ...       ...         ...       ...        ...       ...        ...        ...    ...     ...    ...      ...
-41419    814481        041  POLYGON ((-122.54542 38.06406, -122.54538 38.0...    35637         0           2    800058          1      0.64       0.01      29.39   8.81 -122.54  38.06    41420
-41420    814495        041  POLYGON ((-122.5497 38.07292, -122.54967 38.07...   277108         0           3    800090          1      1.72       0.11      27.72  68.47 -122.55  38.07    41421
-41421    814497        041  POLYGON ((-122.61571 38.10367, -122.61548 38.1...   229095         0           4    800055          1      1.57       0.09      27.77  56.61 -122.61  38.10    41422
-41422    814500        041  POLYGON ((-122.50724 37.88898, -122.50712 37.8...   308470         0           9    800007          1      1.69       0.12      23.88  76.22 -122.51  37.89    41423
-41423    814506        041  POLYGON ((-122.54926 37.91258, -122.54915 37.9...    53655         0           3    800008          1      1.03       0.02      51.38  13.26 -122.55  37.91    41424
+41429    814481        041  POLYGON ((-122.54542 38.06406, -122.54538 38.0...    35637         0           2    800058          1      0.64       0.01      29.39   8.81 -122.54  38.06    41430
+41430    814495        041  POLYGON ((-122.5497 38.07292, -122.54967 38.07...   277108         0           3    800090          1      1.72       0.11      27.72  68.47 -122.55  38.07    41431
+41431    814497        041  POLYGON ((-122.61571 38.10367, -122.61548 38.1...   229095         0           4    800055          1      1.57       0.09      27.77  56.61 -122.61  38.10    41432
+41432    814500        041  POLYGON ((-122.50724 37.88898, -122.50712 37.8...   308470         0           9    800007          1      1.69       0.12      23.88  76.22 -122.51  37.89    41433
+41433    814506        041  POLYGON ((-122.54926 37.91258, -122.54915 37.9...    53655         0           3    800008          1      1.03       0.02      51.38  13.26 -122.55  37.91    41434
 
-[41424 rows x 15 columns]
-01/20/2026 12:35:06 PM - INFO - county_check_df for maz:
+[41434 rows x 15 columns]
+01/28/2026 02:53:54 PM - INFO - county_check_df for maz:
            MAZ_NODE         MAZ_SEQ       
                 min     max     min    max
 COUNTYFP10                                
-001          310001  334484   18866  27466
-013          410001  428307   27467  33342
-041          810002  814506   40018  41424
-055          610002  661598   36136  37086
-075           10001   17386       1   4152
-081          110001  115011    4153   9150
-085          210037  219787    9151  18865
-095          510002  520521   33343  36135
-097          710009  720388   37087  40017
-01/20/2026 12:35:06 PM - INFO - Writing mazs into shapefiles\mazs_TM2_2_6.shp
-01/20/2026 12:35:09 PM - INFO - Created 41,424 records
-01/20/2026 12:35:31 PM - DEBUG - blocks_maz_gdf.crs:EPSG:4326
-01/20/2026 12:35:31 PM - DEBUG - blocks_maz_gdf:
+001          310001  334484   18873  27474
+013          410001  428307   27475  33352
+041          810002  814506   40028  41434
+055          610002  661598   36146  37096
+075           10001   17386       1   4159
+081          110001  115011    4160   9157
+085          210037  219787    9158  18872
+095          510002  520521   33353  36145
+097          710009  720388   37097  40027
+01/28/2026 02:53:54 PM - INFO - Writing mazs into shapefiles\mazs_TM2_2_6.shp
+01/28/2026 02:53:58 PM - INFO - Created 41,434 records
+01/28/2026 02:54:19 PM - DEBUG - blocks_maz_gdf.crs:EPSG:4326
+01/28/2026 02:54:19 PM - DEBUG - blocks_maz_gdf:
        STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10   ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz
 0             06        055    201700      4004  060552017004004  Block 4004   G5040    R   None   None          S   3905437     25696  +38.6157155  -122.4410306  POLYGON ((-122.46066 38.61807, -122.46062 38.6...  610054  600102
 1             06        055    201700      1013  060552017001013  Block 1013   G5040    R   None   None          S  18373208      5143  +38.5070999  -122.3259045  POLYGON ((-122.35414 38.50768, -122.35408 38.5...  611025  600006
@@ -585,12 +585,12 @@ COUNTYFP10
 109223        06        085    504102      1003  060855041021003  Block 1003   G5040    U  79039      U          S      1886         0  +37.3685613  -121.8075930  POLYGON ((-121.80817 37.36835, -121.80801 37.3...  215989  201027
 
 [109224 rows x 18 columns]
-01/20/2026 12:35:31 PM - INFO - Calculated part count for tazs
-01/20/2026 12:35:31 PM - INFO - Calculated perimeter length for tazs
-01/20/2026 12:35:31 PM - INFO - Calculated perim*perim/area for tazs
-01/20/2026 12:35:31 PM - INFO - Calculated acres for tazs
-01/20/2026 12:35:31 PM - INFO - Creating centroids for taz
-01/20/2026 12:35:32 PM - DEBUG - maz_or_taz_gdf with crs EPSG:4326:
+01/28/2026 02:54:19 PM - INFO - Calculated part count for tazs
+01/28/2026 02:54:20 PM - INFO - Calculated perimeter length for tazs
+01/28/2026 02:54:20 PM - INFO - Calculated perim*perim/area for tazs
+01/28/2026 02:54:20 PM - INFO - Calculated acres for tazs
+01/28/2026 02:54:20 PM - INFO - Creating centroids for taz
+01/28/2026 02:54:21 PM - DEBUG - maz_or_taz_gdf with crs EPSG:4326:
          taz COUNTYFP10                                           geometry  ALAND10  AWATER10  blockcount  mazcount  partcount  PERIM_MI  AREA_SQMI  psq_overa  acres                     centroid
 9          1        075  POLYGON ((-122.42457 37.76914, -122.42467 37.7...    79820         0          16        16          1      0.82       0.03      21.60  19.72  POINT (-122.42404 37.77028)
 10         2        075  POLYGON ((-122.42058 37.765, -122.42048 37.765...    85767         0           8         8          1      0.93       0.03      26.18  21.19  POINT (-122.41995 37.76452)
@@ -605,7 +605,7 @@ COUNTYFP10
 5125  800210        041  POLYGON ((-122.48539 37.86005, -122.48527 37.8...   255603         0           5         5          1      4.02       0.10     163.88  63.16  POINT (-122.48484 37.85962)
 
 [5117 rows x 13 columns]
-01/20/2026 12:35:32 PM - DEBUG - Final version of maz_or_taz_gdf for taz len=5,117:
+01/28/2026 02:54:21 PM - DEBUG - Final version of maz_or_taz_gdf for taz len=5,117:
       TAZ_NODE COUNTYFP10                                           geometry  ALAND10  AWATER10  blockcount  mazcount  partcount  PERIM_MI  AREA_SQMI  psq_overa  acres   TAZ_X  TAZ_Y  TAZ_SEQ
 0            1        075  POLYGON ((-122.42457 37.76914, -122.42467 37.7...    79820         0          16        16          1      0.82       0.03      21.60  19.72 -122.42  37.77        1
 1            2        075  POLYGON ((-122.42058 37.765, -122.42048 37.765...    85767         0           8         8          1      0.93       0.03      26.18  21.19 -122.42  37.76        2
@@ -620,7 +620,7 @@ COUNTYFP10
 5116    800210        041  POLYGON ((-122.48539 37.86005, -122.48527 37.8...   255603         0           5         5          1      4.02       0.10     163.88  63.16 -122.48  37.86     5117
 
 [5117 rows x 15 columns]
-01/20/2026 12:35:32 PM - INFO - county_check_df for taz:
+01/28/2026 02:54:21 PM - INFO - county_check_df for taz:
            TAZ_NODE         TAZ_SEQ      
                 min     max     min   max
 COUNTYFP10                               
@@ -633,12 +633,12 @@ COUNTYFP10
 085          200001  201487     985  2460
 095          500001  500287    4191  4459
 097          700001  700387    4560  4916
-01/20/2026 12:35:32 PM - INFO - Writing tazs into shapefiles\tazs_TM2_2_6.shp
-01/20/2026 12:35:33 PM - INFO - Created 5,117 records
-01/20/2026 12:35:33 PM - INFO - Joining mazs/tazs to superdistricts and PUMA20
-01/20/2026 12:35:33 PM - INFO - Reading superdistricts from E:\GitHub\tm2\tm2py-utils\tm2py_utils\inputs\maz_taz\shapefiles\travel_model_super_districts.shp
-01/20/2026 12:35:33 PM - INFO - Reading PUMA20 from M:\Data\GIS layers\Census\2020\tl_2020_06_puma20\tl_2020_06_puma20.shp
-01/20/2026 12:35:33 PM - DEBUG - superdistricts:
+01/28/2026 02:54:21 PM - INFO - Writing tazs into shapefiles\tazs_TM2_2_6.shp
+01/28/2026 02:54:22 PM - INFO - Created 5,117 records
+01/28/2026 02:54:22 PM - INFO - Joining mazs/tazs to superdistricts and PUMA20
+01/28/2026 02:54:22 PM - INFO - Reading superdistricts from E:\GitHub\tm2\tm2py-utils\tm2py_utils\inputs\maz_taz\shapefiles\travel_model_super_districts.shp
+01/28/2026 02:54:22 PM - INFO - Reading PUMA20 from M:\Data\GIS layers\Census\2020\tl_2020_06_puma20\tl_2020_06_puma20.shp
+01/28/2026 02:54:22 PM - DEBUG - superdistricts:
    county_fip  suprdistid                   DistName                                           geometry
 0       06075           1                Downtown SF  MULTIPOLYGON (((-122.42558 37.80601, -122.4253...
 1       06075           2          Richmond District  POLYGON ((-122.51329 37.77108, -122.51304 37.7...
@@ -674,7 +674,7 @@ COUNTYFP10
 31      06041          32                     Novato  POLYGON ((-122.69876 38.12222, -122.69793 38.1...
 32      06041          33                 San Rafael  POLYGON ((-123.02384 37.99543, -123.02383 37.9...
 33      06041          34    Mill Valley & Sausalito  MULTIPOLYGON (((-122.73352 37.92904, -122.7335...
-01/20/2026 12:35:33 PM - DEBUG - PUMA 20: 
+01/28/2026 02:54:22 PM - DEBUG - PUMA 20: 
      STATEFP20 PUMA20  GEOID20                                         NAMELSAD20 MTFCC20 FUNCSTAT20    ALAND20   AWATER20   INTPTLAT20    INTPTLON20                                           geometry
 0          06  10701  0610701       Tulare County (Northwest)--Visalia City PUMA   G6120          S  352764477     661548  +36.3583459  -119.3467968  POLYGON ((-119.26089 36.2843, -119.26095 36.28...
 1          06  03711  0603711  Los Angeles County (East Central)--Glendora, C...   G6120          S  158110964    2077720  +34.1266905  -117.7922150  POLYGON ((-117.71487 34.07953, -117.71522 34.0...
@@ -689,7 +689,7 @@ COUNTYFP10
 280        06  03734  0603734  Los Angeles County--LA City (East Central/Silv...   G6120          S   30212473     816883  +34.0809927  -118.2607303  POLYGON ((-118.26654 34.04786, -118.26854 34.0...
 
 [281 rows x 11 columns]
-01/20/2026 12:35:46 PM - DEBUG - TAZ GeoDataFrame: 
+01/28/2026 02:54:36 PM - DEBUG - TAZ GeoDataFrame: 
        TAZ_NODE COUNTYFP10     ALAND10  AWATER10  blockcount  mazcount  partcount  PERIM_MI  AREA_SQMI  psq_overa     acres   TAZ_X  TAZ_Y  TAZ_SEQ county_fip  suprdistid                 DistName           area STATEFP20 PUMA20  GEOID20                                         NAMELSAD20 MTFCC20 FUNCSTAT20     ALAND20   AWATER20   INTPTLAT20    INTPTLON20                                           geometry
 0       200565        085        9158         0           1         1          1      0.44       0.00      55.38      2.26 -121.73  37.21     1544      06085          14     Gilroy & Morgan Hill       98574.75        06  08506  0608506  Santa Clara County (East)--Gilroy, Morgan Hill...   G6120          S  2152288671   13432166  +37.1884863  -121.5530604  POLYGON ((-121.73136 37.2048, -121.73105 37.20...
 1          312        075      197914         0          16        16          1      2.03       0.08      53.93     48.91 -122.37  37.73      309      06075           3         Mission District      109121.12        06  07507  0607507  San Francisco County (South Central)--Bayview ...   G6120          S    22569935    3467272  +37.7253517  -122.3957172  MULTIPOLYGON (((-122.37411 37.73266, -122.3741...
@@ -704,7 +704,7 @@ COUNTYFP10
 6695    200593        085  1010095724    424143         284       284          1    148.63     390.15      56.62 249599.87 -121.46  37.16     1572      06085          14     Gilroy & Morgan Hill 10854571667.30        06  08506  0608506  Santa Clara County (East)--Gilroy, Morgan Hill...   G6120          S  2152288671   13432166  +37.1884863  -121.5530604  POLYGON ((-121.67024 37.20497, -121.67336 37.2...
 
 [5117 rows x 29 columns]
-01/20/2026 12:35:46 PM - DEBUG - MAZ GDF: 
+01/28/2026 02:54:36 PM - DEBUG - MAZ GDF: 
         MAZ_NODE COUNTYFP10                                           geometry  ALAND10  AWATER10  blockcount  TAZ_NODE  partcount  PERIM_MI  AREA_SQMI  psq_overa  acres   MAZ_X  MAZ_Y  MAZ_SEQ  suprdistid                 DistName PUMA20
 0         10001        075  POLYGON ((-122.44169 37.75084, -122.44062 37.7...    16958         0           1        56          1      0.34       0.01      17.64   4.19 -122.44  37.75        1           3         Mission District  07511
 1         10002        075  POLYGON ((-122.43955 37.75096, -122.43848 37.7...    16823         0           1        56          1      0.34       0.01      17.64   4.16 -122.44  37.75        2           3         Mission District  07511
@@ -712,15 +712,15 @@ COUNTYFP10
 3         10004        075  POLYGON ((-122.43765 37.7543, -122.4366 37.754...    16415         0           1        53          1      0.34       0.01      17.80   4.06 -122.44  37.75        4           3         Mission District  07511
 4         10005        075  POLYGON ((-122.43455 37.75609, -122.43233 37.7...    17523         0           1        48          1      0.35       0.01      18.58   4.33 -122.43  37.76        5           3         Mission District  07511
 ...         ...        ...                                                ...      ...       ...         ...       ...        ...       ...        ...        ...    ...     ...    ...      ...         ...                      ...    ...
-41419    814481        041  POLYGON ((-122.54542 38.06406, -122.54538 38.0...    35637         0           2    800058          1      0.64       0.01      29.39   8.81 -122.54  38.06    41420          32                   Novato  04103
-41420    814495        041  POLYGON ((-122.5497 38.07292, -122.54967 38.07...   277108         0           3    800090          1      1.72       0.11      27.72  68.47 -122.55  38.07    41421          32                   Novato  04103
-41421    814497        041  POLYGON ((-122.61571 38.10367, -122.61548 38.1...   229095         0           4    800055          1      1.57       0.09      27.77  56.61 -122.61  38.10    41422          32                   Novato  04103
-41422    814500        041  POLYGON ((-122.50724 37.88898, -122.50712 37.8...   308470         0           9    800007          1      1.69       0.12      23.88  76.22 -122.51  37.89    41423          34  Mill Valley & Sausalito  04104
-41423    814506        041  POLYGON ((-122.54926 37.91258, -122.54915 37.9...    53655         0           3    800008          1      1.03       0.02      51.38  13.26 -122.55  37.91    41424          34  Mill Valley & Sausalito  04104
+41429    814481        041  POLYGON ((-122.54542 38.06406, -122.54538 38.0...    35637         0           2    800058          1      0.64       0.01      29.39   8.81 -122.54  38.06    41430          32                   Novato  04103
+41430    814495        041  POLYGON ((-122.5497 38.07292, -122.54967 38.07...   277108         0           3    800090          1      1.72       0.11      27.72  68.47 -122.55  38.07    41431          32                   Novato  04103
+41431    814497        041  POLYGON ((-122.61571 38.10367, -122.61548 38.1...   229095         0           4    800055          1      1.57       0.09      27.77  56.61 -122.61  38.10    41432          32                   Novato  04103
+41432    814500        041  POLYGON ((-122.50724 37.88898, -122.50712 37.8...   308470         0           9    800007          1      1.69       0.12      23.88  76.22 -122.51  37.89    41433          34  Mill Valley & Sausalito  04104
+41433    814506        041  POLYGON ((-122.54926 37.91258, -122.54915 37.9...    53655         0           3    800008          1      1.03       0.02      51.38  13.26 -122.55  37.91    41434          34  Mill Valley & Sausalito  04104
 
-[41424 rows x 18 columns]
-01/20/2026 12:35:46 PM - INFO - Read M:\Data\Census\Geography\tl_2010_06_puma10\2010_Census_Tract_to_2010_PUMA.txt
-01/20/2026 12:35:46 PM - DEBUG - census_tract_puma_df:
+[41434 rows x 18 columns]
+01/28/2026 02:54:36 PM - INFO - Read M:\Data\Census\Geography\tl_2010_06_puma10\2010_Census_Tract_to_2010_PUMA.txt
+01/28/2026 02:54:36 PM - DEBUG - census_tract_puma_df:
       STATEFP10 COUNTYFP10 TRACTCE10 PUMA10
 0            01        001    020100  02100
 1            01        001    020200  02100
@@ -735,7 +735,7 @@ COUNTYFP10
 74090        78        030    990000  00100
 
 [74091 rows x 4 columns]
-01/20/2026 12:35:46 PM - DEBUG - blocks_maz_df len=107,252:
+01/28/2026 02:54:36 PM - DEBUG - blocks_maz_df len=107,252:
        STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10   ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry     maz     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY
 0             06        055    201700      4004  060552017004004  Block 4004   G5040    R   None   None          S   3905437     25696  +38.6157155  -122.4410306  POLYGON ((-122.46066 38.61807, -122.46062 38.6...  610054  600102  060552017004   06055201700          06055
 1             06        055    201700      1013  060552017001013  Block 1013   G5040    R   None   None          S  18373208      5143  +38.5070999  -122.3259045  POLYGON ((-122.35414 38.50768, -122.35408 38.5...  611025  600006  060552017001   06055201700          06055
@@ -750,29 +750,29 @@ COUNTYFP10
 109223        06        085    504102      1003  060855041021003  Block 1003   G5040    U  79039      U          S      1886         0  +37.3685613  -121.8075930  POLYGON ((-121.80817 37.36835, -121.80801 37.3...  215989  201027  060855041021   06085504102          06085
 
 [107252 rows x 21 columns]
-01/20/2026 12:35:47 PM - DEBUG - blocks_maz_df len=107,252:
+01/28/2026 02:54:36 PM - DEBUG - blocks_maz_df len=107,252:
        STATEFP10 COUNTYFP10 TRACTCE10 BLOCKCE10          GEOID10      NAME10 MTFCC10 UR10 UACE10 UATYPE FUNCSTAT10   ALAND10  AWATER10   INTPTLAT10    INTPTLON10                                           geometry  MAZ_NODE     taz    GEOID10_BG GEOID10_TRACT GEOID10_COUNTY  MAZ_SEQ  suprdistid                   DistName PUMA20   MAZ_X  MAZ_Y PUMA10
-0             06        055    201700      4004  060552017004004  Block 4004   G5040    R   None   None          S   3905437     25696  +38.6157155  -122.4410306  POLYGON ((-122.46066 38.61807, -122.46062 38.6...    610054  600102  060552017004   06055201700          06055    36161          28               Saint Helena  05500 -122.45  38.62  05500
-1             06        055    201700      1013  060552017001013  Block 1013   G5040    R   None   None          S  18373208      5143  +38.5070999  -122.3259045  POLYGON ((-122.35414 38.50768, -122.35408 38.5...    611025  600006  060552017001   06055201700          06055    36537          28               Saint Helena  05500 -122.33  38.51  05500
-2             06        055    201700      4007  060552017004007  Block 4007   G5040    R   None   None          S   2002844     10132  +38.6007413  -122.4727415  POLYGON ((-122.4883 38.59902, -122.48826 38.60...    610857  600102  060552017004   06055201700          06055    36480          28               Saint Helena  05500 -122.48  38.60  05500
-3             06        055    201700      4023  060552017004023  Block 4023   G5040    R   None   None          S   2057198     46714  +38.5912077  -122.4592519  POLYGON ((-122.47466 38.59312, -122.47346 38.5...    611028  600102  060552017004   06055201700          06055    36538          28               Saint Helena  05500 -122.46  38.59  05500
-4             06        055    201403      1023  060552014031023  Block 1023   G5040    R   None   None          S  20642906     45470  +38.3680728  -122.1517456  POLYGON ((-122.1789 38.38562, -122.17748 38.38...    610051  600097  060552014031   06055201403          06055    36159          28               Saint Helena  05500 -122.15  38.37  05500
+0             06        055    201700      4004  060552017004004  Block 4004   G5040    R   None   None          S   3905437     25696  +38.6157155  -122.4410306  POLYGON ((-122.46066 38.61807, -122.46062 38.6...    610054  600102  060552017004   06055201700          06055    36171          28               Saint Helena  05500 -122.45  38.62  05500
+1             06        055    201700      1013  060552017001013  Block 1013   G5040    R   None   None          S  18373208      5143  +38.5070999  -122.3259045  POLYGON ((-122.35414 38.50768, -122.35408 38.5...    611025  600006  060552017001   06055201700          06055    36547          28               Saint Helena  05500 -122.33  38.51  05500
+2             06        055    201700      4007  060552017004007  Block 4007   G5040    R   None   None          S   2002844     10132  +38.6007413  -122.4727415  POLYGON ((-122.4883 38.59902, -122.48826 38.60...    610857  600102  060552017004   06055201700          06055    36490          28               Saint Helena  05500 -122.48  38.60  05500
+3             06        055    201700      4023  060552017004023  Block 4023   G5040    R   None   None          S   2057198     46714  +38.5912077  -122.4592519  POLYGON ((-122.47466 38.59312, -122.47346 38.5...    611028  600102  060552017004   06055201700          06055    36548          28               Saint Helena  05500 -122.46  38.59  05500
+4             06        055    201403      1023  060552014031023  Block 1023   G5040    R   None   None          S  20642906     45470  +38.3680728  -122.1517456  POLYGON ((-122.1789 38.38562, -122.17748 38.38...    610051  600097  060552014031   06055201403          06055    36169          28               Saint Helena  05500 -122.15  38.37  05500
 ...          ...        ...       ...       ...              ...         ...     ...  ...    ...    ...        ...       ...       ...          ...           ...                                                ...       ...     ...           ...           ...            ...      ...         ...                        ...    ...     ...    ...    ...
-107247        06        013    323000      4024  060133230004024  Block 4024   G5040    U  19504      U          S      9115         0  +37.9518655  -122.0777322  POLYGON ((-122.07841 37.95167, -122.0784 37.95...    421869  400309  060133230004   06013323000          06013    31572          21         Concord & Martinez  01311 -122.08  37.95  01303
-107248        06        085    512001      1006  060855120011006  Block 1006   G5040    U  79039      U          S      2661         0  +37.2801680  -121.8041398  POLYGON ((-121.8046 37.28067, -121.80459 37.28...    215098  200732  060855120011   06085512001          06085    14200          13             South San Jose  08520 -121.80  37.28  08513
-107249        06        041    121100      1023  060411211001023  Block 1023   G5040    U  78904      U          S      8173         0  +37.9266635  -122.5183954  POLYGON ((-122.51872 37.92732, -122.51804 37.9...    814295  800117  060411211001   06041121100          06041    41363          34    Mill Valley & Sausalito  04104 -122.52  37.93  04102
-107250        06        085    504001      2003  060855040012003  Block 2003   G5040    U  79039      U          S     29605         0  +37.3563418  -121.8238510  POLYGON ((-121.82849 37.35597, -121.82848 37.3...    215081  201041  060855040012   06085504001          06085    14183          12  Milipitas & East San Jose  08505 -121.82  37.36  08505
-107251        06        085    504102      1003  060855041021003  Block 1003   G5040    U  79039      U          S      1886         0  +37.3685613  -121.8075930  POLYGON ((-121.80817 37.36835, -121.80801 37.3...    215989  201027  060855041021   06085504102          06085    15090          12  Milipitas & East San Jose  08505 -121.81  37.37  08505
+107247        06        013    323000      4024  060133230004024  Block 4024   G5040    U  19504      U          S      9115         0  +37.9518655  -122.0777322  POLYGON ((-122.07841 37.95167, -122.0784 37.95...    421869  400309  060133230004   06013323000          06013    31583          21         Concord & Martinez  01311 -122.08  37.95  01303
+107248        06        085    512001      1006  060855120011006  Block 1006   G5040    U  79039      U          S      2661         0  +37.2801680  -121.8041398  POLYGON ((-121.8046 37.28067, -121.80459 37.28...    215098  200732  060855120011   06085512001          06085    14207          13             South San Jose  08520 -121.80  37.28  08513
+107249        06        041    121100      1023  060411211001023  Block 1023   G5040    U  78904      U          S      8173         0  +37.9266635  -122.5183954  POLYGON ((-122.51872 37.92732, -122.51804 37.9...    814295  800117  060411211001   06041121100          06041    41373          34    Mill Valley & Sausalito  04104 -122.52  37.93  04102
+107250        06        085    504001      2003  060855040012003  Block 2003   G5040    U  79039      U          S     29605         0  +37.3563418  -121.8238510  POLYGON ((-121.82849 37.35597, -121.82848 37.3...    215081  201041  060855040012   06085504001          06085    14190          12  Milipitas & East San Jose  08505 -121.82  37.36  08505
+107251        06        085    504102      1003  060855041021003  Block 1003   G5040    U  79039      U          S      1886         0  +37.3685613  -121.8075930  POLYGON ((-121.80817 37.36835, -121.80801 37.3...    215989  201027  060855041021   06085504102          06085    15097          12  Milipitas & East San Jose  08505 -121.81  37.37  08505
 
 [107252 rows x 28 columns]
-01/20/2026 12:35:47 PM - DEBUG - After drop_duplicates, len(blocks_maz_df)=41,428 blocks_maz_df.MAZ_NODE.nunique()=41,424
-01/20/2026 12:35:47 PM - DEBUG - After manual fixes, len(blocks_maz_df)=41,424 blocks_maz_df.MAZ_NODE.nunique()=41,424
-01/20/2026 12:35:47 PM - DEBUG - dupe_maz:
+01/28/2026 02:54:37 PM - DEBUG - After drop_duplicates, len(blocks_maz_df)=41,438 blocks_maz_df.MAZ_NODE.nunique()=41,434
+01/28/2026 02:54:37 PM - DEBUG - After manual fixes, len(blocks_maz_df)=41,434 blocks_maz_df.MAZ_NODE.nunique()=41,434
+01/28/2026 02:54:37 PM - DEBUG - dupe_maz:
 Empty DataFrame
 Columns: [MAZ_NODE, MAZ_SEQ, TAZ_NODE, TAZ_SEQ, COUNTY, county_name, COUNTYFP10, TRACTCE10, PUMA10, PUMA20, DistID, DistName, MAZ_X, MAZ_Y]
 Index: []
-01/20/2026 12:35:47 PM - INFO - Writing 41,424 rows to mazs_tazs_county_tract_PUMA_2.6.csv
-01/20/2026 12:35:48 PM - DEBUG - taz_tract_df:
+01/28/2026 02:54:37 PM - INFO - Writing 41,434 rows to mazs_tazs_county_tract_PUMA_2.6.csv
+01/28/2026 02:54:37 PM - DEBUG - taz_tract_df:
        TAZ_NODE  TAZ_SEQ  COUNTY    county_name COUNTYFP10 TRACTCE10 PUMA10 PUMA20  DistID                 DistName
 59340        56       56       1  San Francisco        075    021300  07504  07511       3         Mission District
 66294        10       10       1  San Francisco        075    020500  07504  07511       3         Mission District
@@ -782,12 +782,12 @@ Index: []
 ...         ...      ...     ...            ...        ...       ...    ...    ...     ...                      ...
 12117    800104     5016       9          Marin        041    107000  04101  04103      33               San Rafael
 77576    800182     5089       9          Marin        041    102203  04101  04103      32                   Novato
-62823    800205     5112       9          Marin        041    120000  04102  04104      34  Mill Valley & Sausalito
-5267     800203     5110       9          Marin        041    121200  04102  04104      34  Mill Valley & Sausalito
-98714    800185     5092       9          Marin        041    101200  04101  04103      32                   Novato
+45228    800205     5112       9          Marin        041    120000  04102  04104      34  Mill Valley & Sausalito
+34960    800203     5110       9          Marin        041    121200  04102  04104      34  Mill Valley & Sausalito
+17736    800185     5092       9          Marin        041    101200  04101  04103      32                   Novato
 
 [5117 rows x 10 columns]
-01/20/2026 12:35:48 PM - DEBUG - taz_tract_df:
+01/28/2026 02:54:37 PM - DEBUG - taz_tract_df:
       TAZ_NODE  TAZ_SEQ  COUNTY    county_name COUNTYFP10 TRACTCE10 PUMA10 PUMA20  DistID                 DistName   TAZ_X  TAZ_Y
 0            1        1       1  San Francisco        075    020200  07504  07511       3         Mission District -122.42  37.77
 1            2        2       1  San Francisco        075    020100  07504  07511       3         Mission District -122.42  37.76
@@ -802,4 +802,4 @@ Index: []
 5116    800210     5117       9          Marin        041    130202  04102  04104      34  Mill Valley & Sausalito -122.48  37.86
 
 [5117 rows x 12 columns]
-01/20/2026 12:35:48 PM - INFO - Writing 5,117 rows to tazs_county_tract_PUMA_2.6.csv
+01/28/2026 02:54:37 PM - INFO - Writing 5,117 rows to tazs_county_tract_PUMA_2.6.csv
