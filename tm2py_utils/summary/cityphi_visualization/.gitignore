@@ -1,0 +1,28 @@
+# Data files - don't commit large datasets
+*.shp
+*.dbf
+*.prj
+*.sbn
+*.sbx
+*.shx
+*.csv
+*.osm
+
+# Specific data directories
+data/
+E:/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+# Environment
+.venv/
+venv/
+cityphi_work/
+
+# IDE
+.vscode/
+.idea/

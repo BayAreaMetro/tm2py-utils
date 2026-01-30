@@ -1,0 +1,69 @@
+/* Custom styles for tm2py-utils documentation */
+
+/* Code blocks */
+.codehilite {
+  margin: 1em 0;
+}
+
+/* Admonitions */
+.admonition {
+  margin: 1em 0;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  margin: 1em 0;
+}
+
+/* Navigation improvements */
+.md-nav__item--nested > .md-nav__link {
+  font-weight: 500;
+}
+
+/* Code inline */
+code {
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+}
+
+/* Command blocks */
+.language-bash {
+  background-color: #f6f8fa;
+}
+
+/* Headings */
+h1 {
+  border-bottom: 2px solid #e1e4e8;
+  padding-bottom: 0.3em;
+}
+
+h2 {
+  border-bottom: 1px solid #e1e4e8;
+  padding-bottom: 0.2em;
+  margin-top: 1.5em;
+}
+
+/* Links */
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Dark mode adjustments */
+[data-md-color-scheme="slate"] code {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-md-color-scheme="slate"] .language-bash {
+  background-color: #2d333b;
+}
+
+[data-md-color-scheme="slate"] h1,
+[data-md-color-scheme="slate"] h2 {
+  border-color: #444c56;
+}

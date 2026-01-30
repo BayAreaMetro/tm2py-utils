@@ -9,6 +9,9 @@ income_category_bin: "Income Category"
 household_size: "Household Size"
 households: "Households"
 workers: "Workers"
+workers_category: "Number of Workers"
+county_name: "County"
+age_category: "Age Category"
 
 # Person variables
 person_type: "Person Type"

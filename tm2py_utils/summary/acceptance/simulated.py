@@ -388,7 +388,7 @@ class Simulated:
         temp = a_df["line_long"].str.split(pat="-", expand=True)
         a_df["LINE_ID"] = temp[0]
         a_df = a_df.rename(columns={"i_node": "INODE", "j_node": "JNODE"})
-        a_df = a_df[~(a_df["JNODE"] == "None")].reset_index().copy()
+        a_df = a_df[a_df["JNODE"].notna() & (a_df["JNODE"] != "None")].reset_index().copy()
         a_df["JNODE"] = a_df["JNODE"].astype("float").astype("Int64")
         df = a_df[["LINE_ID", "line", "INODE", "JNODE", "board"]]
 
@@ -635,37 +635,6 @@ class Simulated:
 
         return
 
-    def _make_simulated_maz_data(self):
-        in_file = self.scenario_dir / self.scenario_dict["scenario"]["maz_landuse_file"]
-        logging.info(f"Reading {in_file}")
-        df = pd.read_csv(in_file)
-        logging.debug(f"df:\n{df}")
-
-        index_file = self.scenario_dir / "inputs/landuse/mtc_final_network_zone_seq.csv"
-        logging.info(f"Reading {index_file}")
-        index_df = pd.read_csv(index_file)
-        logging.debug(f"df:\n{df}")
-        join_df = index_df.rename(columns={"N": "MAZ_ORIGINAL"})[
-            ["MAZ_ORIGINAL", "MAZSEQ"]
-        ].copy()
-
-        self.simulated_maz_data_df = pd.merge(
-            df,
-            join_df,
-            how="left",
-            on="MAZ_ORIGINAL",
-        )
-
-        self._make_taz_district_crosswalk()
-
-        return
-
-    def _make_taz_district_crosswalk(self):
-        df = self.simulated_maz_data_df[["TAZ_ORIGINAL", "DistID"]].copy()
-        df = df.rename(columns={"TAZ_ORIGINAL": "taz", "DistID": "district"})
-        self.taz_to_district_df = df.drop_duplicates().reset_index(drop=True)
-
-        return
 
     def _reduce_simulated_rail_access_summaries(self):
         """Process rail station access mode summaries.
@@ -727,7 +696,7 @@ class Simulated:
             names_df = self._get_station_names_from_standard_network(rail_nodes_df)
             logging.debug(f"names_df:\n{names_df}")
             if "level_0" in names_df.columns:
-                names_df = names_df.drop(columns=["level_0", "index"])
+                names_df = names_df.drop(columns=["level_0", "index"]).drop_duplicates()
             station_list = names_df.boarding.astype(str).unique().tolist()
 
             access_df = transit_df.copy()

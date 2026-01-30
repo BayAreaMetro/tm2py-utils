@@ -937,7 +937,7 @@
     num_processors = "MAX-1"
     num_processors_transit_skim = "32"
     all_day_scenario_id = 1
-    project_path = "emme_project/mtc_emme.emp"
+    project_path = "emme_project/emme_project.emp"
     highway_database_path = "emme_project/Database_highway/emmebank"
     active_north_database_path = "emme_project/Database_active_north/emmebank"
     active_south_database_path = "emme_project/Database_active_south/emmebank"
@@ -1265,7 +1265,7 @@
     description = "knrdummy"
     type = "KNR_dummy"
     assign_type = "AUX_TRANSIT"
-    speed_or_time_factor = 40.0
+    speed_or_time_factor = "40.0"
 [[transit.modes]]
     mode_id = "w"
     name = "walk"

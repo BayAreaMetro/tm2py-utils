@@ -1,0 +1,23 @@
+person_type,cdap,persons,share,dataset
+Child too young for school,H,104220.0,20.380944931163956,2015 TM2.2 Sprint 04
+Child too young for school,M,234320.0,45.822903629536924,2015 TM2.2 Sprint 04
+Child too young for school,N,172820.0,33.79615143929912,2015 TM2.2 Sprint 04
+Full-time worker,H,868640.0,33.43237626048803,2015 TM2.2 Sprint 04
+Full-time worker,M,1388180.0,53.42852744207528,2015 TM2.2 Sprint 04
+Full-time worker,N,341380.0,13.139096297436687,2015 TM2.2 Sprint 04
+Non-worker,H,373960.0,29.459123064076508,2015 TM2.2 Sprint 04
+Non-worker,N,895460.0,70.54087693592349,2015 TM2.2 Sprint 04
+Part-time worker,H,162780.0,25.291320965787268,2015 TM2.2 Sprint 04
+Part-time worker,M,230080.0,35.74780149777819,2015 TM2.2 Sprint 04
+Part-time worker,N,250760.0,38.96087753643454,2015 TM2.2 Sprint 04
+Retired,H,257200.0,29.968307233407902,2015 TM2.2 Sprint 04
+Retired,N,601040.0,70.03169276659209,2015 TM2.2 Sprint 04
+Student of driving age,H,19900.0,9.517887889802946,2015 TM2.2 Sprint 04
+Student of driving age,M,184400.0,88.19590587334991,2015 TM2.2 Sprint 04
+Student of driving age,N,4780.0,2.2862062368471396,2015 TM2.2 Sprint 04
+Student of non-driving age,H,10340.0,1.2812887236679058,2015 TM2.2 Sprint 04
+Student of non-driving age,M,773060.0,95.79429987608427,2015 TM2.2 Sprint 04
+Student of non-driving age,N,23600.0,2.9244114002478314,2015 TM2.2 Sprint 04
+University student,H,143620.0,25.583383804196803,2015 TM2.2 Sprint 04
+University student,M,274020.0,48.81185649649079,2015 TM2.2 Sprint 04
+University student,N,143740.0,25.604759699312407,2015 TM2.2 Sprint 04

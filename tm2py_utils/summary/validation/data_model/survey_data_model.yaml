@@ -1,0 +1,17 @@
+# Survey Data Model Configuration
+# File patterns and column mappings for BATS 2023 Travel Diary Survey outputs
+# Based on ctramp_data_model.yaml but adapted for survey file naming conventions
+
+# File naming patterns for survey outputs (no iteration suffix, CamelCase)
+file_patterns:
+  persons: "PersonData.csv"
+  households: "HouseholdData.csv"
+  individual_tours: "IndivTourData.csv"
+  individual_trips: "IndivTripData.csv"
+  joint_tours: "JointTourData.csv"
+  joint_trips: "JointTripData.csv"
+  workplace_school_location: "MandatoryLocationData.csv"
+
+# Import all other configurations from the standard CTRAMP data model
+# This allows us to reuse column mappings, value labels, and summary definitions
+import_from: "ctramp_data_model.yaml"
