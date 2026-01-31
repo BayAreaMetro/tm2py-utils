@@ -1,4 +1,3 @@
-#%%
 from pathlib import Path
 import pandas as pd
 import geopandas as gpd
@@ -20,7 +19,7 @@ RAW_DATA_DIR = Path(r"E:\Box\Modeling and Surveys\Development\Travel Model Two C
 MAZ_TAZ_DIR = Path(__file__).parent.parent / "maz_taz" / "shapefiles"
 ANALYSIS_CRS = "EPSG:26910"
 SQUARE_METERS_PER_ACRE = 4046.86
-OUT_FILE = Path(r"E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-version-05\landuse\parking_maz_v2_5_2023.gpkg")
+OUT_FILE = Path(r"E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-version-05\landuse\parking_capacity.gpkg")
 
 
 def overlay_maz_blockgroups(maz, parking_capacity):
@@ -272,12 +271,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-#%%
-parking_maz = get_parking_maz(write=True)
-
-
-
-
-# %%
