@@ -86,8 +86,8 @@ def load_maz_data():
     print(f"  Loaded employment for {len(jobs_maz):,} MAZs")
     print(f"  Jobs MAZ columns: {list(jobs_maz.columns)[:10]}...")  # Debug: show first 10 columns
     
-    # Merge the synthetic pop data
-    SYNTH_POP_FILE = Path(r"E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-version-05\landuse\maz_data.csv")
+    # Merge the synthetic pop data - IMPORTANT: UPDATE THIS TO LATEST SYNTH POP
+    SYNTH_POP_FILE = Path(r"E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-version-05\landuse\maz_data_old.csv")
     pop_maz = pd.read_csv(SYNTH_POP_FILE)
     pop_maz = pop_maz[["MAZ_NODE", "POP", "HH"]]
     
@@ -223,8 +223,46 @@ def merge_scraped_cost(maz):
     
     return maz
 
-# def merge_published_cost():
-#     # bring in the publised cost data here
+def merge_published_cost(maz):
+    """
+    Merge published parking meter costs to MAZ.
+    
+    Calls published_cost() from parking_published module to get hourly parking costs
+    from Oakland, San Jose, and San Francisco meters, then merges to MAZ.
+    
+    Args:
+        maz: GeoDataFrame with MAZ zones (must have MAZ_NODE)
+    
+    Returns:
+        GeoDataFrame: maz with added hparkcost column
+    """
+    from parking_published import published_cost
+    
+    # Store original count for validation
+    original_count = len(maz)
+    
+    # Get published parking costs
+    hparkcost_data = published_cost()
+    
+    # Ensure consistent data types
+    hparkcost_data['MAZ_NODE'] = hparkcost_data['MAZ_NODE'].astype(str)
+    
+    # Merge to maz (left join to keep all MAZ records)
+    print("  Merging published costs to MAZ...")
+    maz = maz.merge(
+        hparkcost_data[['MAZ_NODE', 'hparkcost']], 
+        on='MAZ_NODE', 
+        how='left',
+        validate="1:1"
+    )
+    
+    # Validate no records were lost
+    if len(maz) != original_count:
+        print(f"  WARNING: Record count changed from {original_count:,} to {len(maz):,}")
+    else:
+        print(f"  ✓ All {original_count:,} MAZ records retained")
+    
+    return maz
 
 def merge_capacity(maz):
     """
@@ -323,6 +361,10 @@ def main():
     maz = merge_scraped_cost(maz)
     print(f"  Completed parking cost merge")
     
+    print("\nMerging published parking meter costs...")
+    maz = merge_published_cost(maz)
+    print(f"  Completed published parking cost merge")
+    
     print("\nMerging parking capacity data...")
     maz = merge_capacity(maz)
     print(f"  Completed parking capacity merge")
@@ -333,3 +375,5 @@ def main():
 if __name__ == "__main__":
     maz_prepped = main()
 
+
+# %%
