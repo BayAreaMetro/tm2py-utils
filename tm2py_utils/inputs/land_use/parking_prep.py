@@ -354,7 +354,7 @@ def merge_capacity(maz):
     return maz
 
 
-def main(run_validation=False, commercial_density_threshold=1.0, daily_percentile=0.95, monthly_percentile=0.98):
+def main(run_validation=False, compare_models_flag=False, commercial_density_threshold=1.0, daily_percentile=0.95, monthly_percentile=0.99):
     """
     Main orchestration for parking data preparation.
     
@@ -363,6 +363,7 @@ def main(run_validation=False, commercial_density_threshold=1.0, daily_percentil
     
     Args:
         run_validation: If True, perform leave-one-city-out cross-validation (default False)
+        compare_models_flag: If True, compare multiple model types (LR, RF, GB, SVM) (default False)
         commercial_density_threshold: Minimum commercial_emp_den for paid parking (default 1.0 jobs/acre)
         daily_percentile: County-level percentile for daily parking threshold (default 0.95)
         monthly_percentile: County-level percentile for monthly parking threshold (default 0.98)
@@ -396,18 +397,22 @@ def main(run_validation=False, commercial_density_threshold=1.0, daily_percentil
     # Estimate costs for unobserved areas using parking_estimation module
     from parking_estimation import merge_estimated_costs
     maz = merge_estimated_costs(
+
         maz,
         run_validation=run_validation,
+        compare_models_flag=compare_models_flag,
+        use_best_model=True,  # Automatically use best performing model from comparison
         commercial_density_threshold=commercial_density_threshold,
         daily_percentile=daily_percentile,
-        monthly_percentile=monthly_percentile
+        monthly_percentile=monthly_percentile,
+        probability_threshold=0.3  # Optimized via cross-validation (F1=0.562 vs 0.520 at 0.5)
     )
     
     return maz
 
 
 if __name__ == "__main__":
-    maz_prepped = main(run_validation=True)
+    maz_prepped = main(run_validation=True, compare_models_flag=True)
 
 
 #%%

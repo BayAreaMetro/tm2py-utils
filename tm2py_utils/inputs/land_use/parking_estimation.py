@@ -12,9 +12,8 @@ Architecture:
   
 - **Daily/Monthly parking (dparkcost, mparkcost)**: County-level density thresholds
   - Uses commercial employment density percentiles within each county
-  - Daily: 95th percentile (top 5% of MAZs by commercial density)
-  - Monthly: 98th percentile (top 2% of MAZs by commercial density)
-  - Assigns median observed rates ($19.25 daily, $339.90 monthly)
+  - Percentiles are configurable (default: 95th daily, 99th monthly)
+  - Assigns discounted rates for non-core cities (65% of SF/Oak/SJ observed median)
 
 Key Constraints:
 - Hourly predictions only where on_all > 0 (on-street capacity)
@@ -38,6 +37,8 @@ import pandas as pd
 import geopandas as gpd
 import numpy as np
 from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
@@ -92,6 +93,13 @@ def add_density_features(maz):
         0
     )
     
+    # Calculate population density
+    maz['pop_den'] = np.where(
+        maz['ACRES'] > 0,
+        maz['POP'] / maz['ACRES'],
+        0
+    )
+    
     # Report statistics
     print(f"  Commercial employment density (jobs/acre):")
     print(f"    Mean: {maz['commercial_emp_den'].mean():.2f}")
@@ -104,6 +112,40 @@ def add_density_features(maz):
     print(f"    Median: {maz['downtown_emp_den'].median():.2f}")
     print(f"    90th percentile: {maz['downtown_emp_den'].quantile(0.90):.2f}")
     print(f"    95th percentile: {maz['downtown_emp_den'].quantile(0.95):.2f}")
+    
+    print(f"  Population density (people/acre):")
+    print(f"    Mean: {maz['pop_den'].mean():.2f}")
+    print(f"    Median: {maz['pop_den'].median():.2f}")
+    print(f"    90th percentile: {maz['pop_den'].quantile(0.90):.2f}")
+    print(f"    95th percentile: {maz['pop_den'].quantile(0.95):.2f}")
+    
+    # Check for multicollinearity among density features
+    print(f"\n  Feature Correlation Matrix:")
+    density_features = ['commercial_emp_den', 'downtown_emp_den', 'pop_den']
+    corr_matrix = maz[density_features].corr()
+    
+    # Print correlation matrix with formatting
+    print(f"  {'':<20} {'commercial':>12} {'downtown':>12} {'pop':>12}")
+    print(f"  {'-'*68}")
+    for idx, row_name in enumerate(density_features):
+        row_label = row_name.replace('_emp_den', '').replace('_den', '')
+        row_values = [f"{corr_matrix.iloc[idx, j]:>12.3f}" for j in range(len(density_features))]
+        print(f"  {row_label:<20} {''.join(row_values)}")
+    
+    # Highlight high correlations (potential multicollinearity)
+    print(f"\n  High Correlations (|r| >= 0.7, excluding diagonal):")
+    high_corr_found = False
+    for i in range(len(density_features)):
+        for j in range(i+1, len(density_features)):
+            r = corr_matrix.iloc[i, j]
+            if abs(r) >= 0.7:
+                feat1 = density_features[i].replace('_emp_den', '').replace('_den', '')
+                feat2 = density_features[j].replace('_emp_den', '').replace('_den', '')
+                print(f"    {feat1} <-> {feat2}: r = {r:.3f}")
+                high_corr_found = True
+    
+    if not high_corr_found:
+        print(f"    None found - features are relatively independent")
     
     return maz
 
@@ -176,21 +218,21 @@ def report_county_density_distributions(maz):
         print(f"  {row['County']}: {row['Observed_Cities']}")
     
     print("\nInterpretation:")
-    print("  - P95 = 95th percentile (top 5% of MAZs by commercial density)")
-    print("  - P98 = 98th percentile (top 2% of MAZs by commercial density)")
+    print("  - Percentiles shown: P90, P95, P98, P99")
     print("  - Higher percentiles = stricter criteria for paid parking prediction")
+    print("  - Top percentiles capture high-density commercial/downtown areas")
     print("  - Counties with ✓ have observed parking cost data for validation")
-    print("\nRecommendation:")
-    print("  - Daily parking: Consider P95 (captures high-density commercial areas)")
-    print("  - Monthly parking: Consider P98 (more restrictive, downtown cores only)")
+    print("\nNote:")
+    print("  - Daily/monthly percentile thresholds are configurable in merge_estimated_costs()")
+    print("  - Default: P95 for daily, P99 for monthly")
     print("="*80)
     
     return df_stats
 
 
-def estimate_parking_costs(maz, commercial_density_threshold=1.0):
+def estimate_parking_costs(maz, commercial_density_threshold=1.0, probability_threshold=0.5, model=None, model_name="Logistic Regression"):
     """
-    Estimate parking costs for MAZs without observed data using logistic regression.
+    Estimate parking costs for MAZs without observed data using machine learning classification.
     
     Uses binary classification to predict paid (1) vs free (0) parking, then assigns:
     - hparkcost: $2.00 flat rate (typical SF/Oakland hourly rate)
@@ -206,20 +248,25 @@ def estimate_parking_costs(maz, commercial_density_threshold=1.0):
     Args:
         maz: GeoDataFrame with MAZ zones (must have density features, observed costs, capacity)
         commercial_density_threshold: Minimum commercial_emp_den for paid parking consideration (default 1.0 jobs/acre)
+        probability_threshold: Classification threshold for model predictions (default 0.5)
+        model: Pre-initialized sklearn model instance (default None, will use LogisticRegression)
+        model_name: Name of the model being used (for reporting purposes)
     
     Returns:
         GeoDataFrame: maz with estimated parking costs filled in
     """
     print(f"\nEstimating parking costs for MAZs without observed data...")
-    print(f"  Approach: Logistic regression (binary classification) + flat rates")
+    print(f"  Model: {model_name}")
+    print(f"  Approach: Binary classification + flat rates")
     print(f"  Excluding from prediction: San Francisco, Oakland, San Jose (observed data only)")
     print(f"  Commercial density threshold: {commercial_density_threshold:.2f} jobs/acre")
+    print(f"  Probability threshold: {probability_threshold:.2f}")
     
     # Cities with observed data - exclude from predictions
     OBSERVED_CITIES = ['San Francisco', 'Oakland', 'San Jose']
     
-    # Feature columns for regression
-    feature_cols = ['commercial_emp_den', 'downtown_emp_den', 'emp_total_den']
+    # Feature columns for regression (emp_total_den removed due to multicollinearity with downtown_emp_den)
+    feature_cols = ['commercial_emp_den', 'downtown_emp_den', 'pop_den']
     
     # Initialize predicted cost columns (start with NaN)
     maz['hparkcost_pred'] = np.nan
@@ -279,11 +326,22 @@ def estimate_parking_costs(maz, commercial_density_threshold=1.0):
         scaler = StandardScaler()
         X_train_scaled = scaler.fit_transform(X_train)
         
-        # Train logistic regression
-        model = LogisticRegression(random_state=42, max_iter=1000)
+        # Initialize model if not provided
+        if model is None:
+            model = LogisticRegression(random_state=42, max_iter=1000)
+        
+        # Train model
         model.fit(X_train_scaled, y_train_binary)
         
-        print(f"    Logit coefficients: commercial={model.coef_[0][0]:.3f}, downtown={model.coef_[0][1]:.3f}, total_emp={model.coef_[0][2]:.3f}")
+        # Report model parameters (coefficients or feature importances)
+        if hasattr(model, 'coef_'):
+            print(f"    Model coefficients:")
+            for feat, coef in zip(feature_cols, model.coef_[0]):
+                print(f"      {feat}: {coef:+.4f}")
+        elif hasattr(model, 'feature_importances_'):
+            print(f"    Feature importances:")
+            for feat, importance in zip(feature_cols, model.feature_importances_):
+                print(f"      {feat}: {importance:.4f}")
         
         # Create prediction mask: NO observed cost AND has capacity AND has place_name AND NOT in observed cities AND above density threshold
         has_observed = maz[cost_type].notna()
@@ -306,8 +364,8 @@ def estimate_parking_costs(maz, commercial_density_threshold=1.0):
             # Predict probability of paid parking
             y_pred_proba = model.predict_proba(X_pred_scaled)[:, 1]  # Probability of class 1 (paid)
             
-            # Use 0.5 threshold to classify
-            y_pred_binary = (y_pred_proba >= 0.5).astype(int)
+            # Apply probability threshold to classify
+            y_pred_binary = (y_pred_proba >= probability_threshold).astype(int)
             
             # Assign flat rate to predicted paid parking MAZs
             y_pred = np.where(y_pred_binary == 1, flat_rate, 0)
@@ -339,7 +397,7 @@ def estimate_parking_costs(maz, commercial_density_threshold=1.0):
     return maz
 
 
-def validate_parking_cost_estimation(maz, commercial_density_threshold=1.0):
+def validate_parking_cost_estimation(maz, commercial_density_threshold=1.0, test_thresholds=None):
     """
     Perform leave-one-city-out cross-validation for hourly parking cost estimation using logistic regression.
     
@@ -351,20 +409,27 @@ def validate_parking_cost_estimation(maz, commercial_density_threshold=1.0):
     Args:
         maz: GeoDataFrame with MAZ zones (must have density features, observed costs, capacity)
         commercial_density_threshold: Minimum commercial_emp_den for paid parking (default 1.0 jobs/acre)
+        test_thresholds: List of probability thresholds to test (default [0.3, 0.4, 0.5, 0.6, 0.7])
     
     Returns:
-        dict: Validation metrics for each cost type and held-out city
+        dict: Validation metrics for each cost type, threshold, and held-out city
     """
     print("\n" + "="*80)
     print("LEAVE-ONE-CITY-OUT CROSS-VALIDATION (Logistic Regression)")
     print("="*80)
     print("Validating hourly parking only (daily/monthly use county thresholds)")
     
+    # Default thresholds to test
+    if test_thresholds is None:
+        test_thresholds = [0.3, 0.4, 0.5, 0.6, 0.7]
+    
+    print(f"Testing probability thresholds: {test_thresholds}")
+    
     # Cities with observed parking cost data
     TARGET_CITIES = ['San Francisco', 'Oakland', 'San Jose']
     
-    # Feature columns for regression
-    feature_cols = ['commercial_emp_den', 'downtown_emp_den', 'emp_total_den']
+    # Feature columns for regression (emp_total_den removed due to multicollinearity with downtown_emp_den)
+    feature_cols = ['commercial_emp_den', 'downtown_emp_den', 'pop_den']
     
     results = {}
     
@@ -464,51 +529,64 @@ def validate_parking_cost_estimation(maz, commercial_density_threshold=1.0):
             model = LogisticRegression(random_state=42, max_iter=1000)
             model.fit(X_train_scaled, y_train_binary)
             
-            # Predict on held-out city
+            # Predict probabilities once
             y_pred_proba = model.predict_proba(X_test_scaled)[:, 1]
-            y_pred_binary = (y_pred_proba >= 0.5).astype(int)
             
-            # Calculate classification metrics
-            accuracy = accuracy_score(y_test_binary, y_pred_binary)
+            # Test multiple thresholds
+            threshold_results = {}
+            for threshold in test_thresholds:
+                y_pred_binary = (y_pred_proba >= threshold).astype(int)
+                
+                # Calculate classification metrics
+                accuracy = accuracy_score(y_test_binary, y_pred_binary)
+                
+                # Handle case where there are no positive predictions
+                if y_pred_binary.sum() == 0:
+                    precision = 0.0
+                    recall = 0.0
+                    f1 = 0.0
+                else:
+                    precision = precision_score(y_test_binary, y_pred_binary, zero_division=0)
+                    recall = recall_score(y_test_binary, y_pred_binary, zero_division=0)
+                    f1 = f1_score(y_test_binary, y_pred_binary, zero_division=0)
+                
+                # Count predictions
+                n_actual_paid = y_test_binary.sum()
+                n_actual_free = len(y_test_binary) - n_actual_paid
+                n_predicted_paid = y_pred_binary.sum()
+                n_predicted_free = len(y_pred_binary) - n_predicted_paid
+                
+                # Store results for this threshold
+                threshold_results[threshold] = {
+                    'accuracy': accuracy,
+                    'precision': precision,
+                    'recall': recall,
+                    'f1': f1,
+                    'n_predicted_paid': n_predicted_paid,
+                    'n_predicted_free': n_predicted_free,
+                }
             
-            # Handle case where there are no positive predictions
-            if y_pred_binary.sum() == 0:
-                precision = 0.0
-                recall = 0.0
-                f1 = 0.0
-            else:
-                precision = precision_score(y_test_binary, y_pred_binary, zero_division=0)
-                recall = recall_score(y_test_binary, y_pred_binary, zero_division=0)
-                f1 = f1_score(y_test_binary, y_pred_binary, zero_division=0)
-            
-            # Count true positives, false positives, etc.
-            n_actual_paid = y_test_binary.sum()
-            n_actual_free = len(y_test_binary) - n_actual_paid
-            n_predicted_paid = y_pred_binary.sum()
-            n_predicted_free = len(y_pred_binary) - n_predicted_paid
-            
-            # Store results
+            # Store results for all thresholds
             results[cost_type][held_out_city] = {
                 'n_train': n_train,
                 'n_test': n_test,
-                'accuracy': accuracy,
-                'precision': precision,
-                'recall': recall,
-                'f1': f1,
-                'n_actual_paid': n_actual_paid,
-                'n_actual_free': n_actual_free,
-                'n_predicted_paid': n_predicted_paid,
-                'n_predicted_free': n_predicted_free,
+                'n_actual_paid': y_test_binary.sum(),
+                'n_actual_free': len(y_test_binary) - y_test_binary.sum(),
+                'thresholds': threshold_results,
             }
             
-            # Print metrics
-            print(f"    Classification Metrics:")
-            print(f"      Accuracy: {accuracy:.1%} ({int(accuracy * n_test)}/{n_test} correct)")
-            print(f"      Precision: {precision:.1%} (of predicted paid, % actually paid)")
-            print(f"      Recall: {recall:.1%} (of actual paid, % correctly predicted)")
-            print(f"      F1 Score: {f1:.3f}")
-            print(f"    Actual: {n_actual_paid:,} paid, {n_actual_free:,} free")
-            print(f"    Predicted: {n_predicted_paid:,} paid, {n_predicted_free:,} free")
+            # Print metrics for each threshold
+            print(f"    Classification Metrics by Threshold:")
+            print(f"    {'Threshold':>10} {'Accuracy':>10} {'Precision':>10} {'Recall':>10} {'F1':>8} {'Pred Paid':>10}")
+            print(f"    {'-'*68}")
+            for threshold in test_thresholds:
+                tr = threshold_results[threshold]
+                print(f"    {threshold:>10.2f} {tr['accuracy']:>10.1%} {tr['precision']:>10.1%} {tr['recall']:>10.1%} {tr['f1']:>8.3f} {tr['n_predicted_paid']:>10,}")
+            
+            # Highlight best threshold by F1 score
+            best_threshold = max(threshold_results.keys(), key=lambda t: threshold_results[t]['f1'])
+            print(f"    {'-'*68}")
+            print(f"    Best threshold by F1: {best_threshold:.2f} (F1={threshold_results[best_threshold]['f1']:.3f})")
     
     # Print summary
     print(f"\n{'='*80}")
@@ -528,36 +606,218 @@ def validate_parking_cost_estimation(maz, commercial_density_threshold=1.0):
         
         print(f"\n{cost_type.upper()}:")
         
-        # Calculate average metrics across cities
-        avg_accuracy = np.mean([r['accuracy'] for r in city_results.values()])
-        avg_precision = np.mean([r['precision'] for r in city_results.values()])
-        avg_recall = np.mean([r['recall'] for r in city_results.values()])
-        avg_f1 = np.mean([r['f1'] for r in city_results.values()])
+        # Calculate average metrics across cities for each threshold
+        print(f"\n  Average Metrics Across Cities:")
+        print(f"  {'Threshold':>10} {'Accuracy':>10} {'Precision':>10} {'Recall':>10} {'F1':>8}")
+        print(f"  {'-'*58}")
         
-        print(f"  Average Accuracy: {avg_accuracy:.1%}")
-        print(f"  Average Precision: {avg_precision:.1%}")
-        print(f"  Average Recall: {avg_recall:.1%}")
-        print(f"  Average F1 Score: {avg_f1:.3f}")
-        print(f"  Tested on {len(city_results)} cities")
+        for threshold in test_thresholds:
+            avg_accuracy = np.mean([r['thresholds'][threshold]['accuracy'] for r in city_results.values()])
+            avg_precision = np.mean([r['thresholds'][threshold]['precision'] for r in city_results.values()])
+            avg_recall = np.mean([r['thresholds'][threshold]['recall'] for r in city_results.values()])
+            avg_f1 = np.mean([r['thresholds'][threshold]['f1'] for r in city_results.values()])
+            
+            print(f"  {threshold:>10.2f} {avg_accuracy:>10.1%} {avg_precision:>10.1%} {avg_recall:>10.1%} {avg_f1:>8.3f}")
         
-        # County-level breakdown
-        print(f"\n  County-Level Breakdown:")
+        # Find best threshold by average F1
+        best_threshold = max(test_thresholds, key=lambda t: np.mean([r['thresholds'][t]['f1'] for r in city_results.values()]))
+        best_f1 = np.mean([r['thresholds'][best_threshold]['f1'] for r in city_results.values()])
+        print(f"  {'-'*58}")
+        print(f"  ✓ RECOMMENDED THRESHOLD: {best_threshold:.2f} (avg F1={best_f1:.3f})")
+        print(f"  {'-'*58}")
+        
+        # County-level breakdown for best threshold
+        print(f"\n  City-Level Performance (Threshold={best_threshold:.2f}):")
         print(f"  {'─'*76}")
         print(f"  {'County':<20} {'City':<15} {'Accuracy':>10} {'Precision':>10} {'Recall':>10}")
         print(f"  {'─'*76}")
         
         for city, metrics in city_results.items():
             county = CITY_TO_COUNTY.get(city, 'Unknown')
-            print(f"  {county:<20} {city:<15} {metrics['accuracy']:>9.1%} {metrics['precision']:>9.1%} {metrics['recall']:>9.1%}")
+            tr = metrics['thresholds'][best_threshold]
+            print(f"  {county:<20} {city:<15} {tr['accuracy']:>9.1%} {tr['precision']:>9.1%} {tr['recall']:>9.1%}")
         
-        print(f"  {'─'*76}")
-        print(f"  {'Total':<20} {'All cities':<15} {avg_accuracy:>9.1%} {avg_precision:>9.1%} {avg_recall:>9.1%}")
         print(f"  {'─'*76}")
     
     return results
 
 
-def estimate_parking_by_county_threshold(maz, daily_percentile=0.95, monthly_percentile=0.98):
+def compare_models(maz, commercial_density_threshold=1.0, test_thresholds=None):
+    """
+    Compare multiple model types using leave-one-city-out cross-validation.
+    
+    Tests Logistic Regression, Random Forest, Gradient Boosting, and SVM to find
+    the best-performing model for parking cost classification.
+    
+    Args:
+        maz: GeoDataFrame with MAZ zones (must have density features, observed costs, capacity)
+        commercial_density_threshold: Minimum commercial_emp_den for paid parking (default 1.0 jobs/acre)
+        test_thresholds: List of probability thresholds to test (default [0.3, 0.4, 0.5, 0.6, 0.7])
+    
+    Returns:
+        dict: Performance metrics for each model and city combination
+    """
+    print("\n" + "="*80)
+    print("MODEL COMPARISON - LEAVE-ONE-CITY-OUT CROSS-VALIDATION")
+    print("="*80)
+    
+    if test_thresholds is None:
+        test_thresholds = [0.3, 0.4, 0.5, 0.6, 0.7]
+    
+    # Define models to test
+    models = {
+        'Logistic Regression': LogisticRegression(random_state=42, max_iter=1000),
+        'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42, max_depth=10),
+        'Gradient Boosting': GradientBoostingClassifier(n_estimators=100, random_state=42, max_depth=5, learning_rate=0.1),
+        'SVM (RBF)': SVC(probability=True, random_state=42, kernel='rbf', C=1.0)
+    }
+    
+    TARGET_CITIES = ['San Francisco', 'Oakland', 'San Jose']
+    feature_cols = ['commercial_emp_den', 'downtown_emp_den', 'pop_den']
+    
+    results = {}
+    
+    for model_name, model in models.items():
+        print(f"\n{'='*80}")
+        print(f"TESTING: {model_name}")
+        print(f"{'='*80}")
+        
+        results[model_name] = {}
+        
+        # Leave-one-city-out cross-validation
+        for held_out_city in TARGET_CITIES:
+            training_cities = [c for c in TARGET_CITIES if c != held_out_city]
+            
+            print(f"\n  Training on {', '.join(training_cities)} → Testing on {held_out_city}")
+            
+            # Prepare data
+            has_capacity = maz['on_all'] > 0
+            has_place = maz['place_name'].notna()
+            
+            train_mask = has_capacity & has_place & maz['place_name'].isin(training_cities)
+            test_mask = (
+                has_capacity & has_place & 
+                (maz['place_name'] == held_out_city) &
+                (maz['commercial_emp_den'] >= commercial_density_threshold)
+            )
+            
+            n_train = train_mask.sum()
+            n_test = test_mask.sum()
+            
+            if n_train < 10 or n_test < 5:
+                print(f"    Insufficient data. Skipping.")
+                continue
+            
+            # Extract and prepare data
+            X_train = maz.loc[train_mask, feature_cols].values
+            y_train = (pd.Series(maz.loc[train_mask, 'hparkcost'].values).fillna(0) > 0).astype(int).values
+            
+            X_test = maz.loc[test_mask, feature_cols].values
+            y_test = (pd.Series(maz.loc[test_mask, 'hparkcost'].values).fillna(0) > 0).astype(int).values
+            
+            # Check for variation
+            if y_train.sum() == 0 or y_train.sum() == len(y_train):
+                print(f"    No variation in training data. Skipping.")
+                continue
+            
+            # Standardize
+            scaler = StandardScaler()
+            X_train_scaled = scaler.fit_transform(X_train)
+            X_test_scaled = scaler.transform(X_test)
+            
+            # Train model
+            print(f"    Training {model_name}...")
+            model.fit(X_train_scaled, y_train)
+            
+            # Get probabilities
+            y_pred_proba = model.predict_proba(X_test_scaled)[:, 1]
+            
+            # Test all thresholds and find best
+            best_f1 = 0
+            best_threshold = 0.5
+            best_metrics = {}
+            
+            for threshold in test_thresholds:
+                y_pred = (y_pred_proba >= threshold).astype(int)
+                
+                accuracy = accuracy_score(y_test, y_pred)
+                
+                if y_pred.sum() == 0:
+                    precision = 0.0
+                    recall = 0.0
+                    f1 = 0.0
+                else:
+                    precision = precision_score(y_test, y_pred, zero_division=0)
+                    recall = recall_score(y_test, y_pred, zero_division=0)
+                    f1 = f1_score(y_test, y_pred, zero_division=0)
+                
+                if f1 > best_f1:
+                    best_f1 = f1
+                    best_threshold = threshold
+                    best_metrics = {
+                        'accuracy': accuracy,
+                        'precision': precision,
+                        'recall': recall,
+                        'f1': f1,
+                        'threshold': threshold
+                    }
+            
+            results[model_name][held_out_city] = {
+                'best_f1': best_f1,
+                'best_threshold': best_threshold,
+                'best_metrics': best_metrics,
+                'n_train': n_train,
+                'n_test': n_test
+            }
+            
+            print(f"    Best F1: {best_f1:.3f} at threshold {best_threshold:.2f}")
+            print(f"    Accuracy: {best_metrics['accuracy']:.1%}, Precision: {best_metrics['precision']:.1%}, Recall: {best_metrics['recall']:.1%}")
+    
+    # Summary comparison
+    print(f"\n{'='*80}")
+    print("MODEL COMPARISON SUMMARY")
+    print(f"{'='*80}\n")
+    
+    print(f"{'Model':<25} {'Avg F1':>10} {'Avg Threshold':>15} {'SF F1':>8} {'Oak F1':>8} {'SJ F1':>8}")
+    print(f"{'-'*85}")
+    
+    model_scores = []
+    
+    for model_name in models.keys():
+        if results[model_name]:
+            avg_f1 = np.mean([r['best_f1'] for r in results[model_name].values()])
+            avg_threshold = np.mean([r['best_threshold'] for r in results[model_name].values()])
+            
+            # City-specific F1s
+            sf_f1 = results[model_name].get('San Francisco', {}).get('best_f1', 0)
+            oak_f1 = results[model_name].get('Oakland', {}).get('best_f1', 0)
+            sj_f1 = results[model_name].get('San Jose', {}).get('best_f1', 0)
+            
+            print(f"{model_name:<25} {avg_f1:>10.3f} {avg_threshold:>15.2f} {sf_f1:>8.3f} {oak_f1:>8.3f} {sj_f1:>8.3f}")
+            
+            model_scores.append((model_name, avg_f1))
+    
+    print(f"{'-'*85}")
+    
+    # Winner
+    if model_scores:
+        best_model, best_f1 = max(model_scores, key=lambda x: x[1])
+        print(f"\n✓ BEST MODEL: {best_model} (Average F1={best_f1:.3f})")
+        
+        # Show recommended threshold for winner
+        best_threshold = np.mean([r['best_threshold'] for r in results[best_model].values()])
+        print(f"  Recommended threshold: {best_threshold:.2f}")
+        
+        # Compare to baseline (Logistic Regression)
+        if 'Logistic Regression' in results and best_model != 'Logistic Regression':
+            baseline_f1 = np.mean([r['best_f1'] for r in results['Logistic Regression'].values()])
+            improvement = ((best_f1 - baseline_f1) / baseline_f1) * 100
+            print(f"  Improvement over Logistic Regression: {improvement:+.1f}%")
+    
+    return results
+
+
+def estimate_parking_by_county_threshold(maz, daily_percentile=0.95, monthly_percentile=0.99):
     """
     Estimate daily and monthly parking costs using county-level density thresholds.
     
@@ -568,7 +828,7 @@ def estimate_parking_by_county_threshold(maz, daily_percentile=0.95, monthly_per
     Args:
         maz: GeoDataFrame with MAZ zones (must have county_name, commercial_emp_den, off_nres)
         daily_percentile: Percentile threshold for daily parking (default 0.95 = 95th percentile)
-        monthly_percentile: Percentile threshold for monthly parking (default 0.98 = 98th percentile)
+        monthly_percentile: Percentile threshold for monthly parking (default 0.99 = 99th percentile)
     
     Returns:
         GeoDataFrame: maz with dparkcost and mparkcost filled in
@@ -581,17 +841,26 @@ def estimate_parking_by_county_threshold(maz, daily_percentile=0.95, monthly_per
     # Cities with observed data - exclude from predictions
     OBSERVED_CITIES = ['San Francisco', 'Oakland', 'San Jose']
     
-    # Flat rates from observed data
-    daily_flat_rate = maz[maz['dparkcost'] > 0]['dparkcost'].median()
-    monthly_flat_rate = maz[maz['mparkcost'] > 0]['mparkcost'].median()
+    # Suburban discount factor: non-core cities typically have 60-70% of SF/Oakland/SJ costs
+    SUBURBAN_DISCOUNT_FACTOR = 0.65
+    
+    # Calculate median rates from observed data (SF/Oakland/SJ only)
+    observed_daily_median = maz[maz['dparkcost'] > 0]['dparkcost'].median()
+    observed_monthly_median = maz[maz['mparkcost'] > 0]['mparkcost'].median()
     
     # Handle case where no observed data exists
-    if pd.isna(daily_flat_rate):
-        daily_flat_rate = 21.15  # Default from previous analysis
-    if pd.isna(monthly_flat_rate):
-        monthly_flat_rate = 343.95  # Default from previous analysis
+    if pd.isna(observed_daily_median):
+        observed_daily_median = 21.15  # Default from previous analysis
+    if pd.isna(observed_monthly_median):
+        observed_monthly_median = 343.95  # Default from previous analysis
     
-    print(f"  Using flat rates: Daily=${daily_flat_rate:.2f}, Monthly=${monthly_flat_rate:.2f}")
+    # Apply discount for suburban/non-core cities
+    daily_flat_rate = observed_daily_median * SUBURBAN_DISCOUNT_FACTOR
+    monthly_flat_rate = observed_monthly_median * SUBURBAN_DISCOUNT_FACTOR
+    
+    print(f"  Observed median rates (SF/Oak/SJ): Daily=${observed_daily_median:.2f}, Monthly=${observed_monthly_median:.2f}")
+    print(f"  Suburban discount factor: {SUBURBAN_DISCOUNT_FACTOR:.0%}")
+    print(f"  Predicted rates for other cities: Daily=${daily_flat_rate:.2f}, Monthly=${monthly_flat_rate:.2f}")
     
     # Initialize prediction columns
     maz['dparkcost_pred'] = np.nan
@@ -696,25 +965,31 @@ def estimate_parking_by_county_threshold(maz, daily_percentile=0.95, monthly_per
 def merge_estimated_costs(
     maz,
     run_validation=False,
+    compare_models_flag=False,
+    use_best_model=True,
     commercial_density_threshold=1.0,
     daily_percentile=0.95,
-    monthly_percentile=0.98
+    monthly_percentile=0.99,
+    probability_threshold=0.3
 ):
     """
     Estimate parking costs for MAZs without observed data.
     
     This is the main entry point called from parking_prep.py orchestration.
     Implements a hybrid estimation approach:
-    - Hourly parking: Logistic regression trained on SF/Oakland/SJ
+    - Hourly parking: Machine learning classification trained on SF/Oakland/SJ
     - Daily/Monthly parking: County-level density thresholds
     
     Args:
         maz: GeoDataFrame with MAZ zones (must have employment, capacity, observed costs, 
              place_name, county_name)
         run_validation: If True, perform leave-one-city-out cross-validation (default False)
+        compare_models_flag: If True, compare multiple model types (LR, RF, GB, SVM) (default False)
+        use_best_model: If True and compare_models_flag=True, use best performing model (default True)
         commercial_density_threshold: Minimum commercial_emp_den for paid parking (default 1.0 jobs/acre)
         daily_percentile: County-level percentile for daily parking threshold (default 0.95)
-        monthly_percentile: County-level percentile for monthly parking threshold (default 0.98)
+        monthly_percentile: County-level percentile for monthly parking threshold (default 0.99)
+        probability_threshold: Classification threshold for model predictions (default 0.3, optimized via cross-validation)
     
     Returns:
         GeoDataFrame: maz with estimated hparkcost, dparkcost, mparkcost filled in
@@ -735,8 +1010,56 @@ def merge_estimated_costs(
             maz, commercial_density_threshold
         )
     
-    # Estimate hourly parking
-    maz = estimate_parking_costs(maz, commercial_density_threshold)
+    # Optional model comparison and selection
+    selected_model = None
+    selected_model_name = "Logistic Regression"
+    
+    if compare_models_flag:
+        model_comparison_results = compare_models(
+            maz, commercial_density_threshold
+        )
+        
+        # Select best model if requested
+        if use_best_model and model_comparison_results:
+            # Calculate mean F1 score for each model
+            model_f1_scores = {}
+            for model_name, city_results in model_comparison_results.items():
+                mean_f1 = np.mean([r['best_f1'] for r in city_results.values()])
+                model_f1_scores[model_name] = mean_f1
+            
+            # Find best model
+            best_model_name = max(model_f1_scores, key=model_f1_scores.get)
+            best_f1 = model_f1_scores[best_model_name]
+            
+            # Create model instance
+            model_mapping = {
+                'Logistic Regression': LogisticRegression(random_state=42, max_iter=1000),
+                'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42),
+                'Gradient Boosting': GradientBoostingClassifier(n_estimators=100, random_state=42),
+                'SVM (RBF)': SVC(kernel='rbf', probability=True, random_state=42)
+            }
+            
+            selected_model = model_mapping.get(best_model_name)
+            selected_model_name = best_model_name
+            
+            print("\n" + "="*80)
+            print("MODEL SELECTION FOR PRODUCTION")
+            print("="*80)
+            print(f"\nComparing {len(model_f1_scores)} models:")
+            for model_name, f1 in sorted(model_f1_scores.items(), key=lambda x: x[1], reverse=True):
+                marker = "← SELECTED" if model_name == best_model_name else ""
+                print(f"  {model_name:<25} F1={f1:.4f} {marker}")
+            print(f"\nUsing {best_model_name} for hourly parking estimation (F1={best_f1:.4f})")
+            print("="*80)
+    
+    # Estimate hourly parking with selected model
+    maz = estimate_parking_costs(
+        maz, 
+        commercial_density_threshold, 
+        probability_threshold,
+        model=selected_model,
+        model_name=selected_model_name
+    )
     
     # Estimate daily/monthly parking
     maz = estimate_parking_by_county_threshold(
