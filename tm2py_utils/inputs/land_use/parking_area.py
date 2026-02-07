@@ -706,19 +706,60 @@ def assign_parking_areas(maz, min_place_employment=100,
         
         print(f"{place:<25} {county:<15} {total_emp:>12,.0f} {int(dt_mazs):>10} {dt_emp:>12,.0f} {moran_i:>10.3f}")
     
+    # Assign parkarea=2: MAZs within 1/4 mile of parkarea=1
     print(f"\n{'='*80}")
-    print("PARKING AREA ASSIGNMENT COMPLETE")
-    print(f"{'='*80}")
+    print("ASSIGNING PARKAREA=2 (WITHIN 1/4 MILE OF DOWNTOWN)")
+    print(f"{'='*80}\n")
     
-    # Print final counts
-    n_downtown = (maz['parkarea'] == 1).sum()
-    total_downtown_emp = maz[maz['parkarea'] == 1][emp_col].sum()
-    pct_mazs = n_downtown / len(maz) * 100
-    pct_emp = total_downtown_emp / maz[emp_col].sum() * 100
+    QUARTER_MILE_METERS = 402.336  # 1/4 mile = 402.336 meters
     
-    print(f"  parkarea=1 (downtown): {n_downtown:,} MAZs ({pct_mazs:.1f}% of all)")
-    print(f"  Downtown employment: {total_downtown_emp:,.0f} ({pct_emp:.1f}% of total {emp_col})")
-    print(f"  Places with downtown: {(df_results['n_mazs_downtown'] > 0).sum()} of {len(eligible_places)}")
+    # Get all parkarea=1 MAZs and create buffer
+    downtown_mazs = maz[maz['parkarea'] == 1].copy()
+    
+    if len(downtown_mazs) > 0:
+        # Create union of all downtown geometries and buffer by 1/4 mile
+        downtown_union = downtown_mazs.geometry.unary_union
+        downtown_buffer = downtown_union.buffer(QUARTER_MILE_METERS)
+        
+        # Find MAZs whose centroids fall within buffer (excluding parkarea=1)
+        maz_centroids = maz.geometry.centroid
+        within_buffer = maz_centroids.within(downtown_buffer)
+        not_downtown = maz['parkarea'] != 1
+        
+        # Assign parkarea=2
+        parkarea_2_mask = within_buffer & not_downtown
+        maz.loc[parkarea_2_mask, 'parkarea'] = 2
+        
+        n_parkarea_2 = parkarea_2_mask.sum()
+        print(f"  Assigned parkarea=2 to {n_parkarea_2:,} MAZs within 1/4 mile of downtown")
+    else:
+        print("  No parkarea=1 MAZs found, skipping parkarea=2 assignment")
+        n_parkarea_2 = 0
+    
+    # Print Stage 1 summary (parkarea 0, 1, 2 only)
+    # Note: parkarea=3 (paid parking) and parkarea=4 (other) are assigned AFTER cost estimation
+    # in parking_prep.update_parkarea_with_predicted_costs() to include predicted costs
+    print(f"\n{'='*80}")
+    print("STAGE 1 PARKING AREA CLASSIFICATION COMPLETE")
+    print(f"{'='*80}\n")
+    
+    # Stage 1 counts
+    n_parkarea_0 = (maz['parkarea'] == 0).sum()
+    n_parkarea_1 = (maz['parkarea'] == 1).sum()
+    n_parkarea_2 = (maz['parkarea'] == 2).sum()
+    total_mazs = len(maz)
+    
+    print(f"{'Category':<40} {'MAZs':>12} {'Percent':>10}")
+    print("─" * 65)
+    print(f"{'parkarea=0 (Unassigned)':<40} {n_parkarea_0:>12,} {n_parkarea_0/total_mazs*100:>9.1f}%")
+    print(f"{'parkarea=1 (Downtown core)':<40} {n_parkarea_1:>12,} {n_parkarea_1/total_mazs*100:>9.1f}%")
+    print(f"{'parkarea=2 (Within 1/4 mi of downtown)':<40} {n_parkarea_2:>12,} {n_parkarea_2/total_mazs*100:>9.1f}%")
+    print("─" * 65)
+    print(f"{'Total':<40} {total_mazs:>12,} {100.0:>9.1f}%")
+    print(f"\n  NOTE: parkarea=3 (paid parking) and parkarea=4 (other) will be assigned")
+    print(f"  after cost estimation to include predicted parking costs.")
+    
+    print(f"\n  Places with parkarea=1 (downtown): {(df_results['n_mazs_downtown'] > 0).sum()} of {len(eligible_places)}")
     
     # Note: Not storing df_results as attribute to avoid GeoDataFrame serialization issues
     # Place-level statistics are printed above and can be exported separately if needed

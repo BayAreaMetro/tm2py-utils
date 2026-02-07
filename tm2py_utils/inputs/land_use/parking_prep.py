@@ -354,6 +354,108 @@ def merge_capacity(maz):
     return maz
 
 
+def update_parkarea_with_predicted_costs(maz, emp_col='downtown_emp'):
+    """
+    Update parkarea classification to include predicted parking costs (Stage 2).
+    
+    Assigns parkarea=3 (paid parking areas) and parkarea=4 (other areas) AFTER cost estimation
+    to ensure both observed and predicted parking costs are included in the classification.
+    
+    This function should be called AFTER merge_estimated_costs() in the main workflow.
+    
+    Args:
+        maz: GeoDataFrame with MAZ zones (must have parkarea, hparkcost, dparkcost, mparkcost)
+        emp_col: Employment column name for reporting (default: 'downtown_emp')
+    
+    Returns:
+        GeoDataFrame: maz with updated parkarea (3 and 4 assigned)
+    """
+    print(f"\n{'='*80}")
+    print("STAGE 2 PARKING AREA CLASSIFICATION - AFTER COST ESTIMATION")
+    print(f"{'='*80}\n")
+    
+    # Check if parking cost columns exist
+    has_parking_costs = all(col in maz.columns for col in ['hparkcost', 'dparkcost', 'mparkcost'])
+    
+    if not has_parking_costs:
+        print("  ERROR: Parking cost columns not found. Cannot assign parkarea=3/4.")
+        return maz
+    
+    # Assign parkarea=3: MAZs with parking costs (not parkarea 1 or 2)
+    print(f"ASSIGNING PARKAREA=3 (PAID PARKING AREAS)\n")
+    
+    # Fill NaN with 0 for comparison
+    hparkcost = maz['hparkcost'].fillna(0)
+    dparkcost = maz['dparkcost'].fillna(0)
+    mparkcost = maz['mparkcost'].fillna(0)
+    
+    # Any parking cost > 0 (observed OR predicted)
+    has_any_cost = (hparkcost > 0) | (dparkcost > 0) | (mparkcost > 0)
+    
+    # Not already assigned parkarea 1 or 2
+    not_assigned = (maz['parkarea'] != 1) & (maz['parkarea'] != 2)
+    
+    # Assign parkarea=3
+    parkarea_3_mask = has_any_cost & not_assigned
+    maz.loc[parkarea_3_mask, 'parkarea'] = 3
+    
+    n_parkarea_3 = parkarea_3_mask.sum()
+    print(f"  Assigned parkarea=3 to {n_parkarea_3:,} MAZs with parking costs (observed or predicted)")
+    
+    # Report breakdown by cost type
+    n_hourly = ((hparkcost > 0) & parkarea_3_mask).sum()
+    n_daily = ((dparkcost > 0) & parkarea_3_mask).sum()
+    n_monthly = ((mparkcost > 0) & parkarea_3_mask).sum()
+    print(f"    Hourly parking: {n_hourly:,} MAZs")
+    print(f"    Daily parking: {n_daily:,} MAZs")
+    print(f"    Monthly parking: {n_monthly:,} MAZs")
+    
+    # Assign parkarea=4: All remaining MAZs
+    print(f"\nASSIGNING PARKAREA=4 (ALL OTHER AREAS)\n")
+    
+    # Not parkarea 1, 2, or 3
+    not_assigned_final = (maz['parkarea'] != 1) & (maz['parkarea'] != 2) & (maz['parkarea'] != 3)
+    maz.loc[not_assigned_final, 'parkarea'] = 4
+    
+    n_parkarea_4 = not_assigned_final.sum()
+    print(f"  Assigned parkarea=4 to {n_parkarea_4:,} MAZs (other/rural areas)")
+    
+    # Print final summary
+    print(f"\n{'='*80}")
+    print("FINAL PARKING AREA CLASSIFICATION COMPLETE")
+    print(f"{'='*80}\n")
+    
+    # Final counts
+    n_parkarea_1 = (maz['parkarea'] == 1).sum()
+    n_parkarea_2 = (maz['parkarea'] == 2).sum()
+    n_parkarea_3 = (maz['parkarea'] == 3).sum()
+    n_parkarea_4 = (maz['parkarea'] == 4).sum()
+    total_mazs = len(maz)
+    
+    print(f"{'Category':<40} {'MAZs':>12} {'Percent':>10}")
+    print("─" * 65)
+    print(f"{'parkarea=1 (Downtown core)':<40} {n_parkarea_1:>12,} {n_parkarea_1/total_mazs*100:>9.1f}%")
+    print(f"{'parkarea=2 (Within 1/4 mi of downtown)':<40} {n_parkarea_2:>12,} {n_parkarea_2/total_mazs*100:>9.1f}%")
+    print(f"{'parkarea=3 (Paid parking areas)':<40} {n_parkarea_3:>12,} {n_parkarea_3/total_mazs*100:>9.1f}%")
+    print(f"{'parkarea=4 (Other/rural areas)':<40} {n_parkarea_4:>12,} {n_parkarea_4/total_mazs*100:>9.1f}%")
+    print("─" * 65)
+    print(f"{'Total':<40} {total_mazs:>12,} {100.0:>9.1f}%")
+    
+    # Report employment distribution across parkarea categories
+    if emp_col in maz.columns:
+        print(f"\n{'Category':<40} {'Employment':>12} {'Percent':>10}")
+        print("─" * 65)
+        total_emp = maz[emp_col].sum()
+        for pa in [1, 2, 3, 4]:
+            pa_emp = maz[maz['parkarea'] == pa][emp_col].sum()
+            pct = (pa_emp / total_emp * 100) if total_emp > 0 else 0
+            print(f"{f'parkarea={pa}':<40} {pa_emp:>12,.0f} {pct:>9.1f}%")
+        print("─" * 65)
+        print(f"{'Total':<40} {total_emp:>12,.0f} {100.0:>9.1f}%")
+    
+    return maz
+
+
 def main(run_validation=False, compare_models_flag=False, commercial_density_threshold=1.0, daily_percentile=0.95, monthly_percentile=0.99):
     """
     Main orchestration for parking data preparation.
@@ -415,6 +517,11 @@ def main(run_validation=False, compare_models_flag=False, commercial_density_thr
         probability_threshold=0.3  # Optimized via cross-validation (F1=0.562 vs 0.520 at 0.5)
     )
     
+    # Update parkarea=3/4 after cost estimation to include predicted costs
+    print("\nUpdating parkarea classification with predicted costs...")
+    maz = update_parkarea_with_predicted_costs(maz)
+    print(f"  Completed final parkarea assignment")
+    
     return maz
 
 
@@ -431,8 +538,8 @@ m.save("parkarea_biv.html")
 # %%
 maz_gdf = maz_prepped.copy()
 maz_gdf = maz_gdf[maz_gdf["place_name"].notnull()]
-m = maz_gdf.explore(column="parkarea", tooltip=False, popup=True)
-m.save("parkarea_getis.html")
+m = maz_gdf.explore(column="hparkcost", tooltip=False, popup=True)
+m.save("parkarea_hparkcost.html")
 
 # %%
 maz_gdf = maz_prepped.copy()
