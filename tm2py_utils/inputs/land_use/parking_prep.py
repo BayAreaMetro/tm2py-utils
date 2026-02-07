@@ -385,6 +385,7 @@ def main(run_validation=False, compare_models_flag=False, commercial_density_thr
     print("\nMerging parking scrape data...")
     maz = merge_scraped_cost(maz)
     print(f"  Completed parking cost merge")
+
     
     print("\nMerging published parking meter costs...")
     maz = merge_published_cost(maz)
@@ -393,6 +394,12 @@ def main(run_validation=False, compare_models_flag=False, commercial_density_thr
     print("\nMerging parking capacity data...")
     maz = merge_capacity(maz)
     print(f"  Completed parking capacity merge")
+    
+    # Assign parking areas using bivariate spatial correlation
+    print("\nAssigning parking areas...")
+    from parking_area import merge_parking_area
+    maz = merge_parking_area(maz, min_place_employment=100, significance_level=0.05)
+    print(f"  Completed parking area assignment")
     
     # Estimate costs for unobserved areas using parking_estimation module
     from parking_estimation import merge_estimated_costs
@@ -418,18 +425,18 @@ if __name__ == "__main__":
 #%%
 maz_gdf = maz_prepped.copy()
 maz_gdf = maz_gdf[maz_gdf["place_name"].notnull()]
-m = maz_gdf.explore(column="hparkcost", tooltip=False, popup=True)
-m.save("est_hparkcost.html")
+m = maz_gdf.explore(column="parkarea", tooltip=False, popup=True)
+m.save("parkarea_biv.html")
 
 # %%
 maz_gdf = maz_prepped.copy()
 maz_gdf = maz_gdf[maz_gdf["place_name"].notnull()]
-m = maz_gdf.explore(column="dparkcost", tooltip=False, popup=True)
-m.save("est_dparkcost.html")
+m = maz_gdf.explore(column="parkarea", tooltip=False, popup=True)
+m.save("parkarea_getis.html")
 
 # %%
 maz_gdf = maz_prepped.copy()
 maz_gdf = maz_gdf[maz_gdf["place_name"].notnull()]
-m = maz_gdf.explore(column="mparkcost", tooltip=False, popup=True)
-m.save("est_mparkcost.html")
+m = maz_gdf.explore(column="parkarea", tooltip=False, popup=True)
+m.save("parkarea_moran.html")
 # %%
