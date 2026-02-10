@@ -648,7 +648,7 @@ def run_pipeline(
     ch.setFormatter(logging.Formatter('%(message)s'))
     logger.addHandler(ch)
     ################## file handler - DEBUG level
-    log_file = BOX_LANDUSE_BASE / "land_use_pipeline.log"
+    log_file = get_output_filename("maz_data", extension="log", spatial=False)
     fh = logging.FileHandler(log_file, mode='w', encoding='utf-8')
     fh.setLevel(logging.DEBUG)
     fh.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', 
@@ -833,7 +833,7 @@ def run_pipeline(
     print("="*80)
     print(f"  Total MAZ records: {len(landuse_maz):,}")
     print(f"  Total columns: {len(landuse_maz.columns)}")
-    print(f"  See {BOX_LANDUSE_BASE / 'land_use_pipeline.log'} for detailed processing log")
+    print(f"  See {log_file} for detailed processing log")
     
     return maz
 
