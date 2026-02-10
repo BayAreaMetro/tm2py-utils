@@ -36,11 +36,42 @@ Entry Point:
 import pandas as pd
 import geopandas as gpd
 import numpy as np
+from pathlib import Path
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+
+from setup import INTERIM_CACHE_DIR
+
+
+def get_observed_cities_from_scraped_data(scraped_file_path):
+    """
+    Extract unique city names from scraped parking data.
+    
+    Args:
+        scraped_file_path (Path): Path to parking_scrape_location_cost.parquet file
+    
+    Returns:
+        List[str]: Sorted list of unique city names with observed parking data
+    
+    Raises:
+        FileNotFoundError: If scraped parking file does not exist
+    """
+    if not scraped_file_path.exists():
+        raise FileNotFoundError(
+            f"Scraped parking data file not found: {scraped_file_path}\n"
+            f"Please run parking_scrape.py and parking_geocode.py first to generate this file."
+        )
+    
+    # Load scraped parking data
+    scraped = pd.read_parquet(scraped_file_path)
+    
+    # Extract unique cities and sort alphabetically
+    observed_cities = sorted(scraped['city'].unique().tolist())
+    
+    return observed_cities
 
 
 def add_density_features(maz):
@@ -840,7 +871,7 @@ def estimate_parking_by_county_threshold(maz, daily_percentile=0.95, monthly_per
     
     Applies county-specific commercial employment density percentiles to identify
     high-density areas likely to have paid parking. Only predicts for cities OTHER
-    than San Francisco, Oakland, and San Jose (those use observed data).
+    than those with observed data (dynamically determined from scraped parking data).
     
     Args:
         maz: GeoDataFrame with MAZ zones (must have county_name, commercial_emp_den, off_nres)
@@ -850,13 +881,14 @@ def estimate_parking_by_county_threshold(maz, daily_percentile=0.95, monthly_per
     Returns:
         GeoDataFrame: maz with dparkcost and mparkcost filled in
     """
+    # Load observed cities from scraped parking data
+    scraped_file_path = INTERIM_CACHE_DIR / "parking_scrape_location_cost.parquet"
+    observed_cities = get_observed_cities_from_scraped_data(scraped_file_path)
+    
     print(f"\nEstimating daily/monthly parking costs using county-level thresholds...")
     print(f"  Daily parking: {daily_percentile*100:.0f}th percentile of commercial_emp_den per county")
     print(f"  Monthly parking: {monthly_percentile*100:.0f}th percentile of commercial_emp_den per county")
-    print(f"  Excluding from prediction: San Francisco, Oakland, San Jose (observed data only)")
-    
-    # Cities with observed data - exclude from predictions
-    OBSERVED_CITIES = ['San Francisco', 'Oakland', 'San Jose']
+    print(f"  Excluding from prediction: {', '.join(observed_cities)} (observed data only)")
     
     # Suburban discount factor: non-core cities typically have 60-70% of SF/Oakland/SJ costs
     SUBURBAN_DISCOUNT_FACTOR = 0.65
@@ -866,10 +898,10 @@ def estimate_parking_by_county_threshold(maz, daily_percentile=0.95, monthly_per
     observed_monthly_median = maz[maz['mparkcost'] > 0]['mparkcost'].median()
     
     # Handle case where no observed data exists
-    if pd.isna(observed_daily_median):
-        observed_daily_median = 21.15  # Default from previous analysis
-    if pd.isna(observed_monthly_median):
-        observed_monthly_median = 343.95  # Default from previous analysis
+    # if pd.isna(observed_daily_median):
+    #     observed_daily_median = 21.15  # Default from previous analysis
+    # if pd.isna(observed_monthly_median):
+    #     observed_monthly_median = 343.95  # Default from previous analysis
     
     # Apply discount for suburban/non-core cities
     daily_flat_rate = observed_daily_median * SUBURBAN_DISCOUNT_FACTOR
@@ -926,7 +958,7 @@ def estimate_parking_by_county_threshold(maz, daily_percentile=0.95, monthly_per
             (maz['county_name'] == county) &
             (maz['off_nres'] > 0) &
             (maz['place_name'].notna()) &
-            ~(maz['place_name'].isin(OBSERVED_CITIES)) &
+            ~(maz['place_name'].isin(observed_cities)) &
             ((maz['dparkcost'].isna()) | (maz['dparkcost'] <= 0)) &
             (maz['commercial_emp_den'] >= thresholds['daily'])
         )
@@ -937,7 +969,7 @@ def estimate_parking_by_county_threshold(maz, daily_percentile=0.95, monthly_per
             (maz['county_name'] == county) &
             (maz['off_nres'] > 0) &
             (maz['place_name'].notna()) &
-            ~(maz['place_name'].isin(OBSERVED_CITIES)) &
+            ~(maz['place_name'].isin(observed_cities)) &
             ((maz['mparkcost'].isna()) | (maz['mparkcost'] <= 0)) &
             (maz['commercial_emp_den'] >= thresholds['monthly'])
         )
@@ -955,11 +987,15 @@ def estimate_parking_by_county_threshold(maz, daily_percentile=0.95, monthly_per
         if n_daily > 0 or n_monthly > 0:
             print(f"  {county}: Predicted {n_daily:,} daily, {n_monthly:,} monthly paid parking MAZs")
     
-    # Fill in predictions
-    maz['dparkcost'] = maz['dparkcost'].fillna(maz['dparkcost_pred'])
-    maz['mparkcost'] = maz['mparkcost'].fillna(maz['mparkcost_pred'])
+    # Fill in predictions ONLY for non-observed cities
+    # Create mask for MAZs that are NOT in observed cities
+    not_observed = ~(maz['place_name'].isin(observed_cities))
     
-    # Fill remaining NaN/None with 0 (free parking)
+    # For non-observed cities: fill NaN with predictions
+    maz.loc[not_observed, 'dparkcost'] = maz.loc[not_observed, 'dparkcost'].fillna(maz.loc[not_observed, 'dparkcost_pred'])
+    maz.loc[not_observed, 'mparkcost'] = maz.loc[not_observed, 'mparkcost'].fillna(maz.loc[not_observed, 'mparkcost_pred'])
+    
+    # Fill remaining NaN with 0 (free parking) for ALL MAZs
     maz['dparkcost'] = maz['dparkcost'].fillna(0)
     maz['mparkcost'] = maz['mparkcost'].fillna(0)
     
@@ -1015,6 +1051,15 @@ def merge_estimated_costs(
     print("\n" + "="*80)
     print("PARKING COST ESTIMATION")
     print("="*80)
+    
+    # Load observed cities from scraped parking data (for daily/monthly costs only)
+    scraped_file_path = INTERIM_CACHE_DIR / "parking_scrape_location_cost.parquet"
+    observed_cities_daily_monthly = get_observed_cities_from_scraped_data(scraped_file_path)
+    print(f"\nDetected {len(observed_cities_daily_monthly)} cities with observed daily/monthly parking data (from scraped data):")
+    print(f"  {', '.join(observed_cities_daily_monthly)}")
+    print(f"These cities will be excluded from daily/monthly parking cost predictions\n")
+    
+    print(f"Note: Hourly parking estimation uses separate observed data (San Francisco, Oakland, San Jose only)\n")
     
     # Add density features
     maz = add_density_features(maz)

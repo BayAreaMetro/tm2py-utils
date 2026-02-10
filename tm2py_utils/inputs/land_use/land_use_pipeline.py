@@ -365,15 +365,8 @@ def merge_scraped_cost(maz):
     
     scraped_file = INTERIM_CACHE_DIR / "parking_scrape_location_cost.parquet"
     
-    if not scraped_file.exists():
-        print(f"  WARNING: Scraped parking file not found: {scraped_file}")
-        print(f"  Skipping scraped costs. Run parking_scrape.py and parking_geocode.py first.")
-        maz['dparkcost'] = None
-        maz['mparkcost'] = None
-        return maz
-    
     print(f"  Loading scraped parking data from: {scraped_file}")
-    scraped = gpd.read_parquet(scraped_file)
+    scraped = gpd.read_parquet(scraped_file).to_crs(ANALYSIS_CRS)
     
     # Filter to daily and monthly parking types
     daily = scraped[scraped['parking_type'] == 'daily'].copy()
