@@ -17,6 +17,9 @@ import re
 from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
 
+# Import configuration
+from setup import INTERIM_CACHE_DIR, ensure_directories
+
 
 # ============================================================================
 # Configuration: Bay Area Cities
@@ -396,17 +399,21 @@ def combine_city_data(all_city_data):
 
 
 def save_main_results(combined_df):
-    """Save combined results to CSV"""
-    output_dir = r'E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-version-05\landuse'
-    combined_df.to_csv(f'{output_dir}\\parking_scrape_spots.csv', index=False)
-    print(f"Saved to {output_dir}\\parking_scrape_spots.csv")
+    """Save combined results to interim cache directory"""
+    ensure_directories()
+    
+    # Save full dataset
+    output_path = INTERIM_CACHE_DIR / 'parking_scrape_spots.csv'
+    combined_df.to_csv(output_path, index=False)
+    print(f"Saved to {output_path}")
     
     # Also save a simplified version with just the essential fields
     essential_fields = ['city', 'parking_type', 'address', 'name', 'latitude', 'longitude', 
                        'price_value', 'rate_type', 'prices', 'spot_id']
     essential_df = combined_df[essential_fields]
-    essential_df.to_csv(f'{output_dir}\\parking_scrape_location_cost.csv', index=False)
-    print(f"Saved essential fields to {output_dir}\\parking_scrape_location_cost.csv")
+    output_path_essential = INTERIM_CACHE_DIR / 'parking_scrape_location_cost.csv'
+    essential_df.to_csv(output_path_essential, index=False)
+    print(f"Saved essential fields to {output_path_essential}")
     print(f"  Fields: {', '.join(essential_fields)}")
 
 

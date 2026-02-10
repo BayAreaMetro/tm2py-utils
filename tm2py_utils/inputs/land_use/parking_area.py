@@ -48,10 +48,41 @@ import pandas as pd
 import geopandas as gpd
 import numpy as np
 import networkx as nx
+import warnings
+import sys
+import os
+from contextlib import contextmanager
 from shapely.geometry import Point, MultiPolygon
 from shapely.ops import unary_union
 from libpysal.weights import Queen
 from esda.moran import Moran_Local
+
+
+@contextmanager
+def suppress_output():
+    """Context manager to suppress stdout and stderr."""
+    old_stdout = sys.stdout
+    old_stderr = sys.stderr
+    
+    try:
+        # Flush any pending output first
+        sys.stdout.flush()
+        sys.stderr.flush()
+        
+        # Redirect to devnull
+        sys.stdout = open(os.devnull, 'w')
+        sys.stderr = open(os.devnull, 'w')
+        yield
+    finally:
+        # Close devnull files
+        if sys.stdout != old_stdout:
+            sys.stdout.close()
+        if sys.stderr != old_stderr:
+            sys.stderr.close()
+        
+        # Restore original streams
+        sys.stdout = old_stdout
+        sys.stderr = old_stderr
 
 
 def calculate_employment_weighted_centroid(mazs_gdf, emp_col='downtown_emp'):
@@ -151,12 +182,32 @@ def assign_parkarea_by_local_morans_i(mazs_gdf, emp_col='downtown_emp',
     mazs_gdf = mazs_gdf[mazs_gdf['area_m2'] <= area_threshold].copy()
     n_filtered = n_before_filter - len(mazs_gdf)
     
-    # Build spatial weights matrix using Queen contiguity
-    w = Queen.from_dataframe(mazs_gdf, use_index=True)
+    # Check for minimum MAZ count (Local Moran's I requires at least 3 observations)
+    if len(mazs_gdf) < 3:
+        # Return empty results for places with too few MAZs
+        category_counts = {'HH': 0, 'HL': 0, 'LH': 0, 'LL': 0, 'NS': len(mazs_gdf)}
+        return pd.Series(False, index=mazs_gdf.index), pd.Series('NS', index=mazs_gdf.index), {
+            'n_high_high': 0,
+            'n_high_low': 0,
+            'n_downtown_candidate': 0,
+            'n_components': 0,
+            'largest_component_size': 0,
+            'mean_moran_i': 0,
+            'max_moran_i': 0,
+            'lisa_counts': category_counts
+        }
     
-    # Calculate Local Moran's I statistic for each MAZ
+    # Build spatial weights matrix using Queen contiguity (suppress warnings about islands/disconnected components)
+    with warnings.catch_warnings(), suppress_output():
+        warnings.filterwarnings('ignore', category=UserWarning)
+        warnings.filterwarnings('ignore')  # Suppress all warnings during this operation
+        w = Queen.from_dataframe(mazs_gdf, use_index=True, silence_warnings=True)
+    
+    # Calculate Local Moran's I statistic for each MAZ (suppress division warnings)
     employment_values = mazs_gdf[emp_col].values
-    moran_local = Moran_Local(employment_values, w, transformation='r', permutations=999)
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        moran_local = Moran_Local(employment_values, w, transformation='r', permutations=999)
     
     # Map LISA quadrants to categories
     # q=1: HH (High-High), q=2: LH (Low-High), q=3: LL (Low-Low), q=4: HL (High-Low)
@@ -756,7 +807,7 @@ def assign_parking_areas(maz, min_place_employment=100,
     print(f"{'parkarea=2 (Within 1/4 mi of downtown)':<40} {n_parkarea_2:>12,} {n_parkarea_2/total_mazs*100:>9.1f}%")
     print("─" * 65)
     print(f"{'Total':<40} {total_mazs:>12,} {100.0:>9.1f}%")
-    print(f"\n  NOTE: parkarea=3 (paid parking) and parkarea=4 (other) will be assigned")
+    print(f"\n  NOTE: parkarea=3 (non-downtown paid parking) and parkarea=4 (other) will be assigned")
     print(f"  after cost estimation to include predicted parking costs.")
     
     print(f"\n  Places with parkarea=1 (downtown): {(df_results['n_mazs_downtown'] > 0).sum()} of {len(eligible_places)}")

@@ -8,18 +8,15 @@ import sys
 # Import job_counts module to get MAZ employment data
 from job_counts import get_jobs_maz
 
-# Import utils module directly to avoid loading full package
-utils_path = Path(__file__).parent / "utils.py"
-import importlib.util
-spec = importlib.util.spec_from_file_location("utils", utils_path)
-utils = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(utils)
-
-RAW_DATA_DIR = Path(r"E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-version-05\landuse\raw_data\parking")
-MAZ_TAZ_DIR = Path(__file__).parent.parent / "maz_taz" / "shapefiles"
-ANALYSIS_CRS = "EPSG:26910"
-SQUARE_METERS_PER_ACRE = 4046.86
-OUT_FILE = Path(r"E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-version-05\landuse\parking_capacity.gpkg")
+# Import configuration and utilities
+from setup import (
+    PARKING_RAW_DATA_DIR,
+    ANALYSIS_CRS,
+    SQUARE_METERS_PER_ACRE,
+    get_output_filename,
+    ensure_directories
+)
+from utils import load_maz_shp
 
 
 def overlay_maz_blockgroups(maz, parking_capacity):
@@ -165,6 +162,10 @@ def allocate_parking_to_maz(weights_df, maz_gdf):
     # Fill any NaN with 0
     parking_maz = parking_maz.fillna(0)
     
+    # Clip any negative values to 0 (safety check)
+    parking_maz['off_nres'] = parking_maz['off_nres'].clip(lower=0)
+    parking_maz['on_all'] = parking_maz['on_all'].clip(lower=0)
+    
     # Merge with MAZ geometry to create GeoDataFrame
     # Ensure MAZ_NODE types match
     maz_gdf_copy = maz_gdf.copy()
@@ -185,18 +186,21 @@ def allocate_parking_to_maz(weights_df, maz_gdf):
     return parking_maz
 
 
-def get_parking_maz(write=False):
+def get_parking_maz(write=False, use_maz_orig=False):
     """
     Main function to allocate block group parking capacity to MAZ level.
     Uses hybrid allocation: employment-weighted for off-street non-residential,
     area-weighted for on-street parking.
     
     Parameters:
-        write (bool): If True, writes output to CSV
+        write (bool): If True, writes output to interim cache as GeoPackage
+        use_maz_orig (bool): If True, uses MAZ v2.2 shapefile. Otherwise uses version from setup.
         
     Returns:
         DataFrame: MAZ-level parking with columns [MAZ_NODE, TAZ_NODE, off_nres, on_all]
     """
+    ensure_directories()
+    
     print(f"\n{'='*60}")
     print(f"Allocating Block Group Parking Capacity to MAZ Level")
     print(f"{'='*60}\n")
@@ -204,13 +208,27 @@ def get_parking_maz(write=False):
     # Load data
     print(f"Loading input data...")
     parking_capacity = gpd.read_file(
-        RAW_DATA_DIR / "2123-Dataset" / "parking_density_Employee_Capita" / "parking_density_Employee_Capita.shp"
+        PARKING_RAW_DATA_DIR / "2123-Dataset" / "parking_density_Employee_Capita" / "parking_density_Employee_Capita.shp"
     ).to_crs(ANALYSIS_CRS)
     parking_capacity = parking_capacity[["blkgrpid", "on_all", "off_nres", "geometry"]]
+    
+    # Clean negative values (data quality issue in source)
+    neg_on_all = (parking_capacity['on_all'] < 0).sum()
+    neg_off_nres = (parking_capacity['off_nres'] < 0).sum()
+    if neg_on_all > 0 or neg_off_nres > 0:
+        print(f"  ⚠ Warning: Found negative parking values in source data:")
+        if neg_on_all > 0:
+            print(f"    on_all: {neg_on_all:,} block groups with negative values")
+        if neg_off_nres > 0:
+            print(f"    off_nres: {neg_off_nres:,} block groups with negative values")
+        print(f"  Clipping negative values to 0...")
+        parking_capacity['on_all'] = parking_capacity['on_all'].clip(lower=0)
+        parking_capacity['off_nres'] = parking_capacity['off_nres'].clip(lower=0)
+    
     print(f"  Loaded {len(parking_capacity):,} block groups with parking data")
     
     # Load MAZ shapefile
-    maz = utils.load_maz_shp().to_crs(ANALYSIS_CRS)
+    maz = load_maz_shp(use_maz_orig=use_maz_orig).to_crs(ANALYSIS_CRS)
     print(f"  Loaded {len(maz):,} MAZ polygons")
     
     # Load employment data
@@ -254,6 +272,7 @@ def get_parking_maz(write=False):
     
     # Write output if requested
     if write:
+        OUT_FILE = get_output_filename("parking_capacity", extension="gpkg", spatial=True)
         print(f"\nWriting parking MAZ data to: {OUT_FILE}")
         parking_maz.to_file(OUT_FILE, driver="GPKG", index=False)
     
@@ -265,8 +284,19 @@ def get_parking_maz(write=False):
 
 
 def main():
-    """Execute the parking allocation script directly."""
-    parking_maz = get_parking_maz(write=True)
+    """
+    Execute script directly with optional command-line flags.
+    Usage:
+        python parking_capacity.py [--write] [--use-maz-orig]
+    """
+    use_maz_orig = "--use-maz-orig" in sys.argv
+    write = "--write" in sys.argv
+    
+    parking_maz = get_parking_maz(write=write, use_maz_orig=use_maz_orig)
+    print(f"\nParking capacity processing complete.")
+    print(f"Total MAZ records: {len(parking_maz)}")
+    print(f"Total off-street parking: {parking_maz['off_nres'].sum():,.0f}")
+    print(f"Total on-street parking: {parking_maz['on_all'].sum():,.0f}")
 
 
 if __name__ == "__main__":

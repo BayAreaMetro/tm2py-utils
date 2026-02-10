@@ -8,8 +8,8 @@ import geopandas as gpd
 import re
 from pathlib import Path
 
-RAW_DATA_DIR = Path(r"E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-version-05\landuse\raw_data\parking")
-ANALYSIS_CRS = "EPSG:26910"
+# Import configuration
+from setup import PARKING_RAW_DATA_DIR, ANALYSIS_CRS
 
 
 def extract_hourly_cost(config_string):
@@ -43,14 +43,14 @@ def published_cost():
     
     # Load Oakland meters
     print("  Loading Oakland meters...")
-    oak_meters = gpd.read_file(RAW_DATA_DIR / "City_of_Oakland_Parking_Meters_20260107.geojson")
+    oak_meters = gpd.read_file(PARKING_RAW_DATA_DIR / "City_of_Oakland_Parking_Meters_20260107.geojson")
     oak_meters['hparkcost'] = oak_meters['config__na'].apply(extract_hourly_cost)
     oak_meters = oak_meters[["hparkcost", "geometry"]]
     print(f"    Loaded {len(oak_meters):,} Oakland meters")
     
     # Load San Jose meters
     print("  Loading San Jose meters...")
-    sj_meters = gpd.read_file(RAW_DATA_DIR / "Parking_Meters.geojson")
+    sj_meters = gpd.read_file(PARKING_RAW_DATA_DIR / "Parking_Meters.geojson")
     sj_meters = sj_meters.rename(columns={"PARKINGRATE": "hparkcost"})
     sj_meters["hparkcost"] = sj_meters["hparkcost"].fillna(2.0).replace(0, 2.0)
     sj_meters = sj_meters[["hparkcost", "geometry"]]
@@ -58,8 +58,8 @@ def published_cost():
     
     # Load San Francisco meter districts
     print("  Loading San Francisco meter districts...")
-    sf_rates = pd.read_csv(RAW_DATA_DIR / "January 2026 Parking Meter Rate Change Data.csv")
-    sf_park_distr = gpd.read_file(RAW_DATA_DIR / "Parking_Management_Districts_20260203.geojson")
+    sf_rates = pd.read_csv(PARKING_RAW_DATA_DIR / "January 2026 Parking Meter Rate Change Data.csv")
+    sf_park_distr = gpd.read_file(PARKING_RAW_DATA_DIR / "Parking_Management_Districts_20260203.geojson")
     
     # Average Final Rate by Parking Management District
     avg_rates = sf_rates.groupby('Parking Management District')['Final Rate'].mean().reset_index()

@@ -297,6 +297,9 @@ def estimate_parking_costs(maz, commercial_density_threshold=1.0, probability_th
         X_train = maz.loc[training_mask, feature_cols].values
         y_train_raw = maz.loc[training_mask, cost_type].values
         
+        # Handle NaN values in features (fill with 0 for density columns)
+        X_train = np.nan_to_num(X_train, nan=0.0)
+        
         # Binary classification: paid (1) vs free (0)
         # Treat NaN and 0 as free parking, > 0 as paid
         y_train_binary = (pd.Series(y_train_raw).fillna(0) > 0).astype(int).values
@@ -359,6 +362,10 @@ def estimate_parking_costs(maz, commercial_density_threshold=1.0, probability_th
         if n_predictions > 0:
             # Extract prediction features
             X_pred = maz.loc[needs_prediction, feature_cols].values
+            
+            # Handle NaN values in prediction features
+            X_pred = np.nan_to_num(X_pred, nan=0.0)
+            
             X_pred_scaled = scaler.transform(X_pred)
             
             # Predict probability of paid parking
@@ -501,6 +508,9 @@ def validate_parking_cost_estimation(maz, commercial_density_threshold=1.0, test
             X_train = maz.loc[train_mask, feature_cols].values
             y_train_raw = maz.loc[train_mask, cost_type].values
             
+            # Handle NaN values in features (fill with 0 for density columns)
+            X_train = np.nan_to_num(X_train, nan=0.0)
+            
             # Convert to binary: paid (1) or free (0)
             # Treat NaN and 0 as free parking, > 0 as paid
             y_train_binary = (pd.Series(y_train_raw).fillna(0) > 0).astype(int).values
@@ -519,6 +529,9 @@ def validate_parking_cost_estimation(maz, commercial_density_threshold=1.0, test
             X_test = maz.loc[test_mask, feature_cols].values
             y_test_raw = maz.loc[test_mask, cost_type].values
             y_test_binary = (pd.Series(y_test_raw).fillna(0) > 0).astype(int).values
+            
+            # Handle NaN values in test features
+            X_test = np.nan_to_num(X_test, nan=0.0)
             
             # Standardize features
             scaler = StandardScaler()
@@ -715,6 +728,10 @@ def compare_models(maz, commercial_density_threshold=1.0, test_thresholds=None):
             X_test = maz.loc[test_mask, feature_cols].values
             y_test = (pd.Series(maz.loc[test_mask, 'hparkcost'].values).fillna(0) > 0).astype(int).values
             
+            # Handle NaN values in features (fill with 0 for density columns)
+            X_train = np.nan_to_num(X_train, nan=0.0)
+            X_test = np.nan_to_num(X_test, nan=0.0)
+            
             # Check for variation
             if y_train.sum() == 0 or y_train.sum() == len(y_train):
                 print(f"    No variation in training data. Skipping.")
@@ -904,23 +921,24 @@ def estimate_parking_by_county_threshold(maz, daily_percentile=0.95, monthly_per
     
     for county, thresholds in county_thresholds.items():
         # Daily parking prediction mask
+        # Check for NaN, None, or <= 0 (no observed cost)
         daily_mask = (
             (maz['county_name'] == county) &
             (maz['off_nres'] > 0) &
             (maz['place_name'].notna()) &
             ~(maz['place_name'].isin(OBSERVED_CITIES)) &
-            (maz['dparkcost'].isna()) &
+            ((maz['dparkcost'].isna()) | (maz['dparkcost'] <= 0)) &
             (maz['commercial_emp_den'] >= thresholds['daily'])
         )
         
         # Monthly parking prediction mask
-        # Note: mparkcost was fillna(0) in merge_capacity, so check <= 0 instead of isna()
+        # Check for NaN, None, or <= 0 (no observed cost)
         monthly_mask = (
             (maz['county_name'] == county) &
             (maz['off_nres'] > 0) &
             (maz['place_name'].notna()) &
             ~(maz['place_name'].isin(OBSERVED_CITIES)) &
-            (maz['mparkcost'] <= 0) &
+            ((maz['mparkcost'].isna()) | (maz['mparkcost'] <= 0)) &
             (maz['commercial_emp_den'] >= thresholds['monthly'])
         )
         
@@ -941,7 +959,7 @@ def estimate_parking_by_county_threshold(maz, daily_percentile=0.95, monthly_per
     maz['dparkcost'] = maz['dparkcost'].fillna(maz['dparkcost_pred'])
     maz['mparkcost'] = maz['mparkcost'].fillna(maz['mparkcost_pred'])
     
-    # Fill remaining NaN with 0 (free parking)
+    # Fill remaining NaN/None with 0 (free parking)
     maz['dparkcost'] = maz['dparkcost'].fillna(0)
     maz['mparkcost'] = maz['mparkcost'].fillna(0)
     
@@ -983,8 +1001,8 @@ def merge_estimated_costs(
     Args:
         maz: GeoDataFrame with MAZ zones (must have employment, capacity, observed costs, 
              place_name, county_name)
-        run_validation: If True, perform leave-one-city-out cross-validation (default False)
-        compare_models_flag: If True, compare multiple model types (LR, RF, GB, SVM) (default False)
+        run_validation: If True, perform leave-one-city-out cross-validation (default True)
+        compare_models_flag: If True, compare multiple model types (LR, RF, GB, SVM) (default True)
         use_best_model: If True and compare_models_flag=True, use best performing model (default True)
         commercial_density_threshold: Minimum commercial_emp_den for paid parking (default 1.0 jobs/acre)
         daily_percentile: County-level percentile for daily parking threshold (default 0.95)

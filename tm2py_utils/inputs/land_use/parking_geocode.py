@@ -2,17 +2,16 @@
 Geocode parking scrape data using GeoPandas
 
 This script:
-1. Reads parking scrape CSV data
+1. Reads parking scrape CSV data from interim cache
 2. Cleans addresses (removes parenthetical content)
 3. Geocodes addresses using Nominatim via GeoPandas
-4. Saves results as GeoParquet with geometry column
+4. Saves results as GeoPackage with geometry column to interim cache
 5. Flags failed geocodes while keeping all records
 
 Dependencies:
 - geopandas
 - pandas
 - tqdm
-- pyarrow (for GeoParquet support)
 """
 
 import pandas as pd
@@ -20,9 +19,10 @@ import geopandas as gpd
 from tqdm import tqdm
 import time
 
+# Import configuration
+from setup import INTERIM_CACHE_DIR, ensure_directories
 
 # Configuration
-INPUT_DIR = r'E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-version-05\landuse'
 INPUT_FILE = 'parking_scrape_location_cost.csv'
 OUTPUT_FILE = 'parking_scrape_location_cost.parquet'
 
@@ -64,12 +64,14 @@ def build_full_address(row):
 def geocode_parking_data():
     """Main function to geocode parking data"""
     
+    ensure_directories()
+    
     print("="*70)
     print("Geocoding Bay Area Parking Scrape Data")
     print("="*70)
     
     # Read input CSV
-    input_path = f"{INPUT_DIR}\\{INPUT_FILE}"
+    input_path = INTERIM_CACHE_DIR / INPUT_FILE
     print(f"\nReading data from:\n  {input_path}")
     
     try:
@@ -193,13 +195,13 @@ def geocode_parking_data():
         failed_samples = gdf_all[~gdf_all['geocoded']][['city', 'address', 'full_address']].head()
         print(failed_samples.to_string(index=False))
     
-    # Save to GeoParquet
-    output_path = f"{INPUT_DIR}\\{OUTPUT_FILE}"
+    # Save to Parquet
+    output_path = INTERIM_CACHE_DIR / OUTPUT_FILE
     print(f"\nSaving results to:\n  {output_path}")
     
     try:
         gdf.to_parquet(output_path)
-        print(f"  ✓ Saved {len(gdf)} records as GeoParquet")
+        print(f"  ✓ Saved {len(gdf)} records as Parquet")
         print(f"  ✓ CRS: {gdf.crs}")
         print(f"  ✓ Columns: {', '.join(gdf.columns.tolist())}")
     except Exception as e:
