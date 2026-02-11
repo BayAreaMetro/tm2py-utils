@@ -577,13 +577,14 @@ def update_parkarea_with_predicted_costs(maz):
     Update parkarea classification to include predicted parking costs.
     
     parkarea codes:
-    - 0: No paid parking (default)
     - 1: Downtown core (from Local Moran's I analysis)
+    - 2: Within 1/4 mile of downtown core
     - 3: Paid parking (predicted or observed outside downtown)
-    - 4: Other areas with some parking but not paid
+    - 4: Free parking / no parking cost
     """
-    # Start with parkarea already assigned by merge_parking_area (0 or 1)
+    # Start with parkarea already assigned by merge_parking_area (0, 1, or 2)
     # parkarea=1 already set for downtown cores
+    # parkarea=2 already set for MAZs within 1/4 mile of downtown
     
    # Set parkarea=3 for non-downtown MAZs with any parking cost (observed or predicted)
     has_parking_cost = (
@@ -592,13 +593,12 @@ def update_parkarea_with_predicted_costs(maz):
         (maz['mparkcost'].notnull() & (maz['mparkcost'] > 0))
     )
     
-    maz.loc[has_parking_cost & (maz['parkarea'] != 1), 'parkarea'] = 3
+    # Only reassign parkarea if not already 1 or 2
+    maz.loc[has_parking_cost & (maz['parkarea'] == 0), 'parkarea'] = 3
     
-    # Set parkarea=4 for MAZs with parking capacity but no cost
-    has_capacity = ((maz['on_all'] > 0) | (maz['off_nres'] > 0))
-    no_cost = ~has_parking_cost
-    
-    maz.loc[has_capacity & no_cost & (maz['parkarea'] != 1), 'parkarea'] = 4
+    # Set parkarea=4 for free parking (no cost areas)
+    # All remaining parkarea=0 (no paid parking) assigned to parkarea=4
+    maz.loc[maz['parkarea'] == 0, 'parkarea'] = 4
     
     # Report final distribution
     print(f"\n  Final parkarea distribution:")

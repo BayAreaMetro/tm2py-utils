@@ -5,18 +5,21 @@ This module assigns parkarea codes to MAZ zones based on downtown employment con
 patterns within each place_name. Uses Local Moran's I analysis to identify
 statistically significant employment clusters.
 
-Architecture:
+Architecture (Stage 1 - this module):
 - **parkarea = 1**: Core downtown area (High-High LISA cluster)
-- **parkarea = 0**: Non-downtown (default)
+- **parkarea = 2**: Within 1/4 mile of downtown core
+- **parkarea = 0**: Unassigned (temporary - will be assigned to 3 or 4 in Stage 2)
 
-Future expansion will define parkarea 2, 3, 4 for urban/suburban/rural gradients.
+Stage 2 assignments (by land_use_pipeline.update_parkarea_with_predicted_costs):
+- **parkarea = 3**: Paid parking (has observed or predicted costs)
+- **parkarea = 4**: Free parking / no parking cost
 
 Methodology:
 1. Filter places by minimum downtown employment threshold (default: 100 jobs)
 2. Calculate Local Moran's I statistic for each MAZ using Queen contiguity weights
 3. Identify significant High-High clusters (HH quadrant with p-value <= 0.05)
 4. Extract largest High-High cluster by employment as downtown (parkarea=1)
-5. Calculate compactness metrics for validation
+5. Assign parkarea=2 to MAZs within 1/4 mile buffer of parkarea=1
 
 Local Moran's I Analysis:
 - **Statistical significance**: Downtown defined by spatial autocorrelation, not arbitrary thresholds
@@ -30,11 +33,6 @@ LISA Categories:
 - **LH (Low-High)**: Low employment surrounded by high employment (edge zones)
 - **LL (Low-Low)**: Low employment surrounded by low employment (suburban/rural)
 - **NS (Not Significant)**: No significant spatial autocorrelation
-
-Compactness Metrics:
-- **Contiguity**: Number of spatially connected components (always 1 by design)
-- **Area Ratio**: Total area / convex hull area (1.0 = perfectly compact)
-- **Perimeter Efficiency**: 4π×area / perimeter² (circle = 1.0)
 
 Dependencies:
 - libpysal: Spatial weights matrix construction
@@ -52,7 +50,6 @@ import warnings
 import sys
 import os
 from contextlib import contextmanager
-from shapely.geometry import Point, MultiPolygon
 from shapely.ops import unary_union
 from libpysal.weights import Queen
 from esda.moran import Moran_Local
@@ -83,68 +80,6 @@ def suppress_output():
         # Restore original streams
         sys.stdout = old_stdout
         sys.stderr = old_stderr
-
-
-def calculate_employment_weighted_centroid(mazs_gdf, emp_col='downtown_emp'):
-    """
-    Calculate employment-weighted centroid for a group of MAZs.
-    
-    Args:
-        mazs_gdf: GeoDataFrame of MAZs (must have geometry and employment column)
-        emp_col: Employment column name for weighting (default: 'downtown_emp')
-    
-    Returns:
-        shapely.Point: Employment-weighted centroid coordinates
-    """
-    # Get centroids of each MAZ
-    centroids = mazs_gdf.geometry.centroid
-    
-    # Calculate weights
-    total_emp = mazs_gdf[emp_col].sum()
-    
-    if total_emp == 0:
-        # Fallback to geometric centroid if no employment
-        return mazs_gdf.geometry.unary_union.centroid
-    
-    # Weighted average of x and y coordinates
-    weighted_x = (centroids.x * mazs_gdf[emp_col]).sum() / total_emp
-    weighted_y = (centroids.y * mazs_gdf[emp_col]).sum() / total_emp
-    
-    return Point(weighted_x, weighted_y)
-
-
-def calculate_radius_of_gyration(mazs_gdf, centroid_point, emp_col='downtown_emp'):
-    """
-    Calculate radius of gyration - measure of spatial spread of employment.
-    
-    R_g = sqrt(Σ(emp × distance²) / Σ(emp))
-    
-    Smaller R_g = more compact downtown
-    Larger R_g = more dispersed employment
-    
-    Args:
-        mazs_gdf: GeoDataFrame of MAZs with employment
-        centroid_point: shapely.Point of employment-weighted centroid
-        emp_col: Employment column name for weighting
-    
-    Returns:
-        float: Radius of gyration in meters (CRS units)
-    """
-    # Calculate distance from each MAZ centroid to employment centroid
-    mazs_gdf = mazs_gdf.copy()
-    mazs_gdf['maz_centroid'] = mazs_gdf.geometry.centroid
-    mazs_gdf['distance_to_center'] = mazs_gdf['maz_centroid'].distance(centroid_point)
-    
-    # Weighted root mean square distance
-    total_emp = mazs_gdf[emp_col].sum()
-    
-    if total_emp == 0:
-        return 0
-    
-    weighted_distance_sq = (mazs_gdf[emp_col] * mazs_gdf['distance_to_center']**2).sum()
-    r_g = np.sqrt(weighted_distance_sq / total_emp)
-    
-    return r_g
 
 
 def assign_parkarea_by_local_morans_i(mazs_gdf, emp_col='downtown_emp', 
@@ -406,97 +341,6 @@ def assign_parkarea_by_local_morans_i(mazs_gdf, emp_col='downtown_emp',
     return parkarea_mask, lisa_categories, metrics
 
 
-def calculate_compactness_metrics(mazs_gdf, centroid_point, r_g, emp_col='downtown_emp'):
-    """
-    Calculate spatial compactness metrics for a set of parkarea=1 MAZs.
-    
-    Metrics:
-    1. Contiguity: Number of spatially connected components (1 = best)
-    2. Area Ratio: Total area / convex hull area (1.0 = best)
-    3. Normalized Dispersion: Mean distance / R_g (lower = better)
-    4. Perimeter Efficiency: 4π×area / perimeter² (circle = 1.0, lower = worse)
-    
-    Args:
-        mazs_gdf: GeoDataFrame of MAZs assigned parkarea=1
-        centroid_point: Employment-weighted centroid
-        r_g: Radius of gyration for this place
-        emp_col: Employment column name
-    
-    Returns:
-        dict: Compactness metrics
-    """
-    if len(mazs_gdf) == 0:
-        return {
-            'n_components': 0,
-            'area_ratio': 0,
-            'normalized_dispersion': 0,
-            'perimeter_efficiency': 0,
-            'n_mazs': 0,
-            'total_area_acres': 0,
-            'total_employment': 0,
-            'mean_distance_m': 0,
-            'max_distance_m': 0
-        }
-    
-    # 1. Contiguity - number of connected components using spatial graph
-    # Build adjacency graph based on touches relationship
-    G = nx.Graph()
-    
-    # Add all MAZs as nodes
-    for idx in mazs_gdf.index:
-        G.add_node(idx)
-    
-    # Add edges for touching MAZs
-    for idx1, maz1 in mazs_gdf.iterrows():
-        for idx2, maz2 in mazs_gdf.iterrows():
-            if idx1 < idx2:  # Avoid duplicates
-                if maz1.geometry.touches(maz2.geometry) or maz1.geometry.intersects(maz2.geometry):
-                    G.add_edge(idx1, idx2)
-    
-    # Find connected components
-    n_components = nx.number_connected_components(G)
-    
-    # 2. Area Ratio - compactness of shape
-    total_area = mazs_gdf.geometry.area.sum()
-    
-    # Get convex hull of all MAZs
-    union_geom = mazs_gdf.geometry.unary_union
-    convex_hull = union_geom.convex_hull
-    convex_hull_area = convex_hull.area
-    
-    area_ratio = total_area / convex_hull_area if convex_hull_area > 0 else 0
-    
-    # 3. Normalized Dispersion - how spread out MAZs are from center
-    mazs_gdf = mazs_gdf.copy()
-    mazs_gdf['maz_centroid'] = mazs_gdf.geometry.centroid
-    mazs_gdf['distance_to_center'] = mazs_gdf['maz_centroid'].distance(centroid_point)
-    
-    mean_distance = mazs_gdf['distance_to_center'].mean()
-    max_distance = mazs_gdf['distance_to_center'].max()
-    
-    normalized_dispersion = mean_distance / r_g if r_g > 0 else 0
-    
-    # 4. Perimeter Efficiency - shape complexity
-    # 4π×area / perimeter² = 1.0 for circle, lower for irregular shapes
-    perimeter = union_geom.boundary.length
-    perimeter_efficiency = (4 * np.pi * total_area) / (perimeter**2) if perimeter > 0 else 0
-    
-    # Additional statistics
-    total_employment = mazs_gdf[emp_col].sum()
-    
-    return {
-        'n_components': n_components,
-        'area_ratio': area_ratio,
-        'normalized_dispersion': normalized_dispersion,
-        'perimeter_efficiency': perimeter_efficiency,
-        'n_mazs': len(mazs_gdf),
-        'total_area_acres': mazs_gdf['ACRES'].sum() if 'ACRES' in mazs_gdf.columns else total_area / 4046.86,
-        'total_employment': total_employment,
-        'mean_distance_m': mean_distance,
-        'max_distance_m': max_distance
-    }
-
-
 def cat_names(cat):
     """Helper function to return full LISA category names."""
     names = {
@@ -613,9 +457,6 @@ def assign_parking_areas(maz, min_place_employment=100,
         
         print(f"  {place_name} ({len(place_mazs):,} MAZs, {place_emp:,.0f} {emp_col})")
         
-        # Calculate employment-weighted centroid (for reporting)
-        centroid = calculate_employment_weighted_centroid(place_mazs, emp_col)
-        
         # Assign parkarea using Local Moran's I analysis
         parkarea_mask, moran_categories, moran_metrics = assign_parkarea_by_local_morans_i(
             place_mazs, emp_col, significance_level,
@@ -629,23 +470,10 @@ def assign_parking_areas(maz, min_place_employment=100,
         # Update main dataframe with all LISA categories
         maz.loc[moran_categories.index, 'moran_category'] = moran_categories
         
-        # Calculate compactness metrics if downtown exists
+        # Count downtown MAZs and employment
         parkarea_mazs = place_mazs.loc[parkarea_mask[parkarea_mask].index]
-        
-        if len(parkarea_mazs) > 0:
-            r_g = calculate_radius_of_gyration(place_mazs, centroid, emp_col)
-            compactness = calculate_compactness_metrics(parkarea_mazs, centroid, r_g, emp_col)
-        else:
-            r_g = 0
-            compactness = {
-                'n_components': 0,
-                'area_ratio': 0,
-                'perimeter_efficiency': 0,
-                'n_mazs': 0,
-                'total_employment': 0,
-                'mean_distance_m': 0,
-                'max_distance_m': 0
-            }
+        n_downtown_mazs = len(parkarea_mazs)
+        downtown_employment = parkarea_mazs[emp_col].sum() if n_downtown_mazs > 0 else 0
         
         # Report LISA category counts
         lisa_counts = moran_metrics.get('lisa_counts', {})
@@ -658,8 +486,8 @@ def assign_parking_areas(maz, min_place_employment=100,
         print(f"    Connected HH+HL clusters: {moran_metrics['n_components']} total, {moran_metrics.get('n_valid_components', 0)} valid (≥{min_cluster_mazs} MAZs, ≥{min_cluster_employment} emp)")
         print(f"    Holes filled: {moran_metrics.get('n_filled_holes', 0)} MAZs completely surrounded by cluster")
         print(f"    Perimeter additions: {moran_metrics.get('n_perimeter_added', 0)} MAZs with >90% perimeter touching cluster")
-        print(f"    Downtown (parkarea=1): {compactness['n_mazs']} MAZs, "
-              f"{compactness['total_employment']:,.0f} emp, "
+        print(f"    Downtown (parkarea=1): {n_downtown_mazs} MAZs, "
+              f"{downtown_employment:,.0f} emp, "
               f"mean_I={moran_metrics.get('mean_moran_i', 0):.3f}")
         
         # Store place results
@@ -668,20 +496,14 @@ def assign_parking_areas(maz, min_place_employment=100,
             'county_name': place_mazs['county_name'].iloc[0] if 'county_name' in place_mazs.columns else None,
             'total_mazs': len(place_mazs),
             'total_employment': place_emp,
-            'centroid_x': centroid.x,
-            'centroid_y': centroid.y,
-            'radius_of_gyration_m': r_g,
             'n_high_high': moran_metrics['n_high_high'],
             'n_high_low': moran_metrics.get('n_high_low', 0),
             'n_downtown_candidate': moran_metrics.get('n_downtown_candidate', 0),
             'n_hh_clusters': moran_metrics['n_components'],
             'mean_moran_i': moran_metrics.get('mean_moran_i', 0),
             'max_moran_i': moran_metrics.get('max_moran_i', 0),
-            'n_mazs_downtown': compactness['n_mazs'],
-            'downtown_employment': compactness['total_employment'],
-            'area_ratio': compactness['area_ratio'],
-            'perim_efficiency': compactness['perimeter_efficiency'],
-            'max_distance_m': compactness.get('max_distance_m', 0),
+            'n_mazs_downtown': n_downtown_mazs,
+            'downtown_employment': downtown_employment,
             **{f'lisa_{cat}': lisa_counts.get(cat, 0) for cat in ['HH', 'HL', 'LH', 'LL', 'NS']}
         })
     
@@ -713,12 +535,6 @@ def assign_parking_areas(maz, min_place_employment=100,
     # Calculate employment capture percentage
     df_results['emp_capture_pct'] = (df_results['downtown_employment'] / df_results['total_employment']) * 100
     print(f"{'Employment captured (%)':<40} {df_results['emp_capture_pct'].mean():>12.1f} {df_results['emp_capture_pct'].median():>12.1f} {df_results['emp_capture_pct'].max():>12.1f}")
-    
-    print()
-    
-    # Compactness metrics
-    print(f"{'Area ratio (1.0=best)':<40} {df_results['area_ratio'].mean():>12.3f} {df_results['area_ratio'].median():>12.3f} {df_results['area_ratio'].max():>12.3f}")
-    print(f"{'Perimeter efficiency (1.0=best)':<40} {df_results['perim_efficiency'].mean():>12.3f} {df_results['perim_efficiency'].median():>12.3f} {df_results['perim_efficiency'].max():>12.3f}")
     
     print("─" * 80)
     
@@ -788,8 +604,8 @@ def assign_parking_areas(maz, min_place_employment=100,
         n_parkarea_2 = 0
     
     # Print Stage 1 summary (parkarea 0, 1, 2 only)
-    # Note: parkarea=3 (paid parking) and parkarea=4 (other) are assigned AFTER cost estimation
-    # in parking_prep.update_parkarea_with_predicted_costs() to include predicted costs
+    # Note: parkarea=3 and parkarea=4 are assigned in Stage 2 by
+    # land_use_pipeline.update_parkarea_with_predicted_costs() after cost estimation
     print(f"\n{'='*80}")
     print("STAGE 1 PARKING AREA CLASSIFICATION COMPLETE")
     print(f"{'='*80}\n")
@@ -802,13 +618,13 @@ def assign_parking_areas(maz, min_place_employment=100,
     
     print(f"{'Category':<40} {'MAZs':>12} {'Percent':>10}")
     print("─" * 65)
-    print(f"{'parkarea=0 (Unassigned)':<40} {n_parkarea_0:>12,} {n_parkarea_0/total_mazs*100:>9.1f}%")
+    print(f"{'parkarea=0 (Temporary - to be assigned)':<40} {n_parkarea_0:>12,} {n_parkarea_0/total_mazs*100:>9.1f}%")
     print(f"{'parkarea=1 (Downtown core)':<40} {n_parkarea_1:>12,} {n_parkarea_1/total_mazs*100:>9.1f}%")
     print(f"{'parkarea=2 (Within 1/4 mi of downtown)':<40} {n_parkarea_2:>12,} {n_parkarea_2/total_mazs*100:>9.1f}%")
     print("─" * 65)
     print(f"{'Total':<40} {total_mazs:>12,} {100.0:>9.1f}%")
-    print(f"\n  NOTE: parkarea=3 (non-downtown paid parking) and parkarea=4 (other) will be assigned")
-    print(f"  after cost estimation to include predicted parking costs.")
+    print(f"\n  NOTE: parkarea=0 will be assigned to parkarea=3 (paid parking) or parkarea=4 (other)")
+    print(f"  after cost estimation to include predicted parking costs. Final output has no parkarea=0.")
     
     print(f"\n  Places with parkarea=1 (downtown): {(df_results['n_mazs_downtown'] > 0).sum()} of {len(eligible_places)}")
     
