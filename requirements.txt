@@ -9,3 +9,15 @@ streamlit # interactive dashboard for validation summaries
 plotly # interactive charts for dashboard
 polars # data processing library
 pyyaml # YAML configuration file parsing
+py7zr
+
+# Land use pipeline dependencies
+pytidycensus # Used to access place boundaries
+tqdm # Progress bars for long-running operations
+networkx # Graph analysis for identifying contiguous downtown parking areas
+libpysal # LISA used for park area classification
+esda # LISA used for park area classification
+scikit-learn # Machine learning models for parking cost estimation
+selenium # Web scraping for SpotHero parking data
+geopy # Geocoding parking addresses
+openpyxl # Excel file reading for NAICS employment crosswalk
