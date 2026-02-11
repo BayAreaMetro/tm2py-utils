@@ -61,7 +61,7 @@ from enrollment_counts import get_enrollment_maz
 # Import parking modules  
 from parking_published import published_cost
 from parking_area import merge_parking_area
-from parking_estimation import merge_estimated_costs
+from parking_estimation import merge_estimated_costs, backfill_downtown_daily_costs
 
 
 # ============================================================================
@@ -769,28 +769,37 @@ def run_pipeline(
     
     print(f"  ✓ Parking costs estimated\n")
     
-    # Step 8.5: Update monthly stalls with predicted costs
-    print("▶ Step 9/11: Updating monthly stalls with predicted costs...")
+    # Step 8.5: Backfill downtown daily costs
+    print("▶ Step 9/12: Backfilling downtown daily costs...")
     logging.info("="*80)
-    logging.info("STEP 9: Updating monthly stalls with predicted costs")
+    logging.info("STEP 9: Backfilling downtown daily costs")
+    logging.info("="*80)
+    with redirect_stdout_to_logger():
+        maz = backfill_downtown_daily_costs(maz)
+    print(f"  ✓ Downtown daily costs backfilled\n")
+    
+    # Step 9: Update monthly stalls with predicted costs
+    print("▶ Step 10/12: Updating monthly stalls with predicted costs...")
+    logging.info("="*80)
+    logging.info("STEP 10: Updating monthly stalls with predicted costs")
     logging.info("="*80)
     with redirect_stdout_to_logger():
         maz = update_monthly_stalls_with_predicted_costs(maz)
     print(f"  ✓ Monthly stalls updated\n")
     
     # Step 9: Update parkarea classification with predicted costs
-    print("▶ Step 10/11: Updating parkarea classifications...")
+    print("▶ Step 11/12: Updating parkarea classifications...")
     logging.info("="*80)
-    logging.info("STEP 10: Updating parkarea classifications")
+    logging.info("STEP 11: Updating parkarea classifications")
     logging.info("="*80)
     with redirect_stdout_to_logger():
         maz = update_parkarea_with_predicted_costs(maz)
     print(f"  ✓ Parkarea classifications updated\n")
     
     # Step 10: Write final output
-    print("▶ Step 11/11: Writing final output...")
+    print("▶ Step 12/12: Writing final output...")
     logging.info("="*80)
-    logging.info("STEP 11: Writing final output")
+    logging.info("STEP 12: Writing final output")
     logging.info("="*80)
     
     # Clean up duplicate TAZ_NODE columns in maz before creating output

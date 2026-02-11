@@ -1016,6 +1016,97 @@ def estimate_parking_by_county_threshold(maz, daily_percentile=0.95, monthly_per
     return maz
 
 
+def backfill_downtown_daily_costs(maz):
+    """
+    Backfill missing daily parking costs for downtown MAZs with capacity in core cities.
+    
+    For MAZs in San Francisco, Oakland, San Jose, and Berkeley with:
+    - parkarea criteria (varies by city):
+      * San Francisco: parkarea = 1 or 2 (downtown core or near-downtown)
+      * Oakland, San Jose, Berkeley: parkarea = 1 only (downtown core only)
+    - dstallssam > 0 (daily parking capacity exists)
+    - dparkcost == 0 or NaN (no observed or predicted cost)
+    
+    Assign city-specific median daily cost from observed downtown parking data.
+    
+    This ensures that MAZs with daily parking capacity in and near downtowns
+    of core cities have associated costs, even when direct observations are missing.
+    
+    Must run AFTER:
+    - merge_capacity() (dstallssam exists)
+    - merge_parking_area() (parkarea 1 or 2 assigned)
+    - merge_estimated_costs() (dparkcost has observed + predicted values or 0)
+    
+    Args:
+        maz: GeoDataFrame with MAZ zones (must have place_name, parkarea, dstallssam, dparkcost)
+    
+    Returns:
+        GeoDataFrame: maz with backfilled dparkcost for eligible downtown MAZs
+    """
+    print(f"\n{'='*80}")
+    print(f"BACKFILLING DOWNTOWN DAILY PARKING COSTS")
+    print(f"{'='*80}")
+    print(f"For core city downtowns with parking capacity but missing costs\n")
+    
+    # Define core cities for backfill
+    CORE_CITIES = ['San Francisco', 'Oakland', 'San Jose', 'Berkeley']
+    
+    total_backfilled = 0
+    
+    for city in CORE_CITIES:
+        # Calculate city-specific median from observed data (dparkcost > 0)
+        city_observed_mask = (maz['place_name'] == city) & (maz['dparkcost'] > 0)
+        observed_costs = maz.loc[city_observed_mask, 'dparkcost']
+        
+        if len(observed_costs) == 0:
+            print(f"  {city}: No observed daily parking costs - skipping backfill")
+            continue
+        
+        city_median = observed_costs.median()
+        
+        # Identify eligible MAZs for backfill:
+        # - In this city
+        # - In downtown (parkarea criteria varies by city)
+        #   * San Francisco: parkarea 1 or 2 (core and near-downtown)
+        #   * Oakland, San Jose, Berkeley: parkarea 1 only (core downtown only)
+        # - Have daily parking capacity (dstallssam > 0)
+        # - Missing daily cost (dparkcost null or <= 0)
+        
+        # Set parkarea criteria based on city
+        if city == 'San Francisco':
+            parkarea_condition = maz['parkarea'].isin([1, 2])
+        else:
+            # Oakland, San Jose, Berkeley: only parkarea 1 (downtown core)
+            parkarea_condition = maz['parkarea'] == 1
+        
+        eligible_mask = (
+            (maz['place_name'] == city) &
+            parkarea_condition &
+            (maz['dstallssam'] > 0) &
+            ((maz['dparkcost'].isna()) | (maz['dparkcost'] <= 0))
+        )
+        
+        n_eligible = eligible_mask.sum()
+        
+        if n_eligible > 0:
+            # Apply city median to eligible MAZs
+            maz.loc[eligible_mask, 'dparkcost'] = city_median
+            total_backfilled += n_eligible
+            print(f"  {city}: Backfilled {n_eligible:,} downtown MAZs with ${city_median:.2f} (median from {len(observed_costs):,} observed)")
+        else:
+            print(f"  {city}: No eligible MAZs for backfill (median=${city_median:.2f} from {len(observed_costs):,} observed)")
+    
+    print(f"\n  Total downtown MAZs backfilled: {total_backfilled:,}")
+    
+    if total_backfilled > 0:
+        final_daily = (maz['dparkcost'] > 0).sum()
+        print(f"  Final dparkcost: {final_daily:,} MAZs with cost > $0 (mean=${maz.loc[maz['dparkcost'] > 0, 'dparkcost'].mean():.2f})")
+    
+    print(f"{'='*80}\n")
+    
+    return maz
+
+
 def merge_estimated_costs(
     maz,
     run_validation=False,
