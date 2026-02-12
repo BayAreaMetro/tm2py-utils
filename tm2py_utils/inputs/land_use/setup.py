@@ -23,12 +23,12 @@ ANALYSIS_CRS = "EPSG:26910"  # NAD83 / UTM Zone 10N (Bay Area)
 WGS84_CRS = "EPSG:4326"
 
 # ================================
-# Base Directories
+# Directories
 # ================================
 # Box directory - main storage for land use inputs
 BOX_LANDUSE_BASE = Path(r"E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-version-05\landuse")
 
-# M: Drive - business and GIS data
+# M: Drive - jobs data
 M_DRIVE_BASE = Path(r"M:\Data")
 
 # Local repository directories
@@ -84,7 +84,7 @@ CENSUS_API_KEY = "a3928abdddafbb9bbd88399816c55c82337c3ca6"
 
 
 CPI_VALUES = {
-    2010: 218.056, # # TM2 uses 2010 dollars
+    2010: 218.056, # TM2 uses 2010 dollars
     2023: 304.702 # We likely have different dollar years for different cost data sources - settle on 2023
 }
 

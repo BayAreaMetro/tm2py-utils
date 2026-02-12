@@ -185,7 +185,7 @@ def allocate_parking_to_maz(weights_df, maz_gdf):
     return parking_maz
 
 
-def get_parking_maz(write=False, use_maz_orig=False):
+def get_parking_maz(write=False):
     """
     Main function to allocate block group parking capacity to MAZ level.
     Uses hybrid allocation: employment-weighted for off-street non-residential,
@@ -193,7 +193,6 @@ def get_parking_maz(write=False, use_maz_orig=False):
     
     Parameters:
         write (bool): If True, writes output to interim cache as GeoPackage
-        use_maz_orig (bool): If True, uses MAZ v2.2 shapefile. Otherwise uses version from setup.
         
     Returns:
         DataFrame: MAZ-level parking with columns [MAZ_NODE, TAZ_NODE, off_nres, on_all]
@@ -227,7 +226,7 @@ def get_parking_maz(write=False, use_maz_orig=False):
     print(f"  Loaded {len(parking_capacity):,} block groups with parking data")
     
     # Load MAZ shapefile
-    maz = load_maz_shp(use_maz_orig=use_maz_orig).to_crs(ANALYSIS_CRS)
+    maz = load_maz_shp().to_crs(ANALYSIS_CRS)
     print(f"  Loaded {len(maz):,} MAZ polygons")
     
     # Load employment data
@@ -286,12 +285,11 @@ def main():
     """
     Execute script directly with optional command-line flags.
     Usage:
-        python parking_capacity.py [--write] [--use-maz-orig]
+        python parking_capacity.py [--write]
     """
-    use_maz_orig = "--use-maz-orig" in sys.argv
     write = "--write" in sys.argv
     
-    parking_maz = get_parking_maz(write=write, use_maz_orig=use_maz_orig)
+    parking_maz = get_parking_maz(write=write)
     print(f"\nParking capacity processing complete.")
     print(f"Total MAZ records: {len(parking_maz)}")
     print(f"Total off-street parking: {parking_maz['off_nres'].sum():,.0f}")

@@ -170,14 +170,13 @@ def summarize_enrollment_by_maz(schools_maz, maz):
 
     return enrollment_maz
 
-def get_enrollment_maz(write=False, use_maz_orig=False):
+def get_enrollment_maz(write=False):
     """
     Loads public, private, and college data, spatially joins to MAZ, summarizes enrollment by MAZ, and merges results.
     Optionally writes output to GeoPackage.
     
     Parameters:
         write (bool, optional): If True, writes the resulting enrollment_maz GeoDataFrame to interim cache.
-        use_maz_orig (bool, optional): If True, uses MAZ v2.2 shapefile. Otherwise uses version from setup.
     
     Returns:
         DataFrame: Enrollment counts by MAZ for all school types.
@@ -188,7 +187,7 @@ def get_enrollment_maz(write=False, use_maz_orig=False):
     pubschls = load_public_schools()
     prvschls = load_private_schools()
     colleges = load_colleges()
-    maz = load_maz_shp(use_maz_orig=use_maz_orig)
+    maz = load_maz_shp()
 
     # Spatial join schools to maz
     pubschls_maz = spatial_join_to_maz(pubschls, maz)
@@ -233,12 +232,11 @@ def main():
     """
     Execute script directly with optional command-line flags.
     Usage:
-        python enrollment_counts.py [--write] [--use-maz-orig]
+        python enrollment_counts.py [--write]
     """
-    use_maz_orig = "--use-maz-orig" in sys.argv
     write = "--write" in sys.argv
     
-    enroll_maz = get_enrollment_maz(write=write, use_maz_orig=use_maz_orig)
+    enroll_maz = get_enrollment_maz(write=write)
     print(f"\nEnrollment counts processing complete.")
     print(f"Total MAZ records: {len(enroll_maz)}")
     print(f"Total K-8 enrollment: {enroll_maz['EnrollGradeKto8'].sum():,.0f}")

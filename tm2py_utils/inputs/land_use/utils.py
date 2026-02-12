@@ -1,19 +1,48 @@
 
 from pathlib import Path
 import os
+import sys
+from io import StringIO
+from contextlib import contextmanager
+import logging
 import pandas as pd
 import geopandas as gpd
+import pytidycensus
 
 # Import configuration from setup module
 from setup import (
     MAZ_TAZ_DIR, 
     ANALYSIS_CRS,
+    WGS84_CRS,
     M_DRIVE_BASE,
     MAZ_VERSION,
     DATA_VINTAGE,
     INTERIM_CACHE_DIR,
-    FINAL_OUTPUT_DIR
+    FINAL_OUTPUT_DIR,
+    SQUARE_METERS_PER_ACRE,
+    CENSUS_API_KEY
 )
+
+
+# ============================================================================
+# Logging Utilities
+# ============================================================================
+
+@contextmanager
+def redirect_stdout_to_logger():
+    """Context manager to redirect stdout (print statements) to logger."""
+    old_stdout = sys.stdout
+    sys.stdout = StringIO()
+    try:
+        yield
+    finally:
+        output = sys.stdout.getvalue()
+        sys.stdout = old_stdout
+        if output.strip():
+            for line in output.splitlines():
+                if line.strip():
+                    logging.info(line)
+
 
 
 # ============================================================================
@@ -41,35 +70,35 @@ def get_output_filename(data_type, extension="csv", spatial=False):
 
 
 # ============================================================================
-# Data Loaders
+# Data Loading Utilities
 # ============================================================================
 
-# Loaders
-def load_maz_shp(use_maz_orig=False):
+def load_maz_shp():
     """
-    Loads the MAZ shapefile. Uses the original MAZ file if use_maz_orig is True, 
-    otherwise loads the default version 2.5 shapefile.
-    
-    Args:
-        use_maz_orig (bool): If True, loads MAZ v2.2 shapefile. Otherwise loads version from setup.MAZ_VERSION.
+    Loads the MAZ shapefile.
     
     Returns:
-        GeoDataFrame: MAZ polygons with MAZ_NODE, TAZ_NODE, and geometry columns.
+        GeoDataFrame: MAZ polygons with MAZ_NODE, TAZ_NODE, ACRES, and geometry columns.
+                     MAZ_NODE and TAZ_NODE are returned as strings for consistent merging.
     """
+    print(f"\n{'='*70}")
+    print(f"Loading MAZ Shapefile")
+    print(f"{'='*70}\n")
+    
     print(f"Loading MAZ shapefile...")
-    if use_maz_orig:
-        maz_path = M_DRIVE_BASE / "GIS layers" / "TM2_maz_taz_v2.2" / "mazs_TM2_v2_2.shp"
-        maz = gpd.read_file(maz_path).to_crs(ANALYSIS_CRS)
-        maz = maz.rename(columns={"maz": "MAZ_NODE", "taz": "TAZ_NODE"})
-        print(f"  Loaded MAZ v2.2 from: {maz_path}")
-    else:
-        maz_shp = os.path.join(MAZ_TAZ_DIR, f"mazs_TM2_{MAZ_VERSION}.shp")
-        maz = gpd.read_file(maz_shp).to_crs(ANALYSIS_CRS)
-        print(f"  Loaded MAZ v{MAZ_VERSION} from: {maz_shp}")
+    maz_shp = os.path.join(MAZ_TAZ_DIR, f"mazs_TM2_{MAZ_VERSION}.shp")
+    maz = gpd.read_file(maz_shp).to_crs(ANALYSIS_CRS)
+    print(f"  Loaded MAZ v{MAZ_VERSION} from: {maz_shp}")
 
     maz = maz[["MAZ_NODE", "TAZ_NODE", "geometry"]]
-    print(f"  MAZ count: {len(maz)}")
-    print(f"  MAZ dtypes:\n{maz.dtypes}")
+    print(f"  Loaded {len(maz):,} MAZ polygons")
+    
+    # Calculate acres from geometry
+    maz['ACRES'] = maz.geometry.area / SQUARE_METERS_PER_ACRE
+    
+    # Ensure MAZ_NODE and TAZ_NODE are strings for consistent merging
+    maz['MAZ_NODE'] = maz['MAZ_NODE'].astype(str)
+    maz['TAZ_NODE'] = maz['TAZ_NODE'].astype(str)
 
     return maz
 
@@ -131,6 +160,107 @@ def spatial_join_to_maz(points_gdf, maz_gdf):
     
     return joined
 
+def load_bay_area_places():
+    """Load Census place boundaries for Bay Area counties."""
+    # Set Census API key
+    pytidycensus.set_census_api_key(CENSUS_API_KEY)
+
+    # Load census place geographies for California
+    places = pytidycensus.get_acs(
+        geography="place",
+        variables=["B01001_001E"],  # Total population
+        state="CA",
+        year=2021,
+        geometry=True
+    ) 
+
+    counties = pytidycensus.get_acs(
+        geography="county",
+        variables=["B01001_001E"],  # Total population
+        state="CA",
+        year=2021,
+        geometry=True
+    ) 
+
+    COUNTY_FIPS = {
+        "Alameda": "001",
+        "Contra Costa": "013",
+        "Marin": "041",
+        "Napa": "055",
+        "San Francisco": "075",
+        "San Mateo": "081",
+        "Santa Clara": "085",
+        "Solano": "095",
+        "Sonoma": "097"
+    }
+    
+    # Filter to Bay Area counties
+    bay_counties = counties[counties['GEOID'].str[2:].isin(COUNTY_FIPS.values())]
+    
+    # Add county names
+    fips_to_name = {v: k for k, v in COUNTY_FIPS.items()}
+    bay_counties['county_name'] = bay_counties['GEOID'].str[2:].map(fips_to_name)
+    
+    # Get place IDs that intersect Bay Area counties
+    places_gdf = gpd.GeoDataFrame(places, geometry='geometry', crs=WGS84_CRS)
+    counties_gdf = gpd.GeoDataFrame(bay_counties, geometry='geometry', crs=WGS84_CRS)
+    
+    # Spatial join to get places in Bay Area
+    places_in_bay = gpd.sjoin(places_gdf, counties_gdf[['geometry', 'county_name']], how='inner', predicate='intersects')
+    
+    # Extract place info
+    places_in_bay['place_id'] = places_in_bay['GEOID']
+    places_in_bay['place_name'] = places_in_bay['NAME'].str.replace(' city, California', '').str.replace(' town, California', '').str.replace(', California', '')
+    
+    # Convert to analysis CRS
+    places_in_bay = places_in_bay.to_crs(ANALYSIS_CRS)
+    places_in_bay = places_in_bay[['place_id', 'place_name', 'county_name', 'geometry']]
+    
+    return places_in_bay
+
+
+def spatial_join_maz_to_place(maz, places):
+    """Spatially join MAZ to Census places by largest intersection area."""
+    print(f"\n{'='*70}")
+    print(f"Spatial Join: MAZ to Census Places")
+    print(f"{'='*70}\n")
+    
+    # Ensure both are in same CRS
+    print(f"  MAZ CRS: {maz.crs}")
+    print(f"  Places CRS: {places.crs}")
+    
+    if maz.crs != places.crs:
+        print(f"  WARNING: CRS mismatch! Converting places to {maz.crs}")
+        places = places.to_crs(maz.crs)
+    
+    # Perform spatial overlay to get intersection areas
+    print(f"  Performing spatial overlay...")
+    overlay = gpd.overlay(maz, places, how='intersection')
+    print(f"  Found {len(overlay):,} MAZ-place intersections")
+    
+    if len(overlay) == 0:
+        print("  ERROR: No intersections found! Check geometries and CRS.")
+        return maz
+    
+    # Calculate the area of each intersection
+    overlay['intersection_area'] = overlay.geometry.area
+    
+    # For each MAZ, find the place with the largest intersection area
+    idx_max_area = overlay.groupby('MAZ_NODE')['intersection_area'].idxmax()
+    maz_place = overlay.loc[idx_max_area, ['MAZ_NODE', 'place_id', 'place_name', 'county_name']]
+    
+    # Merge place info back to maz
+    maz = maz.merge(maz_place, on='MAZ_NODE', how='left')
+    
+    print(f"  Completed spatial join")
+    print(f"  MAZs in cities: {maz['place_name'].notnull().sum():,}")
+    print(f"  MAZs outside cities: {maz['place_name'].isnull().sum():,}")
+    
+    return maz
+
+# ============================================================================
+# Inflation Handling Utilities
+# ============================================================================
 
 def get_cpi_deflator(from_year=2023, to_year=2010):
     """

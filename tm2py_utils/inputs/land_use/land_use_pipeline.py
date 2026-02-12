@@ -2,18 +2,14 @@
 MAZ Land Use Input Creation Pipeline
 
 This module orchestrates the complete process of creating MAZ-level land use inputs
-for Travel Model Two (TM2) and ActivitySim. It integrates employment, enrollment,
+for Travel Model Two (TM2). It integrates employment, enrollment,
 and parking data into a unified dataset.
 
-Pipeline Steps:
+High-Level Steps:
 1. Employment: Spatially join business firms to MAZ, aggregate to 27-way steelhead categories
 2. Enrollment: Spatially join schools/colleges to MAZ, aggregate by grade level and type
 3. Parking: Integrate observed costs, capacity, and estimated costs for unobserved areas
 
-Data Sources:
-- Employment: Esri Business Analyst 2023, NAICS crosswalk  
-- Enrollment: CA public schools, private schools (CPRS), IPEDS colleges
-- Parking: SpotHero scrapes, SF/Oakland/SJ published meter data, ACS block group capacity
 
 Outputs:
 - Interim cache: jobs_maz_*.gpkg, enrollment_maz_*.gpkg, parking_capacity.gpkg
@@ -25,8 +21,6 @@ Usage:
     from land_use_pipeline import run_pipeline
     landuse_maz = run_pipeline(use_cache=True)
 """
-
-import pytidycensus
 import pandas as pd
 import geopandas as gpd
 import numpy as np
@@ -34,9 +28,6 @@ from pathlib import Path
 import argparse
 import logging
 from datetime import datetime
-import sys
-from io import StringIO
-from contextlib import contextmanager
 
 # Import configuration
 from setup import (
@@ -51,142 +42,41 @@ from setup import (
 )
 
 # Import utilities
-from utils import load_maz_shp, deflate_parking_costs, get_output_filename
+from utils import (
+    load_maz_shp,
+    deflate_parking_costs,
+    get_output_filename,
+    redirect_stdout_to_logger,
+    load_bay_area_places,
+    spatial_join_maz_to_place
+)
 
-# Import core data modules
+# Import core modules
 from job_counts import get_jobs_maz
 from enrollment_counts import get_enrollment_maz
-
-# Import parking modules  
 from parking_published import published_cost
 from parking_area import merge_parking_area
-from parking_estimation import merge_estimated_costs, backfill_downtown_daily_costs
+from parking_estimation import (
+    estimate_and_validate_hourly_parking_models,
+    apply_hourly_parking_model,
+    estimate_parking_by_county_threshold,
+    backfill_downtown_daily_costs,
+    update_monthly_stalls_with_predicted_costs,
+    update_parkarea_with_predicted_costs
+)
 
 
 # ============================================================================
-# Logging Utilities
+# Define merging functions
 # ============================================================================
 
-@contextmanager
-def redirect_stdout_to_logger():
-    """Context manager to redirect stdout (print statements) to logger."""
-    old_stdout = sys.stdout
-    sys.stdout = StringIO()
-    try:
-        yield
-    finally:
-        output = sys.stdout.getvalue()
-        sys.stdout = old_stdout
-        if output.strip():
-            for line in output.splitlines():
-                if line.strip():
-                    logging.info(line)
-
-
-# ============================================================================
-# Census Place Loading (for Parking)
-# ============================================================================
-
-def load_bay_area_places():
-    """Load Census place boundaries for Bay Area counties."""
-    # Set Census API key
-    pytidycensus.set_census_api_key(CENSUS_API_KEY)
-
-    # Load census place geographies for California
-    places = pytidycensus.get_acs(
-        geography="place",
-        variables=["B01001_001E"],  # Total population
-        state="CA",
-        year=2021,
-        geometry=True
-    ) 
-
-    counties = pytidycensus.get_acs(
-        geography="county",
-        variables=["B01001_001E"],  # Total population
-        state="CA",
-        year=2021,
-        geometry=True
-    ) 
-
-    COUNTY_FIPS = {
-        "Alameda": "001",
-        "Contra Costa": "013",
-        "Marin": "041",
-        "Napa": "055",
-        "San Francisco": "075",
-        "San Mateo": "081",
-        "Santa Clara": "085",
-        "Solano": "095",
-        "Sonoma": "097"
-    }
-    
-    # Filter to Bay Area counties
-    bay_counties = counties[counties['GEOID'].str[2:].isin(COUNTY_FIPS.values())]
-    
-    # Add county names
-    fips_to_name = {v: k for k, v in COUNTY_FIPS.items()}
-    bay_counties['county_name'] = bay_counties['GEOID'].str[2:].map(fips_to_name)
-    
-    # Get place IDs that intersect Bay Area counties
-    places_gdf = gpd.GeoDataFrame(places, geometry='geometry', crs=WGS84_CRS)
-    counties_gdf = gpd.GeoDataFrame(bay_counties, geometry='geometry', crs=WGS84_CRS)
-    
-    # Spatial join to get places in Bay Area
-    places_in_bay = gpd.sjoin(places_gdf, counties_gdf[['geometry', 'county_name']], how='inner', predicate='intersects')
-    
-    # Extract place info
-    places_in_bay['place_id'] = places_in_bay['GEOID']
-    places_in_bay['place_name'] = places_in_bay['NAME'].str.replace(' city, California', '').str.replace(' town, California', '').str.replace(', California', '')
-    
-    # Convert to analysis CRS
-    places_in_bay = places_in_bay.to_crs(ANALYSIS_CRS)
-    places_in_bay = places_in_bay[['place_id', 'place_name', 'county_name', 'geometry']]
-    
-    return places_in_bay
-
-
-# ============================================================================
-# MAZ Base Data Loading
-# ============================================================================
-
-def load_maz_base_data(use_maz_orig=False):
-    """
-    Load MAZ shapefile with employment, enrollment, and population data.
-    
-    Args:
-        use_maz_orig (bool): If True, uses MAZ v2.2. Otherwise uses version from setup.
-    
-    Returns:
-        GeoDataFrame: MAZ with geometry, employment, enrollment, population, and acres
-    """
-    print(f"\n{'='*70}")
-    print(f"Loading MAZ Base Data")
-    print(f"{'='*70}\n")
-    
-    # Load MAZ shapefile
-    print(f"Loading MAZ shapefile...")
-    maz = load_maz_shp(use_maz_orig=use_maz_orig).to_crs(ANALYSIS_CRS)
-    print(f"  Loaded {len(maz):,} MAZ polygons")
-    
-    # Calculate acres from geometry
-    maz['ACRES'] = maz.geometry.area / SQUARE_METERS_PER_ACRE
-    
-    # Ensure MAZ_NODE and TAZ_NODE are strings for consistent merging
-    maz['MAZ_NODE'] = maz['MAZ_NODE'].astype(str)
-    maz['TAZ_NODE'] = maz['TAZ_NODE'].astype(str)
-    
-    return maz
-
-
-def merge_employment_data(maz, use_cache=False, use_maz_orig=False):
+def merge_employment_data(maz, use_cache=False):
     """
     Merge employment data into MAZ.
     
     Args:
-        maz (GeoDataFrame): MAZ base data
+        maz (GeoDataFrame): MAZ data
         use_cache (bool): If True, reads from interim cache. If False, regenerates data.
-        use_maz_orig (bool): MAZ version parameter to pass to get_jobs_maz
     
     Returns:
         GeoDataFrame: MAZ with employment columns added
@@ -205,10 +95,10 @@ def merge_employment_data(maz, use_cache=False, use_maz_orig=False):
         else:
             print(f"  Cache file not found: {cache_file}")
             print(f"  Regenerating employment data...")
-            jobs_maz = get_jobs_maz(write=True, use_maz_orig=use_maz_orig)
+            jobs_maz = get_jobs_maz(write=True)
     else:
         print(f"  Generating employment data...")
-        jobs_maz = get_jobs_maz(write=True, use_maz_orig=use_maz_orig)
+        jobs_maz = get_jobs_maz(write=True)
     
     # Ensure consistent data types
     jobs_maz['MAZ_NODE'] = jobs_maz['MAZ_NODE'].astype(str)
@@ -230,15 +120,14 @@ def merge_employment_data(maz, use_cache=False, use_maz_orig=False):
     return maz
 
 
-def merge_enrollment_data(maz, use_cache=False, use_maz_orig=False):
+def merge_enrollment_data(maz, use_cache=False):
     """
     Merge enrollment data into MAZ.
-    
+
     Args:
-        maz (GeoDataFrame): MAZ base data
+        maz (GeoDataFrame): MAZ data
         use_cache (bool): If True, reads from interim cache. If False, regenerates data.
-        use_maz_orig (bool): MAZ version parameter to pass to get_enrollment_maz
-    
+
     Returns:
         GeoDataFrame: MAZ with enrollment columns added
     """
@@ -256,11 +145,10 @@ def merge_enrollment_data(maz, use_cache=False, use_maz_orig=False):
         else:
             print(f"  Cache file not found: {cache_file}")
             print(f"  Regenerating enrollment data...")
-            enroll_maz = get_enrollment_maz(write=True, use_maz_orig=use_maz_orig)
+            enroll_maz = get_enrollment_maz(write=True)
     else:
         print(f"  Generating enrollment data...")
-        enroll_maz = get_enrollment_maz(write=True, use_maz_orig=use_maz_orig)
-    
+        enroll_maz = get_enrollment_maz(write=True)
     # Ensure consistent data types
     enroll_maz['MAZ_NODE'] = enroll_maz['MAZ_NODE'].astype(str)
     if 'TAZ_NODE' in enroll_maz.columns:
@@ -288,7 +176,7 @@ def merge_population_data(maz):
     Merge synthetic population data into MAZ.
     
     Args:
-        maz (GeoDataFrame): MAZ base data
+        maz (GeoDataFrame): MAZ data
     
     Returns:
         GeoDataFrame: MAZ with population and household columns added
@@ -312,52 +200,17 @@ def merge_population_data(maz):
     return maz
 
 
-# ============================================================================
-# Parking Data Integration
-# ============================================================================
-
-def spatial_join_maz_to_place(maz, places):
-    """Spatially join MAZ to Census places by largest intersection area."""
-    print(f"\n{'='*70}")
-    print(f"Spatial Join: MAZ to Census Places")
-    print(f"{'='*70}\n")
-    
-    # Ensure both are in same CRS
-    print(f"  MAZ CRS: {maz.crs}")
-    print(f"  Places CRS: {places.crs}")
-    
-    if maz.crs != places.crs:
-        print(f"  WARNING: CRS mismatch! Converting places to {maz.crs}")
-        places = places.to_crs(maz.crs)
-    
-    # Perform spatial overlay to get intersection areas
-    print(f"  Performing spatial overlay...")
-    overlay = gpd.overlay(maz, places, how='intersection')
-    print(f"  Found {len(overlay):,} MAZ-place intersections")
-    
-    if len(overlay) == 0:
-        print("  ERROR: No intersections found! Check geometries and CRS.")
-        return maz
-    
-    # Calculate the area of each intersection
-    overlay['intersection_area'] = overlay.geometry.area
-    
-    # For each MAZ, find the place with the largest intersection area
-    idx_max_area = overlay.groupby('MAZ_NODE')['intersection_area'].idxmax()
-    maz_place = overlay.loc[idx_max_area, ['MAZ_NODE', 'place_id', 'place_name', 'county_name']]
-    
-    # Merge place info back to maz
-    maz = maz.merge(maz_place, on='MAZ_NODE', how='left')
-    
-    print(f"  Completed spatial join")
-    print(f"  MAZs in cities: {maz['place_name'].notnull().sum():,}")
-    print(f"  MAZs outside cities: {maz['place_name'].isnull().sum():,}")
-    
-    return maz
-
 
 def merge_scraped_cost(maz):
-    """Merge scraped parking costs from SpotHero data."""
+    """
+    Merge scraped parking costs from SpotHero data.
+    
+    Args:
+        maz (GeoDataFrame): MAZ data
+    
+    Returns:
+        GeoDataFrame: MAZ with dparkcost and mparkcost columns added
+    """
     print(f"\n{'='*70}")
     print(f"Merging Scraped Parking Costs (SpotHero)")
     print(f"{'='*70}\n")
@@ -404,7 +257,15 @@ def merge_scraped_cost(maz):
 
 
 def merge_published_cost(maz):
-    """Merge published parking meter costs from SF, Oakland, San Jose."""
+    """
+    Merge published parking meter costs from SF, Oakland, San Jose.
+    python
+    Args:
+        maz (GeoDataFrame): MAZ data
+    
+    Returns:
+        GeoDataFrame: MAZ with hparkcost column added
+    """
     print(f"\n{'='*70}")
     print(f"Merging Published Parking Meter Costs")
     print(f"{'='*70}\n")
@@ -424,17 +285,16 @@ def merge_published_cost(maz):
     return maz
 
 
-def merge_capacity(maz, use_cache=False, use_maz_orig=False):
+def merge_capacity(maz, use_cache=False):
     """
     Merge parking capacity data to MAZ and create stall columns.
     
     Args:
-        maz: GeoDataFrame with MAZ zones (must have MAZ_NODE and mparkcost from merge_scraped_cost)
-        use_cache: If True, reads from interim cache. If False, regenerates data.
-        use_maz_orig: MAZ version parameter to pass to get_parking_maz
+        maz (GeoDataFrame): MAZ data
+        use_cache (bool): If True, reads from interim cache. If False, regenerates data.
     
     Returns:
-        GeoDataFrame: maz with added parking stall columns
+        GeoDataFrame: MAZ with parking stall columns added
     """
     print(f"\n{'='*70}")
     print(f"Merging Parking Capacity Data")
@@ -461,7 +321,7 @@ def merge_capacity(maz, use_cache=False, use_maz_orig=False):
             print(f"  Generating parking capacity data...")
         
         from parking_capacity import get_parking_maz
-        capacity_gdf = get_parking_maz(write=True, use_maz_orig=use_maz_orig)
+        capacity_gdf = get_parking_maz(write=True)
         capacity = pd.DataFrame(capacity_gdf.drop(columns='geometry', errors='ignore'))
         if 'emp_total' in capacity.columns:
             capacity = capacity.drop(columns=['emp_total'])
@@ -502,7 +362,7 @@ def merge_capacity(maz, use_cache=False, use_maz_orig=False):
     
     # Create monthly stalls columns (off-street non-residential, only where monthly parking cost exists)
     # NOTE: This is a preliminary assignment based on observed costs only.
-    # Monthly stalls will be recalculated after merge_estimated_costs() adds predicted monthly costs.
+    # Monthly stalls will be recalculated after merge_estimated_cost() adds predicted monthly costs.
     if 'mparkcost' in maz.columns:
         # Create condition without modifying the original mparkcost column
         has_monthly_cost = maz['mparkcost'].fillna(0) > 0
@@ -535,75 +395,69 @@ def merge_capacity(maz, use_cache=False, use_maz_orig=False):
     return maz
 
 
-def update_monthly_stalls_with_predicted_costs(maz):
+def merge_estimated_cost(
+    maz,
+    validate_parking=True,
+    compare_parking_models=True,
+    commercial_density_threshold=1.0,
+    daily_percentile=0.95,
+    monthly_percentile=0.99,
+    probability_threshold=0.3
+):
     """
-    Update monthly stalls to reflect both observed and predicted monthly parking costs.
+    Merge estimated parking costs for hourly, daily, and monthly parking.
     
-    This must be called AFTER merge_estimated_costs() adds predicted monthly costs,
-    since merge_capacity() runs before cost estimation and only captures observed costs.
+    This function orchestrates the complete parking cost estimation workflow:
+    1. Run model selection and validation for hourly parking
+    2. Estimate hourly parking costs using the selected model
+    3. Estimate daily/monthly parking costs using county-level density thresholds
     
     Args:
-        maz: GeoDataFrame with off_nres capacity and final mparkcost (observed + predicted)
+        maz (GeoDataFrame): MAZ data with employment, enrollment, capacity, and observed costs
+        validate_parking (bool): If True, performs leave-one-city-out cross-validation
+        compare_parking_models (bool): If True, compares multiple ML models
+        commercial_density_threshold (float): Minimum commercial employment density for paid parking (jobs/acre)
+        daily_percentile (float): County-level percentile threshold for daily parking cost estimation
+        monthly_percentile (float): County-level percentile threshold for monthly parking cost estimation
+        probability_threshold (float): Classification threshold for model predictions
     
     Returns:
-        GeoDataFrame: maz with updated mstallsoth and mstallssam columns
+        GeoDataFrame: MAZ with estimated hparkcost, dparkcost, mparkcost for areas with unobserved data
     """
     print(f"\n{'='*70}")
-    print(f"Updating Monthly Stalls with Predicted Costs")
+    print(f"Estimating Parking Costs")
     print(f"{'='*70}\n")
     
-    # Recalculate monthly stalls based on final mparkcost (observed + predicted)
-    if 'mparkcost' in maz.columns and 'off_nres' in maz.columns:
-        # Create condition without modifying the original mparkcost column
-        has_monthly_cost = maz['mparkcost'].fillna(0) > 0
-        maz['mstallsoth'] = maz['off_nres'].where(has_monthly_cost, 0).round(0)
-        maz['mstallssam'] = maz['off_nres'].where(has_monthly_cost, 0).round(0)
-        
-        mazs_with_monthly = (maz['mstallsoth'] > 0).sum()
-        total_mazs = len(maz)
-        print(f"  Updated monthly stalls for {mazs_with_monthly:,}/{total_mazs:,} MAZs")
-        
-        if mazs_with_monthly > 0:
-            print(f"  Total monthly stalls: {maz['mstallsoth'].sum():,.0f}")
-    else:
-        print(f"  ⚠ Warning: mparkcost or off_nres column not found, skipping update")
-    
-    return maz
-
-
-def update_parkarea_with_predicted_costs(maz):
-    """
-    Update parkarea classification to include predicted parking costs.
-    
-    parkarea codes:
-    - 1: Downtown core (from Local Moran's I analysis)
-    - 2: Within 1/4 mile of downtown core
-    - 3: Paid parking (predicted or observed outside downtown)
-    - 4: Free parking / no parking cost
-    """
-    # Start with parkarea already assigned by merge_parking_area (0, 1, or 2)
-    # parkarea=1 already set for downtown cores
-    # parkarea=2 already set for MAZs within 1/4 mile of downtown
-    
-   # Set parkarea=3 for non-downtown MAZs with any parking cost (observed or predicted)
-    has_parking_cost = (
-        (maz['hparkcost'].notnull() & (maz['hparkcost'] > 0)) |
-        (maz['dparkcost'].notnull() & (maz['dparkcost'] > 0)) |
-        (maz['mparkcost'].notnull() & (maz['mparkcost'] > 0))
+    # Step 1: Run model selection and validation for hourly parking
+    selected_model, selected_model_name = estimate_and_validate_hourly_parking_models(
+        maz,
+        run_validation=validate_parking,
+        compare_models_flag=compare_parking_models,
+        use_best_model=True,
+        commercial_density_threshold=commercial_density_threshold
     )
     
-    # Only reassign parkarea if not already 1 or 2
-    maz.loc[has_parking_cost & (maz['parkarea'] == 0), 'parkarea'] = 3
+    # Step 2: Estimate hourly parking costs
+    print(f"\n{'='*70}")
+    print(f"Applying Hourly Parking Cost Model")
+    print(f"{'='*70}\n")
+    maz = apply_hourly_parking_model(
+        maz,
+        commercial_density_threshold,
+        probability_threshold,
+        model=selected_model,
+        model_name=selected_model_name
+    )
     
-    # Set parkarea=4 for free parking (no cost areas)
-    # All remaining parkarea=0 (no paid parking) assigned to parkarea=4
-    maz.loc[maz['parkarea'] == 0, 'parkarea'] = 4
+    # Step 3: Estimate daily/monthly parking costs
+    print(f"\n{'='*70}")
+    print(f"Estimating Daily/Monthly Parking Costs")
+    print(f"{'='*70}\n")
+    maz = estimate_parking_by_county_threshold(
+        maz, daily_percentile, monthly_percentile
+    )
     
-    # Report final distribution
-    print(f"\n  Final parkarea distribution:")
-    for code in sorted(maz['parkarea'].unique()):
-        count = (maz['parkarea'] == code).sum()
-        print(f"    parkarea={int(code)}: {count:,} MAZs")
+    print(f"\n  Parking cost estimation complete")
     
     return maz
 
@@ -614,7 +468,6 @@ def update_parkarea_with_predicted_costs(maz):
 
 def run_pipeline(
     use_cache=True,
-    use_maz_orig=False,
     validate_parking=True,
     compare_parking_models=True,
     commercial_density_threshold=1.0,
@@ -626,7 +479,6 @@ def run_pipeline(
     
     Args:
         use_cache (bool): If True, reads employment/enrollment from interim cache when available
-        use_maz_orig (bool): If True, uses MAZ v2.2. Otherwise uses version from setup.
         validate_parking (bool): If True, performs leave-one-city-out cross-validation for parking cost estimation
         compare_parking_models (bool): If True, compares multiple ML models for parking cost estimation
         commercial_density_threshold (float): Minimum commercial employment density for paid parking (jobs/acre)
@@ -634,7 +486,7 @@ def run_pipeline(
         monthly_percentile (float): County-level percentile threshold for monthly parking cost estimation
     
     Returns:
-        GeoDataFrame: Complete MAZ land use dataset with employment, enrollment, population, and parking
+        GeoDataFrame: Complete MAZ land use dataset with employment, enrollment, parking, and synthesized population
     """
     ensure_directories()
     
@@ -669,30 +521,26 @@ def run_pipeline(
     logging.info("="*80)
     logging.info(f"Configuration:")
     logging.info(f"  Use cached interim data: {use_cache}")
-    logging.info(f"  MAZ version: {'2.2 (original)' if use_maz_orig else 'from setup.py'}")
     logging.info(f"  Validate parking estimation: {validate_parking}")
     logging.info(f"  Compare parking models: {compare_parking_models}")
     logging.info(f"  Commercial density threshold: {commercial_density_threshold}")
     logging.info(f"  Daily cost percentile: {daily_percentile}")
     logging.info(f"  Monthly cost percentile: {monthly_percentile}")
     
-    # Step 1: Load MAZ base data
-    print("▶ Step 1/13: Loading MAZ base data...")
+    # Step 1: Load MAZ data
+    print("▶ Step 1/13: Loading MAZ data...")
     logging.info("="*80)
-    logging.info("STEP 1: Loading MAZ base data")
+    logging.info("STEP 1: Loading MAZ data")
     logging.info("="*80)
     with redirect_stdout_to_logger():
-        maz = load_maz_base_data(use_maz_orig=use_maz_orig)
-    logging.info(f"Loaded {len(maz):,} MAZ zones")
-    print(f"  ✓ Loaded {len(maz):,} MAZ zones\n")
-    
+        maz = load_maz_shp()
     # Step 2: Merge employment data
     print("▶ Step 2/13: Processing employment data...")
     logging.info("="*80)
     logging.info("STEP 2: Processing employment data")
     logging.info("="*80)
     with redirect_stdout_to_logger():
-        maz = merge_employment_data(maz, use_cache=use_cache, use_maz_orig=use_maz_orig)
+        maz = merge_employment_data(maz, use_cache=use_cache)
     print(f"  ✓ Employment data merged\n")
     
     # Step 3: Merge enrollment data
@@ -701,7 +549,7 @@ def run_pipeline(
     logging.info("STEP 3: Processing enrollment data")
     logging.info("="*80)
     with redirect_stdout_to_logger():
-        maz = merge_enrollment_data(maz, use_cache=use_cache, use_maz_orig=use_maz_orig)
+        maz = merge_enrollment_data(maz, use_cache=use_cache)
     print(f"  ✓ Enrollment data merged\n")
     
     # Step 4: Merge population data
@@ -732,11 +580,11 @@ def run_pipeline(
     with redirect_stdout_to_logger():
         maz = merge_scraped_cost(maz)
         maz = merge_published_cost(maz)
-        maz = merge_capacity(maz, use_cache=use_cache, use_maz_orig=use_maz_orig)
+        maz = merge_capacity(maz, use_cache=use_cache)
     print(f"  ✓ Parking cost data merged\n")
     
-    # Step 7: Assign parking areas using Local Moran's I
-    print("▶ Step 7/13: Assigning parking areas (Local Moran's I)...")
+    # Step 7: Assign initial parking areas
+    print("▶ Step 7/13: Assigning parking areas...")
     logging.info("="*80)
     logging.info("STEP 7: Assigning parking areas")
     logging.info("="*80)
@@ -745,16 +593,15 @@ def run_pipeline(
     print(f"  ✓ Parking areas assigned\n")
     
     # Step 8: Estimate parking costs for unobserved areas
-    print("▶ Step 8/13: Estimating parking costs (ML models)...")
+    print("▶ Step 8/13: Estimating parking costs...")
     logging.info("="*80)
     logging.info("STEP 8: Estimating parking costs")
     logging.info("="*80)
     with redirect_stdout_to_logger():
-        maz = merge_estimated_costs(
+        maz = merge_estimated_cost(
             maz,
-            run_validation=validate_parking,
-            compare_models_flag=compare_parking_models,
-            use_best_model=True,
+            validate_parking=validate_parking,
+            compare_parking_models=compare_parking_models,
             commercial_density_threshold=commercial_density_threshold,
             daily_percentile=daily_percentile,
             monthly_percentile=monthly_percentile,
@@ -763,7 +610,7 @@ def run_pipeline(
     
     print(f"  ✓ Parking costs estimated\n")
     
-    # Step 8.5: Backfill downtown daily costs (in 2023$)
+    # Step 9: Backfill downtown daily costs
     print("▶ Step 9/13: Backfilling downtown daily costs...")
     logging.info("="*80)
     logging.info("STEP 9: Backfilling downtown daily costs")
@@ -772,7 +619,7 @@ def run_pipeline(
         maz = backfill_downtown_daily_costs(maz)
     print(f"  ✓ Downtown daily costs backfilled\n")
     
-    # Step 9.5: Deflate parking costs to 2010 dollars
+    # Step 10: Deflate parking costs to 2010 dollars
     print("▶ Step 10/13: Deflating parking costs to 2010 dollars...")
     logging.info("="*80)
     logging.info("STEP 10: Deflating parking costs to 2010 dollars")
@@ -781,7 +628,7 @@ def run_pipeline(
         maz = deflate_parking_costs(maz, from_year=2023, to_year=2010)
     print(f"  ✓ Parking costs deflated to 2010 dollars\n")
     
-    # Step 10: Update monthly stalls with predicted costs
+    # Step 11: Update monthly stalls with predicted costs
     print("▶ Step 11/13: Updating monthly stalls with predicted costs...")
     logging.info("="*80)
     logging.info("STEP 11: Updating monthly stalls with predicted costs")
@@ -790,7 +637,7 @@ def run_pipeline(
         maz = update_monthly_stalls_with_predicted_costs(maz)
     print(f"  ✓ Monthly stalls updated\n")
     
-    # Step 11: Update parkarea classification with predicted costs
+    # Step 11: Update parkarea classification with predicted costs (parkarea 3)
     print("▶ Step 12/13: Updating parkarea classifications...")
     logging.info("="*80)
     logging.info("STEP 12: Updating parkarea classifications")
@@ -805,7 +652,7 @@ def run_pipeline(
     logging.info("STEP 13: Writing final output")
     logging.info("="*80)
     
-    # Clean up duplicate TAZ_NODE columns in maz before creating output
+    # Clean up any duplicate TAZ_NODE columns in maz before creating output
     dup_cols = [col for col in maz.columns if col.endswith('_x') or col.endswith('_y')]
     if dup_cols:
         logging.warning(f"Found duplicate columns in maz GeoDataFrame: {dup_cols}")
@@ -855,7 +702,12 @@ def run_pipeline(
 # ============================================================================
 
 def main():
-    """Command-line interface for the land use pipeline."""
+    """
+    Command-line interface for the land use pipeline.
+    
+    Returns:
+        GeoDataFrame: Complete MAZ land use dataset
+    """
     parser = argparse.ArgumentParser(
         description="MAZ Land Use Input Creation Pipeline for TM2/ActivitySim"
     )
@@ -864,11 +716,6 @@ def main():
         action="store_false",
         dest="use_cache",
         help="Skip cached employment/enrollment data and regenerate from raw sources"
-    )
-    parser.add_argument(
-        "--use-maz-orig",
-        action="store_true",
-        help="Use original MAZ v2.2 shapefile instead of version from setup.py"
     )
     parser.add_argument(
         "--no-validate-parking",
@@ -887,7 +734,6 @@ def main():
     
     maz = run_pipeline(
         use_cache=args.use_cache,
-        use_maz_orig=args.use_maz_orig,
         validate_parking=args.validate_parking,
         compare_parking_models=args.compare_parking_models
     )

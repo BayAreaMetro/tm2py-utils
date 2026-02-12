@@ -84,12 +84,11 @@ def summarize_jobs_by_maz(firms_maz, maz):
     return jobs_maz
 
 
-def get_jobs_maz(write=False, use_maz_orig=False):
+def get_jobs_maz(write=False):
     """
     Loads data, performs spatial joins, and summarizes jobs.
     Parameters:
         write (bool, optional): If True, writes the resulting jobs_maz GeoDataFrame to interim cache.
-        use_maz_orig (bool, optional): If True, uses MAZ v2.2 shapefile. Otherwise uses version from setup.
     Returns:
         DataFrame: jobs_maz with job counts by MAZ and steelhead categories.
     """
@@ -97,7 +96,7 @@ def get_jobs_maz(write=False, use_maz_orig=False):
     
     naics_xwalk = create_naics_xwalk()
     firms = load_firms_gdf().merge(naics_xwalk, how="left", on="naicssix")
-    maz = load_maz_shp(use_maz_orig=use_maz_orig)
+    maz = load_maz_shp()
     firms_maz = spatial_join_to_maz(firms, maz)
     jobs_maz = summarize_jobs_by_maz(firms_maz, maz)
     
@@ -123,12 +122,11 @@ def main():
     """
     Execute script directly with optional command-line flags.
     Usage:
-        python job_counts.py [--write] [--use-maz-orig]
+        python job_counts.py [--write]
     """
-    use_maz_orig = "--use-maz-orig" in sys.argv
     write = "--write" in sys.argv
     
-    jobs_maz = get_jobs_maz(write=write, use_maz_orig=use_maz_orig)
+    jobs_maz = get_jobs_maz(write=write)
     print(f"\nJob counts processing complete.")
     print(f"Total MAZ records: {len(jobs_maz)}")
     print(f"Total employment: {jobs_maz['emp_total'].sum():,.0f}")
