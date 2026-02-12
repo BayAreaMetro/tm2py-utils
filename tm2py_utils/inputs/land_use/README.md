@@ -135,6 +135,8 @@ The land use pipeline creates MAZ-level attributes from multiple data sources:
 |-----------|--------|---------|--------|----------|-----|
 | **Block group capacity** | ACS (via MTC dataset 2123) | 2019 | SHP | `{PARKING_RAW}/2123-Dataset/parking_density_Employee_Capita/parking_density_Employee_Capita.shp` | [SPUR Bay Area Parking Census](https://www.spur.org/publications/spur-report/2022-02-28/bay-area-parking-census) |
 
+**Citation:**
+> Mikhail Chester, Alysha Helmrich, and Rui Li. "San Francisco Bay Area Parking Census [Dataset]" Mineta Transportation Institute Publications (2022). doi: https://doi.org/10.31979/mti.2022.2123.ds
 
 ---
 
