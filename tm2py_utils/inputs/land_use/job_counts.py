@@ -11,10 +11,9 @@ import unittest
 from setup import (
     EMPLOYMENT_RAW_DATA_DIR,
     ANALYSIS_CRS,
-    get_output_filename,
     ensure_directories
 )
-from utils import load_maz_shp, spatial_join_to_maz
+from utils import load_maz_shp, spatial_join_to_maz, get_output_filename
 
 
 def load_firms_gdf():

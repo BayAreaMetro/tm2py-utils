@@ -45,14 +45,13 @@ from setup import (
     SQUARE_METERS_PER_ACRE,
     CENSUS_API_KEY,
     SYNTH_POP_FILE,
-    get_output_filename,
     ensure_directories,
     INTERIM_CACHE_DIR,
     BOX_LANDUSE_BASE
 )
 
 # Import utilities
-from utils import load_maz_shp
+from utils import load_maz_shp, deflate_parking_costs, get_output_filename
 
 # Import core data modules
 from job_counts import get_jobs_maz
@@ -674,11 +673,11 @@ def run_pipeline(
     logging.info(f"  Validate parking estimation: {validate_parking}")
     logging.info(f"  Compare parking models: {compare_parking_models}")
     logging.info(f"  Commercial density threshold: {commercial_density_threshold}")
-    logging.info(f"  Daily percentile: {daily_percentile}")
-    logging.info(f"  Monthly percentile: {monthly_percentile}")
+    logging.info(f"  Daily cost percentile: {daily_percentile}")
+    logging.info(f"  Monthly cost percentile: {monthly_percentile}")
     
     # Step 1: Load MAZ base data
-    print("▶ Step 1/11: Loading MAZ base data...")
+    print("▶ Step 1/13: Loading MAZ base data...")
     logging.info("="*80)
     logging.info("STEP 1: Loading MAZ base data")
     logging.info("="*80)
@@ -688,7 +687,7 @@ def run_pipeline(
     print(f"  ✓ Loaded {len(maz):,} MAZ zones\n")
     
     # Step 2: Merge employment data
-    print("▶ Step 2/11: Processing employment data...")
+    print("▶ Step 2/13: Processing employment data...")
     logging.info("="*80)
     logging.info("STEP 2: Processing employment data")
     logging.info("="*80)
@@ -697,7 +696,7 @@ def run_pipeline(
     print(f"  ✓ Employment data merged\n")
     
     # Step 3: Merge enrollment data
-    print("▶ Step 3/11: Processing enrollment data...")
+    print("▶ Step 3/13: Processing enrollment data...")
     logging.info("="*80)
     logging.info("STEP 3: Processing enrollment data")
     logging.info("="*80)
@@ -706,7 +705,7 @@ def run_pipeline(
     print(f"  ✓ Enrollment data merged\n")
     
     # Step 4: Merge population data
-    print("▶ Step 4/11: Processing population data...")
+    print("▶ Step 4/13: Processing population data...")
     logging.info("="*80)
     logging.info("STEP 4: Processing population data")
     logging.info("="*80)
@@ -715,7 +714,7 @@ def run_pipeline(
     print(f"  ✓ Population data merged\n")
     
     # Step 5: Spatial join to Census places (for parking analysis)
-    print("▶ Step 5/11: Joining Census place boundaries...")
+    print("▶ Step 5/13: Joining Census place boundaries...")
     logging.info("="*80)
     logging.info("STEP 5: Joining Census place boundaries")
     logging.info("="*80)
@@ -726,7 +725,7 @@ def run_pipeline(
     print(f"  ✓ Joined {len(places):,} places\n")
     
     # Step 6: Merge parking data
-    print("▶ Step 6/11: Merging parking cost data...")
+    print("▶ Step 6/13: Merging parking cost data...")
     logging.info("="*80)
     logging.info("STEP 6: Merging parking cost data")
     logging.info("="*80)
@@ -737,7 +736,7 @@ def run_pipeline(
     print(f"  ✓ Parking cost data merged\n")
     
     # Step 7: Assign parking areas using Local Moran's I
-    print("▶ Step 7/11: Assigning parking areas (Local Moran's I)...")
+    print("▶ Step 7/13: Assigning parking areas (Local Moran's I)...")
     logging.info("="*80)
     logging.info("STEP 7: Assigning parking areas")
     logging.info("="*80)
@@ -746,7 +745,7 @@ def run_pipeline(
     print(f"  ✓ Parking areas assigned\n")
     
     # Step 8: Estimate parking costs for unobserved areas
-    print("▶ Step 8/11: Estimating parking costs (ML models)...")
+    print("▶ Step 8/13: Estimating parking costs (ML models)...")
     logging.info("="*80)
     logging.info("STEP 8: Estimating parking costs")
     logging.info("="*80)
@@ -762,15 +761,10 @@ def run_pipeline(
             probability_threshold=0.3  # Optimized via cross-validation
         )
     
-    # Round parking cost columns to 2 decimal places (after prediction)
-    for cost_col in ['hparkcost', 'dparkcost', 'mparkcost']:
-        if cost_col in maz.columns:
-            maz[cost_col] = maz[cost_col].round(2)
-    
     print(f"  ✓ Parking costs estimated\n")
     
-    # Step 8.5: Backfill downtown daily costs
-    print("▶ Step 9/12: Backfilling downtown daily costs...")
+    # Step 8.5: Backfill downtown daily costs (in 2023$)
+    print("▶ Step 9/13: Backfilling downtown daily costs...")
     logging.info("="*80)
     logging.info("STEP 9: Backfilling downtown daily costs")
     logging.info("="*80)
@@ -778,28 +772,37 @@ def run_pipeline(
         maz = backfill_downtown_daily_costs(maz)
     print(f"  ✓ Downtown daily costs backfilled\n")
     
-    # Step 9: Update monthly stalls with predicted costs
-    print("▶ Step 10/12: Updating monthly stalls with predicted costs...")
+    # Step 9.5: Deflate parking costs to 2010 dollars
+    print("▶ Step 10/13: Deflating parking costs to 2010 dollars...")
     logging.info("="*80)
-    logging.info("STEP 10: Updating monthly stalls with predicted costs")
+    logging.info("STEP 10: Deflating parking costs to 2010 dollars")
+    logging.info("="*80)
+    with redirect_stdout_to_logger():
+        maz = deflate_parking_costs(maz, from_year=2023, to_year=2010)
+    print(f"  ✓ Parking costs deflated to 2010 dollars\n")
+    
+    # Step 10: Update monthly stalls with predicted costs
+    print("▶ Step 11/13: Updating monthly stalls with predicted costs...")
+    logging.info("="*80)
+    logging.info("STEP 11: Updating monthly stalls with predicted costs")
     logging.info("="*80)
     with redirect_stdout_to_logger():
         maz = update_monthly_stalls_with_predicted_costs(maz)
     print(f"  ✓ Monthly stalls updated\n")
     
-    # Step 9: Update parkarea classification with predicted costs
-    print("▶ Step 11/12: Updating parkarea classifications...")
+    # Step 11: Update parkarea classification with predicted costs
+    print("▶ Step 12/13: Updating parkarea classifications...")
     logging.info("="*80)
-    logging.info("STEP 11: Updating parkarea classifications")
+    logging.info("STEP 12: Updating parkarea classifications")
     logging.info("="*80)
     with redirect_stdout_to_logger():
         maz = update_parkarea_with_predicted_costs(maz)
     print(f"  ✓ Parkarea classifications updated\n")
     
-    # Step 10: Write final output
-    print("▶ Step 12/12: Writing final output...")
+    # Step 12: Write final output
+    print("▶ Step 13/13: Writing final output...")
     logging.info("="*80)
-    logging.info("STEP 12: Writing final output")
+    logging.info("STEP 13: Writing final output")
     logging.info("="*80)
     
     # Clean up duplicate TAZ_NODE columns in maz before creating output

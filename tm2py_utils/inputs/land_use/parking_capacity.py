@@ -13,10 +13,9 @@ from setup import (
     PARKING_RAW_DATA_DIR,
     ANALYSIS_CRS,
     SQUARE_METERS_PER_ACRE,
-    get_output_filename,
     ensure_directories
 )
-from utils import load_maz_shp
+from utils import load_maz_shp, get_output_filename
 
 
 def overlay_maz_blockgroups(maz, parking_capacity):

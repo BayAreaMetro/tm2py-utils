@@ -9,10 +9,9 @@ from setup import (
     ENROLLMENT_RAW_DATA_DIR,
     ANALYSIS_CRS,
     BAY_AREA_COUNTIES,
-    get_output_filename,
     ensure_directories
 )
-from utils import load_maz_shp, spatial_join_to_maz
+from utils import load_maz_shp, spatial_join_to_maz, get_output_filename
 
 
 def load_public_schools():

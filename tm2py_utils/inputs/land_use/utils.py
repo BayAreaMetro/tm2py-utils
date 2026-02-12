@@ -9,8 +9,40 @@ from setup import (
     MAZ_TAZ_DIR, 
     ANALYSIS_CRS,
     M_DRIVE_BASE,
-    MAZ_VERSION
+    MAZ_VERSION,
+    DATA_VINTAGE,
+    INTERIM_CACHE_DIR,
+    FINAL_OUTPUT_DIR
 )
+
+
+# ============================================================================
+# File Naming Utilities
+# ============================================================================
+
+def get_output_filename(data_type, extension="csv", spatial=False):
+    """
+    Generate standardized output filename.
+    
+    Args:
+        data_type (str): Type of data (e.g., 'jobs_maz', 'enrollment_maz', 'maz_landuse')
+        extension (str): File extension ('csv', 'gpkg', etc.)
+        spatial (bool): If True, returns path to interim cache (for spatial data)
+    
+    Returns:
+        Path: Full path to output file
+    """
+    filename = f"{data_type}_v{MAZ_VERSION}_{DATA_VINTAGE}.{extension}"
+    
+    if spatial or extension == "gpkg":
+        return INTERIM_CACHE_DIR / filename
+    else:
+        return FINAL_OUTPUT_DIR / filename
+
+
+# ============================================================================
+# Data Loaders
+# ============================================================================
 
 # Loaders
 def load_maz_shp(use_maz_orig=False):
@@ -98,3 +130,81 @@ def spatial_join_to_maz(points_gdf, maz_gdf):
     print(f"  Final: {total_matched:,} / {len(points_gdf):,} points assigned to MAZ")
     
     return joined
+
+
+def get_cpi_deflator(from_year=2023, to_year=2010):
+    """
+    Calculate CPI deflator to convert monetary values between years.
+    
+    Args:
+        from_year (int): Year of original data (default: 2023)
+        to_year (int): Target year for TM2 (default: 2010)
+    
+    Returns:
+        float: Deflator multiplier (value in to_year = value in from_year * deflator)
+    
+    Example:
+        # Convert 2023 parking cost to 2010 dollars
+        cost_2010 = cost_2023 * get_cpi_deflator(2023, 2010)
+        # Deflator = 218.056 / 304.702 = 0.7155
+    """
+    from setup import CPI_VALUES
+    
+    if from_year not in CPI_VALUES:
+        raise ValueError(f"CPI value not available for year {from_year}. "
+                        f"Available years: {list(CPI_VALUES.keys())}")
+    if to_year not in CPI_VALUES:
+        raise ValueError(f"CPI value not available for year {to_year}. "
+                        f"Available years: {list(CPI_VALUES.keys())}")
+    
+    return CPI_VALUES[to_year] / CPI_VALUES[from_year]
+
+
+def deflate_parking_costs(maz, from_year=2023, to_year=2010):
+    """
+    Deflate parking cost variables from source year to target year using CPI-U.
+    
+    Applies deflation to:
+    - hparkcost (hourly parking cost)
+    - dparkcost (daily parking cost)  
+    - mparkcost (monthly parking cost)
+    
+    Args:
+        maz (GeoDataFrame): MAZ data with parking cost columns
+        from_year (int): Source year of cost data (default: 2023)
+        to_year (int): Target year for deflation (default: 2010)
+    
+    Returns:
+        GeoDataFrame: maz with deflated parking costs
+    """
+    print(f"\n{'='*70}")
+    print(f"Deflating Parking Costs to {to_year} Dollars")
+    print(f"{'='*70}\n")
+    
+    deflator = get_cpi_deflator(from_year, to_year)
+    print(f"  CPI deflator ({from_year} → {to_year}): {deflator:.4f}")
+    
+    cost_columns = ['hparkcost', 'dparkcost', 'mparkcost']
+    
+    for col in cost_columns:
+        non_null_count = maz[col].notnull().sum()
+        
+        # Store original mean for reporting (non-zero values only)
+        non_zero_mask = maz[col] > 0
+        original_mean = maz.loc[non_zero_mask, col].mean() if non_zero_mask.any() else 0
+        
+        # Apply deflator to non-null values
+        maz[col] = maz[col] * deflator
+        
+        # Round to 2 decimal places
+        maz[col] = maz[col].round(2)
+        
+        # Report deflation (recalculate mask after deflation)
+        non_zero_mask = maz[col] > 0
+        deflated_mean = maz.loc[non_zero_mask, col].mean() if non_zero_mask.any() else 0
+        print(f"  {col}:")
+        print(f"    MAZs with data: {non_null_count:,}")
+        print(f"    Mean ({from_year}$): ${original_mean:.2f}")
+        print(f"    Mean ({to_year}$): ${deflated_mean:.2f}")
+    
+    return maz
