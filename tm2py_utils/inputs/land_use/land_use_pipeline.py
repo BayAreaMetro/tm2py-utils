@@ -472,7 +472,8 @@ def run_pipeline(
     compare_parking_models=True,
     commercial_density_threshold=1.0,
     daily_percentile=0.95,
-    monthly_percentile=0.99
+    monthly_percentile=0.99,
+    output_format="csv"
 ):
     """
     Execute the complete MAZ land use input creation pipeline.
@@ -484,6 +485,7 @@ def run_pipeline(
         commercial_density_threshold (float): Minimum commercial employment density for paid parking (jobs/acre)
         daily_percentile (float): County-level percentile threshold for daily parking cost estimation
         monthly_percentile (float): County-level percentile threshold for monthly parking cost estimation
+        output_format (str): Output file format - either "csv" or "gpkg" (default: "csv")
     
     Returns:
         GeoDataFrame: Complete MAZ land use dataset with employment, enrollment, parking, and synthesized population
@@ -513,7 +515,8 @@ def run_pipeline(
     print(f"  Log file: {log_file}")
     print(f"  Cache enabled: {use_cache}")
     print(f"  Validation: {validate_parking}")
-    print(f"  Model comparison: {compare_parking_models}\n")
+    print(f"  Model comparison: {compare_parking_models}")
+    print(f"  Output format: {output_format}\n")
     
     # Detailed logging
     logging.info("="*80)
@@ -526,6 +529,7 @@ def run_pipeline(
     logging.info(f"  Commercial density threshold: {commercial_density_threshold}")
     logging.info(f"  Daily cost percentile: {daily_percentile}")
     logging.info(f"  Monthly cost percentile: {monthly_percentile}")
+    logging.info(f"  Output format: {output_format}")
     
     # Step 1: Load MAZ data
     print("▶ Step 1/13: Loading MAZ data...")
@@ -670,13 +674,21 @@ def run_pipeline(
     else:
         logging.info(f"No interim columns found to remove from maz (checked: {interim_cols})")
     
-    # Drop geometry for final tabular output
-    landuse_maz = pd.DataFrame(maz.drop(columns='geometry'))
-    
-    output_file = get_output_filename("maz_data", extension="csv", spatial=False)
-    logging.info(f"Writing MAZ land use data to: {output_file}")
-    landuse_maz.to_csv(output_file, index=False)
-    print(f"  ✓ Output written to: {output_file.name}\n")
+    # Write output based on format
+    if output_format.lower() == "gpkg":
+        # Keep geometry for GeoPackage output (saved to interim cache)
+        output_file = get_output_filename("maz_data", extension="gpkg", spatial=True)
+        logging.info(f"Writing MAZ land use data to GeoPackage (interim cache): {output_file}")
+        maz.to_file(output_file, driver="GPKG")
+        landuse_maz = maz  # Return GeoDataFrame for gpkg
+        print(f"  ✓ Output written to interim cache: {output_file.name}\n")
+    else:
+        # Drop geometry for CSV output
+        landuse_maz = pd.DataFrame(maz.drop(columns='geometry'))
+        output_file = get_output_filename("maz_data", extension="csv", spatial=False)
+        logging.info(f"Writing MAZ land use data to CSV: {output_file}")
+        landuse_maz.to_csv(output_file, index=False)
+        print(f"  ✓ Output written to: {output_file.name}\n")
     
     # Final summary
     
@@ -729,13 +741,21 @@ def main():
         dest="compare_parking_models",
         help="Skip comparison of multiple ML models for parking cost estimation"
     )
+    parser.add_argument(
+        "--output-format",
+        type=str,
+        choices=["csv", "gpkg"],
+        default="csv",
+        help="Output file format: csv (default) or gpkg (GeoPackage)"
+    )
     
     args = parser.parse_args()
     
     maz = run_pipeline(
         use_cache=args.use_cache,
         validate_parking=args.validate_parking,
-        compare_parking_models=args.compare_parking_models
+        compare_parking_models=args.compare_parking_models,
+        output_format=args.output_format
     )
     
     print(f"\nPipeline execution complete!")

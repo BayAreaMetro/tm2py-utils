@@ -100,10 +100,10 @@ The land use pipeline creates MAZ-level attributes from multiple data sources:
 
 | Component | Source | Vintage | Format | Location | URL | Download Date | Notes |
 |-----------|--------|---------|--------|----------|-----|---------------|-------|
-| **Public schools** | CA Dept of Education (CDE) | 2024-25 | GPKG | `{BOX}/enrollment/SchoolSites2425.gpkg` | [CDE Data Portal](https://data-cdegis.opendata.arcgis.com/datasets/CDEGIS::california-public-schools-2024-25/about) | 11/21/2025 | |
-| **Private schools** | CA Dept of Education (CDE) | 2023-24 | GPKG | `{BOX}/enrollment/cprs_2324.gpkg` | [CDE Data Portal](https://data-cdegis.opendata.arcgis.com/datasets/CDEGIS::california-private-schools-2023-24-2/about) | 11/21/2025 | |
-| **College locations** | NCES via Esri Living Atlas | 2023-24 | SHP | `{BOX}/enrollment/bayarea_postsec_2324.shp` | [Living Atlas](https://www.arcgis.com/home/item.html?id=a15e8731a17a46aabc452ea607f172c0) | - | Accessed from Living Atlas in Pro, filtered to Bay Area, and saved here |
-| **College enrollment** | IPEDS | 2023-24 | CSV | `{BOX}/enrollment/postsec_enroll_2324.csv` | [IPEDS Data Center](https://nces.ed.gov/ipeds/datacenter/InstitutionByGroup.aspx?sid=2e6e42bc-97bb-4007-a9f8-73d7e6dc15f6&rtid=1) | - | Selected and downloaded schools in CA with "Total 12-month unduplicated headcount" variable (UNDUP DRVEF122024 field) |
+| **Public schools** | CA Dept of Education (CDE) | 2024-25 | GPKG | `E:\Box\Modeling and Surveys\Development\raw_base_data\2023\enrollment\SchoolSites2425.gpkg` | [CDE Data Portal](https://data-cdegis.opendata.arcgis.com/datasets/CDEGIS::california-public-schools-2024-25/about) | 11/21/2025 | |
+| **Private schools** | CA Dept of Education (CDE) | 2023-24 | GPKG | `E:\Box\Modeling and Surveys\Development\raw_base_data\2023\enrollment\cprs_2324.gpkg` | [CDE Data Portal](https://data-cdegis.opendata.arcgis.com/datasets/CDEGIS::california-private-schools-2023-24-2/about) | 11/21/2025 | |
+| **College locations** | NCES via Esri Living Atlas | 2023-24 | SHP | `E:\Box\Modeling and Surveys\Development\raw_base_data\2023\enrollment\bayarea_postsec_2324.shp` | [Living Atlas](https://www.arcgis.com/home/item.html?id=a15e8731a17a46aabc452ea607f172c0) | - | Accessed from Living Atlas in Pro, filtered to Bay Area, and saved here |
+| **College enrollment** | IPEDS | 2023-24 | CSV | `E:\Box\Modeling and Surveys\Development\raw_base_data\2023\enrollment\postsec_enroll_2324.csv` | [IPEDS Data Center](https://nces.ed.gov/ipeds/datacenter/InstitutionByGroup.aspx?sid=2e6e42bc-97bb-4007-a9f8-73d7e6dc15f6&rtid=1) | - | Selected and downloaded schools in CA with "Total 12-month unduplicated headcount" variable (UNDUP DRVEF122024 field) |
 
 
 
@@ -112,28 +112,28 @@ The land use pipeline creates MAZ-level attributes from multiple data sources:
 ### Parking Data
 
 #### Scraped Costs (daily/monthly)
-| Component | Source | Vintage | Format | Location |
-|-----------|--------|---------|--------|----------|
-| **Raw scrape** | SpotHero website | 2026-01 | CSV | `{INTERIM}/parking_scrape_spots.csv` |
-| **Geocoded** | Nominatim | 2026-01 | GPKG | `{INTERIM}/parking_scrape_location_cost.gpkg` |
+| Component | Source | Vintage | Format | Location | URL |
+|-----------|--------|---------|--------|----------|-----|
+| **Raw scrape** | SpotHero website | 2026-01 | CSV | `E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-version-05\landuse\interim_cache\parking_scrape_spots.csv` | [SpotHero](https://spothero.com/) |
+| **Geocoded** | Nominatim | 2026-01 | GPKG | `E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-version-05\landuse\interim_cache\parking_scrape_location_cost.gpkg` | |
 
 
 
 #### Published Meter Costs (hourly)
 | Component | Source | Vintage | Format | Location | URL |
 |-----------|--------|---------|--------|----------|-----|
-| **Oakland meters** | City of Oakland open data | 2026-01 | GeoJSON | `{PARKING_RAW}/City_of_Oakland_Parking_Meters_20260107.geojson` | [Oakland Data Portal](https://www.oaklandca.gov/Public-Safety-Streets/Transportation-Projects-Reports/Parking-and-Mobility-Related-Maps-and-Data) |
-| **San Jose meters** | City of San Jose open data | 2026 | GeoJSON | `{PARKING_RAW}/Parking_Meters.geojson` | [San Jose Data Portal](https://data.sanjoseca.gov/dataset/parking-meters) |
-| **San Francisco meters** | SF open data | 2026-02 | GeoJSON | `{PARKING_RAW}/Parking_Meters_20260203.geojson` | [SF Data Portal](https://data.sfgov.org/Transportation/Map-of-Parking-Meters/fqfu-vcqd) |
-| **SF variable rates** | SFMTA | 2026-01 | CSV | `{PARKING_RAW}/January 2026 Parking Meter Rate Change Data.csv` | [SFMTA Meter Rate Adjustments](https://www.sfmta.com/notices/citywide-meter-rate-adjustments) |
-| **SF parking mgmt districts** | SF open data | 2026-02 | GeoJSON | `{PARKING_RAW}/Parking_Management_Districts_20260203.geojson` | [SF Data Portal](https://data.sfgov.org/Transportation/Map-of-Parking-Management-Districts/fqfe-qhy8) |
+| **Oakland meters** | City of Oakland open data | 2026-01 | GeoJSON | `E:\Box\Modeling and Surveys\Development\raw_base_data\2023\parking\City_of_Oakland_Parking_Meters_20260107.geojson` | [Oakland Data Portal](https://www.oaklandca.gov/Public-Safety-Streets/Transportation-Projects-Reports/Parking-and-Mobility-Related-Maps-and-Data) |
+| **San Jose meters** | City of San Jose open data | 2026 | GeoJSON | `E:\Box\Modeling and Surveys\Development\raw_base_data\2023\parking\Parking_Meters.geojson` | [San Jose Data Portal](https://data.sanjoseca.gov/dataset/parking-meters) |
+| **San Francisco meters** | SF open data | 2026-02 | GeoJSON | `E:\Box\Modeling and Surveys\Development\raw_base_data\2023\parking\Parking_Meters_20260203.geojson` | [SF Data Portal](https://data.sfgov.org/Transportation/Map-of-Parking-Meters/fqfu-vcqd) |
+| **SF variable rates** | SFMTA | 2026-01 | CSV | `E:\Box\Modeling and Surveys\Development\raw_base_data\2023\parking\January 2026 Parking Meter Rate Change Data.csv` | [SFMTA Meter Rate Adjustments](https://www.sfmta.com/notices/citywide-meter-rate-adjustments) |
+| **SF parking mgmt districts** | SF open data | 2026-02 | GeoJSON | `E:\Box\Modeling and Surveys\Development\raw_base_data\2023\parking\Parking_Management_Districts_20260203.geojson` | [SF Data Portal](https://data.sfgov.org/Transportation/Map-of-Parking-Management-Districts/fqfe-qhy8) |
 
 
 
 #### Parking Capacity
 | Component | Source | Vintage | Format | Location | URL |
 |-----------|--------|---------|--------|----------|-----|
-| **Block group capacity** | ACS (via MTC dataset 2123) | 2019 | SHP | `{PARKING_RAW}/2123-Dataset/parking_density_Employee_Capita/parking_density_Employee_Capita.shp` | [SPUR Bay Area Parking Census](https://www.spur.org/publications/spur-report/2022-02-28/bay-area-parking-census) |
+| **Block group capacity** | ACS (via MTC dataset 2123) | 2019 | SHP | `E:\Box\Modeling and Surveys\Development\raw_base_data\2023\parking\2123-Dataset\parking_density_Employee_Capita\parking_density_Employee_Capita.shp` | [SPUR Bay Area Parking Census](https://www.spur.org/publications/spur-report/2022-02-28/bay-area-parking-census) |
 
 **Citation:**
 > Mikhail Chester, Alysha Helmrich, and Rui Li. "San Francisco Bay Area Parking Census [Dataset]" Mineta Transportation Institute Publications (2022). doi: https://doi.org/10.31979/mti.2022.2123.ds
@@ -205,7 +205,7 @@ The land use pipeline creates MAZ-level attributes from multiple data sources:
 - **Geocoding**: Nominatim API to convert addresses → lat/lon
 - **Output**: GeoPackage with point geometries, `price_value`, `rate_type` (daily/monthly)
 - **Runtime**: ~1-2 hours (run separately, not part of main pipeline)
-- **Storage**: `{INTERIM}/parking_scrape_location_cost.gpkg`
+- **Storage**: `E:\Box\Modeling and Surveys\Development\Travel Model Two Conversion\Model Inputs\2023-tm22-dev-version-05\landuse\interim_cache\parking_scrape_location_cost.gpkg`
 
 #### 2. Published Costs (`parking_published.py`)
 **Method**: Direct import of city-published meter data

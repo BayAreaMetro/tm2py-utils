@@ -38,7 +38,7 @@ REPO_BASE = Path(__file__).parent.parent  # tm2py_utils/inputs/
 # Input Data Directories
 # ================================
 # Raw data directories
-RAW_DATA_DIR = BOX_LANDUSE_BASE / "raw_data"
+RAW_DATA_DIR = Path(r"E:\Box\Modeling and Surveys\Development\raw_base_data\2023")
 EMPLOYMENT_RAW_DATA_DIR = M_DRIVE_BASE / "BusinessData"
 ENROLLMENT_RAW_DATA_DIR = RAW_DATA_DIR / "enrollment"
 PARKING_RAW_DATA_DIR = RAW_DATA_DIR / "parking"
