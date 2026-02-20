@@ -8,8 +8,10 @@ This directory contains the pipeline for creating MAZ-level land use inputs for 
 
 1. [Overview](#overview)
 2. [Pipeline Architecture](#pipeline-architecture)
-3. [Methods](#methods)
-5. [Usage](#usage)
+3. [Employment](#employment)
+4. [School Enrollment](#school-enrollment)
+5. [Parking](#parking)
+6. [Usage](#usage)
 
 ---
 
@@ -20,8 +22,6 @@ The land use pipeline creates MAZ-level attributes from multiple data sources:
 - **Employment**: Business locations → 27-way steelhead employment categories
 - **Enrollment**: School/college locations → enrollment by grade level and institution type  
 - **Parking**: Published meter data + web scraping + capacity allocation + cost estimation
-
-
 
 ---
 
