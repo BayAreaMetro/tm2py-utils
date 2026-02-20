@@ -62,6 +62,8 @@ def summarize_jobs_by_maz(firms_maz, maz):
     firms_maz = firms_maz[["MAZ_NODE", "TAZ_NODE", "steelhead", "EMPNUM"]]
     print(f"Total jobs by steelhead category: ", firms_maz.groupby(["steelhead"], as_index=False)["EMPNUM"].sum())
     jobs_maz = firms_maz.groupby(["MAZ_NODE", "TAZ_NODE", "steelhead"], as_index=False)["EMPNUM"].sum()
+    # Save the steelhead categories to later derive emp_total
+    STEELHEAD = jobs_maz["steelhead"].unique().tolist()
    
     # Spread the steelhead column
     jobs_maz = jobs_maz.pivot(index=["MAZ_NODE", "TAZ_NODE"], columns="steelhead", values="EMPNUM").reset_index()
@@ -76,7 +78,7 @@ def summarize_jobs_by_maz(firms_maz, maz):
     jobs_maz = jobs_maz.fillna(0)
 
     # Create total jobs column
-    jobs_maz["emp_total"] = jobs_maz.sum(axis=1, numeric_only=True)
+    jobs_maz["emp_total"] = jobs_maz[STEELHEAD].sum(axis=1)
     print(f"Total jobs in region from 2023 Esri Business Analyst dataset: ", jobs_maz["emp_total"].sum())
     print(f"Total unique MAZ ids in unprocessed MAZ data: ", len(maz["MAZ_NODE"].unique()))
     print(f"Total unique MAZ ids in processed MAZ data: ", len(jobs_maz["MAZ_NODE"].unique()))
