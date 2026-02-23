@@ -3,8 +3,8 @@
 ####################################
 
 [scenario]
-    name = "tm22-dev-sprint-04"
-    year = 2015
+    name ="tm2_2023_maz26"
+    year = 2023
     verify = false
     zone_seq_file = "inputs/landuse/mtc_final_network_zone_seq.csv"
     landuse_file = "inputs/landuse/maz_data_withDensity.csv"
@@ -38,8 +38,8 @@
 
 [warmstart]
     warmstart = true
-    use_warmstart_skim = true
-    use_warmstart_demand = false
+    use_warmstart_skim = false
+    use_warmstart_demand = true
 
 [slack_notifications]
 enabled = true

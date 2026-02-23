@@ -11,10 +11,9 @@ import unittest
 from setup import (
     EMPLOYMENT_RAW_DATA_DIR,
     ANALYSIS_CRS,
-    get_output_filename,
     ensure_directories
 )
-from utils import load_maz_shp, spatial_join_to_maz
+from utils import load_maz_shp, spatial_join_to_maz, get_output_filename
 
 
 def load_firms_gdf():
@@ -63,6 +62,8 @@ def summarize_jobs_by_maz(firms_maz, maz):
     firms_maz = firms_maz[["MAZ_NODE", "TAZ_NODE", "steelhead", "EMPNUM"]]
     print(f"Total jobs by steelhead category: ", firms_maz.groupby(["steelhead"], as_index=False)["EMPNUM"].sum())
     jobs_maz = firms_maz.groupby(["MAZ_NODE", "TAZ_NODE", "steelhead"], as_index=False)["EMPNUM"].sum()
+    # Save the steelhead categories to later derive emp_total
+    STEELHEAD = jobs_maz["steelhead"].unique().tolist()
    
     # Spread the steelhead column
     jobs_maz = jobs_maz.pivot(index=["MAZ_NODE", "TAZ_NODE"], columns="steelhead", values="EMPNUM").reset_index()
@@ -77,7 +78,7 @@ def summarize_jobs_by_maz(firms_maz, maz):
     jobs_maz = jobs_maz.fillna(0)
 
     # Create total jobs column
-    jobs_maz["emp_total"] = jobs_maz.sum(axis=1, numeric_only=True)
+    jobs_maz["emp_total"] = jobs_maz[STEELHEAD].sum(axis=1)
     print(f"Total jobs in region from 2023 Esri Business Analyst dataset: ", jobs_maz["emp_total"].sum())
     print(f"Total unique MAZ ids in unprocessed MAZ data: ", len(maz["MAZ_NODE"].unique()))
     print(f"Total unique MAZ ids in processed MAZ data: ", len(jobs_maz["MAZ_NODE"].unique()))
@@ -85,12 +86,11 @@ def summarize_jobs_by_maz(firms_maz, maz):
     return jobs_maz
 
 
-def get_jobs_maz(write=False, use_maz_orig=False):
+def get_jobs_maz(write=False):
     """
     Loads data, performs spatial joins, and summarizes jobs.
     Parameters:
         write (bool, optional): If True, writes the resulting jobs_maz GeoDataFrame to interim cache.
-        use_maz_orig (bool, optional): If True, uses MAZ v2.2 shapefile. Otherwise uses version from setup.
     Returns:
         DataFrame: jobs_maz with job counts by MAZ and steelhead categories.
     """
@@ -98,7 +98,7 @@ def get_jobs_maz(write=False, use_maz_orig=False):
     
     naics_xwalk = create_naics_xwalk()
     firms = load_firms_gdf().merge(naics_xwalk, how="left", on="naicssix")
-    maz = load_maz_shp(use_maz_orig=use_maz_orig)
+    maz = load_maz_shp()
     firms_maz = spatial_join_to_maz(firms, maz)
     jobs_maz = summarize_jobs_by_maz(firms_maz, maz)
     
@@ -124,12 +124,11 @@ def main():
     """
     Execute script directly with optional command-line flags.
     Usage:
-        python job_counts.py [--write] [--use-maz-orig]
+        python job_counts.py [--write]
     """
-    use_maz_orig = "--use-maz-orig" in sys.argv
     write = "--write" in sys.argv
     
-    jobs_maz = get_jobs_maz(write=write, use_maz_orig=use_maz_orig)
+    jobs_maz = get_jobs_maz(write=write)
     print(f"\nJob counts processing complete.")
     print(f"Total MAZ records: {len(jobs_maz)}")
     print(f"Total employment: {jobs_maz['emp_total'].sum():,.0f}")

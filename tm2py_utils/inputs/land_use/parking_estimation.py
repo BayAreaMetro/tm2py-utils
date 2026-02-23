@@ -5,8 +5,10 @@ This module provides statistical modeling for estimating parking costs in MAZ zo
 without observed data. It implements a hybrid approach:
 
 Architecture:
-- **Hourly parking (hparkcost)**: Logistic regression for binary classification
+- **Hourly parking (hparkcost)**: Machine learning classification with model comparison
+  - Supports multiple models: Logistic Regression, Random Forest, Gradient Boosting, SVM
   - Trains on San Francisco, Oakland, San Jose observed data (paid vs free)
+  - Performs leave-one-city-out cross-validation to select best model
   - Predicts paid/free for other cities with parking capacity
   - Assigns flat $2.00/hr rate to predicted paid parking MAZs
   
@@ -26,11 +28,13 @@ Workflow:
 1. add_density_features(): Calculate commercial/downtown employment densities
 2. report_county_density_distributions(): Diagnostic percentile report by county
 3. [Optional] validate_parking_cost_estimation(): Leave-one-city-out cross-validation
-4. estimate_parking_costs(): Logistic regression for hourly parking
-5. estimate_parking_by_county_threshold(): Threshold-based daily/monthly estimation
+4. [Optional] compare_models(): Compare model performance across ML algorithms
+5. estimate_and_validate_hourly_parking_models(): Model selection and validation
+6. apply_hourly_parking_model(): Apply selected model for hourly parking prediction
+7. estimate_parking_by_county_threshold(): Threshold-based daily/monthly estimation
 
 Entry Point:
-- merge_estimated_costs(): Main function called from parking_prep.py orchestration
+- merge_hourly_cost(): Main function called from land_use_pipeline.py orchestration
 """
 
 import pandas as pd
@@ -79,10 +83,10 @@ def add_density_features(maz):
     Add employment density features for parking cost estimation.
     
     Args:
-        maz: GeoDataFrame with MAZ zones (must have employment columns and ACRES)
+        maz (GeoDataFrame): MAZ zones with employment columns and ACRES
     
     Returns:
-        GeoDataFrame: maz with added density feature columns
+        GeoDataFrame: MAZ with added density feature columns
     """
     print("Calculating density features for parking cost estimation...")
     
@@ -189,7 +193,7 @@ def report_county_density_distributions(maz):
     Only includes MAZs with off_nres > 0 and place_name not null.
     
     Args:
-        maz: GeoDataFrame with MAZ zones (must have county_name, commercial_emp_den, off_nres)
+        maz (GeoDataFrame): MAZ zones with county_name, commercial_emp_den, and off_nres
     """
     print("\n" + "="*80)
     print("COUNTY-LEVEL COMMERCIAL EMPLOYMENT DENSITY DISTRIBUTIONS")
@@ -261,7 +265,7 @@ def report_county_density_distributions(maz):
     return df_stats
 
 
-def estimate_parking_costs(maz, commercial_density_threshold=1.0, probability_threshold=0.5, model=None, model_name="Logistic Regression"):
+def apply_hourly_parking_model(maz, commercial_density_threshold=1.0, probability_threshold=0.5, model=None, model_name="Logistic Regression"):
     """
     Estimate parking costs for MAZs without observed data using machine learning classification.
     
@@ -277,14 +281,14 @@ def estimate_parking_costs(maz, commercial_density_threshold=1.0, probability_th
     - All costs: only predict where commercial_emp_den >= threshold
     
     Args:
-        maz: GeoDataFrame with MAZ zones (must have density features, observed costs, capacity)
-        commercial_density_threshold: Minimum commercial_emp_den for paid parking consideration (default 1.0 jobs/acre)
-        probability_threshold: Classification threshold for model predictions (default 0.5)
-        model: Pre-initialized sklearn model instance (default None, will use LogisticRegression)
-        model_name: Name of the model being used (for reporting purposes)
+        maz (GeoDataFrame): MAZ zones with density features, observed costs, and capacity
+        commercial_density_threshold (float): Minimum commercial_emp_den for paid parking consideration
+        probability_threshold (float): Classification threshold for model predictions
+        model: Pre-initialized sklearn model instance (default None)
+        model_name (str): Name of the model being used for reporting purposes
     
     Returns:
-        GeoDataFrame: maz with estimated parking costs filled in
+        GeoDataFrame: MAZ with estimated parking costs filled in
     """
     print(f"\nEstimating parking costs for MAZs without observed data...")
     print(f"  Model: {model_name}")
@@ -445,9 +449,9 @@ def validate_parking_cost_estimation(maz, commercial_density_threshold=1.0, test
     Note: Only validates hourly parking (hparkcost) since daily/monthly use county-level thresholds.
     
     Args:
-        maz: GeoDataFrame with MAZ zones (must have density features, observed costs, capacity)
-        commercial_density_threshold: Minimum commercial_emp_den for paid parking (default 1.0 jobs/acre)
-        test_thresholds: List of probability thresholds to test (default [0.3, 0.4, 0.5, 0.6, 0.7])
+        maz (GeoDataFrame): MAZ zones with density features, observed costs, and capacity
+        commercial_density_threshold (float): Minimum commercial_emp_den for paid parking
+        test_thresholds (list): List of probability thresholds to test
     
     Returns:
         dict: Validation metrics for each cost type, threshold, and held-out city
@@ -694,9 +698,9 @@ def compare_models(maz, commercial_density_threshold=1.0, test_thresholds=None):
     the best-performing model for parking cost classification.
     
     Args:
-        maz: GeoDataFrame with MAZ zones (must have density features, observed costs, capacity)
-        commercial_density_threshold: Minimum commercial_emp_den for paid parking (default 1.0 jobs/acre)
-        test_thresholds: List of probability thresholds to test (default [0.3, 0.4, 0.5, 0.6, 0.7])
+        maz (GeoDataFrame): MAZ zones with density features, observed costs, and capacity
+        commercial_density_threshold (float): Minimum commercial_emp_den for paid parking
+        test_thresholds (list): List of probability thresholds to test
     
     Returns:
         dict: Performance metrics for each model and city combination
@@ -874,12 +878,12 @@ def estimate_parking_by_county_threshold(maz, daily_percentile=0.95, monthly_per
     than those with observed data (dynamically determined from scraped parking data).
     
     Args:
-        maz: GeoDataFrame with MAZ zones (must have county_name, commercial_emp_den, off_nres)
-        daily_percentile: Percentile threshold for daily parking (default 0.95 = 95th percentile)
-        monthly_percentile: Percentile threshold for monthly parking (default 0.99 = 99th percentile)
+        maz (GeoDataFrame): MAZ zones with county_name, commercial_emp_den, and off_nres
+        daily_percentile (float): Percentile threshold for daily parking
+        monthly_percentile (float): Percentile threshold for monthly parking
     
     Returns:
-        GeoDataFrame: maz with dparkcost and mparkcost filled in
+        GeoDataFrame: MAZ with dparkcost and mparkcost filled in
     """
     # Load observed cities from scraped parking data
     scraped_file_path = INTERIM_CACHE_DIR / "parking_scrape_location_cost.parquet"
@@ -1038,10 +1042,10 @@ def backfill_downtown_daily_costs(maz):
     - merge_estimated_costs() (dparkcost has observed + predicted values or 0)
     
     Args:
-        maz: GeoDataFrame with MAZ zones (must have place_name, parkarea, dstallssam, dparkcost)
+        maz (GeoDataFrame): MAZ zones with place_name, parkarea, dstallssam, and dparkcost
     
     Returns:
-        GeoDataFrame: maz with backfilled dparkcost for eligible downtown MAZs
+        GeoDataFrame: MAZ with backfilled dparkcost for eligible downtown MAZs
     """
     print(f"\n{'='*80}")
     print(f"BACKFILLING DOWNTOWN DAILY PARKING COSTS")
@@ -1107,52 +1111,73 @@ def backfill_downtown_daily_costs(maz):
     return maz
 
 
-def merge_estimated_costs(
-    maz,
-    run_validation=False,
-    compare_models_flag=False,
-    use_best_model=True,
-    commercial_density_threshold=1.0,
-    daily_percentile=0.95,
-    monthly_percentile=0.99,
-    probability_threshold=0.3
-):
+def update_monthly_stalls_with_predicted_costs(maz):
     """
-    Estimate parking costs for MAZs without observed data.
+    Update monthly stalls to reflect both observed and predicted monthly parking costs.
     
-    This is the main entry point called from parking_prep.py orchestration.
-    Implements a hybrid estimation approach:
-    - Hourly parking: Machine learning classification trained on SF/Oakland/SJ
-    - Daily/Monthly parking: County-level density thresholds
+    This must be called AFTER merge_estimated_costs() adds predicted monthly costs,
+    since merge_capacity() runs before cost estimation and only captures observed costs.
     
     Args:
-        maz: GeoDataFrame with MAZ zones (must have employment, capacity, observed costs, 
-             place_name, county_name)
-        run_validation: If True, perform leave-one-city-out cross-validation (default True)
-        compare_models_flag: If True, compare multiple model types (LR, RF, GB, SVM) (default True)
-        use_best_model: If True and compare_models_flag=True, use best performing model (default True)
-        commercial_density_threshold: Minimum commercial_emp_den for paid parking (default 1.0 jobs/acre)
-        daily_percentile: County-level percentile for daily parking threshold (default 0.95)
-        monthly_percentile: County-level percentile for monthly parking threshold (default 0.99)
-        probability_threshold: Classification threshold for model predictions (default 0.3, optimized via cross-validation)
+        maz (GeoDataFrame): MAZ with off_nres capacity and final mparkcost
     
     Returns:
-        GeoDataFrame: maz with estimated hparkcost, dparkcost, mparkcost filled in
+        GeoDataFrame: MAZ with updated mstallsoth and mstallssam columns
+    """
+    print(f"\n{'='*70}")
+    print(f"Updating Monthly Stalls with Predicted Costs")
+    print(f"{'='*70}\n")
+    
+    # Recalculate monthly stalls based on final mparkcost (observed + predicted)
+    if 'mparkcost' in maz.columns and 'off_nres' in maz.columns:
+        # Create condition without modifying the original mparkcost column
+        has_monthly_cost = maz['mparkcost'].fillna(0) > 0
+        maz['mstallsoth'] = maz['off_nres'].where(has_monthly_cost, 0).round(0)
+        maz['mstallssam'] = maz['off_nres'].where(has_monthly_cost, 0).round(0)
+        
+        mazs_with_monthly = (maz['mstallsoth'] > 0).sum()
+        total_mazs = len(maz)
+        print(f"  Updated monthly stalls for {mazs_with_monthly:,}/{total_mazs:,} MAZs")
+        
+        if mazs_with_monthly > 0:
+            print(f"  Total monthly stalls: {maz['mstallsoth'].sum():,.0f}")
+    else:
+        print(f"  ⚠ Warning: mparkcost or off_nres column not found, skipping update")
+    
+    return maz
+
+
+def estimate_and_validate_hourly_parking_models(
+    maz,
+    run_validation=True,
+    compare_models_flag=True,
+    use_best_model=True,
+    commercial_density_threshold=1.0
+):
+    """
+    Run validation and model comparison for hourly parking cost estimation.
+    
+    This function runs the ML model training, validation, and selection process
+    for hourly parking cost estimation. It returns the selected model to be used
+    for production predictions.
+    
+    Args:
+        maz (GeoDataFrame): MAZ zones with employment, capacity, observed costs, place_name, and county_name
+        run_validation (bool): If True, perform leave-one-city-out cross-validation
+        compare_models_flag (bool): If True, compare multiple model types (LR, RF, GB, SVM)
+        use_best_model (bool): If True and compare_models_flag=True, use best performing model
+        commercial_density_threshold (float): Minimum commercial_emp_den for paid parking
+    
+    Returns:
+        tuple: (selected_model, selected_model_name) where selected_model is a trained model instance and selected_model_name is the name of the selected model
     """
     print("\n" + "="*80)
-    print("PARKING COST ESTIMATION")
+    print("HOURLY PARKING MODEL ESTIMATION")
     print("="*80)
     
-    # Load observed cities from scraped parking data (for daily/monthly costs only)
-    scraped_file_path = INTERIM_CACHE_DIR / "parking_scrape_location_cost.parquet"
-    observed_cities_daily_monthly = get_observed_cities_from_scraped_data(scraped_file_path)
-    print(f"\nDetected {len(observed_cities_daily_monthly)} cities with observed daily/monthly parking data (from scraped data):")
-    print(f"  {', '.join(observed_cities_daily_monthly)}")
-    print(f"These cities will be excluded from daily/monthly parking cost predictions\n")
+    print(f"\nNote: Hourly parking estimation uses observed data from San Francisco, Oakland, San Jose only\n")
     
-    print(f"Note: Hourly parking estimation uses separate observed data (San Francisco, Oakland, San Jose only)\n")
-    
-    # Add density features
+    # Add density features (needed for validation/model training)
     maz = add_density_features(maz)
     
     # Report county distributions
@@ -1206,22 +1231,47 @@ def merge_estimated_costs(
             print(f"\nUsing {best_model_name} for hourly parking estimation (F1={best_f1:.4f})")
             print("="*80)
     
-    # Estimate hourly parking with selected model
-    maz = estimate_parking_costs(
-        maz, 
-        commercial_density_threshold, 
-        probability_threshold,
-        model=selected_model,
-        model_name=selected_model_name
+    return selected_model, selected_model_name
+
+
+def update_parkarea_with_predicted_costs(maz):
+    """
+    Update parkarea classification to include predicted parking costs.
+    
+    parkarea codes:
+    - 1: Downtown core (from Local Moran's I analysis)
+    - 2: Within 1/4 mile of downtown core
+    - 3: Paid parking (predicted or observed outside downtown)
+    - 4: Free parking / no parking cost
+    
+    Args:
+        maz (GeoDataFrame): MAZ with parkarea, hparkcost, dparkcost, and mparkcost
+    
+    Returns:
+        GeoDataFrame: MAZ with updated parkarea classifications
+    """
+    # Start with parkarea already assigned by merge_parking_area (0, 1, or 2)
+    # parkarea=1 already set for downtown cores
+    # parkarea=2 already set for MAZs within 1/4 mile of downtown
+    
+   # Set parkarea=3 for non-downtown MAZs with any parking cost (observed or predicted)
+    has_parking_cost = (
+        (maz['hparkcost'].notnull() & (maz['hparkcost'] > 0)) |
+        (maz['dparkcost'].notnull() & (maz['dparkcost'] > 0)) |
+        (maz['mparkcost'].notnull() & (maz['mparkcost'] > 0))
     )
     
-    # Estimate daily/monthly parking
-    maz = estimate_parking_by_county_threshold(
-        maz, daily_percentile, monthly_percentile
-    )
+    # Only reassign parkarea if not already 1 or 2
+    maz.loc[has_parking_cost & (maz['parkarea'] == 0), 'parkarea'] = 3
     
-    print("\n" + "="*80)
-    print("PARKING COST ESTIMATION COMPLETE")
-    print("="*80)
+    # Set parkarea=4 for free parking (no cost areas)
+    # All remaining parkarea=0 (no paid parking) assigned to parkarea=4
+    maz.loc[maz['parkarea'] == 0, 'parkarea'] = 4
+    
+    # Report final distribution
+    print(f"\n  Final parkarea distribution:")
+    for code in sorted(maz['parkarea'].unique()):
+        count = (maz['parkarea'] == code).sum()
+        print(f"    parkarea={int(code)}: {count:,} MAZs")
     
     return maz
