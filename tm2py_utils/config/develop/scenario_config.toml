@@ -33,7 +33,7 @@
         "transit_assign",
         "transit_skim",
     ]
-    final_components = ["post_processor","network_summary"]
+    final_components = ["network_summary"]
     start_iteration = 0
     end_iteration = 3
 
